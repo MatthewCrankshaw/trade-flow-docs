@@ -31,10 +31,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. When a new business is created for a specific trade, default visit types appropriate to that trade are automatically generated
   2. Visit types are stored in their own collection and retrievable via API by business ID
   3. The visit type data model supports name, description, and business association
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: TBD
+- [ ] 01-01-PLAN.md — Visit Type CRUD module (entity, repository, services, controller, policy, configuration)
+- [ ] 01-02-PLAN.md — Default visit type generation at onboarding + MongoDB indexes
 
 ### Phase 2: Visit Type Management UI
 **Goal**: Users can view their visit types and create custom ones for their business
@@ -138,7 +139,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Visit Type Backend | 0/? | Not started | - |
+| 1. Visit Type Backend | 0/2 | Planned | - |
 | 2. Visit Type Management UI | 0/? | Not started | - |
 | 3. Schedule Data Model and Create API | 0/? | Not started | - |
 | 4. Schedule Status and CRUD API | 0/? | Not started | - |
