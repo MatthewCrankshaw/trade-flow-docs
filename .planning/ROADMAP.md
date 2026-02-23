@@ -12,7 +12,7 @@ This milestone adds job scheduling to Trade Flow, enabling tradespeople to creat
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Visit Type Backend** - Data model, CRUD API, and default visit type generation per trade
+- [x] **Phase 1: Visit Type Backend** - Data model, CRUD API, and default visit type generation per trade (completed 2026-02-23)
 - [ ] **Phase 2: Visit Type Management UI** - Frontend for viewing, managing, and creating custom visit types
 - [ ] **Phase 3: Schedule Data Model and Create API** - Schedule collection, create endpoint with smart defaults
 - [ ] **Phase 4: Schedule Status and CRUD API** - Status state machine, list/edit/cancel/notes endpoints
@@ -139,7 +139,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Visit Type Backend | 1/2 | In Progress | - |
+| 1. Visit Type Backend | 1/2 | Complete    | 2026-02-23 |
 | 2. Visit Type Management UI | 0/? | Not started | - |
 | 3. Schedule Data Model and Create API | 0/? | Not started | - |
 | 4. Schedule Status and CRUD API | 0/? | Not started | - |

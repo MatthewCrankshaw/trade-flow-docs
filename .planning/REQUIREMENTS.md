@@ -26,7 +26,7 @@ Requirements for the scheduling milestone. Each maps to roadmap phases.
 ### Visit Types
 
 - [ ] **VTYPE-01**: User can select a visit type when creating a schedule entry
-- [ ] **VTYPE-02**: Default visit types are generated per trade when a business is created
+- [x] **VTYPE-02**: Default visit types are generated per trade when a business is created
 - [ ] **VTYPE-03**: User can create custom visit types
 - [ ] **VTYPE-04**: User can view and manage visit types for their business
 
@@ -89,7 +89,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VSTAT-02 | Phase 4 | Pending |
 | VSTAT-03 | Phase 4 | Pending |
 | VTYPE-01 | Phase 5 | Pending |
-| VTYPE-02 | Phase 1 | Pending |
+| VTYPE-02 | Phase 1 | Complete |
 | VTYPE-03 | Phase 2 | Pending |
 | VTYPE-04 | Phase 2 | Pending |
 | INTG-01 | Phase 8 | Pending |
