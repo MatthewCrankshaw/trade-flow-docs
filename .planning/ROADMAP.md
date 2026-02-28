@@ -45,10 +45,11 @@ Plans:
   1. User can navigate to a visit types management area and see all visit types for their business
   2. User can create a new custom visit type with a name and it appears in the list
   3. Default visit types generated during onboarding are visible alongside custom ones
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: TBD
+- [x] 02-01-PLAN.md -- Backend patch (isDefault field, remove active-only filter) + frontend API/types/schema + Scheduling tab (completed 2026-02-28)
+- [ ] 02-02-PLAN.md -- Visit types list UI, form dialog, color picker, status filter, and management actions
 
 ### Phase 3: Schedule Data Model and Create API
 **Goal**: Schedules can be created via the API with smart defaults that match how tradespeople think
@@ -139,8 +140,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Visit Type Backend | 1/2 | Complete    | 2026-02-23 |
-| 2. Visit Type Management UI | 0/? | Not started | - |
+| 1. Visit Type Backend | 2/2 | Complete    | 2026-02-23 |
+| 2. Visit Type Management UI | 1/2 | In progress | - |
 | 3. Schedule Data Model and Create API | 0/? | Not started | - |
 | 4. Schedule Status and CRUD API | 0/? | Not started | - |
 | 5. Schedule Creation UI | 0/? | Not started | - |
