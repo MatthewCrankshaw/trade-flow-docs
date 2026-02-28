@@ -10,29 +10,29 @@ See: .planning/PROJECT.md (updated 2026-02-21)
 ## Current Position
 
 Phase: 2 of 8 (Visit Type Management UI)
-Plan: 1 of 2 in current phase
-Status: Plan 01 complete -- backend patches and frontend infrastructure
-Last activity: 2026-02-28 -- Plan 01 complete (Backend isDefault + frontend RTK Query + Scheduling tab)
+Plan: 2 of 2 in current phase
+Status: Plan 02 complete (awaiting human-verify checkpoint) -- visit type management UI built
+Last activity: 2026-02-28 -- Plan 02 auto tasks complete (responsive list views + form dialog + BusinessDetails wiring)
 
-Progress: [######----] 60%
+Progress: [########--] 80%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 11min
-- Total execution time: 0.6 hours
+- Total plans completed: 4
+- Average duration: 10min
+- Total execution time: 0.7 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-visit-type-backend | 2/2 | 20min | 10min |
-| 02-visit-type-management-ui | 1/2 | 13min | 13min |
+| 02-visit-type-management-ui | 2/2 | 18min | 9min |
 
 **Recent Trend:**
-- Last 5 plans: 12min, 8min, 13min
-- Trend: stable
+- Last 5 plans: 12min, 8min, 13min, 5min
+- Trend: accelerating
 
 *Updated after each plan completion*
 
@@ -53,6 +53,9 @@ Recent decisions affecting current work:
 - countActiveByBusinessId uses MongoConnectionService.getDb() directly since MongoDbFetcher has no count method
 - Used nullish coalescing (isDefault ?? false) in toDto for backward-compatible field addition without data migration
 - Types barrel (types/index.ts) needs explicit re-export for @/types path alias to resolve correctly
+- Server-side name uniqueness errors surfaced as inline form field errors for better UX
+- Default icon "calendar" hardcoded for create requests (no icon selection UI per CONTEXT.md)
+- Deactivate/activate available from both active and inactive filter views
 
 ### Pending Todos
 
@@ -65,5 +68,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Completed 02-01-PLAN.md -- backend patches and frontend infrastructure
-Resume file: .planning/phases/02-visit-type-management-ui/02-02-PLAN.md
+Stopped at: Completed 02-02-PLAN.md Tasks 1-2 -- awaiting human-verify checkpoint (Task 3)
+Resume file: .planning/phases/02-visit-type-management-ui/02-02-PLAN.md (Task 3: checkpoint:human-verify)
