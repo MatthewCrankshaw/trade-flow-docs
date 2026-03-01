@@ -8,7 +8,7 @@ progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 8
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Project State
@@ -22,12 +22,12 @@ See: .planning/PROJECT.md (updated 2026-02-21)
 
 ## Current Position
 
-Phase: 4 of 8 (Schedule Status and CRUD API) -- IN PROGRESS
-Plan: 1 of 2 in current phase -- COMPLETE
-Status: Plan 1 complete -- state machine, service layer, and repository methods with 29 new tests (64 total)
-Last activity: 2026-03-01 - Completed 04-01: schedule status state machine and service layer
+Phase: 4 of 8 (Schedule Status and CRUD API) -- COMPLETE
+Plan: 2 of 2 in current phase -- COMPLETE
+Status: Phase 4 complete -- 6 controller endpoints, 196 tests passing, OpenAPI spec updated
+Last activity: 2026-03-01 - Completed 04-02: schedule controller endpoints and tests
 
-Progress: [########--] 87%
+Progress: [#########-] 93%
 
 ## Performance Metrics
 
@@ -43,10 +43,10 @@ Progress: [########--] 87%
 | 01-visit-type-backend | 2/2 | 20min | 10min |
 | 02-visit-type-management-ui | 2/2 | 18min | 9min |
 | 03-schedule-data-model-and-create-api | 2/2 | 8min | 4min |
-| 04-schedule-status-and-crud-api | 1/2 | 6min | 6min |
+| 04-schedule-status-and-crud-api | 2/2 | 10min | 5min |
 
 **Recent Trend:**
-- Last 5 plans: 13min, 5min, 3min, 5min, 6min
+- Last 5 plans: 5min, 3min, 5min, 6min, 4min
 - Trend: stable-fast
 
 *Updated after each plan completion*
@@ -82,6 +82,8 @@ Recent decisions affecting current work:
 - [Phase 04-01]: Repository findByJobId/findByBusinessId use connection.getDb() directly since MongoDbFetcher lacks sort support
 - [Phase 04-01]: Extracted common findByScope private method in repository to avoid duplicating filter/pagination logic
 - [Phase 04-01]: ScheduleRetrieverService exported from ScheduleModule for controller usage in Plan 02
+- [Phase 04-02]: parseScheduleFilters as standalone function in controller file for query param parsing (comma-separated status, ISO date range)
+- [Phase 04-02]: findByBusiness endpoint declared before findByJob in controller to avoid NestJS route matching conflicts
 
 ### Pending Todos
 
@@ -101,5 +103,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 04-01-PLAN.md (schedule status state machine and service layer)
-Resume file: .planning/phases/04-schedule-status-and-crud-api/04-02-PLAN.md
+Stopped at: Completed 04-02-PLAN.md (schedule controller endpoints and tests -- Phase 4 complete)
+Resume file: Next phase
