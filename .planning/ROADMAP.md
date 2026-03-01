@@ -75,10 +75,11 @@ Plans:
   2. Valid status transitions succeed (scheduled to confirmed, confirmed to completed, scheduled to canceled, scheduled to no-show, confirmed to canceled)
   3. Invalid status transitions are rejected by the API with a clear error message
   4. Full CRUD is available: list schedules by job, update schedule fields, cancel (status change preserving history), and add/edit notes
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 04-01: TBD
+- [ ] 04-01-PLAN.md -- State machine, services (retriever/updater/transition), repository list+update, error codes, index migration
+- [ ] 04-02-PLAN.md -- Controller endpoints (list/get/update/transition), unit tests, OpenAPI spec
 
 ### Phase 5: Schedule Creation UI
 **Goal**: Users can create schedule entries on a job through an intuitive form with visit type selection
