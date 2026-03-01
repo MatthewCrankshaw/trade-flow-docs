@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-01T15:45:01.558Z"
+last_updated: "2026-03-01T16:49:04.872Z"
 progress:
   total_phases: 4
   completed_phases: 4
-  total_plans: 8
-  completed_plans: 8
+  total_plans: 9
+  completed_plans: 9
 ---
 
 # Project State
@@ -23,18 +23,18 @@ See: .planning/PROJECT.md (updated 2026-02-21)
 ## Current Position
 
 Phase: 4 of 8 (Schedule Status and CRUD API) -- COMPLETE
-Plan: 2 of 2 in current phase -- COMPLETE
-Status: Phase 4 complete -- 6 controller endpoints, 196 tests passing, OpenAPI spec updated
-Last activity: 2026-03-01 - Completed 04-02: schedule controller endpoints and tests
+Plan: 3 of 3 in current phase -- COMPLETE
+Status: Phase 4 complete -- 6 controller endpoints, structured filtering, 210 tests passing, OpenAPI spec updated
+Last activity: 2026-03-01 - Completed 04-03: gap closure -- structured filtering and case-insensitive status fix
 
 Progress: [#########-] 93%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
-- Average duration: 8min
-- Total execution time: 1.0 hours
+- Total plans completed: 8
+- Average duration: 7min
+- Total execution time: 1.1 hours
 
 **By Phase:**
 
@@ -43,10 +43,10 @@ Progress: [#########-] 93%
 | 01-visit-type-backend | 2/2 | 20min | 10min |
 | 02-visit-type-management-ui | 2/2 | 18min | 9min |
 | 03-schedule-data-model-and-create-api | 2/2 | 8min | 4min |
-| 04-schedule-status-and-crud-api | 2/2 | 10min | 5min |
+| 04-schedule-status-and-crud-api | 3/3 | 14min | 5min |
 
 **Recent Trend:**
-- Last 5 plans: 5min, 3min, 5min, 6min, 4min
+- Last 5 plans: 3min, 5min, 6min, 4min, 4min
 - Trend: stable-fast
 
 *Updated after each plan completion*
@@ -84,6 +84,10 @@ Recent decisions affecting current work:
 - [Phase 04-01]: ScheduleRetrieverService exported from ScheduleModule for controller usage in Plan 02
 - [Phase 04-02]: parseScheduleFilters as standalone function in controller file for query param parsing (comma-separated status, ISO date range)
 - [Phase 04-02]: findByBusiness endpoint declared before findByJob in controller to avoid NestJS route matching conflicts
+- [Phase 04-03]: Structured filter format filter:<field>:<op>=value as project-wide API filtering standard
+- [Phase 04-03]: Case-insensitive status filtering via toLowerCase() normalization before enum validation
+- [Phase 04-03]: Generic filter parser in @core/filters/ for reuse by any future controller
+- [Phase 04-03]: Silent skip for invalid/malformed filter params (no error thrown, graceful degradation)
 
 ### Pending Todos
 
@@ -103,5 +107,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 04-02-PLAN.md (schedule controller endpoints and tests -- Phase 4 complete)
+Stopped at: Completed 04-03-PLAN.md (gap closure -- structured filtering and case-insensitive status fix)
 Resume file: Next phase

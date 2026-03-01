@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Visit Type Backend** - Data model, CRUD API, and default visit type generation per trade (completed 2026-02-23)
 - [ ] **Phase 2: Visit Type Management UI** - Frontend for viewing, managing, and creating custom visit types
 - [ ] **Phase 3: Schedule Data Model and Create API** - Schedule collection, create endpoint with smart defaults
-- [ ] **Phase 4: Schedule Status and CRUD API** - Status state machine, list/edit/cancel/notes endpoints
+- [x] **Phase 4: Schedule Status and CRUD API** - Status state machine, list/edit/cancel/notes endpoints
 - [ ] **Phase 5: Schedule Creation UI** - Create schedule dialog with visit type selection and empty state
 - [ ] **Phase 6: Schedule List and Detail UI** - Chronological schedule list view with notes display
 - [ ] **Phase 7: Schedule Edit and Management UI** - Edit form, cancel action, and status transition controls
@@ -80,7 +80,7 @@ Plans:
 Plans:
 - [x] 04-01-PLAN.md -- State machine, services (retriever/updater/transition), repository list+update, error codes, index migration (completed 2026-03-01)
 - [x] 04-02-PLAN.md -- Controller endpoints (list/get/update/transition), unit tests, OpenAPI spec (completed 2026-03-01)
-- [ ] 04-03-PLAN.md -- Gap closure: structured filter parser, case-insensitive status fix, replace ad-hoc query params
+- [x] 04-03-PLAN.md -- Gap closure: structured filter parser, case-insensitive status fix, replace ad-hoc query params (completed 2026-03-01)
 
 ### Phase 5: Schedule Creation UI
 **Goal**: Users can create schedule entries on a job through an intuitive form with visit type selection
