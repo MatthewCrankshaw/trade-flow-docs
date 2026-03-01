@@ -19,9 +19,9 @@ Requirements for the scheduling milestone. Each maps to roadmap phases.
 
 ### Visit Status
 
-- [ ] **VSTAT-01**: Schedule entries have status: Scheduled, Confirmed, Completed, Canceled, No-show
-- [ ] **VSTAT-02**: User can transition status following valid state machine (scheduled->confirmed->completed, scheduled->canceled, scheduled->no-show, confirmed->canceled)
-- [ ] **VSTAT-03**: Invalid status transitions are rejected by the API
+- [x] **VSTAT-01**: Schedule entries have status: Scheduled, Confirmed, Completed, Canceled, No-show
+- [x] **VSTAT-02**: User can transition status following valid state machine (scheduled->confirmed->completed, scheduled->canceled, scheduled->no-show, confirmed->canceled)
+- [x] **VSTAT-03**: Invalid status transitions are rejected by the API
 
 ### Visit Types
 
@@ -85,9 +85,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SCHED-05 | Phase 6 | Pending |
 | SCHED-06 | Phase 3 | Complete |
 | SCHED-07 | Phase 3 | Complete |
-| VSTAT-01 | Phase 4 | Pending |
-| VSTAT-02 | Phase 4 | Pending |
-| VSTAT-03 | Phase 4 | Pending |
+| VSTAT-01 | Phase 4 | Complete |
+| VSTAT-02 | Phase 4 | Complete |
+| VSTAT-03 | Phase 4 | Complete |
 | VTYPE-01 | Phase 5 | Pending |
 | VTYPE-02 | Phase 1 | Complete |
 | VTYPE-03 | Phase 2 | Complete |

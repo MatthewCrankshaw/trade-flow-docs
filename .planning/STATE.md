@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-last_updated: "2026-03-01T13:24:00.000Z"
+status: in-progress
+last_updated: "2026-03-01T15:31:13.000Z"
 progress:
-  total_phases: 3
+  total_phases: 4
   completed_phases: 3
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 8
+  completed_plans: 7
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 3: Schedule Data Model and Create API
+**Current focus:** Phase 4: Schedule Status and CRUD API
 
 ## Current Position
 
-Phase: 3 of 8 (Schedule Data Model and Create API) -- COMPLETE
-Plan: 2 of 2 in current phase -- COMPLETE
-Status: Phase 3 complete -- schedule create API fully operational with cross-module validation and 34 unit tests
-Last activity: 2026-03-01 - Completed quick task 2: Merge schedule date and startTime into startDateTime
+Phase: 4 of 8 (Schedule Status and CRUD API) -- IN PROGRESS
+Plan: 1 of 2 in current phase -- COMPLETE
+Status: Plan 1 complete -- state machine, service layer, and repository methods with 29 new tests (64 total)
+Last activity: 2026-03-01 - Completed 04-01: schedule status state machine and service layer
 
-Progress: [##########] 100%
+Progress: [########--] 87%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
+- Total plans completed: 7
 - Average duration: 8min
-- Total execution time: 0.9 hours
+- Total execution time: 1.0 hours
 
 **By Phase:**
 
@@ -43,9 +43,10 @@ Progress: [##########] 100%
 | 01-visit-type-backend | 2/2 | 20min | 10min |
 | 02-visit-type-management-ui | 2/2 | 18min | 9min |
 | 03-schedule-data-model-and-create-api | 2/2 | 8min | 4min |
+| 04-schedule-status-and-crud-api | 1/2 | 6min | 6min |
 
 **Recent Trend:**
-- Last 5 plans: 8min, 13min, 5min, 3min, 5min
+- Last 5 plans: 13min, 5min, 3min, 5min, 6min
 - Trend: stable-fast
 
 *Updated after each plan completion*
@@ -77,6 +78,10 @@ Recent decisions affecting current work:
 - Assignee validation deferred to FUT-04 (team support) with TODO comment in creator service
 - [Phase quick-1]: Luxon DateTime enforced in all DTOs: schedule uses fromISO/fromFormat, quote/migration use fromJSDate, repositories handle bidirectional conversion
 - [Phase quick-2]: Merged separate date+startTime into single startDateTime ISO8601 field across schedule module; @IsISO8601 validation on request, DateTime.fromISO with { zone: "utc" } for parsing
+- [Phase 04-01]: Separate ScheduleTransitionService from ScheduleUpdaterService for clean separation of lifecycle changes vs field updates
+- [Phase 04-01]: Repository findByJobId/findByBusinessId use connection.getDb() directly since MongoDbFetcher lacks sort support
+- [Phase 04-01]: Extracted common findByScope private method in repository to avoid duplicating filter/pagination logic
+- [Phase 04-01]: ScheduleRetrieverService exported from ScheduleModule for controller usage in Plan 02
 
 ### Pending Todos
 
@@ -96,5 +101,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed quick task 2: Merge schedule date+startTime into startDateTime
-Resume file: Next phase
+Stopped at: Completed 04-01-PLAN.md (schedule status state machine and service layer)
+Resume file: .planning/phases/04-schedule-status-and-crud-api/04-02-PLAN.md
