@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-01T13:07:42.924Z"
+last_updated: "2026-03-01T13:24:00.000Z"
 progress:
   total_phases: 3
   completed_phases: 3
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-02-21)
 Phase: 3 of 8 (Schedule Data Model and Create API) -- COMPLETE
 Plan: 2 of 2 in current phase -- COMPLETE
 Status: Phase 3 complete -- schedule create API fully operational with cross-module validation and 34 unit tests
-Last activity: 2026-03-01 - Completed quick task 1: Enforce Luxon DateTime usage in DTOs for dates and durations in trade-flow-api
+Last activity: 2026-03-01 - Completed quick task 2: Merge schedule date and startTime into startDateTime
 
 Progress: [##########] 100%
 
@@ -76,6 +76,7 @@ Recent decisions affecting current work:
 - Cross-module validation catches errors early with specific error codes (SCHEDULE_0 for job, SCHEDULE_1 for visit type)
 - Assignee validation deferred to FUT-04 (team support) with TODO comment in creator service
 - [Phase quick-1]: Luxon DateTime enforced in all DTOs: schedule uses fromISO/fromFormat, quote/migration use fromJSDate, repositories handle bidirectional conversion
+- [Phase quick-2]: Merged separate date+startTime into single startDateTime ISO8601 field across schedule module; @IsISO8601 validation on request, DateTime.fromISO with { zone: "utc" } for parsing
 
 ### Pending Todos
 
@@ -90,9 +91,10 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 1 | Enforce Luxon DateTime usage in DTOs for dates and durations in trade-flow-api | 2026-03-01 | 67894c5 | [1-enforce-luxon-datetime-usage-in-dtos-for](./quick/1-enforce-luxon-datetime-usage-in-dtos-for/) |
+| 2 | Merge schedule date and startTime into startDateTime | 2026-03-01 | 0b2933f | [2-merge-schedule-date-and-starttime-into-a](./quick/2-merge-schedule-date-and-starttime-into-a/) |
 
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 03-02-PLAN.md (Phase 3 complete)
+Stopped at: Completed quick task 2: Merge schedule date+startTime into startDateTime
 Resume file: Next phase
