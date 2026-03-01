@@ -1,9 +1,9 @@
 ---
-status: diagnosed
+status: resolved
 phase: 04-schedule-status-and-crud-api
 source: 04-01-SUMMARY.md, 04-02-SUMMARY.md
 started: 2026-03-01T16:00:00Z
-updated: 2026-03-01T16:20:00Z
+updated: 2026-03-01T17:00:00Z
 ---
 
 ## Current Test
@@ -66,7 +66,7 @@ skipped: 0
 ## Gaps
 
 - truth: "List endpoints filter by status using query parameters"
-  status: failed
+  status: resolved
   reason: "User reported: Status filter doesn't work. Additionally, filtering needs a structured formal approach using colon-separated format: ?filter:<field>:<operation>=value with operators eq, nq, lt, gt, bt, in. This replaces the current ad-hoc ?status=...&from=...&to=... approach across all list endpoints."
   severity: major
   test: 9
