@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 04-schedule-status-and-crud-api
 source: 04-01-SUMMARY.md, 04-02-SUMMARY.md
 started: 2026-03-01T16:00:00Z
@@ -70,5 +70,16 @@ skipped: 0
   reason: "User reported: Status filter doesn't work. Additionally, filtering needs a structured formal approach using colon-separated format: ?filter:<field>:<operation>=value with operators eq, nq, lt, gt, bt, in. This replaces the current ad-hoc ?status=...&from=...&to=... approach across all list endpoints."
   severity: major
   test: 9
-  artifacts: []
-  missing: []
+  root_cause: "parseScheduleFilters in schedule.controller.ts validates status values case-sensitively against lowercase enum values (scheduled, no_show, etc.). Client-sent values like 'Scheduled' silently fail validation, resulting in an empty array that causes the status filter to be dropped entirely. Additionally, the entire ad-hoc filter approach (?status=...&from=...&to=...) needs to be replaced with a structured format: ?filter:<field>:<op>=value"
+  artifacts:
+    - path: "trade-flow-api/src/schedule/controllers/schedule.controller.ts"
+      issue: "parseScheduleFilters case-sensitive validation silently drops mismatched values; entire ad-hoc approach needs replacement with structured filter format"
+    - path: "trade-flow-api/src/schedule/data-transfer-objects/schedule-filter.dto.ts"
+      issue: "Flat IScheduleFilterDto needs replacement with structured filter spec type"
+    - path: "trade-flow-api/src/schedule/repositories/schedule.repository.ts"
+      issue: "buildFilter per-field if-blocks need replacement with operator-mapped loop over structured filter specs"
+  missing:
+    - "Generic structured filter parser supporting filter:<field>:<op>=value query param format"
+    - "Operator mapping: eq->$eq, nq->$ne, lt->$lt, gt->$gt, bt->$gte/$lte range, in->$in"
+    - "Case-insensitive or normalized status value handling"
+    - "API filtering standards documentation"
