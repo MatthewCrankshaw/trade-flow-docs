@@ -60,10 +60,11 @@ Plans:
   2. When duration is not provided, it defaults to 1 hour
   3. The schedule assignee automatically defaults to the authenticated user
   4. The schedule data model supports job reference, visit type reference, date/time, duration, notes, status, and assignee (modeled for future team support)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: TBD
+- [x] 03-01-PLAN.md -- Schedule data model, repository, policy, mappers (SCHED-06/SCHED-07 defaults), module wiring, migration, error codes (completed 2026-03-01)
+- [ ] 03-02-PLAN.md -- Creator service (cross-module validation), controller (POST endpoint), unit tests, OpenAPI spec
 
 ### Phase 4: Schedule Status and CRUD API
 **Goal**: The API supports full schedule lifecycle including status transitions with validation
@@ -142,7 +143,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 |-------|----------------|--------|-----------|
 | 1. Visit Type Backend | 2/2 | Complete    | 2026-02-23 |
 | 2. Visit Type Management UI | 1/2 | In progress | - |
-| 3. Schedule Data Model and Create API | 0/? | Not started | - |
+| 3. Schedule Data Model and Create API | 1/2 | In progress | - |
 | 4. Schedule Status and CRUD API | 0/? | Not started | - |
 | 5. Schedule Creation UI | 0/? | Not started | - |
 | 6. Schedule List and Detail UI | 0/? | Not started | - |

@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 2: Visit Type Management UI
+**Current focus:** Phase 3: Schedule Data Model and Create API
 
 ## Current Position
 
-Phase: 2 of 8 (Visit Type Management UI)
-Plan: 2 of 2 in current phase
-Status: Plan 02 complete (awaiting human-verify checkpoint) -- visit type management UI built
-Last activity: 2026-02-28 -- Plan 02 auto tasks complete (responsive list views + form dialog + BusinessDetails wiring)
+Phase: 3 of 8 (Schedule Data Model and Create API)
+Plan: 1 of 2 in current phase
+Status: Plan 01 complete -- schedule module foundation built (data model, repository, policy, mappers, wiring)
+Last activity: 2026-03-01 -- Plan 01 complete (schedule data model, repository, policy, module wiring, migration)
 
 Progress: [########--] 80%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 10min
-- Total execution time: 0.7 hours
+- Total plans completed: 5
+- Average duration: 9min
+- Total execution time: 0.8 hours
 
 **By Phase:**
 
@@ -29,9 +29,10 @@ Progress: [########--] 80%
 |-------|-------|-------|----------|
 | 01-visit-type-backend | 2/2 | 20min | 10min |
 | 02-visit-type-management-ui | 2/2 | 18min | 9min |
+| 03-schedule-data-model-and-create-api | 1/2 | 3min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 12min, 8min, 13min, 5min
+- Last 5 plans: 12min, 8min, 13min, 5min, 3min
 - Trend: accelerating
 
 *Updated after each plan completion*
@@ -56,6 +57,9 @@ Recent decisions affecting current work:
 - Server-side name uniqueness errors surfaced as inline form field errors for better UX
 - Default icon "calendar" hardcoded for create requests (no icon selection UI per CONTEXT.md)
 - Deactivate/activate available from both active and inactive filter views
+- Followed visit-type module pattern exactly for schedule module structure
+- All 5 ScheduleStatus values defined now as scaffolding for Phase 4 (only SCHEDULED used in Phase 3)
+- DTO-to-response mapper uses relative imports matching the visit-type pattern convention
 
 ### Pending Todos
 
@@ -67,6 +71,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-28
-Stopped at: Completed 02-02-PLAN.md Tasks 1-2 -- awaiting human-verify checkpoint (Task 3)
-Resume file: .planning/phases/02-visit-type-management-ui/02-02-PLAN.md (Task 3: checkpoint:human-verify)
+Last session: 2026-03-01
+Stopped at: Completed 03-01-PLAN.md
+Resume file: .planning/phases/03-schedule-data-model-and-create-api/03-02-PLAN.md

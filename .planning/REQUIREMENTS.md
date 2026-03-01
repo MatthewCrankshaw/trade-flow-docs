@@ -14,8 +14,8 @@ Requirements for the scheduling milestone. Each maps to roadmap phases.
 - [ ] **SCHED-03**: User can edit an existing schedule entry (date, time, duration)
 - [ ] **SCHED-04**: User can cancel a schedule entry (status change, entry preserved in history)
 - [ ] **SCHED-05**: User can add free-text notes to a schedule entry
-- [ ] **SCHED-06**: Schedule assignee defaults to the logged-in user
-- [ ] **SCHED-07**: Duration defaults to 1 hour when not specified
+- [x] **SCHED-06**: Schedule assignee defaults to the logged-in user
+- [x] **SCHED-07**: Duration defaults to 1 hour when not specified
 
 ### Visit Status
 
@@ -83,8 +83,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SCHED-03 | Phase 7 | Pending |
 | SCHED-04 | Phase 7 | Pending |
 | SCHED-05 | Phase 6 | Pending |
-| SCHED-06 | Phase 3 | Pending |
-| SCHED-07 | Phase 3 | Pending |
+| SCHED-06 | Phase 3 | Complete |
+| SCHED-07 | Phase 3 | Complete |
 | VSTAT-01 | Phase 4 | Pending |
 | VSTAT-02 | Phase 4 | Pending |
 | VSTAT-03 | Phase 4 | Pending |
