@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-01T08:25:15.132Z"
+last_updated: "2026-03-01T13:07:42.924Z"
 progress:
   total_phases: 3
   completed_phases: 3
@@ -75,6 +75,7 @@ Recent decisions affecting current work:
 - DTO-to-response mapper uses relative imports matching the visit-type pattern convention
 - Cross-module validation catches errors early with specific error codes (SCHEDULE_0 for job, SCHEDULE_1 for visit type)
 - Assignee validation deferred to FUT-04 (team support) with TODO comment in creator service
+- [Phase quick-1]: Luxon DateTime enforced in all DTOs: schedule uses fromISO/fromFormat, quote/migration use fromJSDate, repositories handle bidirectional conversion
 
 ### Pending Todos
 
