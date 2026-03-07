@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: completed
 stopped_at: Phase 8 context gathered
-last_updated: "2026-03-07T20:49:42.948Z"
+last_updated: "2026-03-07T21:01:07.236Z"
 last_activity: "2026-03-07 - Completed 07-02: Schedule management actions and edit flow"
 progress:
   total_phases: 8
-  completed_phases: 7
-  total_plans: 15
-  completed_plans: 15
+  completed_phases: 8
+  total_plans: 16
+  completed_plans: 16
   percent: 100
 ---
 
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 7: Schedule Edit and Management UI
+**Current focus:** Phase 8: Job Detail Integration
 
 ## Current Position
 
-Phase: 7 of 8 (Schedule Edit and Management UI)
-Plan: 2 of 2 in current phase (COMPLETE)
-Status: 07-02 complete -- schedule management actions, transitions, edit flow wiring
-Last activity: 2026-03-07 - Completed 07-02: Schedule management actions and edit flow
+Phase: 8 of 8 (Job Detail Integration)
+Plan: 1 of 1 in current phase (COMPLETE)
+Status: 08-01 complete -- schedule-derived header hints and per-status badge breakdown
+Last activity: 2026-03-07 - Completed 08-01: Job detail integration with real schedule data
 
 Progress: [##########] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
+- Total plans completed: 16
 - Average duration: 6min
-- Total execution time: 1.47 hours
+- Total execution time: 1.50 hours
 
 **By Phase:**
 
@@ -50,9 +50,10 @@ Progress: [##########] 100%
 | 05-schedule-creation-ui | 2/2 | 18min | 9min |
 | 06-schedule-list-and-detail-ui | 2/2 | 8min | 4min |
 | 07-schedule-edit-and-management-ui | 2/2 | 7min | 4min |
+| 08-job-detail-integration | 1/1 | 2min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 10min, 8min, 3min, 3min, 4min
+- Last 5 plans: 8min, 3min, 3min, 4min, 2min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -108,6 +109,8 @@ Recent decisions affecting current work:
 - [Phase 07-02]: Dialog closes on successful status transition (user override of plan to stay open and update badge)
 - [Phase 07-02]: Three-dot DropdownMenu replaces X close button in detail dialog header; Close button in footer
 - [Phase 07-02]: Terminal-status dialogs show X close button instead of dropdown menu
+- [Phase 08-01]: deriveNextVisitHint handles all job statuses with schedule-aware logic for active, on-hold, and completed/closed states
+- [Phase 08-01]: Status badges use Partial<Record<ScheduleStatus, number>> reduce pattern showing only non-zero counts
 
 ### Pending Todos
 
@@ -126,6 +129,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-07T20:49:42.944Z
-Stopped at: Phase 8 context gathered
-Resume file: .planning/phases/08-job-detail-integration/08-CONTEXT.md
+Last session: 2026-03-07T21:01:00.000Z
+Stopped at: Completed 08-01-PLAN.md
+Resume file: .planning/phases/08-job-detail-integration/08-01-SUMMARY.md

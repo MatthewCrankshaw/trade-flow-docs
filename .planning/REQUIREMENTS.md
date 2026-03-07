@@ -32,8 +32,8 @@ Requirements for the scheduling milestone. Each maps to roadmap phases.
 
 ### Integration
 
-- [ ] **INTG-01**: Schedule entries replace MOCK_SCHEDULES in the job detail page
-- [ ] **INTG-02**: Job detail page shows schedule count/status summary
+- [x] **INTG-01**: Schedule entries replace MOCK_SCHEDULES in the job detail page
+- [x] **INTG-02**: Job detail page shows schedule count/status summary
 - [x] **INTG-03**: Empty state displayed when a job has no schedule entries
 
 ## v2 Requirements
@@ -92,8 +92,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VTYPE-02 | Phase 1 | Complete |
 | VTYPE-03 | Phase 2 | Complete |
 | VTYPE-04 | Phase 2 | Complete |
-| INTG-01 | Phase 8 | Pending |
-| INTG-02 | Phase 8 | Pending |
+| INTG-01 | Phase 8 | Complete |
+| INTG-02 | Phase 8 | Complete |
 | INTG-03 | Phase 5 | Complete |
 
 **Coverage:**
