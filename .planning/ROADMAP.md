@@ -134,10 +134,10 @@ Plans:
   1. MOCK_SCHEDULES data is completely removed from JobDetailTabs.tsx and replaced with real API data
   2. The job detail page shows a schedule count and status summary (e.g., "3 visits: 1 completed, 1 confirmed, 1 scheduled")
   3. All schedule functionality works end-to-end from job detail: create, view, edit, cancel, status transitions
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 08-01: TBD
+- [ ] 08-01-PLAN.md -- Replace getNextVisitHint with schedule-derived logic, enhance ScheduleSummaryCard with per-status badges
 
 ## Progress
 
@@ -153,4 +153,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 5. Schedule Creation UI | 2/2 | Complete   | 2026-03-07 |
 | 6. Schedule List and Detail UI | 2/2 | Complete   | 2026-03-07 |
 | 7. Schedule Edit and Management UI | 2/2 | Complete   | 2026-03-07 |
-| 8. Job Detail Integration | 0/? | Not started | - |
+| 8. Job Detail Integration | 0/1 | Not started | - |
