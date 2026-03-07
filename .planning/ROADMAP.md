@@ -120,10 +120,11 @@ Plans:
   2. User can cancel a schedule entry and it remains visible in the list with canceled status
   3. User can transition schedule status through valid states (e.g., mark as confirmed, mark as completed)
   4. Invalid status transitions are prevented in the UI (unavailable options are not shown)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 07-01: TBD
+- [ ] 07-01-PLAN.md -- Fix no_show type mismatch, add transition API + constants, ScheduleFormDialog edit mode
+- [ ] 07-02-PLAN.md -- DropdownMenu with transitions, AlertDialog confirmations, locked state, edit flow wiring
 
 ### Phase 8: Job Detail Integration
 **Goal**: The job detail page shows real schedule data with a useful summary replacing all mock data
@@ -151,5 +152,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 4. Schedule Status and CRUD API | 1/2 | In progress | - |
 | 5. Schedule Creation UI | 2/2 | Complete   | 2026-03-07 |
 | 6. Schedule List and Detail UI | 2/2 | Complete   | 2026-03-07 |
-| 7. Schedule Edit and Management UI | 0/? | Not started | - |
+| 7. Schedule Edit and Management UI | 0/2 | Not started | - |
 | 8. Job Detail Integration | 0/? | Not started | - |
