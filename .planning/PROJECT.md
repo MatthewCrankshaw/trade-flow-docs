@@ -10,6 +10,15 @@ Two independent codebases: `trade-flow-api` (NestJS/MongoDB) and `trade-flow-ui`
 
 A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment in one simple, structured system.
 
+## Current Milestone: v1.1 Item Tax Rate Linkage
+
+**Goal:** Update items (products) to reference tax rates by ID instead of storing a tax rate value, connecting the existing tax rate system to the items system across API and UI.
+
+**Target features:**
+- Items store a tax rate ID reference instead of a numeric tax rate value
+- Item create/edit forms show a tax rate dropdown populated from business tax rates
+- Item display shows the linked tax rate name/percentage
+
 ## Requirements
 
 ### Validated
@@ -47,7 +56,9 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 
 <!-- Requirements for next milestone -- to be defined via /gsd:new-milestone -->
 
-(None yet -- run `/gsd:new-milestone` to define next scope)
+- [ ] Items reference tax rates by ID instead of storing a tax rate value
+- [ ] Item create/edit UI shows tax rate dropdown from business tax rates
+- [ ] Item display shows linked tax rate details
 
 ### Out of Scope
 
@@ -110,4 +121,4 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 | Luxon DateTime enforced in all DTOs | Consistent date handling across API | ✓ Good -- eliminated date bugs |
 
 ---
-*Last updated: 2026-03-07 after v1.0 Scheduling milestone*
+*Last updated: 2026-03-07 after v1.1 milestone started*

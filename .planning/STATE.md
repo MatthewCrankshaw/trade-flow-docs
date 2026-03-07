@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: Scheduling
-status: milestone_complete
-stopped_at: v1.0 Scheduling milestone archived
-last_updated: "2026-03-07T21:15:31.210Z"
-last_activity: "2026-03-07 - Milestone v1.0 Scheduling shipped"
+milestone: v1.1
+milestone_name: Item Tax Rate Linkage
+status: defining_requirements
+stopped_at: null
+last_updated: "2026-03-07T21:30:00.000Z"
+last_activity: "2026-03-07 - Milestone v1.1 started"
 progress:
-  total_phases: 8
-  completed_phases: 8
-  total_plans: 16
-  completed_plans: 16
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,15 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-07)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Planning next milestone
+**Current focus:** Defining requirements for v1.1 Item Tax Rate Linkage
 
 ## Current Position
 
-Milestone v1.0 Scheduling: SHIPPED (2026-03-07)
-All 8 phases, 16 plans complete.
-Next step: `/gsd:new-milestone`
+Phase: Not started (defining requirements)
+Plan: --
+Status: Defining requirements
+Last activity: 2026-03-07 -- Milestone v1.1 started
 
-Progress: [##########] 100%
+Progress: [----------] 0%
 
 ## Performance Metrics
 
