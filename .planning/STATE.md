@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Phase 7 context gathered
-last_updated: "2026-03-07T19:52:42.293Z"
-last_activity: "2026-03-07 - Completed 06-02: ScheduleDetailDialog and real data wiring"
+stopped_at: Completed 07-02-PLAN.md
+last_updated: "2026-03-07T20:30:50Z"
+last_activity: "2026-03-07 - Completed 07-02: Schedule management actions and edit flow"
 progress:
   total_phases: 8
-  completed_phases: 6
-  total_plans: 13
-  completed_plans: 13
+  completed_phases: 7
+  total_plans: 15
+  completed_plans: 15
   percent: 100
 ---
 
@@ -26,18 +26,18 @@ See: .planning/PROJECT.md (updated 2026-02-21)
 ## Current Position
 
 Phase: 7 of 8 (Schedule Edit and Management UI)
-Plan: 1 of 2 in current phase
-Status: 07-01 complete -- edit form dialog with transition mutations and no_show fix
-Last activity: 2026-03-07 - Completed 07-01: Schedule edit form and API layer
+Plan: 2 of 2 in current phase (COMPLETE)
+Status: 07-02 complete -- schedule management actions, transitions, edit flow wiring
+Last activity: 2026-03-07 - Completed 07-02: Schedule management actions and edit flow
 
 Progress: [##########] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
-- Average duration: 7min
-- Total execution time: 1.40 hours
+- Total plans completed: 15
+- Average duration: 6min
+- Total execution time: 1.47 hours
 
 **By Phase:**
 
@@ -49,10 +49,10 @@ Progress: [##########] 100%
 | 04-schedule-status-and-crud-api | 3/3 | 14min | 5min |
 | 05-schedule-creation-ui | 2/2 | 18min | 9min |
 | 06-schedule-list-and-detail-ui | 2/2 | 8min | 4min |
-| 07-schedule-edit-and-management-ui | 1/2 | 3min | 3min |
+| 07-schedule-edit-and-management-ui | 2/2 | 7min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 4min, 10min, 8min, 3min, 3min
+- Last 5 plans: 10min, 8min, 3min, 3min, 4min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -105,6 +105,9 @@ Recent decisions affecting current work:
 - [Phase 07-01]: Conditional useController for notes field with eslint-disable to handle create vs edit mode schema differences
 - [Phase 07-01]: React component key on ScheduleFormContent (not useForm key option) to force form reset between schedules
 - [Phase 07-01]: visitTypeId sent as null (not undefined) in edit mode for explicit API-side clearing
+- [Phase 07-02]: Dialog closes on successful status transition (user override of plan to stay open and update badge)
+- [Phase 07-02]: Three-dot DropdownMenu replaces X close button in detail dialog header; Close button in footer
+- [Phase 07-02]: Terminal-status dialogs show X close button instead of dropdown menu
 
 ### Pending Todos
 
@@ -123,6 +126,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-07T20:16:02Z
-Stopped at: Completed 07-01-PLAN.md
-Resume file: .planning/phases/07-schedule-edit-and-management-ui/07-02-PLAN.md
+Last session: 2026-03-07T20:30:50Z
+Stopped at: Completed 07-02-PLAN.md
+Resume file: N/A (phase 7 complete)
