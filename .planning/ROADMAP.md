@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 3: Schedule Data Model and Create API** - Schedule collection, create endpoint with smart defaults
 - [x] **Phase 4: Schedule Status and CRUD API** - Status state machine, list/edit/cancel/notes endpoints
 - [x] **Phase 5: Schedule Creation UI** - Create schedule dialog with visit type selection and empty state (completed 2026-03-07)
-- [ ] **Phase 6: Schedule List and Detail UI** - Chronological schedule list view with notes display
+- [x] **Phase 6: Schedule List and Detail UI** - Chronological schedule list view with notes display (completed 2026-03-07)
 - [ ] **Phase 7: Schedule Edit and Management UI** - Edit form, cancel action, and status transition controls
 - [ ] **Phase 8: Job Detail Integration** - Replace mock data, add schedule summary to job detail page
 
@@ -150,6 +150,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 3. Schedule Data Model and Create API | 1/2 | In progress | - |
 | 4. Schedule Status and CRUD API | 1/2 | In progress | - |
 | 5. Schedule Creation UI | 2/2 | Complete   | 2026-03-07 |
-| 6. Schedule List and Detail UI | 1/2 | In Progress|  |
+| 6. Schedule List and Detail UI | 2/2 | Complete   | 2026-03-07 |
 | 7. Schedule Edit and Management UI | 0/? | Not started | - |
 | 8. Job Detail Integration | 0/? | Not started | - |

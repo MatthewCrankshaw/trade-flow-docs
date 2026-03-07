@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-03-07T16:20:14.000Z"
-last_activity: "2026-03-07 - Completed 06-01: Schedule list components with responsive views and status utilities"
+stopped_at: Completed 06-02-PLAN.md
+last_updated: "2026-03-07T16:30:00.000Z"
+last_activity: "2026-03-07 - Completed 06-02: ScheduleDetailDialog and real data wiring into JobDetailTabs"
 progress:
   total_phases: 8
   completed_phases: 5
   total_plans: 13
-  completed_plans: 12
-  percent: 92
+  completed_plans: 13
+  percent: 100
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 6: Schedule List and Detail UI -- IN PROGRESS
+**Current focus:** Phase 6: Schedule List and Detail UI -- COMPLETE
 
 ## Current Position
 
-Phase: 6 of 8 (Schedule List and Detail UI) -- IN PROGRESS
-Plan: 1 of 2 in current phase -- COMPLETE
-Status: Plan 06-01 complete -- schedule list components with responsive views, status utilities, updateSchedule mutation
-Last activity: 2026-03-07 - Completed 06-01: Schedule list components with responsive table/card views
+Phase: 6 of 8 (Schedule List and Detail UI) -- COMPLETE
+Plan: 2 of 2 in current phase -- COMPLETE
+Status: Phase 06 complete -- schedule detail dialog with notes editing, JobDetailTabs wired to real data
+Last activity: 2026-03-07 - Completed 06-02: ScheduleDetailDialog and real data wiring
 
-Progress: [#########-] 92%
+Progress: [##########] 100%
 
 ## Performance Metrics
 
@@ -48,7 +48,7 @@ Progress: [#########-] 92%
 | 03-schedule-data-model-and-create-api | 2/2 | 8min | 4min |
 | 04-schedule-status-and-crud-api | 3/3 | 14min | 5min |
 | 05-schedule-creation-ui | 2/2 | 18min | 9min |
-| 06-schedule-list-and-detail-ui | 1/2 | 3min | 3min |
+| 06-schedule-list-and-detail-ui | 2/2 | 8min | 4min |
 
 **Recent Trend:**
 - Last 5 plans: 4min, 10min, 8min, 3min
@@ -98,6 +98,9 @@ Recent decisions affecting current work:
 - [Phase 05-02]: MOCK_SCHEDULES in JobDetailTabs.tsx deferred to Phase 6 (out of scope for form dialog plan)
 - [Phase 06-01]: Used div with role=button for mobile schedule cards instead of shadcn Card for lighter DOM
 - [Phase 06-01]: STATUS_CONFIG record pattern for consistent badge rendering across schedule views
+- [Phase 06-02]: ScheduleDetailDialog uses label/value div pairs for read-only fields, designed for Phase 7 swap to form inputs
+- [Phase 06-02]: TabHeader onAdd prop optional -- schedule tab omits Add button (action strip is primary creation trigger)
+- [Phase 06-02]: EmptyTabState onAction callback added as optional prop to avoid breaking other tabs
 
 ### Pending Todos
 
@@ -116,6 +119,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-07T16:20:14.000Z
-Stopped at: Completed 06-01-PLAN.md
-Resume file: .planning/phases/06-schedule-list-and-detail-ui/06-02-PLAN.md
+Last session: 2026-03-07T16:30:00.000Z
+Stopped at: Completed 06-02-PLAN.md (Phase 06 complete)
+Resume file: Next phase
