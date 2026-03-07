@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: in-progress
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-03-07T11:13:31.000Z"
-last_activity: "2026-03-07 - Completed 05-01: schedule foundation (types, API, schema, hooks, Calendar)"
+status: completed
+stopped_at: Completed 05-02-PLAN.md
+last_updated: "2026-03-07T14:32:00.000Z"
+last_activity: "2026-03-07 - Completed 05-02: ScheduleFormDialog, ScheduleEmptyState, JobDetailPage wiring"
 progress:
   total_phases: 8
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 11
-  completed_plans: 10
-  percent: 91
+  completed_plans: 11
+  percent: 100
 ---
 
 # Project State
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 5: Schedule Creation UI
+**Current focus:** Phase 5: Schedule Creation UI -- COMPLETE
 
 ## Current Position
 
-Phase: 5 of 8 (Schedule Creation UI) -- IN PROGRESS
-Plan: 1 of 2 in current phase -- COMPLETE
-Status: Plan 05-01 complete -- schedule types, RTK Query API, Valibot schema, Calendar component, actions hook
-Last activity: 2026-03-07 - Completed 05-01: schedule foundation (types, API, schema, hooks, Calendar)
+Phase: 5 of 8 (Schedule Creation UI) -- COMPLETE
+Plan: 2 of 2 in current phase -- COMPLETE
+Status: Phase 05 complete -- schedule form dialog, empty state, JobDetailPage wiring
+Last activity: 2026-03-07 - Completed 05-02: ScheduleFormDialog, ScheduleEmptyState, JobDetailPage wiring
 
-Progress: [#########-] 91%
+Progress: [##########] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
+- Total plans completed: 11
 - Average duration: 7min
-- Total execution time: 1.1 hours
+- Total execution time: 1.3 hours
 
 **By Phase:**
 
@@ -47,10 +47,10 @@ Progress: [#########-] 91%
 | 02-visit-type-management-ui | 2/2 | 18min | 9min |
 | 03-schedule-data-model-and-create-api | 2/2 | 8min | 4min |
 | 04-schedule-status-and-crud-api | 3/3 | 14min | 5min |
-| 05-schedule-creation-ui | 1/2 | 10min | 10min |
+| 05-schedule-creation-ui | 2/2 | 18min | 9min |
 
 **Recent Trend:**
-- Last 5 plans: 5min, 6min, 4min, 4min, 10min
+- Last 5 plans: 4min, 4min, 10min, 8min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -94,6 +94,7 @@ Recent decisions affecting current work:
 - [Phase 04-03]: Silent skip for invalid/malformed filter params (no error thrown, graceful degradation)
 - [Phase 05-01]: Job-scoped cache tags (JOB-${jobId}) for schedule list invalidation instead of global LIST tag
 - [Phase 05-01]: Restored button.tsx split-file pattern after shadcn overwrite to satisfy react-refresh lint rule
+- [Phase 05-02]: MOCK_SCHEDULES in JobDetailTabs.tsx deferred to Phase 6 (out of scope for form dialog plan)
 
 ### Pending Todos
 
@@ -112,6 +113,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-07T11:13:31.000Z
-Stopped at: Completed 05-01-PLAN.md
-Resume file: .planning/phases/05-schedule-creation-ui/05-02-PLAN.md
+Last session: 2026-03-07T14:32:00.000Z
+Stopped at: Completed 05-02-PLAN.md
+Resume file: Phase 05 complete. Next: Phase 06
