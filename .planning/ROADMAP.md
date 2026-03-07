@@ -105,10 +105,11 @@ Plans:
   1. User can view all schedule entries for a job displayed in chronological order
   2. Each schedule entry shows date, time, duration, visit type, status, and assignee
   3. User can add free-text notes to a schedule entry and see them displayed on the entry
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 06-01: TBD
+- [ ] 06-01-PLAN.md -- Schedule display utilities, responsive ScheduleList/ScheduleTable/ScheduleCardList, updateSchedule mutation
+- [ ] 06-02-PLAN.md -- ScheduleDetailDialog with notes editing, JobDetailTabs wiring replacing MOCK_SCHEDULES
 
 ### Phase 7: Schedule Edit and Management UI
 **Goal**: Users can modify, cancel, and manage the status of their schedule entries
@@ -149,6 +150,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 3. Schedule Data Model and Create API | 1/2 | In progress | - |
 | 4. Schedule Status and CRUD API | 1/2 | In progress | - |
 | 5. Schedule Creation UI | 2/2 | Complete   | 2026-03-07 |
-| 6. Schedule List and Detail UI | 0/? | Not started | - |
+| 6. Schedule List and Detail UI | 0/2 | Not started | - |
 | 7. Schedule Edit and Management UI | 0/? | Not started | - |
 | 8. Job Detail Integration | 0/? | Not started | - |
