@@ -9,7 +9,7 @@ Requirements for the scheduling milestone. Each maps to roadmap phases.
 
 ### Scheduling
 
-- [ ] **SCHED-01**: User can create a schedule entry on a job with date, start time, and duration
+- [x] **SCHED-01**: User can create a schedule entry on a job with date, start time, and duration
 - [ ] **SCHED-02**: User can view all schedule entries for a job in chronological order
 - [ ] **SCHED-03**: User can edit an existing schedule entry (date, time, duration)
 - [ ] **SCHED-04**: User can cancel a schedule entry (status change, entry preserved in history)
@@ -25,7 +25,7 @@ Requirements for the scheduling milestone. Each maps to roadmap phases.
 
 ### Visit Types
 
-- [ ] **VTYPE-01**: User can select a visit type when creating a schedule entry
+- [x] **VTYPE-01**: User can select a visit type when creating a schedule entry
 - [x] **VTYPE-02**: Default visit types are generated per trade when a business is created
 - [x] **VTYPE-03**: User can create custom visit types
 - [x] **VTYPE-04**: User can view and manage visit types for their business
@@ -78,7 +78,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SCHED-01 | Phase 5 | Pending |
+| SCHED-01 | Phase 5 | Complete |
 | SCHED-02 | Phase 6 | Pending |
 | SCHED-03 | Phase 7 | Pending |
 | SCHED-04 | Phase 7 | Pending |
@@ -88,7 +88,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VSTAT-01 | Phase 4 | Complete |
 | VSTAT-02 | Phase 4 | Complete |
 | VSTAT-03 | Phase 4 | Complete |
-| VTYPE-01 | Phase 5 | Pending |
+| VTYPE-01 | Phase 5 | Complete |
 | VTYPE-02 | Phase 1 | Complete |
 | VTYPE-03 | Phase 2 | Complete |
 | VTYPE-04 | Phase 2 | Complete |
