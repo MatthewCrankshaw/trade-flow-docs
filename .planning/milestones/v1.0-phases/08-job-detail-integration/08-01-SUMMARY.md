@@ -86,6 +86,15 @@ None - no external service configuration required.
 - Job detail page now shows real schedule-derived data in both the sticky header and overview section
 - All mock schedule data replaced; remaining MOCK_ prefixed data (customer, access notes, commercial) intentionally preserved per user decision
 
+## Self-Check: PASSED
+
+- FOUND: trade-flow-ui/src/pages/JobDetailPage.tsx
+- FOUND: trade-flow-ui/src/features/jobs/components/JobOverviewSection.tsx
+- FOUND: 08-01-SUMMARY.md
+- FOUND: commit 86a216c (Task 1)
+- FOUND: commit 550fc29 (Task 2)
+- FOUND: commit 4be824e (docs)
+
 ---
 *Phase: 08-job-detail-integration*
 *Completed: 2026-03-07*

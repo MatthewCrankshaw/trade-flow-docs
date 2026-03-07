@@ -1,11 +1,11 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: milestone
-status: completed
-stopped_at: Completed 08-01-PLAN.md
-last_updated: "2026-03-07T21:04:18.654Z"
-last_activity: "2026-03-07 - Completed 08-01: Job detail integration with real schedule data"
+milestone_name: Scheduling
+status: milestone_complete
+stopped_at: v1.0 Scheduling milestone archived
+last_updated: "2026-03-07T21:15:31.210Z"
+last_activity: "2026-03-07 - Milestone v1.0 Scheduling shipped"
 progress:
   total_phases: 8
   completed_phases: 8
@@ -18,17 +18,16 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-21)
+See: .planning/PROJECT.md (updated 2026-03-07)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 8: Job Detail Integration
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 8 of 8 (Job Detail Integration)
-Plan: 1 of 1 in current phase (COMPLETE)
-Status: 08-01 complete -- schedule-derived header hints and per-status badge breakdown
-Last activity: 2026-03-07 - Completed 08-01: Job detail integration with real schedule data
+Milestone v1.0 Scheduling: SHIPPED (2026-03-07)
+All 8 phases, 16 plans complete.
+Next step: `/gsd:new-milestone`
 
 Progress: [##########] 100%
 
@@ -52,73 +51,21 @@ Progress: [##########] 100%
 | 07-schedule-edit-and-management-ui | 2/2 | 7min | 4min |
 | 08-job-detail-integration | 1/1 | 2min | 2min |
 
-**Recent Trend:**
-- Last 5 plans: 8min, 3min, 3min, 4min, 2min
-- Trend: stable
-
 *Updated after each plan completion*
 
 ## Accumulated Context
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
-
-- Start Time + Duration model (not Start + End) -- matches tradesperson thinking
-- Two scheduling modes deferred to v2 (arrival window mode)
-- Conflict detection deferred to v2
-- Visit types mirror existing JobType pattern
-- Separate MongoDB collection for schedules (not embedded in Job)
-- Used enum/ (singular) directory for visit-type to match JobType module pattern
-- Repository update $set excludes name field to reinforce name immutability at persistence level
-- countActiveByBusinessId uses MongoConnectionService.getDb() directly since MongoDbFetcher has no count method
-- Used nullish coalescing (isDefault ?? false) in toDto for backward-compatible field addition without data migration
-- Types barrel (types/index.ts) needs explicit re-export for @/types path alias to resolve correctly
-- Server-side name uniqueness errors surfaced as inline form field errors for better UX
-- Default icon "calendar" hardcoded for create requests (no icon selection UI per CONTEXT.md)
-- Deactivate/activate available from both active and inactive filter views
-- Followed visit-type module pattern exactly for schedule module structure
-- All 5 ScheduleStatus values defined now as scaffolding for Phase 4 (only SCHEDULED used in Phase 3)
-- DTO-to-response mapper uses relative imports matching the visit-type pattern convention
-- Cross-module validation catches errors early with specific error codes (SCHEDULE_0 for job, SCHEDULE_1 for visit type)
-- Assignee validation deferred to FUT-04 (team support) with TODO comment in creator service
-- [Phase quick-1]: Luxon DateTime enforced in all DTOs: schedule uses fromISO/fromFormat, quote/migration use fromJSDate, repositories handle bidirectional conversion
-- [Phase quick-2]: Merged separate date+startTime into single startDateTime ISO8601 field across schedule module; @IsISO8601 validation on request, DateTime.fromISO with { zone: "utc" } for parsing
-- [Phase 04-01]: Separate ScheduleTransitionService from ScheduleUpdaterService for clean separation of lifecycle changes vs field updates
-- [Phase 04-01]: Repository findByJobId/findByBusinessId use connection.getDb() directly since MongoDbFetcher lacks sort support
-- [Phase 04-01]: Extracted common findByScope private method in repository to avoid duplicating filter/pagination logic
-- [Phase 04-01]: ScheduleRetrieverService exported from ScheduleModule for controller usage in Plan 02
-- [Phase 04-02]: parseScheduleFilters as standalone function in controller file for query param parsing (comma-separated status, ISO date range)
-- [Phase 04-02]: findByBusiness endpoint declared before findByJob in controller to avoid NestJS route matching conflicts
-- [Phase 04-03]: Structured filter format filter:<field>:<op>=value as project-wide API filtering standard
-- [Phase 04-03]: Case-insensitive status filtering via toLowerCase() normalization before enum validation
-- [Phase 04-03]: Generic filter parser in @core/filters/ for reuse by any future controller
-- [Phase 04-03]: Silent skip for invalid/malformed filter params (no error thrown, graceful degradation)
-- [Phase 05-01]: Job-scoped cache tags (JOB-${jobId}) for schedule list invalidation instead of global LIST tag
-- [Phase 05-01]: Restored button.tsx split-file pattern after shadcn overwrite to satisfy react-refresh lint rule
-- [Phase 05-02]: MOCK_SCHEDULES in JobDetailTabs.tsx deferred to Phase 6 (out of scope for form dialog plan)
-- [Phase 06-01]: Used div with role=button for mobile schedule cards instead of shadcn Card for lighter DOM
-- [Phase 06-01]: STATUS_CONFIG record pattern for consistent badge rendering across schedule views
-- [Phase 06-02]: ScheduleDetailDialog uses label/value div pairs for read-only fields, designed for Phase 7 swap to form inputs
-- [Phase 06-02]: TabHeader onAdd prop optional -- schedule tab omits Add button (action strip is primary creation trigger)
-- [Phase 06-02]: EmptyTabState onAction callback added as optional prop to avoid breaking other tabs
-- [Phase 07-01]: Conditional useController for notes field with eslint-disable to handle create vs edit mode schema differences
-- [Phase 07-01]: React component key on ScheduleFormContent (not useForm key option) to force form reset between schedules
-- [Phase 07-01]: visitTypeId sent as null (not undefined) in edit mode for explicit API-side clearing
-- [Phase 07-02]: Dialog closes on successful status transition (user override of plan to stay open and update badge)
-- [Phase 07-02]: Three-dot DropdownMenu replaces X close button in detail dialog header; Close button in footer
-- [Phase 07-02]: Terminal-status dialogs show X close button instead of dropdown menu
-- [Phase 08-01]: deriveNextVisitHint handles all job statuses with schedule-aware logic for active, on-hold, and completed/closed states
-- [Phase 08-01]: Status badges use Partial<Record<ScheduleStatus, number>> reduce pattern showing only non-zero counts
+Key decisions archived in PROJECT.md Key Decisions table.
 
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
-None yet.
+None.
 
 ### Quick Tasks Completed
 
@@ -129,6 +76,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-07T21:01:00.000Z
-Stopped at: Completed 08-01-PLAN.md
-Resume file: .planning/phases/08-job-detail-integration/08-01-SUMMARY.md
+Last session: 2026-03-07
+Stopped at: v1.0 Scheduling milestone archived
+Resume file: None
