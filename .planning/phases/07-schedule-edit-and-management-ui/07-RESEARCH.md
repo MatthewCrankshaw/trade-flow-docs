@@ -341,6 +341,59 @@ import { MoreVertical } from "lucide-react";
 | Separate create/edit dialog components | Single dialog with mode prop | Project convention from VisitTypeFormDialog | Less code, consistent UX |
 | Local state for API data | RTK Query cache as source of truth | Project convention | Automatic refetch, no stale data |
 
+## Validation Architecture
+
+### Test Framework
+| Property | Value |
+|----------|-------|
+| Framework | None -- no frontend test framework configured |
+| Config file | none -- see Wave 0 |
+| Quick run command | `cd trade-flow-ui && npm run typecheck && npm run lint` |
+| Full suite command | `cd trade-flow-ui && npm run typecheck && npm run lint && npm run build` |
+
+**Note:** The trade-flow-ui project has no test runner (no vitest, jest, or similar configured). No test files exist anywhere in `src/`. Validation relies on TypeScript type checking, ESLint, and successful builds. The backend (trade-flow-api) has Jest tests, but this phase is frontend-only.
+
+### Phase Requirements --> Validation Map
+| Req ID | Behavior | Validation Type | Automated Command | Notes |
+|--------|----------|-----------------|-------------------|-------|
+| SCHED-03 | User can edit schedule (date, time, duration, visit type) | typecheck + lint + build | `cd trade-flow-ui && npm run typecheck && npm run lint` | Edit form pre-fills correctly, PATCH fires with correct fields, cache invalidates |
+| SCHED-04 | User can cancel schedule (status change, preserved in list) | typecheck + lint + build | `cd trade-flow-ui && npm run typecheck && npm run lint` | Transition endpoint fires, canceled entry stays in list with muted styling |
+
+### Manual Verification Scenarios
+
+Since there is no automated test framework, these are the critical manual verification points:
+
+**SCHED-03 (Edit Schedule):**
+1. Open a scheduled entry detail dialog --> three-dot menu shows "Edit" option
+2. Click Edit --> detail dialog closes, ScheduleFormDialog opens with pre-filled data
+3. Change date/time/duration --> form submits successfully with "Visit updated" toast
+4. Changed values reflected in list after dialog closes
+5. Edit a confirmed schedule, change time --> inline warning appears about status reset
+6. Submit confirmed edit with time change --> status resets to "scheduled" in list
+
+**SCHED-04 (Cancel Schedule):**
+1. Open a scheduled entry --> three-dot menu shows "Cancel Visit"
+2. Click "Cancel Visit" --> AlertDialog appears with confirmation text
+3. Click "Go Back" --> AlertDialog closes, nothing happens
+4. Click "Cancel Visit" in AlertDialog --> status changes to canceled, toast confirms
+5. Canceled entry remains in list with muted styling
+6. Canceled entry detail dialog has no three-dot menu, shows "Schedule locked" note
+7. Notes remain editable on canceled entry
+
+**Status Transitions (broader SCHED-04 scope):**
+1. Scheduled --> Confirm: immediate (no dialog), status updates to confirmed
+2. Scheduled --> Mark No-show: AlertDialog confirmation, then status updates
+3. Confirmed --> Mark Complete: AlertDialog confirmation, then status updates
+4. Terminal statuses: no three-dot menu visible, locked message shown
+
+### Sampling Rate
+- **Per task commit:** `cd trade-flow-ui && npm run typecheck && npm run lint`
+- **Per wave merge:** `cd trade-flow-ui && npm run typecheck && npm run lint && npm run build`
+- **Phase gate:** Full suite green (typecheck + lint + build) before `/gsd:verify-work`
+
+### Wave 0 Gaps
+None -- no test infrastructure is being set up for this phase. Validation is via typecheck, lint, and build (established project pattern). All prior phases used this same validation approach.
+
 ## Open Questions
 
 1. **no_show vs no-show mismatch**
@@ -377,6 +430,7 @@ import { MoreVertical } from "lucide-react";
 - Architecture: HIGH - extending existing components with established patterns
 - Pitfalls: HIGH - identified from direct code review of both API and UI codebases
 - Status mismatch bug: HIGH - verified by reading both enum definitions
+- Validation: HIGH - verified no test framework exists, typecheck/lint/build is established pattern
 
 **Research date:** 2026-03-07
 **Valid until:** 2026-04-07 (stable codebase, no external dependencies changing)
