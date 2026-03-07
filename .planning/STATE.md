@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Phase 6 context gathered
-last_updated: "2026-03-07T15:59:12.648Z"
-last_activity: "2026-03-07 - Completed 05-02: ScheduleFormDialog, ScheduleEmptyState, JobDetailPage wiring"
+status: in-progress
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-03-07T16:20:14.000Z"
+last_activity: "2026-03-07 - Completed 06-01: Schedule list components with responsive views and status utilities"
 progress:
   total_phases: 8
   completed_phases: 5
-  total_plans: 11
-  completed_plans: 11
-  percent: 100
+  total_plans: 13
+  completed_plans: 12
+  percent: 92
 ---
 
 # Project State
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 5: Schedule Creation UI -- COMPLETE
+**Current focus:** Phase 6: Schedule List and Detail UI -- IN PROGRESS
 
 ## Current Position
 
-Phase: 5 of 8 (Schedule Creation UI) -- COMPLETE
-Plan: 2 of 2 in current phase -- COMPLETE
-Status: Phase 05 complete -- schedule form dialog, empty state, JobDetailPage wiring
-Last activity: 2026-03-07 - Completed 05-02: ScheduleFormDialog, ScheduleEmptyState, JobDetailPage wiring
+Phase: 6 of 8 (Schedule List and Detail UI) -- IN PROGRESS
+Plan: 1 of 2 in current phase -- COMPLETE
+Status: Plan 06-01 complete -- schedule list components with responsive views, status utilities, updateSchedule mutation
+Last activity: 2026-03-07 - Completed 06-01: Schedule list components with responsive table/card views
 
-Progress: [##########] 100%
+Progress: [#########-] 92%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
+- Total plans completed: 12
 - Average duration: 7min
-- Total execution time: 1.3 hours
+- Total execution time: 1.35 hours
 
 **By Phase:**
 
@@ -48,9 +48,10 @@ Progress: [##########] 100%
 | 03-schedule-data-model-and-create-api | 2/2 | 8min | 4min |
 | 04-schedule-status-and-crud-api | 3/3 | 14min | 5min |
 | 05-schedule-creation-ui | 2/2 | 18min | 9min |
+| 06-schedule-list-and-detail-ui | 1/2 | 3min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 4min, 4min, 10min, 8min
+- Last 5 plans: 4min, 10min, 8min, 3min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -95,6 +96,8 @@ Recent decisions affecting current work:
 - [Phase 05-01]: Job-scoped cache tags (JOB-${jobId}) for schedule list invalidation instead of global LIST tag
 - [Phase 05-01]: Restored button.tsx split-file pattern after shadcn overwrite to satisfy react-refresh lint rule
 - [Phase 05-02]: MOCK_SCHEDULES in JobDetailTabs.tsx deferred to Phase 6 (out of scope for form dialog plan)
+- [Phase 06-01]: Used div with role=button for mobile schedule cards instead of shadcn Card for lighter DOM
+- [Phase 06-01]: STATUS_CONFIG record pattern for consistent badge rendering across schedule views
 
 ### Pending Todos
 
@@ -113,6 +116,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-07T15:59:12.644Z
-Stopped at: Phase 6 context gathered
-Resume file: .planning/phases/06-schedule-list-and-detail-ui/06-CONTEXT.md
+Last session: 2026-03-07T16:20:14.000Z
+Stopped at: Completed 06-01-PLAN.md
+Resume file: .planning/phases/06-schedule-list-and-detail-ui/06-02-PLAN.md
