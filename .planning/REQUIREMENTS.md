@@ -49,21 +49,21 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ITAX-01 | - | Pending |
-| ITAX-02 | - | Pending |
-| ITAX-03 | - | Pending |
-| ITAX-04 | - | Pending |
-| ITAX-05 | - | Pending |
-| QUOT-01 | - | Pending |
-| ITMUI-01 | - | Pending |
-| ITMUI-02 | - | Pending |
-| ITMUI-03 | - | Pending |
+| ITAX-01 | Phase 9 | Pending |
+| ITAX-02 | Phase 9 | Pending |
+| ITAX-03 | Phase 9 | Pending |
+| ITAX-04 | Phase 9 | Pending |
+| ITAX-05 | Phase 9 | Pending |
+| QUOT-01 | Phase 9 | Pending |
+| ITMUI-01 | Phase 10 | Pending |
+| ITMUI-02 | Phase 10 | Pending |
+| ITMUI-03 | Phase 10 | Pending |
 
 **Coverage:**
 - v1 requirements: 9 total
-- Mapped to phases: 0
-- Unmapped: 9
+- Mapped to phases: 9
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-07*
-*Last updated: 2026-03-07 after initial definition*
+*Last updated: 2026-03-07 after roadmap creation*
