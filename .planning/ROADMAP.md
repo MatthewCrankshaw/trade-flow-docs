@@ -91,10 +91,11 @@ Plans:
   2. User can select a visit type from a dropdown populated with their business visit types when creating a schedule
   3. When a job has no schedule entries, an informative empty state is displayed with a prompt to create the first one
   4. The creation form uses smart defaults (1-hour duration, current user as assignee) so minimal input is needed
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 05-01: TBD
+- [ ] 05-01-PLAN.md -- Schedule types, RTK Query API, Valibot schema, Calendar install, actions hook
+- [ ] 05-02-PLAN.md -- ScheduleFormDialog, ScheduleEmptyState, JobDetailPage wiring
 
 ### Phase 6: Schedule List and Detail UI
 **Goal**: Users can see all scheduled visits for a job and read visit details including notes
@@ -147,7 +148,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 2. Visit Type Management UI | 1/2 | In progress | - |
 | 3. Schedule Data Model and Create API | 1/2 | In progress | - |
 | 4. Schedule Status and CRUD API | 1/2 | In progress | - |
-| 5. Schedule Creation UI | 0/? | Not started | - |
+| 5. Schedule Creation UI | 0/2 | Not started | - |
 | 6. Schedule List and Detail UI | 0/? | Not started | - |
 | 7. Schedule Edit and Management UI | 0/? | Not started | - |
 | 8. Job Detail Integration | 0/? | Not started | - |
