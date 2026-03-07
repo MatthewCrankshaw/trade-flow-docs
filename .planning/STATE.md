@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-02-21)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 6: Schedule List and Detail UI -- COMPLETE
+**Current focus:** Phase 7: Schedule Edit and Management UI
 
 ## Current Position
 
-Phase: 6 of 8 (Schedule List and Detail UI) -- COMPLETE
-Plan: 2 of 2 in current phase -- COMPLETE
-Status: Phase 06 complete -- schedule detail dialog with notes editing, JobDetailTabs wired to real data
-Last activity: 2026-03-07 - Completed 06-02: ScheduleDetailDialog and real data wiring
+Phase: 7 of 8 (Schedule Edit and Management UI)
+Plan: 1 of 2 in current phase
+Status: 07-01 complete -- edit form dialog with transition mutations and no_show fix
+Last activity: 2026-03-07 - Completed 07-01: Schedule edit form and API layer
 
 Progress: [##########] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
+- Total plans completed: 13
 - Average duration: 7min
-- Total execution time: 1.35 hours
+- Total execution time: 1.40 hours
 
 **By Phase:**
 
@@ -49,9 +49,10 @@ Progress: [##########] 100%
 | 04-schedule-status-and-crud-api | 3/3 | 14min | 5min |
 | 05-schedule-creation-ui | 2/2 | 18min | 9min |
 | 06-schedule-list-and-detail-ui | 2/2 | 8min | 4min |
+| 07-schedule-edit-and-management-ui | 1/2 | 3min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 4min, 10min, 8min, 3min
+- Last 5 plans: 4min, 10min, 8min, 3min, 3min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -101,6 +102,9 @@ Recent decisions affecting current work:
 - [Phase 06-02]: ScheduleDetailDialog uses label/value div pairs for read-only fields, designed for Phase 7 swap to form inputs
 - [Phase 06-02]: TabHeader onAdd prop optional -- schedule tab omits Add button (action strip is primary creation trigger)
 - [Phase 06-02]: EmptyTabState onAction callback added as optional prop to avoid breaking other tabs
+- [Phase 07-01]: Conditional useController for notes field with eslint-disable to handle create vs edit mode schema differences
+- [Phase 07-01]: React component key on ScheduleFormContent (not useForm key option) to force form reset between schedules
+- [Phase 07-01]: visitTypeId sent as null (not undefined) in edit mode for explicit API-side clearing
 
 ### Pending Todos
 
@@ -119,6 +123,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-07T19:52:42.288Z
-Stopped at: Phase 7 context gathered
-Resume file: .planning/phases/07-schedule-edit-and-management-ui/07-CONTEXT.md
+Last session: 2026-03-07T20:16:02Z
+Stopped at: Completed 07-01-PLAN.md
+Resume file: .planning/phases/07-schedule-edit-and-management-ui/07-02-PLAN.md

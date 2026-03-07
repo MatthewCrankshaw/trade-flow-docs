@@ -11,7 +11,7 @@ Requirements for the scheduling milestone. Each maps to roadmap phases.
 
 - [x] **SCHED-01**: User can create a schedule entry on a job with date, start time, and duration
 - [x] **SCHED-02**: User can view all schedule entries for a job in chronological order
-- [ ] **SCHED-03**: User can edit an existing schedule entry (date, time, duration)
+- [x] **SCHED-03**: User can edit an existing schedule entry (date, time, duration)
 - [ ] **SCHED-04**: User can cancel a schedule entry (status change, entry preserved in history)
 - [x] **SCHED-05**: User can add free-text notes to a schedule entry
 - [x] **SCHED-06**: Schedule assignee defaults to the logged-in user
@@ -80,7 +80,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | SCHED-01 | Phase 5 | Complete |
 | SCHED-02 | Phase 6 | Complete |
-| SCHED-03 | Phase 7 | Pending |
+| SCHED-03 | Phase 7 | Complete |
 | SCHED-04 | Phase 7 | Pending |
 | SCHED-05 | Phase 6 | Complete |
 | SCHED-06 | Phase 3 | Complete |
