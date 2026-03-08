@@ -10,7 +10,7 @@ Requirements for Bundles & Quotes milestone. Each maps to roadmap phases.
 ### Bundle Fixes
 
 - [x] **BNDL-01**: User can create a bundle item without errors (unit defaults to "bundle")
-- [ ] **BNDL-02**: User can edit bundle components on an existing bundle (add/remove items, change quantities)
+- [x] **BNDL-02**: User can edit bundle components on an existing bundle (add/remove items, change quantities)
 - [x] **BNDL-03**: User can search and filter items when selecting bundle components via a searchable dropdown
 - [ ] **BNDL-04**: User can view bundle components in a structured list showing item name, quantity, and unit
 
@@ -67,7 +67,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | BNDL-01 | Phase 11 | Complete |
-| BNDL-02 | Phase 12 | Pending |
+| BNDL-02 | Phase 12 | Complete |
 | BNDL-03 | Phase 11 | Complete |
 | BNDL-04 | Phase 12 | Pending |
 | QUOT-01 | Phase 13 | Pending |

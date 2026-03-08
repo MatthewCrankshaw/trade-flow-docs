@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Bundles & Quotes
-status: completed
-stopped_at: Phase 12 context gathered
-last_updated: "2026-03-08T19:16:28.753Z"
-last_activity: 2026-03-08 -- Completed 11-01 bundle bug fix and SearchableItemPicker
+status: executing
+stopped_at: Completed 12-01-PLAN.md
+last_updated: "2026-03-08T19:36:24.012Z"
+last_activity: 2026-03-08 -- Completed 12-01 bundle component update API
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 1
-  completed_plans: 1
+  total_plans: 3
+  completed_plans: 2
   percent: 11
 ---
 
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: 11 of 14 (Bundle Bug Fix and Foundation) -- 1 of 4 in v1.2
-Plan: 1 of 1 in current phase
-Status: Phase complete
-Last activity: 2026-03-08 -- Completed 11-01 bundle bug fix and SearchableItemPicker
+Phase: 12 of 14 (Bundle Component Editing) -- 2 of 4 in v1.2
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-03-08 -- Completed 12-01 bundle component update API
 
 Progress: [█░░░░░░░░░] 11%
 
@@ -46,6 +46,7 @@ Progress: [█░░░░░░░░░] 11%
 | v1.0 Scheduling | 8 | 16 | 1.5 hours | 6min |
 | v1.1 Item Tax Rate Linkage | 2 | 6 | ~1 hour | 4min |
 | v1.2 Bundles & Quotes | 4 | 9 | 2min | 2min |
+| Phase 12 P01 | 4min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -55,6 +56,8 @@ Key decisions archived in PROJECT.md Key Decisions table.
 
 - 11-01: Items pre-selected via SearchableItemPicker eliminates empty itemId intermediate state
 - 11-01: SearchableItemPicker placed in src/components/ for cross-feature reuse
+- [Phase 12]: Reused CreateBundleComponentRequest for update validation (same shape, same rules)
+- [Phase 12]: Always validate bundle components on update, consistent with taxRateId always-validate pattern
 
 ### Pending Todos
 
@@ -74,6 +77,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-08T19:16:28.750Z
-Stopped at: Phase 12 context gathered
-Resume file: .planning/phases/12-bundle-component-editing/12-CONTEXT.md
+Last session: 2026-03-08T19:36:24.009Z
+Stopped at: Completed 12-01-PLAN.md
+Resume file: None
