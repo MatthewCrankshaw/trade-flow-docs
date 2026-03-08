@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Bundles & Quotes
 status: executing
-stopped_at: Completed 12-01-PLAN.md
-last_updated: "2026-03-08T19:36:24.012Z"
-last_activity: 2026-03-08 -- Completed 12-01 bundle component update API
+stopped_at: Completed 12-02-PLAN.md
+last_updated: "2026-03-08T19:49:57.212Z"
+last_activity: 2026-03-08 -- Completed 12-02 bundle component display enhancement
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 3
-  completed_plans: 2
-  percent: 11
+  completed_plans: 3
+  percent: 100
 ---
 
 # Project State
@@ -21,21 +21,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-08)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** v1.2 Bundles & Quotes -- Phase 11 plan 1 of 2 complete
+**Current focus:** v1.2 Bundles & Quotes -- Phase 12 complete (2 of 4 phases)
 
 ## Current Position
 
 Phase: 12 of 14 (Bundle Component Editing) -- 2 of 4 in v1.2
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-03-08 -- Completed 12-01 bundle component update API
+Plan: 2 of 2 in current phase (COMPLETE)
+Status: Phase complete
+Last activity: 2026-03-08 -- Completed 12-02 bundle component display enhancement
 
-Progress: [█░░░░░░░░░] 11%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity (cumulative):**
-- Total plans completed: 23 (16 v1.0 + 6 v1.1 + 1 v1.2)
+- Total plans completed: 24 (16 v1.0 + 6 v1.1 + 2 v1.2)
 - Average duration: 6min
 - Total execution time: ~2.5 hours
 
@@ -45,8 +45,9 @@ Progress: [█░░░░░░░░░] 11%
 |-----------|--------|-------|---------------|----------|
 | v1.0 Scheduling | 8 | 16 | 1.5 hours | 6min |
 | v1.1 Item Tax Rate Linkage | 2 | 6 | ~1 hour | 4min |
-| v1.2 Bundles & Quotes | 4 | 9 | 2min | 2min |
+| v1.2 Bundles & Quotes | 4 | 9 | 6min | 3min |
 | Phase 12 P01 | 4min | 2 tasks | 6 files |
+| Phase 12 P02 | 4min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -58,6 +59,8 @@ Key decisions archived in PROJECT.md Key Decisions table.
 - 11-01: SearchableItemPicker placed in src/components/ for cross-feature reuse
 - [Phase 12]: Reused CreateBundleComponentRequest for update validation (same shape, same rules)
 - [Phase 12]: Always validate bundle components on update, consistent with taxRateId always-validate pattern
+- 12-02: Reused typeColors/typeLabels mappings across all three component views for consistency
+- 12-02: No cost/price shown in component rows or header per user design decision
 
 ### Pending Todos
 
@@ -77,6 +80,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-08T19:36:24.009Z
-Stopped at: Completed 12-01-PLAN.md
+Last session: 2026-03-08T19:49:00Z
+Stopped at: Completed 12-02-PLAN.md
 Resume file: None

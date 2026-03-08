@@ -39,7 +39,7 @@ Full details: `.planning/milestones/v1.1-ROADMAP.md`
 **Milestone Goal:** Complete the partially-built bundle feature (fix creation bug, enable component editing, searchable item picker, improved display) and wire up the quote system with bundle support (API integration, creation flow, detail view with expandable bundle lines).
 
 - [x] **Phase 11: Bundle Bug Fix and Foundation** - Fix bundle creation bug and build reusable SearchableItemPicker component (completed 2026-03-08)
-- [ ] **Phase 12: Bundle Component Editing** - Enable full component editing on existing bundles with improved display
+- [x] **Phase 12: Bundle Component Editing** - Enable full component editing on existing bundles with improved display (completed 2026-03-08)
 - [ ] **Phase 13: Quote API Integration** - Wire quote UI to existing API with creation flow and status transitions
 - [ ] **Phase 14: Quote Detail and Line Items** - Build quote detail view with line item management and expandable bundle rows
 
@@ -123,6 +123,6 @@ Phases execute in numeric order: 11 -> 12 -> 13 -> 14
 | 9. Item Tax Rate API | v1.1 | 4/4 | Complete | 2026-03-08 |
 | 10. Item Tax Rate UI | v1.1 | 2/2 | Complete | 2026-03-08 |
 | 11. Bundle Bug Fix and Foundation | 1/1 | Complete    | 2026-03-08 | - |
-| 12. Bundle Component Editing | 1/2 | In Progress|  | - |
+| 12. Bundle Component Editing | 2/2 | Complete   | 2026-03-08 | - |
 | 13. Quote API Integration | v1.2 | 0/2 | Not started | - |
 | 14. Quote Detail and Line Items | v1.2 | 0/3 | Not started | - |
