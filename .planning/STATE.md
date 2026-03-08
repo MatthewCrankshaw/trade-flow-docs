@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Bundles & Quotes
-status: defining_requirements
+status: ready_to_plan
 stopped_at: null
-last_updated: "2026-03-08T17:00:00Z"
-last_activity: 2026-03-08 -- Milestone v1.2 started
+last_updated: "2026-03-08T18:00:00Z"
+last_activity: 2026-03-08 -- Roadmap created for v1.2
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
-  total_plans: 0
+  total_plans: 9
   completed_plans: 0
   percent: 0
 ---
@@ -21,14 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-08)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** v1.2 Bundles & Quotes
+**Current focus:** v1.2 Bundles & Quotes -- Phase 11 ready to plan
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-08 — Milestone v1.2 started
+Phase: 11 of 14 (Bundle Bug Fix and Foundation) -- 1 of 4 in v1.2
+Plan: 0 of 2 in current phase
+Status: Ready to plan
+Last activity: 2026-03-08 -- Roadmap created for v1.2
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -43,6 +45,7 @@ Last activity: 2026-03-08 — Milestone v1.2 started
 |-----------|--------|-------|---------------|----------|
 | v1.0 Scheduling | 8 | 16 | 1.5 hours | 6min |
 | v1.1 Item Tax Rate Linkage | 2 | 6 | ~1 hour | 4min |
+| v1.2 Bundles & Quotes | 4 | 9 | - | - |
 
 ## Accumulated Context
 
@@ -56,7 +59,8 @@ None.
 
 ### Blockers/Concerns
 
-None -- all v1.1 concerns resolved.
+- Research flags Phase 12 (bundle component editing): BundleItemForm submit handler and mergeExistingItemWithChanges utility need careful tracing during planning
+- Research flags Phase 14 (quote detail): parentLineItemId pipeline and Money serialization format need verification during planning
 
 ### Quick Tasks Completed
 
@@ -67,6 +71,6 @@ None -- all v1.1 concerns resolved.
 
 ## Session Continuity
 
-Last session: 2026-03-08T16:00:00Z
-Stopped at: v1.1 milestone completed and archived
-Resume file: None - between milestones
+Last session: 2026-03-08
+Stopped at: Roadmap created for v1.2 Bundles & Quotes
+Resume file: None -- ready to plan Phase 11

@@ -66,24 +66,24 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BNDL-01 | — | Pending |
-| BNDL-02 | — | Pending |
-| BNDL-03 | — | Pending |
-| BNDL-04 | — | Pending |
-| QUOT-01 | — | Pending |
-| QUOT-02 | — | Pending |
-| QUOT-03 | — | Pending |
-| QUOT-04 | — | Pending |
-| QLIT-01 | — | Pending |
-| QLIT-02 | — | Pending |
-| QLIT-03 | — | Pending |
-| QLIT-04 | — | Pending |
+| BNDL-01 | Phase 11 | Pending |
+| BNDL-02 | Phase 12 | Pending |
+| BNDL-03 | Phase 11 | Pending |
+| BNDL-04 | Phase 12 | Pending |
+| QUOT-01 | Phase 13 | Pending |
+| QUOT-02 | Phase 13 | Pending |
+| QUOT-03 | Phase 14 | Pending |
+| QUOT-04 | Phase 13 | Pending |
+| QLIT-01 | Phase 14 | Pending |
+| QLIT-02 | Phase 14 | Pending |
+| QLIT-03 | Phase 14 | Pending |
+| QLIT-04 | Phase 14 | Pending |
 
 **Coverage:**
 - v1.2 requirements: 12 total
-- Mapped to phases: 0
-- Unmapped: 12 ⚠️
+- Mapped to phases: 12
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-08*
-*Last updated: 2026-03-08 after initial definition*
+*Last updated: 2026-03-08 after roadmap creation*
