@@ -9,10 +9,10 @@ Requirements for the item tax rate linkage milestone. Each maps to roadmap phase
 
 ### Item Tax Rate Reference
 
-- [ ] **ITAX-01**: Item entity stores a tax rate ID reference instead of a numeric tax rate value
+- [x] **ITAX-01**: Item entity stores a tax rate ID reference instead of a numeric tax rate value
 - [ ] **ITAX-02**: Creating an item validates that the referenced tax rate exists and belongs to the business
 - [ ] **ITAX-03**: Updating an item validates the new tax rate ID if changed
-- [ ] **ITAX-04**: Item API response includes the tax rate ID (UI resolves details client-side)
+- [x] **ITAX-04**: Item API response includes the tax rate ID (UI resolves details client-side)
 - [ ] **ITAX-05**: Default items created during onboarding reference the correct default tax rate
 
 ### Quote Integration
@@ -49,10 +49,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ITAX-01 | Phase 9 | Pending |
+| ITAX-01 | Phase 9 | Complete |
 | ITAX-02 | Phase 9 | Pending |
 | ITAX-03 | Phase 9 | Pending |
-| ITAX-04 | Phase 9 | Pending |
+| ITAX-04 | Phase 9 | Complete |
 | ITAX-05 | Phase 9 | Pending |
 | QUOT-01 | Phase 9 | Pending |
 | ITMUI-01 | Phase 10 | Pending |
