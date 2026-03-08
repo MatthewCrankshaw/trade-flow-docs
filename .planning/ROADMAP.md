@@ -42,11 +42,12 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
   3. Item API responses include the tax rate ID field (not a numeric rate)
   4. Creating a quote from items with tax rate references correctly resolves the tax percentage on each line item
   5. Signing up and completing onboarding creates default items that reference the correct default tax rate (not a hardcoded number)
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 09-01: TBD
-- [ ] 09-02: TBD
+- [ ] 09-01-PLAN.md -- Replace defaultTaxRate with taxRateId across item data layer (entity, DTO, repo, requests, response, mappers)
+- [ ] 09-02-PLAN.md -- Add tax rate ID validation to item creator and updater services
+- [ ] 09-03-PLAN.md -- Fix onboarding flow and update quote factories for tax rate resolution
 
 ### Phase 10: Item Tax Rate UI
 **Goal**: Users select tax rates from a dropdown when creating or editing items, and see linked tax rate details when viewing items
@@ -77,5 +78,5 @@ Phases execute in numeric order: 9 -> 10
 | 6. Schedule List and Detail UI | v1.0 | 2/2 | Complete | 2026-03-07 |
 | 7. Schedule Edit and Management UI | v1.0 | 2/2 | Complete | 2026-03-07 |
 | 8. Job Detail Integration | v1.0 | 1/1 | Complete | 2026-03-07 |
-| 9. Item Tax Rate API | v1.1 | 0/? | Not started | - |
+| 9. Item Tax Rate API | v1.1 | 0/3 | Not started | - |
 | 10. Item Tax Rate UI | v1.1 | 0/? | Not started | - |
