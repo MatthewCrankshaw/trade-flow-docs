@@ -28,7 +28,7 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
 **Milestone Goal:** Update items to reference tax rates by ID instead of storing a numeric value, connecting the existing tax rate system to items across API and UI.
 
 - [x] **Phase 9: Item Tax Rate API** - Items reference tax rates by ID with cross-module validation, updated quote factories, and fixed onboarding (completed 2026-03-08)
-- [ ] **Phase 10: Item Tax Rate UI** - Tax rate dropdown on item forms and tax rate display on item lists
+- [ ] **Phase 10: Item Tax Rate UI** - Tax rate dropdown on item forms replacing numeric tax input
 
 ## Phase Details
 
@@ -50,13 +50,13 @@ Plans:
 - [ ] 09-03-PLAN.md -- Fix onboarding flow and update quote factories for tax rate resolution
 
 ### Phase 10: Item Tax Rate UI
-**Goal**: Users select tax rates from a dropdown when creating or editing items, and see linked tax rate details when viewing items
+**Goal**: Users select tax rates from a dropdown when creating or editing items; tax rate is visible in the edit form only (not in lists or detail views)
 **Depends on**: Phase 9
 **Requirements**: ITMUI-01, ITMUI-02, ITMUI-03
 **Success Criteria** (what must be TRUE):
   1. Item create form shows a dropdown of the business's tax rates (name and percentage visible) instead of a numeric input
   2. Item edit form shows the same dropdown with the item's current tax rate pre-selected
-  3. Item list and detail views display the linked tax rate name and percentage (not a raw ID)
+  3. Item list and detail views remain unchanged -- no tax rate column or display added
 **Plans:** 2 plans
 
 Plans:

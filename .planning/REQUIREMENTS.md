@@ -23,7 +23,7 @@ Requirements for the item tax rate linkage milestone. Each maps to roadmap phase
 
 - [ ] **ITMUI-01**: Item create form shows a tax rate dropdown populated from the business's tax rates
 - [ ] **ITMUI-02**: Item edit form shows a tax rate dropdown with the current tax rate pre-selected
-- [ ] **ITMUI-03**: Item list/detail displays the linked tax rate name and percentage
+- [ ] **ITMUI-03**: Item list and detail views remain unchanged -- tax rate is only visible in the edit form (per user decision to keep lists/details simple)
 
 ## v2 Requirements
 
@@ -42,6 +42,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | Tax rate inline creation from item form | Adds complexity; user can create tax rates in settings first |
 | Data migration for existing items | App not in production; no existing user data to migrate |
 | Server-side tax rate embedding in item response | UI resolves from RTK Query cache; no need for server joins |
+| Tax rate display in item list/detail views | User decided tax rate is a secondary detail, only visible in edit form |
 
 ## Traceability
 
@@ -66,4 +67,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-07*
-*Last updated: 2026-03-07 after roadmap creation*
+*Last updated: 2026-03-08 after plan revision (ITMUI-03 scope narrowed per user decision)*
