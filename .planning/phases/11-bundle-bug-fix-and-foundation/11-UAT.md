@@ -2,8 +2,8 @@
 status: complete
 phase: 11-bundle-bug-fix-and-foundation
 source: 11-01-SUMMARY.md
-started: 2026-03-08T18:00:00Z
-updated: 2026-03-08T18:10:00Z
+started: 2026-03-08T18:25:00Z
+updated: 2026-03-08T18:35:00Z
 ---
 
 ## Current Test
@@ -14,69 +14,49 @@ updated: 2026-03-08T18:10:00Z
 
 ### 1. Create a Bundle Item
 expected: Navigate to Items. Click "New Item". Select type "Bundle". Fill in name, add at least one component. Submit the form. The bundle should be created successfully without any validation errors or API rejections.
+result: pass
+
+### 2. Picker Scrolling
+expected: Open the item picker when adding a component to a bundle. The item list should be scrollable with the mouse wheel. You should be able to reach all items in the list. Also verify scrolling works in other pickers (e.g., Create Job dialog customer/type pickers).
+result: pass
+
+### 3. Add Component in Edit Mode
+expected: Open an existing bundle item for editing. Click "Add component". The searchable item picker should open and allow you to add new components, just like in create mode.
 result: issue
-reported: "I am unable to scroll down in the searchable item picker list, I have noticed this with other dropdown picker / searchable pickers as well. Apart from that it seems to be working fine."
+reported: "I can open the existing bundle item, I can add a component but then when it saves the item disappears. I think the API does not support adding or updating bundle components yet."
 severity: major
 
-### 2. Searchable Item Picker Opens
-expected: When creating or editing a bundle, click "Add component" (or equivalent). A searchable dropdown should appear with a search input at the top. Items should be listed below, grouped under headings: Materials, Labour, Fees.
-result: issue
-reported: "When creating a bundle I can click the add component button but when editing a bundle I cannot. The dropdown seems to work fine apart from scrolling."
-severity: major
-
-### 3. Search Filters Items
-expected: With the item picker open, type a search term. The item list should filter in real-time across all groups simultaneously. Only items matching the search appear. If nothing matches, an empty state message should show (e.g., "No items found").
+### 4. Long Item Names
+expected: Open the item picker. Items with long names should show a tooltip on hover revealing the full name. The dropdown should be wide enough to show most names comfortably.
 result: pass
 
-### 4. Item Display in Picker
-expected: Each item in the picker dropdown should show: the item name, a type badge (Material/Labour/Fee), and the default price formatted correctly (e.g., "$15.00" not "1500").
+### 5. Search Filters Items
+expected: With the item picker open, type a search term. The item list should filter in real-time across all groups. If nothing matches, an empty state message should show.
 result: pass
 
-### 5. Select Item and Auto-Close
-expected: Click on an item in the picker. The dropdown should close automatically. A new component row should appear in the bundle with that item pre-selected. The search field should be cleared for next use.
+### 6. Select Item and Auto-Close
+expected: Click on an item in the picker. The dropdown should close automatically. A new component row should appear with that item pre-selected. The search field should be cleared for next use.
 result: pass
 
-### 6. Already-Added Items Hidden
-expected: After adding an item to the bundle, open the picker again. The item you just added should NOT appear in the picker list (hidden, not grayed out). This prevents duplicate components.
-result: issue
-reported: "Yes the already selected item is hidden, there is an issue where items with longer names have their names cut off and there is no way to see what the full name is."
-severity: minor
+### 7. Already-Added Items Hidden
+expected: After adding an item to the bundle, open the picker again. The item you just added should NOT appear in the picker list.
+result: pass
 
 ## Summary
 
-total: 6
-passed: 3
-issues: 3
+total: 7
+passed: 6
+issues: 1
 pending: 0
 skipped: 0
 
 ## Gaps
 
-- truth: "Searchable item picker list is scrollable to reach all items"
+- truth: "Bundle component changes are persisted when editing an existing bundle"
   status: failed
-  reason: "User reported: I am unable to scroll down in the searchable item picker list, I have noticed this with other dropdown picker / searchable pickers as well."
+  reason: "User reported: I can open the existing bundle item, I can add a component but then when it saves the item disappears. I think the API does not support adding or updating bundle components yet."
   severity: major
-  test: 1
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
-
-- truth: "Add component button works in both bundle creation and editing contexts"
-  status: failed
-  reason: "User reported: When creating a bundle I can click the add component button but when editing a bundle I cannot."
-  severity: major
-  test: 2
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
-
-- truth: "Items with long names are fully visible or have a way to view the full name"
-  status: failed
-  reason: "User reported: items with longer names have their names cut off and there is no way to see what the full name is."
-  severity: minor
-  test: 6
+  test: 3
   root_cause: ""
   artifacts: []
   missing: []
