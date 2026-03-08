@@ -10,9 +10,18 @@ Two independent codebases: `trade-flow-api` (NestJS/MongoDB) and `trade-flow-ui`
 
 A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment in one simple, structured system.
 
-## Current Milestone: None (planning next)
+## Current Milestone: v1.2 Bundles & Quotes
 
-Previous milestone (v1.1 Item Tax Rate Linkage) shipped 2026-03-08. Run `/gsd:new-milestone` to start next.
+**Goal:** Complete the partially-built bundle feature (fix creation bug, enable component editing, searchable item picker, improved display) and wire up the quote system with bundle support (API integration, creation flow, detail view with expandable bundle lines).
+
+**Target features:**
+- Fix bundle creation bug (unit field defaulting to "bundle")
+- Bundle component editing (add/remove items, change quantities on existing bundles)
+- Searchable/filterable item dropdown for bundle component selection
+- Improved bundle component display (Components section with quantity × unit format)
+- Quote UI wired to existing API (creation, listing, detail view)
+- Quote line item management (add items/bundles, view line items)
+- Bundle quote integration (rolled-up line by default, expandable to show components)
 
 ## Requirements
 
@@ -55,9 +64,9 @@ Previous milestone (v1.1 Item Tax Rate Linkage) shipped 2026-03-08. Run `/gsd:ne
 
 ### Active
 
-<!-- Requirements for next milestone -- to be defined via /gsd:new-milestone -->
+<!-- Requirements for v1.2 Bundles & Quotes -- to be defined -->
 
-(None yet — define via `/gsd:new-milestone`)
+(Being defined — see REQUIREMENTS.md)
 
 ### Out of Scope
 
@@ -125,4 +134,4 @@ Previous milestone (v1.1 Item Tax Rate Linkage) shipped 2026-03-08. Run `/gsd:ne
 | Tax rate only visible in edit form (not list/detail) | User decision: tax rate is secondary detail | ✓ Good -- clean UI |
 
 ---
-*Last updated: 2026-03-08 after v1.1 milestone completed*
+*Last updated: 2026-03-08 after v1.2 milestone started*
