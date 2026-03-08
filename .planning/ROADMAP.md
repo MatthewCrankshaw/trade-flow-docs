@@ -57,11 +57,11 @@ Plans:
   1. Item create form shows a dropdown of the business's tax rates (name and percentage visible) instead of a numeric input
   2. Item edit form shows the same dropdown with the item's current tax rate pre-selected
   3. Item list and detail views display the linked tax rate name and percentage (not a raw ID)
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 10-01: TBD
-- [ ] 10-02: TBD
+- [ ] 10-01-PLAN.md -- Update Item types, form schema, and useItemForm hook to use taxRateId
+- [ ] 10-02-PLAN.md -- Replace numeric tax input with tax rate dropdown in Material, Labour, and Fee forms
 
 ## Progress
 
@@ -78,5 +78,5 @@ Phases execute in numeric order: 9 -> 10
 | 6. Schedule List and Detail UI | v1.0 | 2/2 | Complete | 2026-03-07 |
 | 7. Schedule Edit and Management UI | v1.0 | 2/2 | Complete | 2026-03-07 |
 | 8. Job Detail Integration | v1.0 | 1/1 | Complete | 2026-03-07 |
-| 9. Item Tax Rate API | 4/4 | Complete   | 2026-03-08 | - |
-| 10. Item Tax Rate UI | v1.1 | 0/? | Not started | - |
+| 9. Item Tax Rate API | v1.1 | 4/4 | Complete | 2026-03-08 |
+| 10. Item Tax Rate UI | v1.1 | 0/2 | Not started | - |
