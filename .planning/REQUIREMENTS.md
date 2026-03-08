@@ -21,8 +21,8 @@ Requirements for the item tax rate linkage milestone. Each maps to roadmap phase
 
 ### Item UI
 
-- [ ] **ITMUI-01**: Item create form shows a tax rate dropdown populated from the business's tax rates
-- [ ] **ITMUI-02**: Item edit form shows a tax rate dropdown with the current tax rate pre-selected
+- [x] **ITMUI-01**: Item create form shows a tax rate dropdown populated from the business's tax rates
+- [x] **ITMUI-02**: Item edit form shows a tax rate dropdown with the current tax rate pre-selected
 - [ ] **ITMUI-03**: Item list and detail views remain unchanged -- tax rate is only visible in the edit form (per user decision to keep lists/details simple)
 
 ## v2 Requirements
@@ -56,8 +56,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ITAX-04 | Phase 9 | Complete |
 | ITAX-05 | Phase 9 | Complete |
 | QUOT-01 | Phase 9 | Complete |
-| ITMUI-01 | Phase 10 | Pending |
-| ITMUI-02 | Phase 10 | Pending |
+| ITMUI-01 | Phase 10 | Complete |
+| ITMUI-02 | Phase 10 | Complete |
 | ITMUI-03 | Phase 10 | Pending |
 
 **Coverage:**
