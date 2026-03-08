@@ -67,11 +67,11 @@ Plans:
   2. User can remove component items and change quantities on an existing bundle
   3. User can view bundle components in a structured list showing item name, quantity, and unit (e.g., "10 x metres")
   4. Changes to bundle components persist correctly after saving the edit form
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 12-01: TBD
-- [ ] 12-02: TBD
+- [ ] 12-01-PLAN.md -- Extend API update endpoint for bundle components, update frontend type
+- [ ] 12-02-PLAN.md -- Enhance component display with two-line format and type badges (edit form + items list)
 
 ### Phase 13: Quote API Integration
 **Goal**: Users can create quotes, view them in a list from real API data, and manage quote status
