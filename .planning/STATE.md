@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Item Tax Rate Linkage
 status: completed
-stopped_at: Phase 10 context gathered
-last_updated: "2026-03-08T14:13:30.047Z"
-last_activity: "2026-03-08 -- Completed 09-04 (gap closure: OpenAPI spec + updater validation)"
+stopped_at: Completed 10-02-PLAN.md
+last_updated: "2026-03-08T14:33:39.707Z"
+last_activity: "2026-03-08 -- Completed 10-02 (item form tax rate dropdown)"
 progress:
   total_phases: 2
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 6
-  completed_plans: 5
-  percent: 17
+  completed_plans: 6
+  percent: 100
 ---
 
 # Project State
@@ -26,18 +26,18 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 ## Current Position
 
 Phase: 10 of 10 (Item Tax Rate UI)
-Plan: 1 of 2 in current phase
-Status: in-progress
-Last activity: 2026-03-08 -- Completed 10-01 (item data contracts: types, schema, hook)
+Plan: 2 of 2 in current phase (COMPLETE)
+Status: completed
+Last activity: 2026-03-08 -- Completed 10-02 (item form tax rate dropdown)
 
-Progress: [████████░░] 83% (v1.1)
+Progress: [██████████] 100% (v1.1)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
+- Total plans completed: 18
 - Average duration: 6min
-- Total execution time: 1.68 hours
+- Total execution time: 1.85 hours
 
 **By Phase:**
 
@@ -52,10 +52,11 @@ Progress: [████████░░] 83% (v1.1)
 | 07-schedule-edit-and-management-ui | 2/2 | 7min | 4min |
 | 08-job-detail-integration | 1/1 | 2min | 2min |
 | 09-item-tax-rate-api | 1/3 | 11min | 11min |
-| 10-item-tax-rate-ui | 1/2 | 2min | 2min |
+| 10-item-tax-rate-ui | 2/2 | 12min | 6min |
 
 *Updated after each plan completion*
 | Phase 10 P01 | 2min | 2 tasks | 3 files |
+| Phase 10 P02 | 10min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,8 @@ Recent decisions affecting current work:
 - [Phase 09]: Replicated validateTaxRateExists in ItemUpdaterService rather than shared utility - keeps services self-contained
 - [10-01]: Filter tax rates to active-only in useItemForm hook, not in form components
 - [10-01]: Pre-select default tax rate on create using taxRates.find(tr => tr.isDefault)
+- [10-02]: Used FormSelect with "Name (rate%)" format for tax rate dropdown on item forms
+- [10-02]: Empty tax rates state shows disabled dropdown with link to Settings page
 
 ### Pending Todos
 
@@ -90,6 +93,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-08T14:13:00Z
-Stopped at: Completed 10-01-PLAN.md
-Resume file: .planning/phases/10-item-tax-rate-ui/10-02-PLAN.md
+Last session: 2026-03-08T14:26:00Z
+Stopped at: Completed 10-02-PLAN.md (v1.1 milestone complete)
+Resume file: None - milestone complete
