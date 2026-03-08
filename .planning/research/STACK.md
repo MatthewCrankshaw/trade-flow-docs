@@ -1,201 +1,171 @@
-# Technology Stack: Item Tax Rate Linkage
+# Technology Stack
 
-**Project:** Trade Flow v1.1 - Item Tax Rate Linkage
-**Researched:** 2026-03-07
+**Project:** Trade Flow v1.2 - Bundles & Quotes
+**Researched:** 2026-03-08
 
-## Recommended Stack
+## Verdict: No New Dependencies Required
 
-### No New Libraries Required
+The existing stack already contains every library needed for this milestone. All three major UI capabilities (searchable combobox, expandable rows, bundle component management) are already installed and partially in use.
 
-**Confidence:** HIGH
+## Existing Stack (Already Installed - USE THESE)
 
-This milestone is a data model refactor within the existing stack. Every tool needed is already in the codebase. No npm installs, no new dependencies, no new patterns to learn.
+### Searchable/Filterable Item Dropdown
 
-The change: replace `defaultTaxRate: number | null` with `taxRateId: string | null` (DTO layer) / `taxRateId: ObjectId | null` (entity layer) on items.
+| Technology | Version | Purpose | Status |
+|------------|---------|---------|--------|
+| `cmdk` | 1.1.1 | Command menu with fuzzy search, keyboard navigation | Already installed, wraps `Command` UI component |
+| `radix-ui` (Popover) | 1.4.3 | Popover container for combobox pattern | Already installed, `Popover` UI component exists |
 
-## Changes by Layer
+**Why no new library:** The project already has a working `Command + Popover` combobox pattern in `CreateJobDialog.tsx` (lines 289-473). This exact pattern -- Popover trigger button, Command with `shouldFilter={false}`, manual search/filter via `useMemo`, CommandInput + CommandList + CommandItem -- should be reused directly for the bundle item picker. The `CreateJobDialog` implementation includes search, "create new" inline options, and selection state management. The bundle item picker is simpler (no "create new" flow, just select existing items).
 
-### Entity Layer (MongoDB Document)
+**Confidence:** HIGH (verified against `trade-flow-ui/src/features/jobs/components/CreateJobDialog.tsx`)
 
-| Field | Current | New | Notes |
-|-------|---------|-----|-------|
-| `defaultTaxRate` | `number \| null` | REMOVE | Drop the numeric rate value |
-| `taxRateId` | n/a | `ObjectId \| null` | ADD - reference to taxrates collection |
+**How to apply for bundle components:**
+- Replace the current `<Select>` in `BundleComponentsList.tsx` (line 120-136) with the `Popover + Command` pattern
+- Use `shouldFilter={false}` and filter manually with `useMemo` (matches existing pattern)
+- Filter to `type !== "bundle"` and `status === "active"` (already done in `availableItemsForBundle`)
+- Show item name, unit, and price in each CommandItem for better selection context
 
-**Why ObjectId, not string:** The entity layer already uses `ObjectId` for all cross-document references (`businessId`, `jobId`, `visitTypeId`, bundle component `itemId`). This is the established codebase pattern. The repository `toDto()` converts to string; `toEntity()` converts back to `ObjectId`. No change to the pattern.
+### Expandable Table Rows (Quote Bundle Lines)
 
-**Why nullable:** Bundle items derive tax from their components and must not have a direct tax rate. The existing `null` pattern for bundles carries over. Additionally, items could theoretically have no tax rate assigned yet (though business logic may require one for non-bundle items).
+| Technology | Version | Purpose | Status |
+|------------|---------|---------|--------|
+| `@radix-ui/react-collapsible` | 1.1.12 | Animate expand/collapse of content regions | Already installed, `Collapsible` UI component exists |
+| shadcn `Table` components | n/a | Standard table primitives (Table, TableRow, TableCell, etc.) | Already installed |
 
-### DTO Layer
+**Why no new library:** The API already returns bundle line items with a nested `components` array (see `IQuoteLineItemResponse.components`). The UI needs a clickable row that expands to show child component rows. This is a `Collapsible` wrapping additional `TableRow` elements -- no data table library needed.
 
-| Field | Current | New | Notes |
-|-------|---------|-----|-------|
-| `defaultTaxRate` | `number \| null` | REMOVE | |
-| `taxRateId` | n/a | `string \| null` | ADD - string ID matching all other DTO references |
+**Confidence:** HIGH (verified against `trade-flow-ui/src/components/ui/collapsible.tsx` and `trade-flow-api/src/quote/responses/quote.responses.ts`)
 
-**Pattern precedent:** `IScheduleDto.visitTypeId: string | null` follows the exact same pattern -- an optional reference to another business-scoped entity, validated at the service layer via its retriever service.
+**Implementation pattern:**
+```tsx
+// Collapsible wrapping table rows for bundle expansion
+<Collapsible>
+  <TableRow>
+    <TableCell>
+      <CollapsibleTrigger>
+        <ChevronRight className="transition-transform data-[state=open]:rotate-90" />
+      </CollapsibleTrigger>
+    </TableCell>
+    <TableCell>{bundleItem.name}</TableCell>
+    <TableCell>{formatCurrency(bundleItem.lineTotal)}</TableCell>
+  </TableRow>
+  <CollapsibleContent asChild>
+    <>
+      {bundleItem.components.map(component => (
+        <TableRow key={component.id} className="bg-muted/30">
+          <TableCell /> {/* indent spacer */}
+          <TableCell className="pl-8">{component.name}</TableCell>
+          <TableCell>{formatCurrency(component.lineTotal)}</TableCell>
+        </TableRow>
+      ))}
+    </>
+  </CollapsibleContent>
+</Collapsible>
+```
 
-### Request/Response Layer (API Contract)
+### Quote UI Integration
 
-| Layer | Current Field | New Field | Validation |
-|-------|---------------|-----------|------------|
-| `CreateItemRequest` | `defaultTaxRate?: number` | `taxRateId?: string` | `@IsString() @IsOptional() @IsMongoId()` |
-| `UpdateItemRequest` | `defaultTaxRate?: number` | `taxRateId?: string` | `@IsString() @IsOptional() @IsMongoId()` |
-| `IItemResponse` | `defaultTaxRate: number \| null` | `taxRateId: string \| null` | n/a (output only) |
+| Technology | Version | Purpose | Status |
+|------------|---------|---------|--------|
+| RTK Query | via `@reduxjs/toolkit` | API data fetching, caching, mutations | Already installed, `"Quote"` tag defined but no endpoints yet |
+| `react-hook-form` | 7.71.1 | Form state management for quote creation | Already installed |
+| `valibot` | 1.2.0 | Schema validation for quote forms | Already installed |
+| `@hookform/resolvers` | installed | Bridges valibot schemas to react-hook-form | Already installed |
 
-**`@IsMongoId()` from class-validator:** Already available in the project. Validates that the string is a valid 24-character hex MongoDB ObjectId. This is used for structural validation only -- existence validation happens in the service layer.
+**Confidence:** HIGH (verified against `trade-flow-ui/src/services/api.ts` and `trade-flow-api/src/quote/controllers/quote.controller.ts`)
 
-### Service Layer (Cross-Module Validation)
+**What needs to be BUILT (not installed):**
 
-**Confidence:** HIGH
+1. **RTK Query endpoints** for quotes -- the `api.ts` has a `"Quote"` tag but no quote endpoints yet. Required:
+   - `getQuotes(businessId)` -- GET `business/:businessId/quotes`
+   - `getQuote(quoteId)` -- GET `quote/:quoteId`
+   - `createQuote({ businessId, data })` -- POST `business/:businessId/quote`
+   - `addQuoteLineItem({ businessId, quoteId, data })` -- POST `business/:businessId/quote/:quoteId/line-item`
 
-The exact pattern to follow already exists: `ScheduleCreatorService` validates `visitTypeId` by calling `VisitTypeRetrieverService.findByIdOrFail()`. Apply the same approach:
+2. **Quote detail page** -- route, layout, line items display with expandable bundles
+
+3. **Quote creation form** -- customer selector (reuse Combobox pattern from CreateJobDialog), title, notes
+
+### Bundle Component Display & Editing
+
+| Technology | Version | Purpose | Status |
+|------------|---------|---------|--------|
+| `lucide-react` | installed | Icons (ChevronRight, Package, Plus, Trash2, etc.) | Already installed |
+| shadcn `Badge` | n/a | "optional" badges on components, status badges | Already installed |
+| shadcn `Card` | n/a | Mobile card layout for quotes | Already installed |
+
+**What needs to change in BundleComponentsList:**
+- Current `isReadOnly = mode === "edit"` on line 53 blocks component editing. This guard must be removed to enable add/remove/update in edit mode.
+- Replace `<Select>` (lines 120-136) with `Popover + Command` combobox for searchable item selection.
+- Remove the "Component editing is not yet available" placeholder message (lines 164-166).
+
+## Libraries Explicitly NOT Needed
+
+| Library | Why Considered | Why Not |
+|---------|---------------|---------|
+| `@tanstack/react-table` | Expandable rows, sorting | Overkill for simple quote line items table (typically <20 rows, 5-7 columns). No other tables in the project use it. Collapsible + Table primitives achieve the same result with zero new deps. |
+| `downshift` | Combobox/autocomplete | Already have cmdk + Popover pattern working in CreateJobDialog; switching adds no value |
+| `react-select` | Searchable dropdown | Heavy (27KB min+gz), style-opinionated; cmdk is lighter and already integrated with shadcn theming |
+| `react-pdf` / PDF libraries | Quote PDF generation | Out of scope for v1.2; quote acceptance/invoicing is next milestone |
+| `@dnd-kit/core` | Drag-and-drop line item reordering | Over-engineering; line items don't need reordering in v1.2 |
+| `decimal.js` / `dinero.js` | Currency math | API already handles Money value objects server-side; UI just displays pre-calculated values |
+
+## Currency Formatting
+
+The project already has a `useCurrency` hook. The quote UI should use this for formatting `unitPrice`, `lineTotal`, `subTotal`, `taxTotal`, and `total` values returned by the API (already in major units as numbers).
+
+## Integration Points
+
+### API Response Structure (Already Built)
+
+The quote API returns line items with nested `components` for bundles:
 
 ```typescript
-// In ItemCreatorService and ItemUpdaterService
-constructor(
-  // ... existing deps
-  private readonly taxRateRetriever: TaxRateRetrieverService,
-) {}
-
-// Validation (same try/catch pattern as schedule-creator.service.ts lines 39-49)
-if (item.taxRateId) {
-  try {
-    await this.taxRateRetriever.findByIdOrFail(authUser, item.taxRateId);
-  } catch (_error) {
-    throw new InvalidRequestError(
-      ErrorCodes.ITEM_TAX_RATE_NOT_FOUND,
-      `Tax rate with id ${item.taxRateId} not found`,
-    );
-  }
+// IQuoteResponse.lineItems structure:
+{
+  id: string;
+  itemId: string;
+  quantity: number;
+  unit: string;
+  unitPrice: number;      // major units (e.g., 25.50)
+  lineTotal: number;       // major units
+  taxRate: number;          // percentage (e.g., 20)
+  type: "material" | "labour" | "bundle";
+  components?: IQuoteLineItemResponse[];  // only for bundles
 }
 ```
 
-**Why validate at service layer, not repository:**
-- Service layer has access to `authUser` for policy checks (ensures the tax rate belongs to the same business)
-- `TaxRateRetrieverService.findByIdOrFail()` already enforces access control via `TaxRatePolicy`
-- Repository layer only handles entity/DTO conversion and DB operations (strict layering)
+The frontend does NOT need to compute totals or resolve bundle components -- the API handles all pricing and returns a nested structure ready for display.
 
-### Module Wiring
+### RTK Query Cache Strategy
 
-```typescript
-// item.module.ts - add TaxRateModule import
-@Module({
-  imports: [CoreModule, forwardRef(() => UserModule), forwardRef(() => TaxRateModule)],
-  // ... rest unchanged
-})
+Follow the existing pattern: queries tagged with `"Quote"`, mutations invalidate `"Quote"` tag. The `addLineItem` mutation should invalidate the specific quote's cache entry to refresh totals after a line item is added.
+
+### Combobox Reuse Strategy
+
+Extract the Popover + Command pattern from `CreateJobDialog` into a reusable `ComboboxSelect` component (or just follow the pattern inline). It will be used in at least two places:
+1. Bundle component item picker (replacing `<Select>`)
+2. Quote creation customer selector
+
+Both use the same pattern: trigger button with chevron, Command with `shouldFilter={false}`, manual filtering via `useMemo`, CommandItem with check mark for selected state.
+
+## Installation
+
+```bash
+# No new packages to install.
+# All required dependencies are already in package.json.
 ```
-
-**Why `forwardRef`:** Follows the existing pattern for all cross-module imports. `TaxRateModule` exports `TaxRateRetrieverService` already (confirmed in `tax-rate.module.ts` line 16).
-
-### Frontend Types
-
-| Type | Current Field | New Field |
-|------|---------------|-----------|
-| `Item` | `defaultTaxRate: number \| null` | `taxRateId: string \| null` |
-| `CreateItemRequest` | `defaultTaxRate?: number` | `taxRateId?: string` |
-| `UpdateItemRequest` | `defaultTaxRate?: number` | `taxRateId?: string` |
-
-### Frontend Form Schema (Valibot)
-
-Current `itemFormSchema` has `defaultTaxRate` as a string-validated number field. Replace with:
-
-```typescript
-taxRateId: v.pipe(
-  v.string(),
-  v.minLength(1, "Tax rate is required"),
-),
-```
-
-The form will use a dropdown select (populated from `useGetTaxRatesQuery`) instead of a free-text number input.
-
-### Frontend Resolution Strategy
-
-**Do NOT use MongoDB `$lookup` or server-side populate.** Resolve tax rate details on the frontend.
-
-**Why:**
-- Tax rates are already fetched via `useGetTaxRatesQuery(businessId)` and cached by RTK Query
-- The item list/detail just needs to display tax rate name/percentage alongside the item
-- Client-side join: `taxRates.find(tr => tr.id === item.taxRateId)` -- trivial
-- No new API endpoints needed
-- Follows existing pattern: bundle component items are resolved client-side the same way
-
-### Error Codes
-
-Add one new error code to `ErrorCodes` enum:
-
-```typescript
-ITEM_TAX_RATE_NOT_FOUND = "ITEM_11",  // follows existing ITEM_0 through ITEM_10
-```
-
-### Migration
-
-A data migration is needed to convert existing items from `defaultTaxRate: number` to `taxRateId: ObjectId`. The migration should:
-
-1. For each item with a non-null `defaultTaxRate`, find the matching tax rate in the same business by rate value
-2. Set `taxRateId` to the matched tax rate's `_id`
-3. Unset the `defaultTaxRate` field
-4. Items where no matching tax rate is found should have `taxRateId` set to `null` (log a warning)
-
-Follow the existing migration pattern (`IMigration` interface with `up`/`down`/`isBootstrap`).
-
-## What NOT to Add
-
-| Library/Approach | Why Not |
-|-----------------|---------|
-| Mongoose populate / `$lookup` | No server-side joins needed. Frontend resolves from cached tax rates |
-| New API endpoint for "items with tax rate details" | Over-engineering. Client-side join is trivial with RTK Query cache |
-| Denormalized tax rate fields on item (name, rate) | Creates stale data problem when tax rate is updated |
-| `class-validator` custom decorator for tax rate existence | Decorators can't do async DB lookups cleanly. Service-layer validation is the established pattern |
-| Any new npm packages | Everything needed is already installed |
-
-## Alternatives Considered
-
-| Decision | Recommended | Alternative | Why Not |
-|----------|-------------|-------------|---------|
-| Reference type | `ObjectId` in entity, `string` in DTO | `string` everywhere | Breaks entity layer convention; all other refs use ObjectId |
-| Validation location | Service layer (try/catch on retriever) | Custom class-validator decorator | Service layer has auth context; matches schedule pattern exactly |
-| Tax rate resolution | Frontend join from RTK Query cache | `$lookup` aggregation | Adds backend complexity for no benefit; tax rates already cached |
-| Nullable taxRateId | `null` for bundles, required for others | Always required | Bundles derive tax from components; forcing a reference is incorrect |
-| Field naming | `taxRateId` | `defaultTaxRateId` | Shorter is clearer; the "default" prefix was about the value being a default price-level rate, but now it's a reference not a value |
-
-## Touched Files Summary
-
-### Backend (trade-flow-api)
-
-| File | Change |
-|------|--------|
-| `src/item/entities/item.entity.ts` | Replace `defaultTaxRate: number \| null` with `taxRateId: ObjectId \| null` |
-| `src/item/data-transfer-objects/item.dto.ts` | Replace `defaultTaxRate: number \| null` with `taxRateId: string \| null` |
-| `src/item/requests/create-item.request.ts` | Replace `defaultTaxRate` with `taxRateId`, use `@IsMongoId()` |
-| `src/item/requests/update-item.request.ts` | Replace `defaultTaxRate` with `taxRateId`, use `@IsMongoId()` |
-| `src/item/responses/item.response.ts` | Replace `defaultTaxRate` with `taxRateId` |
-| `src/item/repositories/item.repository.ts` | Update `toDto()` and `toEntity()` conversions, update `$set` in `update()` |
-| `src/item/services/item-creator.service.ts` | Add `TaxRateRetrieverService` dep, add tax rate existence validation |
-| `src/item/services/item-updater.service.ts` | Add `TaxRateRetrieverService` dep, add tax rate existence validation |
-| `src/item/controllers/mappers/map-create-item-request-to-dto.utility.ts` | Map `taxRateId` instead of `defaultTaxRate` |
-| `src/item/controllers/mappers/map-item-to-response.utility.ts` | Map `taxRateId` instead of `defaultTaxRate` |
-| `src/item/controllers/mappers/merge-existing-item-with-changes.utility.ts` | Merge `taxRateId` instead of `defaultTaxRate` |
-| `src/item/item.module.ts` | Add `TaxRateModule` import |
-| `src/core/errors/error-codes.enum.ts` | Add `ITEM_TAX_RATE_NOT_FOUND = "ITEM_11"` |
-| `src/migration/migrations/` | New migration to convert existing data |
-
-### Frontend (trade-flow-ui)
-
-| File | Change |
-|------|--------|
-| `src/types/api.types.ts` | Update `Item`, `CreateItemRequest`, `UpdateItemRequest` types |
-| `src/lib/forms/schemas/item.schema.ts` | Replace `defaultTaxRate` field with `taxRateId` dropdown select |
-| `src/features/items/api/itemApi.ts` | No changes needed (endpoints unchanged) |
-| Item form components | Replace tax rate number input with tax rate select dropdown |
-| Item display components | Resolve and display tax rate name/percentage from cached tax rates |
 
 ## Sources
 
-- Codebase analysis: direct file inspection (HIGH confidence -- verified against actual source)
-- Pattern precedent: `ScheduleCreatorService` cross-module validation of `visitTypeId` via `VisitTypeRetrieverService`
-- Pattern precedent: `IScheduleEntity.visitTypeId: ObjectId | null` reference pattern
-- Pattern precedent: `TaxRateModule` already exports `TaxRateRetrieverService`
+- Codebase: `trade-flow-ui/src/features/jobs/components/CreateJobDialog.tsx` -- Command+Popover combobox pattern (HIGH confidence)
+- Codebase: `trade-flow-ui/src/components/ui/command.tsx` -- cmdk 1.1.1 wrapper (HIGH confidence)
+- Codebase: `trade-flow-ui/src/components/ui/collapsible.tsx` -- Radix Collapsible component (HIGH confidence)
+- Codebase: `trade-flow-ui/src/features/items/components/forms/shared/BundleComponentsList.tsx` -- current Select-based picker (HIGH confidence)
+- Codebase: `trade-flow-api/src/quote/controllers/quote.controller.ts` -- existing API endpoints with nested line item mapping (HIGH confidence)
+- Codebase: `trade-flow-api/src/quote/responses/quote.responses.ts` -- nested `components` array structure (HIGH confidence)
+- Codebase: `trade-flow-ui/package.json` -- verified installed versions (HIGH confidence)
 
 ---
-*Research completed: 2026-03-07*
+*Research completed: 2026-03-08*

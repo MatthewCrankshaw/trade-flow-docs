@@ -1,126 +1,144 @@
-# Feature Landscape: Item-Tax Rate Linkage
+# Feature Landscape
 
-**Domain:** Item/product tax rate referencing in business management and invoicing apps
-**Researched:** 2026-03-07
-**Competitors/References:** QuickBooks, Xero, Invoice Ninja, FreshBooks, Tradify
+**Domain:** Bundle management and quote creation for sole-trader business management
+**Researched:** 2026-03-08
 
 ## Table Stakes
 
 Features users expect. Missing = product feels incomplete.
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Tax rate dropdown on item forms | Every invoicing app uses a dropdown to select from predefined tax rates, not manual numeric entry | Low | Replaces current free-text number input with a select populated from business tax rates |
-| Display linked tax rate name + percentage on items | Users need to see "VAT (20%)" not just "20" -- the name provides semantic meaning | Low | Item list/detail views should show the tax rate name and percentage |
-| Default tax rate pre-selection | When creating a new item, the business's default tax rate should be pre-selected in the dropdown | Low | Tax rate entity already has `isDefault` field -- use it |
-| "No tax" / exempt option | Some items are tax-exempt; users need a way to explicitly set zero tax | Low | Provide a "No tax (0%)" option or allow clearing the selection |
-| Disabled tax rates hidden from dropdown | Only enabled tax rates should appear in the item form dropdown | Low | Filter by `status: enabled` when populating the dropdown |
+### Bundle Management
+
+| Feature | Why Expected | Complexity | Dependencies | Notes |
+|---------|--------------|------------|--------------|-------|
+| Fix bundle creation bug (unit field) | Broken CRUD is a blocker; users cannot create bundles at all | Low | BundleItemForm, API item creation | Unit field defaults to "bundle" instead of respecting component units. Likely a hardcoded default in form or API. |
+| Component editing on existing bundles | Currently read-only in edit mode with a "coming soon" message. Users who make mistakes or need to update bundles have no recourse. | Medium | BundleComponentsList (mode="edit" path), API update endpoint for bundleConfig | The `isReadOnly = mode === "edit"` guard in BundleComponentsList needs removal. Requires API support for PATCH/PUT on bundleConfig.components. Form currently skips bundleConfig on edit (`if (!isEditMode)`). |
+| Searchable item dropdown for component selection | Current Select dropdown is a flat list that becomes unusable with 20+ items. Tradespeople build item catalogues of 50-200+ items. | Medium | Command+Popover pattern (exists in CreateJobDialog), items API | Reuse the exact Command+Popover combobox pattern from CreateJobDialog. Filter to non-bundle, active items. Show item type badge + unit + price in each option row. |
+| Improved bundle component display | Current "bullet + name x qty unit" is functional but lacks price visibility and visual hierarchy | Low | ItemsTable expanded row, currency formatting (useBusinessCurrency exists) | Show per-component line total (qty x defaultPrice). Add subtotal row. Display-only change to existing expandable row in ItemsTable. |
+
+### Quote UI -- API Integration
+
+| Feature | Why Expected | Complexity | Dependencies | Notes |
+|---------|--------------|------------|--------------|-------|
+| Quote listing from API | Currently hardcoded mock data. Users see fake quotes that cannot be interacted with. | Low | QuotesDataView, QuotesTable, RTK Query (pattern established across all features) | Create quoteApi.ts with RTK Query endpoints matching existing API routes: GET business/:businessId/quotes, GET quote/:quoteId. Follow itemApi.ts pattern exactly. |
+| Quote creation dialog | Users need to create quotes to use the feature at all | Medium | Customer selector (reuse Command+Popover from CreateJobDialog), quote API POST endpoint exists | Dialog with: customer picker (searchable), title, optional notes, optional validUntil date. Submit creates draft quote via API. Auto-generate title from customer name like jobs do. |
+| Quote detail view | After creating a quote, users need to see it with its line items, totals, and status | Medium | Quote GET endpoint exists, line item response includes parent/child hierarchy | Page or sheet showing: header (number, title, status badge, customer, dates), line items table, totals summary (subtotal, tax, total). |
+| Add line items to quote | A quote with no line items is useless. Users need to add items/bundles from their catalogue. | Medium | POST quote/:quoteId/line-item endpoint exists, item picker (same Command+Popover pattern), quote detail refresh | Item picker + quantity input. On submit, POST to add-line-item endpoint. Refresh quote detail to show new line item with calculated pricing. |
+| Bundle line items on quotes (expandable) | When a bundle is added as a line item, users need to see what is included without cluttering the main line items list | Medium | API already returns parent/child hierarchy with `components` array on bundle line items, expandable row pattern exists in ItemsTable | Show bundle as single rolled-up row (name, total price). Chevron expands to show component breakdown indented below. Reuse the Fragment + expanded TableRow pattern from ItemsTable. |
+| Quote totals display | Users need to see subtotal, tax, and total. This is fundamental to any quoting tool. | Low | API already calculates and returns totals object with subTotal, taxTotal, total | Display in a summary section at the bottom of the quote detail view. Format with useBusinessCurrency. |
 
 ## Differentiators
 
-Features that set product apart. Not expected, but valued.
+Features that set product apart. Not expected in v1.2, but add clear value.
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| Tax rate inline preview | Show the rate percentage next to dropdown options (e.g., "VAT - 20%", "Reduced Rate - 5%") so users can confirm without navigating away | Low | Minor UX polish that reduces errors |
-| Quick-create tax rate from item form | If a needed tax rate doesn't exist, let users create one without leaving the item form | Medium | "Add new tax rate" option at bottom of dropdown -- common in QuickBooks/Xero. Defer to later milestone. |
+| Inline quantity editing on quote line items | Edit quantity directly in the line items table without opening a dialog. Faster workflow for tradespeople adjusting quantities on-site. | Medium | Would need a PATCH endpoint for line item quantity (does not exist yet). Defer to next iteration. |
+| Quote duplication | Tradespeople often quote similar jobs. "Duplicate quote" saves significant time vs re-creating from scratch. | Low | API would need a clone endpoint. Pure convenience feature. |
+| Quick-add from recent items | Show recently used items at the top of the item picker. Tradespeople quote the same 10-15 items repeatedly. | Low | Client-side tracking of recently selected items, or API endpoint for usage frequency. Adds to the Command+Popover item picker. |
+| Bundle price override on quote | Allow overriding the component-based calculated price with a fixed amount for a specific quote (e.g., discount the whole bundle). | Medium | Would need discount/override field on bundle parent line item. API discount infrastructure exists (discountAmount field) but may not be wired to UI. |
+| PDF/print quote export | Tradespeople need to send quotes to customers. Currently no way to share. | High | Requires PDF generation (server-side or client-side), template design, branding. Major feature on its own. Candidate for next milestone. |
+| Quote notes per line item | Add context to individual line items (e.g., "Rinnai Infinity 26 -- customer prefers this model") | Low | Would need notes field on line item entity (does not exist). Minor API + UI change. |
 
 ## Anti-Features
 
-Features to explicitly NOT build.
+Features to explicitly NOT build for v1.2.
 
 | Anti-Feature | Why Avoid | What to Do Instead |
 |--------------|-----------|-------------------|
-| Multiple tax rates per item | Adds significant complexity (compound tax, tax-on-tax). Most trades businesses deal with a single tax rate per item (VAT or no VAT). Invoice Ninja supports up to 3 per item but it's overkill for sole traders. | Single tax rate reference per item. Revisit only if invoicing milestone demands compound tax. |
-| Tax rate override at invoice/quote line level | The quote system already snapshots `taxRate` as a numeric value on the line item. Allowing per-line overrides at the item level adds confusion between "item default" and "actual applied rate". | Keep item tax rate as the default. Overrides happen at the quote/invoice line item level (already supported by existing `taxRate` field on quote line items). |
-| Tax-inclusive pricing toggle per item | Some apps let each item specify whether its price includes or excludes tax. This is a business-wide setting, not per-item. | Handle at business level if needed later. Current system treats prices as exclusive. |
-| Hard deletion of tax rates | QuickBooks does not allow deletion of tax rates -- only deactivation. Xero archives rather than deletes. Deleting a tax rate that items reference causes orphaned references. | Use existing `status: disabled` for soft-delete. Prevent disabling if items reference it, or allow it with clear warnings. |
+| Quote acceptance/rejection workflow | Explicitly out of scope per PROJECT.md. Adds status transition complexity, notification logic, and customer-facing concerns. | Keep quotes in draft status only for v1.2. Status field exists in the model for future use. |
+| Drag-and-drop line item reordering | Over-engineering for the number of line items a tradesperson typically has (5-15). Adds complexity with bundle parent/child relationships. | Use the natural order from API (creation order). Add sort-by-type later if needed. |
+| Complex pricing rules (tiered, volume, conditional) | CPQ-level pricing is enterprise software. Tradespeople use simple unit price x quantity. | Use existing flat pricing. Component-based bundle pricing already handles the main use case. |
+| Customer-facing quote view/portal | Out of scope per PROJECT.md. Requires auth, branding, acceptance workflow. | Future milestone candidate alongside PDF export. |
+| Multi-currency quotes | Solo tradespeople operate in one currency. Adding currency selection adds unnecessary complexity. | Use business default currency (already established pattern). |
+| Line item grouping/sections | Grouping line items into sections (e.g., "Labour", "Materials") adds UI complexity without proportional value for small quotes. | Bundle items already provide logical grouping. Keep flat list with type badges. |
+| Optional bundle component selection on quotes | The API supports `isOptional` on bundle components, but building UI for customers to select/deselect optional components adds significant complexity. | Always include all components for v1.2. Optional component UI is a future differentiator. |
+| Direct component line item editing on quotes | Modifying individual component quantities/prices within a bundle on a quote breaks the bundle's integrity and causes pricing inconsistencies. | All changes to bundle line items should go through the parent bundle. Matches commercetools best practice: restrict direct modifications to component line items. |
 
 ## Feature Dependencies
 
 ```
-Tax Rates (existing)     Items (existing)
-     |                        |
-     v                        v
-Tax Rate ID Reference ------> Item Entity (replace defaultTaxRate: number with taxRateId: string)
-     |                        |
-     v                        v
-Tax Rate Dropdown      Item Form (replace number input with select)
-     |                        |
-     v                        v
-Display Tax Info       Item List/Detail (show tax rate name + percentage)
+Fix bundle creation bug
+  (no dependencies -- do first, unblocks all bundle features)
+
+Component editing on existing bundles
+  --> Requires: Fix bundle creation bug (establishes correct bundle data)
+  --> Requires: API PATCH/PUT for bundleConfig (verify exists or build)
+
+Searchable item dropdown for bundles
+  --> Requires: Command+Popover pattern (exists in jobs feature)
+  --> Can be built independently of other bundle features
+
+Improved bundle component display
+  --> Requires: Existing expandable row pattern (exists in ItemsTable)
+  --> Can be built independently
+
+Quote API integration (listing)
+  --> Requires: RTK Query setup for quotes (quoteApi.ts -- does not exist yet)
+  --> Unblocks all other quote UI features
+
+Quote creation dialog
+  --> Requires: Quote API integration (for createQuote mutation)
+  --> Requires: Customer data (useGetCustomersQuery exists)
+
+Quote detail view
+  --> Requires: Quote API integration (for getQuote query)
+  --> Requires: Quote creation (need quotes to view)
+
+Add line items to quote
+  --> Requires: Quote detail view (need a place to display them)
+  --> Requires: Searchable item dropdown (same picker component, reuse)
+  --> Requires: Items API (exists)
+
+Bundle line items on quotes (expandable)
+  --> Requires: Add line items to quote
+  --> Requires: Improved bundle component display pattern (same expand/collapse)
+
+Quote totals display
+  --> Requires: Quote detail view
+  --> API already calculates totals
 ```
-
-### Dependency Details
-
-1. **API must change before UI** -- Item entity/DTO needs the `taxRateId` field before the UI can use a dropdown
-2. **Tax rate list endpoint already exists** -- `GET /v1/business/:businessId/tax-rates` returns all tax rates with name, rate, rateType, status
-3. **RTK Query hook already exists** -- `useGetTaxRatesQuery(businessId)` is ready to use in the item form
-4. **Quote line item factory must update** -- `QuoteStandardLineItemFactory` currently reads `item.defaultTaxRate` (a number) and must be updated to resolve the tax rate from the referenced ID
-5. **Bundle tax calculation must update** -- `BundleTaxRateCalculator` derives tax from component items, so it transitively depends on the new linkage
-
-## Edge Cases: Reference Integrity
-
-These are the critical scenarios that must be handled when items reference tax rates.
-
-### When a referenced tax rate is disabled
-
-**Industry standard:** QuickBooks deactivates but does not delete. Items keep the reference. The disabled tax rate still applies to existing items but cannot be selected for new items.
-
-**Recommended approach:**
-- Items that already reference a disabled tax rate continue to work -- the tax rate ID remains valid
-- The dropdown for new items / editing items filters to `status: enabled` only
-- When editing an item that references a disabled tax rate, show it as a special option: "VAT 20% (disabled)" so the user can see what's set but is encouraged to change it
-- Do NOT automatically reassign items to a different tax rate -- that changes pricing silently
-
-### When a tax rate's percentage changes
-
-**Industry standard:** The change applies going forward. Historical documents (quotes, invoices) retain the rate that was in effect when created.
-
-**Recommended approach:**
-- Items reference a tax rate by ID, so they always get the current rate value
-- The quote line item already snapshots the numeric `taxRate` value at creation time (existing behavior) -- this is correct and must be preserved
-- No migration needed for historical quotes -- they already store the numeric value
-
-### When all tax rates are disabled or none exist
-
-**Recommended approach:**
-- Item form should show an empty dropdown with a helpful message: "No tax rates available. Create one in Settings."
-- Form validation should require a tax rate selection for non-bundle items (matching current behavior where `defaultTaxRate` is required)
-- Alternatively, allow a "No tax" selection that stores `null` or a sentinel value
-
-### Data migration for existing items
-
-**Current state:** Items store `defaultTaxRate: number` (e.g., `20`)
-**Target state:** Items store `taxRateId: string` referencing a tax rate document
-
-**Migration approach:**
-- Match existing items to tax rates by rate value within the same business
-- Items with `defaultTaxRate: 0` can be set to null/exempt or matched to a 0% tax rate if one exists
-- Items that cannot be matched (no tax rate with that percentage exists) should be flagged for manual resolution
-- Keep `defaultTaxRate` field temporarily for backward compatibility during migration, remove after verification
 
 ## MVP Recommendation
 
-Prioritize (all are table stakes, low complexity):
-1. **Tax rate ID reference on item entity** -- the foundational data model change
-2. **Tax rate dropdown on item create/edit forms** -- replaces number input, filtered to enabled rates, default pre-selected
-3. **Display linked tax rate on item views** -- show name and percentage where items are displayed
-4. **Reference integrity on disable** -- show disabled tax rate on existing items, filter from new selections
+### Must-have for v1.2 (in build order):
 
-Defer:
-- **Quick-create tax rate from item form** -- nice UX but not essential for v1.1; users can create tax rates in the existing tax rate management UI
-- **Data migration script** -- may be needed depending on whether this is a breaking change or additive; assess during implementation planning
-- **Quote line item factory update** -- must be updated but is a code-level concern, not a feature
+1. **Fix bundle creation bug** -- unblocks everything, low effort
+2. **Quote API integration (RTK Query)** -- unblocks all quote UI work
+3. **Searchable item dropdown** -- needed for both bundle component editing AND quote line item adding; build as reusable component once
+4. **Component editing on existing bundles** -- completes bundle CRUD
+5. **Improved bundle component display** -- polish existing feature
+6. **Quote creation dialog** -- enables quote workflow
+7. **Quote detail view with totals** -- shows created quotes
+8. **Add line items to quote** -- makes quotes useful
+9. **Bundle line items on quotes (expandable)** -- completes bundle-quote integration
+
+### Defer to v1.3+:
+
+- **PDF/print export** -- high complexity, needs design work, but is the most requested feature for quoting tools in the trades space
+- **Quote acceptance/rejection workflow** -- explicitly deferred per PROJECT.md
+- **Inline quantity editing** -- nice-to-have, not blocking
+- **Quote duplication** -- convenience, not blocking
+
+### Reusable component opportunity:
+
+The **searchable item picker** (Command+Popover with item search, type badges, price display) should be built as a shared component since it is needed in:
+- Bundle component selection (replacing current flat Select dropdown)
+- Quote line item addition (new feature)
+- Potentially future features (invoice line items, purchase orders)
+
+The pattern already exists in CreateJobDialog for customers and job types. The item picker variant needs: type icon/badge per item, unit display, default price display, filter to non-bundle active items only.
 
 ## Sources
 
-- [QuickBooks: Delete sales tax rates and agencies](https://quickbooks.intuit.com/learn-support/en-us/help-article/sales-taxes/delete-sales-tax-rates-agencies/L6JKrQWgQ_US_en_US) -- confirms QBO does not allow deletion, only deactivation
-- [Invoice Ninja: Tax Settings](https://invoiceninja.github.io/docs/user-guide/taxes) -- documents per-item tax rate dropdown with 1-3 rate support
-- [Invoice Ninja: Tax Setting Per Item or Invoice Total](https://www.invoiceninja.com/tax-setting-per-item-or-invoice-total/) -- per-item vs invoice-level tax selection patterns
-- [FreshBooks: How do I create an invoice?](https://support.freshbooks.com/hc/en-us/articles/216631328-How-do-I-create-an-Invoice-) -- documents "Add Taxes" link pattern on line items
-- [Xero: Suspend, archive or delete a tax return](https://central.xero.com/s/article/Suspend-archive-or-delete-a-tax-return) -- Xero archive vs delete approach
-- Existing codebase: `trade-flow-api/src/item/data-transfer-objects/item.dto.ts`, `trade-flow-api/src/tax-rate/entities/tax-rate.entity.ts`, `trade-flow-ui/src/features/tax-rates/api/taxRateApi.ts`
+- Codebase analysis: BundleItemForm.tsx, BundleComponentsList.tsx, ItemsTable.tsx, CreateJobDialog.tsx, QuotesTable.tsx, QuotesDataView.tsx (existing patterns and current limitations)
+- Codebase analysis: quote.controller.ts, quote-line-item.entity.ts, bundle-config.dto.ts (API capabilities and data model)
+- [Extensiv Bundle/Kit UI](https://help.extensiv.com/om-products/creating-bundleskits-through-the-ui) -- bundle component editing patterns (add/remove/edit quantity)
+- [commercetools Bundle Management](https://docs.commercetools.com/foundry/best-practice-guides/product-bundles) -- restrict direct component line item modifications, apply changes via parent
+- [Trax Group ERP Bundle Issues](https://traxgroup.com/erp-bundle-management-issues/) -- common pitfalls with bundle pricing, component tracking, and revenue distribution
+- [Shadcn Combobox Patterns](https://shadcnstudio.com/docs/components/combobox) -- searchable dropdown variants with async, grouped, and creatable options
+- [YourTradebase Quoting](https://www.yourtradebase.com/electricians/quote-software) -- tradesperson-specific quoting patterns, template reuse
+- [Extraflow Quoting](https://extraflow.io/industries/estimating-and-quoting-software-for-plumbing) -- plumber quoting workflows with saved item catalogues
 
 ---
-*Research completed: 2026-03-07*
+*Research completed: 2026-03-08*

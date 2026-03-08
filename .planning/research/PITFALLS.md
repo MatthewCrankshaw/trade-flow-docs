@@ -1,164 +1,256 @@
-# Domain Pitfalls: Item Tax Rate Linkage
+# Domain Pitfalls: Bundles & Quotes (v1.2)
 
-**Domain:** Adding tax rate ID references to items in a NestJS/MongoDB business management app
-**Researched:** 2026-03-07
+**Domain:** Bundle editing, searchable item pickers, and quote management in a NestJS/React business management app
+**Researched:** 2026-03-08
 
 ## Critical Pitfalls
 
 Mistakes that cause rewrites or major issues.
 
-### Pitfall 1: Replacing `defaultTaxRate` Without Updating Quote Line Item Factories
+### Pitfall 1: Bundle Component Edits Not Propagating to Existing Quote Line Items
 
-**What goes wrong:** The item entity currently stores `defaultTaxRate` as a number. Quote line item factories (`quote-standard-line-item-factory.service.ts` and `quote-bundle-line-item-factory.service.ts`) read `item.defaultTaxRate` directly to set the `taxRate` on new quote line items. If you replace `defaultTaxRate: number` with `defaultTaxRateId: string` but forget to update these factories, quote creation breaks silently -- line items get `undefined` or `null` tax rates instead of actual percentage values.
+**What goes wrong:** A user edits a bundle's components (adds a component, removes one, changes quantities) through the item management UI. Existing quotes that use this bundle still have the OLD component line items. The user expects the quote to reflect the updated bundle, but it does not -- or worse, the quote totals are now inconsistent with the bundle definition.
 
-**Why it happens:** The item-to-quote pipeline is not obvious when you are focused on the item module. The coupling is through the `IItemDto` interface, which is consumed by the quote module's factories. There is no compile-time safety if you change a field name -- TypeScript catches the type change but only if the quote factories are re-checked.
+**Why it happens:** The quote system snapshots bundle data at the time a bundle is added to a quote. The `QuoteBundleLineItemFactory` creates parent + child line items with `parentLineItemId` references, storing concrete `unitPrice`, `lineTotal`, `discountAmount`, and `taxRate` values. These are intentionally decoupled from the source item -- quotes are point-in-time snapshots. But developers (and users) may not realize this and expect edits to cascade.
 
-**Consequences:** Quotes generate with zero or undefined tax rates. Since quotes involve money, this directly affects invoicing accuracy downstream. The bug may not surface until a user creates a quote and notices wrong totals.
+**Consequences:** If you try to "sync" bundle edits to existing quotes, you break the snapshot model and introduce complex recalculation cascades. If you do not sync, users may be confused when their quote does not match the current bundle definition.
 
 **Prevention:**
-- Before changing `IItemDto`, grep the entire codebase for every reference to `defaultTaxRate` (there are 15+ references across entity, DTO, repository mappers, request validators, response mappers, service validators, quote factories, default items creator, and merge utilities)
-- The quote line item entity stores `taxRate: number` -- this is a snapshot value and should remain a number. The factory must resolve the tax rate ID to a percentage before setting it
-- Write a test that creates a quote line item from an item with a tax rate reference, asserting the line item gets the correct numeric rate
+- Do NOT retroactively update existing quote line items when a bundle is edited. Quotes are snapshots. Document this decision in the UI with a clear message: "Changes to this bundle will not affect existing quotes."
+- When displaying a bundle on a quote, show the snapshotted data, not the current item definition
+- Consider adding a "refresh from current item" action on individual quote line items in a future milestone, but do NOT build it now -- it introduces recalculation complexity that is out of v1.2 scope
 
-**Detection:** Quote creation tests fail. If no quote tests exercise the full pipeline (item lookup through line item creation), the bug hides until manual testing.
+**Detection:** Manual testing: create a quote with a bundle, edit the bundle's components, verify the quote is unchanged.
 
-**Phase relevance:** API phase -- must update quote factories in the same phase as the item schema change.
+**Phase relevance:** Bundle editing phase -- must make the deliberate decision NOT to sync, and communicate this in the UI.
 
 ---
 
-### Pitfall 2: Not Validating Tax Rate Exists on Item Create/Update
+### Pitfall 2: BundleItemForm Skips bundleConfig on Edit (Existing Bug)
 
-**What goes wrong:** Accepting a `defaultTaxRateId` without verifying it exists in the tax rates collection, or that it belongs to the same business. Items end up referencing tax rates that do not exist or belong to a different business.
+**What goes wrong:** The current `BundleItemForm.tsx` (line 90-93) explicitly skips `bundleConfig` when `isEditMode` is true:
+```typescript
+if (!isEditMode) {
+  itemData.bundleConfig = {
+    priceStrategy: "component_based",
+    bundlePrice: null,
+    components: values.components,
+  };
+}
+```
+When enabling component editing, developers must change this guard. But naively including `bundleConfig` on every edit means the API `PATCH` endpoint must handle partial `bundleConfig` updates -- replacing the entire `bundleConfig` object versus merging individual fields.
 
-**Why it happens:** MongoDB does not enforce foreign key constraints. The current item creator service validates `defaultTaxRate` only as a non-negative number -- there is no cross-collection lookup. When switching to an ID reference, developers may add string validation (`IsMongoId()`) but forget the existence check.
+**Why it happens:** The original code deliberately excluded `bundleConfig` from edits because component editing was not yet built. The `BundleComponentsList` component also sets `isReadOnly = mode === "edit"` (line 53), preventing any interaction. Removing these guards requires coordinated changes across form, component list, submit handler, and API merge logic.
 
-**Consequences:** Items reference nonexistent tax rates. When the UI tries to display the linked tax rate name, it gets a 404 or null. Quote creation using this item fails or produces wrong results.
+**Consequences:** If you only remove the `isReadOnly` guard but forget the submit handler guard, the form renders editable components but submits without them. If you include `bundleConfig` but the API merge utility does not handle it, the entire config gets overwritten or lost.
 
 **Prevention:**
-- Follow the exact pattern from `ScheduleCreatorService.create()` -- it validates `visitTypeId` by calling `visitTypeRetriever.findByIdOrFail()` in a try/catch, wrapping the error with a domain-specific error code
-- Add the same validation to `ItemCreatorService.validateCommonFields()` for non-bundle items
-- Add the same validation to the update path (currently `ItemUpdaterService.update()` does no field-level validation -- this is a gap that needs fixing)
-- Validate the tax rate belongs to the same business (the retriever's access control should handle this, but verify)
+- Remove both guards in the same commit: the submit handler's `if (!isEditMode)` check AND the `BundleComponentsList`'s `isReadOnly` logic
+- The API's item update merge utility (`mergeExistingItemWithChanges`) must handle `bundleConfig` as a full replacement (not a deep merge) -- the UI should always send the complete component list when editing
+- Validate that the updated `bundleConfig.components` array is non-empty (existing `BundleConfigValidator.ensureComponentsPresent()` handles this server-side)
+- Add a Valibot schema validation on the form ensuring at least one component before submit
 
-**Detection:** Integration tests that attempt to create items with invalid tax rate IDs. Unit tests that mock the tax rate retriever to throw.
+**Detection:** Edit a bundle, change a component quantity, submit -- verify the API receives the updated `bundleConfig` and the bundle's components reflect the change.
 
-**Phase relevance:** API phase -- implement alongside the field change, not after.
+**Phase relevance:** Bundle component editing phase -- this is the first thing to fix.
 
 ---
 
-### Pitfall 3: Forgetting to Update the Default Items Creator
+### Pitfall 3: Double-Counting Bundle Components in Quote Totals
 
-**What goes wrong:** The `DefaultBusinessItemsCreatorService` creates items on business onboarding with `defaultTaxRate: 0` hardcoded. After the schema change, this code still tries to set a numeric value instead of a tax rate ID, breaking onboarding for new users.
+**What goes wrong:** The `QuoteTotalsCalculator` (line 14) skips line items with `parentLineItemId` to avoid double-counting -- it only sums parent (bundle-level) line items. But if the `parentLineItemId` field is not set correctly during bundle line item creation, component line items get counted BOTH as standalone items AND through their parent's total, inflating the quote total.
 
-**Why it happens:** The default items creator is in the `business` module, not the `item` module. It is easy to miss when focused on item CRUD changes. The current code sets `defaultTaxRate: 0` for all default labour, fee, and material items, and `null` for bundles.
+**Why it happens:** The `QuoteBundleLineItemFactory.buildComponentLineItem()` currently sets `parentLineItemId: null` (line 118) -- the parent ID is assigned later when the component is persisted. If the persistence step does not correctly set `parentLineItemId` on each component, the totals calculator includes them as top-level line items.
 
-**Consequences:** New business creation fails or creates items with invalid tax rate references. Since this runs during onboarding, it blocks the entire user registration flow.
+**Consequences:** Quote totals are 2x the actual amount for all bundle components. This is a financial correctness bug that directly affects customer-facing quotes.
 
 **Prevention:**
-- The default items creator must reference the business's default tax rate (which is created by `DefaultTaxRatesCreatorService` in the same onboarding flow)
-- Ensure the tax rates are created BEFORE default items (check the order in `BusinessCreatorService.create()` -- currently tax rates are created after items, which would cause a dependency ordering bug)
-- Either reorder the calls so `defaultTaxRatesCreator.createDefaultTaxRates()` runs before `defaultItemsCreator.createDefaultItems()`, or make the items creator look up the default tax rate
+- Trace the full pipeline: factory creates line items -> creator persists them -> ensure `parentLineItemId` is set on every component BEFORE `QuoteTotalsCalculator.calculateTotals()` runs
+- The factory returns `IBundleLineItemGroupDto { parent, components }` -- the caller (quote creator) must set `parentLineItemId = parent.id` on each component before persisting
+- Write a test that adds a 3-component bundle to a quote and asserts: (a) totals include the bundle parent only, (b) each component has `parentLineItemId` set, (c) the quote total equals `parent.lineTotal * (1 + taxRate/100)`
 
-**Detection:** Create a new business in development and verify items have valid tax rate references. Integration test for the full onboarding flow.
+**Detection:** Unit test on `QuoteTotalsCalculator` with mixed standalone and bundle line items. Integration test on quote creation with bundles.
 
-**Phase relevance:** API phase -- must fix ordering and update default items creator.
+**Phase relevance:** Quote line item management phase -- validate this works end-to-end when wiring the quote UI to the API.
+
+---
+
+### Pitfall 4: RTK Query Cache Invalidation for Nested Quote Data
+
+**What goes wrong:** A quote contains nested line items. When a line item is added/removed/updated via a mutation, the quote detail cache does not automatically refresh. The user adds an item to a quote, the mutation succeeds, but the quote detail view still shows the old line items (missing the new one) until a manual page refresh.
+
+**Why it happens:** RTK Query's tag-based invalidation works at the entity level. If the "add line item" mutation only invalidates `QuoteLineItem` tags but not the `Quote` tag for the parent quote, the quote detail query (which includes line items in its response) stays stale. Conversely, if quote detail and line items are fetched separately, the invalidation strategy must cover both.
+
+**Consequences:** Users think their changes were not saved. They may add the same item twice, or navigate away and lose trust in the system.
+
+**Prevention:**
+- Decide on ONE data fetching strategy for quote details:
+  - **Option A (recommended):** The quote detail API returns the full quote with embedded line items (the backend already does this via `IQuoteDto.lineItems`). The "add line item" mutation invalidates `{ type: "Quote", id: quoteId }`, which triggers a refetch of the full quote detail
+  - **Option B:** Fetch line items separately. Then BOTH `Quote` and `QuoteLineItem` tags must be invalidated on mutations. This adds complexity for no benefit
+- Follow Option A: single quote detail endpoint returns everything, mutations invalidate the parent quote tag
+- Tag structure: `providesTags: (result) => [{ type: "Quote", id: result.id }, "Quote"]`
+- Mutation: `invalidatesTags: (result, error, arg) => [{ type: "Quote", id: arg.quoteId }]`
+
+**Detection:** Add a line item to a quote, verify the quote detail view updates without manual refresh.
+
+**Phase relevance:** Quote UI wiring phase -- define the cache strategy before building components.
 
 ---
 
 ## Moderate Pitfalls
 
-### Pitfall 4: Bundle Items and Tax Rate References
+### Pitfall 5: Searchable Dropdown Performance with Large Item Lists
 
-**What goes wrong:** Bundle items currently set `defaultTaxRate: null` because bundles derive tax from their components. When switching to `defaultTaxRateId`, the validation logic must still enforce that bundle items do NOT have a tax rate ID, and that each component item has one. The existing validation checks `item.defaultTaxRate !== null` for bundles -- this condition needs updating.
+**What goes wrong:** The current `BundleComponentsList` renders ALL available items in a `<Select>` dropdown. For a tradesperson with 50-200 items, this works. But as the list grows, the dropdown becomes unusable -- no search, no filtering, slow rendering. The `<SelectContent>` from shadcn/ui renders all options in the DOM at once.
+
+**Why it happens:** The current implementation uses shadcn's basic `<Select>` component, which is built on Radix UI's Select primitive. It does not support filtering or search out of the box. Developers often reach for a `<Combobox>` pattern (Command + Popover) but implement it incorrectly -- e.g., opening a full dialog instead of an inline dropdown, or not handling keyboard navigation.
 
 **Prevention:**
-- Update `validateCommonFields()` to check `defaultTaxRateId !== null` instead of `defaultTaxRate !== null` for the bundle exclusion rule
-- Ensure the bundle component validation also verifies each component item has a valid tax rate reference
-- The `CreateItemRequest` uses `@ValidateIf((o) => o.type !== ItemType.BUNDLE)` for `defaultTaxRate` -- update this to validate the new ID field with the same conditional
+- Use shadcn/ui's `Combobox` pattern: `<Popover>` + `<Command>` (from cmdk library, already a shadcn dependency). This provides built-in search, keyboard navigation, and virtualized rendering
+- Filter items client-side (the full item list is already in the RTK Query cache). Do NOT add a server-side search endpoint for this -- the item count per business is small enough for client-side filtering
+- Filter OUT: (a) items with `type === "bundle"` (bundles cannot contain bundles), (b) items with `status !== "active"`, (c) items already selected as components in this bundle (prevent duplicates)
+- Debounce the search input if implementing custom filtering (300ms is sufficient)
 
-**Phase relevance:** API phase -- update all bundle-related validation logic.
+**Detection:** Load the item picker with 100+ items, verify search filters instantly, verify keyboard navigation works (arrow keys, enter to select, escape to close).
+
+**Phase relevance:** Searchable item picker phase -- replace `<Select>` with `<Combobox>` pattern.
 
 ---
 
-### Pitfall 5: UI Form Loads Tax Rates Before They Exist
+### Pitfall 6: Duplicate Components in Bundle Config
 
-**What goes wrong:** The item create/edit form needs a dropdown of tax rates. If the `useGetTaxRatesQuery` call fails or returns empty (no tax rates exist yet), the user sees an empty dropdown with no way to create an item. This is especially problematic during onboarding if the ordering fix from Pitfall 3 is not applied.
+**What goes wrong:** A user adds the same item as a component twice in a bundle. The current UI does not prevent this -- the dropdown allows selecting the same `itemId` multiple times. The API may accept this, resulting in a bundle with two rows for "Copper Pipe" (e.g., quantity 5 and quantity 3) instead of one row with quantity 8.
+
+**Why it happens:** There is no uniqueness check on `component.itemId` in either the form validation (`bundleItemFormSchema`) or the API validation (`BundleConfigValidator`). The `BundleComponentsList` uses `index` as the key (line 116), which hides the duplication in React rendering.
+
+**Consequences:** Duplicate components create confusing bundle displays. On quotes, the same item appears twice as separate child line items. Pricing calculations may be correct numerically but the UX is confusing.
 
 **Prevention:**
-- Handle the empty tax rates case in the UI -- show a message like "Create a tax rate first" with a link to the tax rates section
-- Consider pre-selecting the business's default tax rate (the one with `isDefault: true`) when creating a new item
-- Handle the loading state for the tax rates query -- do not show the form until tax rates are loaded
-- Consider what happens if the only tax rate a business has is `disabled` -- the dropdown should only show enabled tax rates
+- Client-side: In the searchable dropdown, disable or hide items that are already selected as components. The `availableItemsForBundle` memo already filters by type and status -- add a filter to exclude `itemIds` that are already in the `components` array
+- Client-side: Add Valibot validation that `components` has unique `itemId` values: `v.custom((components) => new Set(components.map(c => c.itemId)).size === components.length, "Duplicate components")`
+- Server-side: Add a uniqueness check in `BundleConfigValidator` or the item update service. Throw `InvalidRequestError` with a clear message
+- Use `component.itemId` as the React key instead of `index` when the item is selected
 
-**Phase relevance:** UI phase -- design the form with these edge cases.
+**Detection:** Try adding the same item twice in the bundle form. Verify it is prevented or visually warned.
+
+**Phase relevance:** Bundle component editing phase -- add the constraint when enabling editing.
 
 ---
 
-### Pitfall 6: Losing the Numeric Tax Rate During API Response Transition
+### Pitfall 7: Expandable Bundle Lines UX Confusion
 
-**What goes wrong:** The API currently returns `defaultTaxRate: 20` (a number) in the item response. After the change, it returns `defaultTaxRateId: "abc123"`. The UI needs the actual rate value to display "20% VAT" on items, but now only has an ID. Developers either (a) force the UI to make a separate API call for every item to resolve the tax rate name, causing N+1 queries, or (b) forget to include tax rate details in the item response at all.
+**What goes wrong:** On the quote detail view, bundle line items show as a single rolled-up row (the parent) with an expand/collapse toggle to reveal components. Users do not understand what the expand icon means, or they think the components are separate billable items on top of the bundle price. The total appears to "not add up" visually.
+
+**Why it happens:** The parent line item's `lineTotal` IS the bundle total (either fixed price or sum of components). The component line items are breakdowns, not additional charges. But without clear visual hierarchy, users (especially the tradesperson's customers who receive the quote) may misread the structure.
+
+**Consequences:** Users distrust the quote totals. They may manually override prices to "fix" what they perceive as a calculation error. Customer-facing quotes look confusing.
 
 **Prevention:**
-- Include resolved tax rate details in the item response: return both `defaultTaxRateId` and a nested `defaultTaxRate: { id, name, rate, rateType }` object in the API response
-- Alternatively, populate the tax rate in the repository layer when fetching items (MongoDB aggregation with `$lookup`, or manual population in the service layer)
-- The UI item type should include the resolved tax rate, not just the ID
-- Do NOT make the UI call `getTaxRate` for each item individually -- this creates N+1 API calls on the items list page
+- Visual hierarchy is critical:
+  - Parent row: normal styling, shows bundle total, has a chevron/expand icon with "View components" tooltip
+  - Child rows: indented (left padding or border), muted/secondary text color, smaller font or `text-muted-foreground`
+  - Child rows should NOT show individual prices if the bundle uses `fixed` pricing strategy (the per-component prices are internal allocations, not meaningful to the customer)
+  - For `component_based` pricing, child rows can show individual prices since they sum to the parent total
+- Add a subtle label on the parent row: "Bundle" badge similar to the existing `ItemType` badge pattern
+- On collapse, show the component count: "3 components" as secondary text on the parent row
+- Do NOT show component totals in the quote summary/totals section -- only parent line items contribute to totals (the calculator already handles this)
 
-**Phase relevance:** API phase (response shape) and UI phase (consuming the response).
+**Detection:** Create a quote with a bundle (3 components) and a standalone item. Verify: (a) the total is bundle total + standalone total, (b) expanding the bundle shows components with clear visual nesting, (c) collapsing hides components cleanly.
+
+**Phase relevance:** Quote detail UI phase -- design the component expansion before coding.
 
 ---
 
-### Pitfall 7: `merge-existing-item-with-changes` Utility Handles the Field Wrong
+### Pitfall 8: Money Value Object Serialization Between API and UI
 
-**What goes wrong:** The `mergeExistingItemWithChanges` utility merges update request fields with existing item data. It currently has a `mergeDefaultTaxRate` function that handles the numeric merge. When switching to a tax rate ID, this merge logic needs updating to handle the string ID correctly -- especially the distinction between `undefined` (field not in request, keep existing) and `null` (explicitly clearing, which should not be valid for non-bundle items).
+**What goes wrong:** The API uses a `Money` value object for all price fields (`unitPrice`, `lineTotal`, `discountAmount`, etc. on `IQuoteLineItemDto`). The UI receives these as serialized objects (likely `{ amount: number, currency: string }` or similar). If the UI treats these as raw numbers, arithmetic operations produce wrong results due to floating-point issues.
+
+**Why it happens:** The API's `Money` class handles precision internally (likely using minor units / cents). When serialized to JSON, the structure may not be obvious. Frontend developers may do `lineItem.unitPrice * lineItem.quantity` directly on the serialized values, bypassing the precision guarantees.
 
 **Prevention:**
-- Update the merge utility to handle `defaultTaxRateId` with the same undefined-vs-null pattern used by `visitTypeId` in `merge-existing-schedule-with-changes.utility.ts`
-- For non-bundle items, `null` should NOT be a valid value for the tax rate reference (unlike `visitTypeId` on schedules, which is optional). Validate this in the service layer
-- Update the corresponding unit tests
+- Check exactly how `Money` serializes in the API response (read `money.value-object.ts` and the response mapper). Ensure the UI type definitions match the serialized shape
+- On the UI, use a consistent formatting utility (`formatCurrency` from `useCurrency` hook) for display -- never do raw arithmetic on money values in the frontend
+- The quote totals should be calculated server-side ONLY (via `QuoteTotalsCalculator`). The UI should display the pre-calculated `totals.subTotal`, `totals.taxTotal`, `totals.total` from the API response, NOT recalculate them client-side
+- If any client-side price preview is needed (e.g., showing estimated total before saving), round to 2 decimal places and label it as "estimated"
 
-**Phase relevance:** API phase -- update mapper utilities.
+**Detection:** Add a bundle with components that have fractional prices (e.g., $1.33 each, quantity 3). Verify the displayed total matches the API-calculated total exactly.
+
+**Phase relevance:** Quote UI wiring phase -- establish the pattern for displaying money values early.
 
 ---
 
-### Pitfall 8: Valibot Schema Still Validates as Numeric String
+### Pitfall 9: Item Deletion or Deactivation After Adding to Quote
 
-**What goes wrong:** The UI's `itemFormSchema` validates `defaultTaxRate` as a numeric string with `Number.parseFloat()`. After switching to a tax rate ID dropdown, this validation is wrong -- the form value is now a selected ID string, not a number to parse. If the schema is not updated, form submission fails validation.
+**What goes wrong:** A user creates a quote with a bundle. Later, they deactivate or delete one of the bundle's component items. The quote still references the item by `itemId`. When displaying the quote, the UI tries to look up the item name and gets a 404 or shows "Unknown Item."
+
+**Why it happens:** Quote line items store `itemId` as a reference but the line item itself is a snapshot (it has its own `unitPrice`, `unit`, `type`). The problem is display-only: the line item data is self-contained for pricing, but the UI may fetch the item name from the items cache to display a friendly name instead of an ID.
 
 **Prevention:**
-- Replace the `defaultTaxRate` field in `itemFormSchema` with a `defaultTaxRateId` field validated as a non-empty string (required for non-bundle items)
-- The bundle item form schema does not include tax rate fields and should remain unchanged
-- Update the `ItemFormValues` type and all components consuming it (`MaterialItemForm`, `LabourItemForm`, `FeeItemForm`)
+- Store the item name on the quote line item at creation time (snapshot pattern). This may require adding a `name` or `description` field to `IQuoteLineItemDto`. If this is too much schema change for v1.2, handle it in the UI:
+- UI fallback: If the item lookup from RTK Query cache fails, display the line item with generic text like "Item (removed)" rather than crashing or showing an ID
+- Do NOT prevent item deactivation based on quote references -- that creates tight coupling and frustrates users
 
-**Phase relevance:** UI phase -- update schema before updating form components.
+**Detection:** Create a quote with items, deactivate one of the items, view the quote. Verify the display degrades gracefully.
+
+**Phase relevance:** Quote detail UI phase -- handle graceful degradation for deleted/deactivated items.
+
+---
+
+### Pitfall 10: Bundle Creation Bug (Unit Field Defaulting to "bundle")
+
+**What goes wrong:** This is an existing known bug listed in the milestone scope. When creating a bundle item, the `unit` field defaults to "bundle" (from the `ItemType` enum value leaking into the unit field). This produces nonsensical display: "1 bundle" instead of "1 each" or "1 pkg."
+
+**Why it happens:** Likely in the API's item creation path, the `unit` field is being set from the `type` field when not provided. For non-bundle items this works (e.g., "hour" for labour), but for bundles the type name leaks into the unit.
+
+**Prevention:**
+- Fix in the API: bundle items should default `unit` to "each" or "pkg" (or whatever the business convention is), not inherit from the type name
+- Validate: the `CreateItemRequest` should NOT accept `type` as a valid value for `unit` when type is "bundle"
+- Fix existing bad data: consider a migration or lazy fix (update on next edit) for any bundles already created with `unit: "bundle"`
+
+**Detection:** Create a bundle item without specifying a unit. Verify it defaults to a sensible value like "each."
+
+**Phase relevance:** First phase -- fix this bug before building on top of bundles.
 
 ---
 
 ## Minor Pitfalls
 
-### Pitfall 9: RTK Query Cache Invalidation Gap
+### Pitfall 11: Form State Reset When Switching Between Create and Edit Modes
 
-**What goes wrong:** When a tax rate is updated (name or rate percentage changes), item list displays become stale -- they still show the old tax rate details. RTK Query's `providesTags` on items does not know about tax rate changes.
+**What goes wrong:** The `ItemFormDialog` may reuse the same form component for both create and edit. If the dialog opens for "create bundle," user fills in data, closes without saving, then opens "edit bundle" -- the form still has the unsaved create data instead of the bundle's actual data.
 
 **Prevention:**
-- When the tax rate mutation invalidates `TaxRate` tags, also invalidate `Item` tags (or at least `{ type: "Item", id: "LIST" }`) since items display resolved tax rate data
-- Alternatively, ensure the item list fetches fresh data when navigating to it (RTK Query's `refetchOnMountOrArgChange` can help)
+- Reset form state when the dialog opens by using `useForm` with `defaultValues` derived from the `item` prop
+- Add a `key` prop to the form component that changes between create/edit (e.g., `key={item?.id ?? "create"}`) to force React to remount the form
+- Alternatively, call `form.reset(defaultValues)` in a `useEffect` when the `item` prop changes
 
-**Phase relevance:** UI phase -- configure cache invalidation when wiring up the tax rate dropdown.
+**Phase relevance:** Bundle editing phase -- verify form reset behavior when enabling edit mode.
 
 ---
 
-### Pitfall 10: Disabled Tax Rates on Existing Items
+### Pitfall 12: Optimistic Updates vs. Server Recalculation for Quote Totals
 
-**What goes wrong:** A user assigns tax rate "Standard VAT 20%" to items, then later disables that tax rate. The items still reference it. When displaying the item, the UI either shows nothing (if it filters to enabled-only) or shows a disabled tax rate. When editing the item, the dropdown (showing only enabled rates) does not include the currently selected rate, making it look like no rate is set.
+**What goes wrong:** After adding a line item to a quote, the UI could optimistically update the displayed totals before the server response arrives. But the server-calculated totals (using `Money` precision, bundle pricing allocation, blended tax rates) may differ from the client's naive arithmetic. The totals "flash" -- showing one value, then correcting to another.
 
 **Prevention:**
-- The API should NOT prevent disabling a tax rate that is referenced by items (this is intentional -- it just means new items should not use it)
-- The item edit form dropdown should include the currently-selected tax rate even if disabled, with a visual indicator like "(disabled)" suffix
-- The item display should show the tax rate normally even if disabled -- the reference is still valid
-- Consider: should creating a NEW item with a disabled tax rate be allowed? Probably not -- validate that the referenced tax rate has `status: enabled` on create, but allow it on existing items (update path should not re-validate status of an unchanged tax rate ID)
+- Do NOT implement optimistic updates for quote totals. The calculation logic (bundle pricing plans, proportional discount allocation, blended tax rates) is too complex to replicate client-side
+- Show a loading state on the totals section while the mutation is in flight. A simple spinner or skeleton on the totals row is sufficient
+- The response from the "add line item" mutation (or the refetched quote detail) provides the authoritative totals -- display those
 
-**Phase relevance:** Both API and UI phases -- validation differs between create and update paths.
+**Phase relevance:** Quote UI wiring phase -- avoid the temptation to optimize perceived performance with optimistic updates on calculated fields.
+
+---
+
+### Pitfall 13: Quantity Validation Edge Cases on Bundle Components
+
+**What goes wrong:** The quantity input on bundle components accepts `0`, negative values, or non-numeric strings. `parseFloat(e.target.value) || 1` (current code, line 149) handles empty/NaN by falling back to 1, but does not prevent 0 or negative quantities. The API's `BundleConfigValidator` checks for empty components but does not validate individual component quantities.
+
+**Prevention:**
+- Client-side: Valibot schema should enforce `quantity > 0` on each component: `v.number([v.minValue(0.01, "Quantity must be greater than zero")])`
+- Server-side: Add a quantity check in `BundleConfigValidator` or in the item creator/updater service -- each component must have `quantity > 0`
+- The quantity input should use `min="0.01"` (already present) but also clamp on blur, not just on change, to catch paste/autofill edge cases
+
+**Phase relevance:** Bundle component editing phase -- tighten validation when enabling editing.
 
 ---
 
@@ -166,24 +258,27 @@ Mistakes that cause rewrites or major issues.
 
 | Phase Topic | Likely Pitfall | Mitigation |
 |-------------|---------------|------------|
-| API schema change | Quote factories break (Pitfall 1) | Grep all `defaultTaxRate` references; update quote factories to resolve ID to rate |
-| API validation | Missing existence check (Pitfall 2) | Follow `visitTypeId` validation pattern from schedule module |
-| API onboarding | Default items creator breaks (Pitfall 3) | Fix creation ordering; default items reference default tax rate |
-| API bundle logic | Bundle validation conditions wrong (Pitfall 4) | Update all `defaultTaxRate` checks to use new field name |
-| API response shape | N+1 queries for tax rate details (Pitfall 6) | Include resolved tax rate in item response |
-| API merge utility | Merge handles field type wrong (Pitfall 7) | Update merge to handle string ID with undefined/null semantics |
-| UI form schema | Valibot validates number not ID (Pitfall 8) | Replace numeric validation with string ID validation |
-| UI empty state | No tax rates available (Pitfall 5) | Handle empty/loading states; pre-select default |
-| UI cache | Stale items after tax rate edit (Pitfall 9) | Cross-invalidate Item tags on TaxRate mutations |
-| UI disabled rates | Edit dropdown missing current rate (Pitfall 10) | Include disabled current rate in dropdown |
+| Bundle creation bug fix | Unit defaults to "bundle" (Pitfall 10) | Fix default unit value for bundle type in API |
+| Bundle component editing | Submit handler skips bundleConfig on edit (Pitfall 2) | Remove both UI guards (submit handler + read-only flag) in same commit |
+| Bundle component editing | Duplicate components allowed (Pitfall 6) | Add uniqueness validation client-side and server-side |
+| Bundle component editing | Quantity edge cases (Pitfall 13) | Enforce quantity > 0 in Valibot schema and API validator |
+| Searchable item picker | Performance with basic Select (Pitfall 5) | Use Combobox pattern (Popover + Command) from shadcn/ui |
+| Quote line item management | Double-counting bundle components (Pitfall 3) | Verify parentLineItemId is set before totals calculation |
+| Quote UI wiring | Cache invalidation for nested data (Pitfall 4) | Single quote detail endpoint; mutations invalidate parent Quote tag |
+| Quote UI wiring | Money serialization mismatch (Pitfall 8) | Display server-calculated totals only; use formatCurrency for display |
+| Quote UI wiring | Optimistic update temptation (Pitfall 12) | Do not optimistically update totals; show loading state instead |
+| Quote detail view | Expandable bundles confuse users (Pitfall 7) | Clear visual hierarchy: indented, muted child rows; "Bundle" badge on parent |
+| Quote detail view | Deleted items break display (Pitfall 9) | Graceful fallback for missing item references |
+| All editing phases | Bundle edits do not affect existing quotes (Pitfall 1) | Intentional design: quotes are snapshots; communicate in UI |
+| All form phases | Form state not resetting (Pitfall 11) | Use key prop or form.reset() on dialog open |
 
 ## Summary: Top 3 Risks
 
 | Risk | Likelihood | Impact | Mitigation |
 |------|-----------|--------|------------|
-| Quote factories break silently | HIGH | Quotes generate with wrong tax amounts | Update factories in same phase as schema change; add integration test |
-| Onboarding flow breaks | HIGH | New users cannot create a business | Fix tax rate/item creation ordering; test full onboarding |
-| N+1 API calls for tax rate display | MEDIUM | Item list page is slow; poor UX | Resolve tax rate details server-side in item response |
+| Submit handler silently drops bundleConfig on edit (Pitfall 2) | HIGH | Bundle component editing appears to work but saves nothing | Remove the `if (!isEditMode)` guard; update API merge utility |
+| Cache not refreshing after quote line item changes (Pitfall 4) | HIGH | Users think changes were not saved; may duplicate work | Define tag invalidation strategy upfront; mutations invalidate parent Quote tag |
+| Bundle component double-counting in totals (Pitfall 3) | MEDIUM | Quote totals 2x actual amount; financial correctness issue | Verify parentLineItemId pipeline end-to-end; write explicit tests |
 
 ---
-*Research completed: 2026-03-07*
+*Research completed: 2026-03-08*
