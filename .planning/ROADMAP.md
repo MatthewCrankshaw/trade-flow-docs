@@ -27,7 +27,7 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
 
 **Milestone Goal:** Update items to reference tax rates by ID instead of storing a numeric value, connecting the existing tax rate system to items across API and UI.
 
-- [ ] **Phase 9: Item Tax Rate API** - Items reference tax rates by ID with cross-module validation, updated quote factories, and fixed onboarding
+- [x] **Phase 9: Item Tax Rate API** - Items reference tax rates by ID with cross-module validation, updated quote factories, and fixed onboarding (completed 2026-03-08)
 - [ ] **Phase 10: Item Tax Rate UI** - Tax rate dropdown on item forms and tax rate display on item lists
 
 ## Phase Details
@@ -42,7 +42,7 @@ Full details: `.planning/milestones/v1.0-ROADMAP.md`
   3. Item API responses include the tax rate ID field (not a numeric rate)
   4. Creating a quote from items with tax rate references correctly resolves the tax percentage on each line item
   5. Signing up and completing onboarding creates default items that reference the correct default tax rate (not a hardcoded number)
-**Plans:** 3 plans
+**Plans:** 4/4 plans complete
 
 Plans:
 - [ ] 09-01-PLAN.md -- Replace defaultTaxRate with taxRateId across item data layer (entity, DTO, repo, requests, response, mappers)
@@ -78,5 +78,5 @@ Phases execute in numeric order: 9 -> 10
 | 6. Schedule List and Detail UI | v1.0 | 2/2 | Complete | 2026-03-07 |
 | 7. Schedule Edit and Management UI | v1.0 | 2/2 | Complete | 2026-03-07 |
 | 8. Job Detail Integration | v1.0 | 1/1 | Complete | 2026-03-07 |
-| 9. Item Tax Rate API | v1.1 | 0/3 | Not started | - |
+| 9. Item Tax Rate API | 4/4 | Complete   | 2026-03-08 | - |
 | 10. Item Tax Rate UI | v1.1 | 0/? | Not started | - |
