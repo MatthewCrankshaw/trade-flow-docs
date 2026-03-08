@@ -10,14 +10,9 @@ Two independent codebases: `trade-flow-api` (NestJS/MongoDB) and `trade-flow-ui`
 
 A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment in one simple, structured system.
 
-## Current Milestone: v1.1 Item Tax Rate Linkage
+## Current Milestone: None (planning next)
 
-**Goal:** Update items (products) to reference tax rates by ID instead of storing a tax rate value, connecting the existing tax rate system to the items system across API and UI.
-
-**Target features:**
-- Items store a tax rate ID reference instead of a numeric tax rate value
-- Item create/edit forms show a tax rate dropdown populated from business tax rates
-- Item display shows the linked tax rate name/percentage
+Previous milestone (v1.1 Item Tax Rate Linkage) shipped 2026-03-08. Run `/gsd:new-milestone` to start next.
 
 ## Requirements
 
@@ -51,14 +46,18 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - ✓ Schedule entries replace mock data in job detail page -- v1.0
 - ✓ Job detail shows schedule count/status summary -- v1.0
 - ✓ Empty state displayed when job has no schedule entries -- v1.0
+- ✓ Items reference tax rates by ID instead of storing a numeric value -- v1.1
+- ✓ Item create/edit forms show tax rate dropdown from business tax rates -- v1.1
+- ✓ Item list/detail views unchanged (tax rate only visible in edit form) -- v1.1
+- ✓ Item create/update validates referenced tax rate exists -- v1.1
+- ✓ Default items during onboarding reference the correct default tax rate -- v1.1
+- ✓ Quote line item factories resolve tax rate percentage from taxRateId -- v1.1
 
 ### Active
 
 <!-- Requirements for next milestone -- to be defined via /gsd:new-milestone -->
 
-- [ ] Items reference tax rates by ID instead of storing a tax rate value
-- [ ] Item create/edit UI shows tax rate dropdown from business tax rates
-- [ ] Item display shows linked tax rate details
+(None yet — define via `/gsd:new-milestone`)
 
 ### Out of Scope
 
@@ -92,9 +91,10 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - **Auth:** Firebase JWT (RS256) with server-side public key validation
 - **API contract:** Standardized response format: `{ data: T[], pagination?, errors? }`
 - **Scheduling shipped (v1.0):** Visit types (CRUD + defaults per trade) and schedules (create/list/edit/cancel/status transitions) fully integrated into job detail page
+- **Item tax rate linkage shipped (v1.1):** Items reference tax rates by ID; API validates references; UI shows tax rate dropdown on item forms; quote factories resolve rates
 - **Two scheduling modes deferred:** Only exact start time shipped; arrival window mode deferred to v2
 - **Conflict detection deferred:** Overlap warnings deferred to v2
-- **Codebase size:** ~17.4k LOC API (TypeScript) + ~20.3k LOC UI (TypeScript/TSX)
+- **Codebase size:** ~18.2k LOC API (TypeScript) + ~20.3k LOC UI (TypeScript/TSX)
 
 ## Constraints
 
@@ -119,6 +119,10 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 | Structured filter format (filter:field:op=value) | Project-wide API filtering standard from Phase 4 | ✓ Good -- reusable pattern |
 | Merged date+startTime into single startDateTime | ISO8601 field simplifies parsing and timezone handling | ✓ Good -- cleaner API |
 | Luxon DateTime enforced in all DTOs | Consistent date handling across API | ✓ Good -- eliminated date bugs |
+| taxRateId reference instead of numeric defaultTaxRate | Proper relational model; tax rate changes propagate automatically | ✓ Good -- clean data model |
+| Client-side tax rate resolution via RTK Query cache | No server joins needed; UI resolves tax rate details from cache | ✓ Good -- simpler API |
+| TaxRateRepository directly (not RetrieverService) for validation | Avoids unnecessary auth check; item creation itself is business-scoped | ✓ Good -- simpler validation |
+| Tax rate only visible in edit form (not list/detail) | User decision: tax rate is secondary detail | ✓ Good -- clean UI |
 
 ---
-*Last updated: 2026-03-07 after v1.1 milestone started*
+*Last updated: 2026-03-08 after v1.1 milestone completed*

@@ -1,5 +1,22 @@
 # Milestones
 
+## v1.1 Item Tax Rate Linkage (Shipped: 2026-03-08)
+
+**Phases completed:** 2 phases, 6 plans
+**Timeline:** 1 day (2026-03-08)
+**Execution time:** ~1 hour (avg 4min/plan)
+**Codebase:** ~18.2k LOC API + ~20.3k LOC UI (TypeScript)
+
+**Key accomplishments:**
+- Item entity migrated from numeric defaultTaxRate to taxRateId ObjectId reference across entity, DTO, repository, requests, response, and mappers
+- Tax rate existence validation on both item create and update services with unit tests
+- Onboarding flow reordered — tax rates created before items, default tax rate ID threaded to item creator
+- Quote factories resolve tax rate percentage from taxRateId via TaxRateRepository
+- Item forms (Material, Labour, Fee) show tax rate dropdown with "Name (rate%)" format and default pre-selection
+- OpenAPI spec fully migrated from defaultTaxRate to taxRateId
+
+---
+
 ## v1.0 Scheduling (Shipped: 2026-03-07)
 
 **Phases completed:** 8 phases, 16 plans, 0 tasks

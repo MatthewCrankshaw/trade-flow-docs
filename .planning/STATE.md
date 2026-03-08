@@ -1,79 +1,52 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Item Tax Rate Linkage
-status: completed
-stopped_at: Completed 10-02-PLAN.md (v1.1 milestone complete)
-last_updated: "2026-03-08T14:37:00.595Z"
-last_activity: 2026-03-08 -- Completed 10-02 (item form tax rate dropdown)
+milestone: none
+milestone_name: Planning next milestone
+status: idle
+stopped_at: v1.1 milestone completed and archived
+last_updated: "2026-03-08T16:00:00Z"
+last_activity: 2026-03-08 -- Completed v1.1 milestone (Item Tax Rate Linkage)
 progress:
-  total_phases: 2
-  completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-07)
+See: .planning/PROJECT.md (updated 2026-03-08)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 10 - Item Tax Rate UI
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 10 of 10 (Item Tax Rate UI)
-Plan: 2 of 2 in current phase (COMPLETE)
-Status: completed
-Last activity: 2026-03-08 -- Completed 10-02 (item form tax rate dropdown)
-
-Progress: [██████████] 100% (v1.1)
+Milestone: v1.1 Item Tax Rate Linkage shipped 2026-03-08
+Next: Run `/gsd:new-milestone` to start next milestone
 
 ## Performance Metrics
 
-**Velocity:**
-- Total plans completed: 18
+**Velocity (cumulative):**
+- Total plans completed: 22 (16 v1.0 + 6 v1.1)
 - Average duration: 6min
-- Total execution time: 1.85 hours
+- Total execution time: ~2.5 hours
 
-**By Phase:**
+**By Milestone:**
 
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 01-visit-type-backend | 2/2 | 20min | 10min |
-| 02-visit-type-management-ui | 2/2 | 18min | 9min |
-| 03-schedule-data-model-and-create-api | 2/2 | 8min | 4min |
-| 04-schedule-status-and-crud-api | 3/3 | 14min | 5min |
-| 05-schedule-creation-ui | 2/2 | 18min | 9min |
-| 06-schedule-list-and-detail-ui | 2/2 | 8min | 4min |
-| 07-schedule-edit-and-management-ui | 2/2 | 7min | 4min |
-| 08-job-detail-integration | 1/1 | 2min | 2min |
-| 09-item-tax-rate-api | 1/3 | 11min | 11min |
-| 10-item-tax-rate-ui | 2/2 | 12min | 6min |
-
-*Updated after each plan completion*
-| Phase 10 P01 | 2min | 2 tasks | 3 files |
-| Phase 10 P02 | 10min | 3 tasks | 4 files |
+| Milestone | Phases | Plans | Execution Time | Avg/Plan |
+|-----------|--------|-------|---------------|----------|
+| v1.0 Scheduling | 8 | 16 | 1.5 hours | 6min |
+| v1.1 Item Tax Rate Linkage | 2 | 6 | ~1 hour | 4min |
 
 ## Accumulated Context
 
 ### Decisions
 
 Key decisions archived in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
-
-- [v1.1 Research]: Follow schedule-to-visit-type pattern for item-to-tax-rate reference (client-side resolution via RTK Query cache)
-- [v1.1 Research]: No server-side tax rate embedding in item response -- UI resolves from cache
-- [09-01]: Added @item-test path alias following existing module test alias pattern
-- [09-01]: Used reflect-metadata import in mapper tests for decorated request class support
-- [Phase 09]: Replicated validateTaxRateExists in ItemUpdaterService rather than shared utility - keeps services self-contained
-- [10-01]: Filter tax rates to active-only in useItemForm hook, not in form components
-- [10-01]: Pre-select default tax rate on create using taxRates.find(tr => tr.isDefault)
-- [10-02]: Used FormSelect with "Name (rate%)" format for tax rate dropdown on item forms
-- [10-02]: Empty tax rates state shows disabled dropdown with link to Settings page
 
 ### Pending Todos
 
@@ -81,8 +54,7 @@ None.
 
 ### Blockers/Concerns
 
-- [Research]: Onboarding call ordering (defaultTaxRatesCreator vs defaultItemsCreator) needs verification during Phase 9 planning
-- [Research]: Quote factory tax rate resolution path needs to be determined during Phase 9 planning
+None -- all v1.1 concerns resolved.
 
 ### Quick Tasks Completed
 
@@ -93,6 +65,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-08T14:26:00Z
-Stopped at: Completed 10-02-PLAN.md (v1.1 milestone complete)
-Resume file: None - milestone complete
+Last session: 2026-03-08T16:00:00Z
+Stopped at: v1.1 milestone completed and archived
+Resume file: None - between milestones
