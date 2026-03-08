@@ -53,11 +53,10 @@ Full details: `.planning/milestones/v1.1-ROADMAP.md`
   1. User can create a new bundle item and the unit field correctly defaults to "bundle" without form errors
   2. User can search and filter items by name when selecting components for a bundle via a combobox dropdown
   3. SearchableItemPicker component works in both bundle creation and bundle editing contexts
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 11-01: TBD
-- [ ] 11-02: TBD
+- [ ] 11-01-PLAN.md -- Fix bundle unit bug, create SearchableItemPicker, integrate into BundleComponentsList
 
 ### Phase 12: Bundle Component Editing
 **Goal**: Users can fully manage bundle components on existing bundles with clear visual display
@@ -123,7 +122,7 @@ Phases execute in numeric order: 11 -> 12 -> 13 -> 14
 | 8. Job Detail Integration | v1.0 | 1/1 | Complete | 2026-03-07 |
 | 9. Item Tax Rate API | v1.1 | 4/4 | Complete | 2026-03-08 |
 | 10. Item Tax Rate UI | v1.1 | 2/2 | Complete | 2026-03-08 |
-| 11. Bundle Bug Fix and Foundation | v1.2 | 0/2 | Not started | - |
+| 11. Bundle Bug Fix and Foundation | v1.2 | 0/1 | Not started | - |
 | 12. Bundle Component Editing | v1.2 | 0/2 | Not started | - |
 | 13. Quote API Integration | v1.2 | 0/2 | Not started | - |
 | 14. Quote Detail and Line Items | v1.2 | 0/3 | Not started | - |
