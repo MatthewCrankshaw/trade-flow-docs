@@ -41,7 +41,7 @@ Full details: `.planning/milestones/v1.1-ROADMAP.md`
 - [x] **Phase 11: Bundle Bug Fix and Foundation** - Fix bundle creation bug and build reusable SearchableItemPicker component (completed 2026-03-08)
 - [x] **Phase 12: Bundle Component Editing** - Enable full component editing on existing bundles with improved display (completed 2026-03-08)
 - [x] **Phase 13: Quote API Integration** - Wire quote UI to existing API with creation flow and status transitions (completed 2026-03-14)
-- [x] **Phase 14: Quote Detail and Line Items** - Build quote detail view with line item management and expandable bundle rows (completed 2026-03-14)
+- [ ] **Phase 14: Quote Detail and Line Items** - Build quote detail view with line item management and expandable bundle rows (UAT gap closure in progress)
 
 ## Phase Details
 
@@ -98,11 +98,13 @@ Plans:
   3. User can add bundle items to a quote and see them as a single rolled-up line
   4. User can expand a bundle line item to reveal its individual component breakdown
   5. User can view quote totals (subtotal, tax, total) calculated from line items with correct bundle handling (no double-counting)
-**Plans**: 2 plans
+**Plans**: 4 plans
 
 Plans:
-- [ ] 14-01-PLAN.md -- API update/delete endpoints, UI types, RTK Query mutations, SearchableItemPicker bundle support
-- [ ] 14-02-PLAN.md -- Line items table/cards with add, inline edit, delete, expandable bundles, wired into QuoteDetailPage
+- [x] 14-01-PLAN.md -- API update/delete endpoints, UI types, RTK Query mutations, SearchableItemPicker bundle support
+- [x] 14-02-PLAN.md -- Line items table/cards with add, inline edit, delete, expandable bundles, wired into QuoteDetailPage
+- [ ] 14-03-PLAN.md -- Fix percentageOf math bug and implement soft delete for line items (gap closure)
+- [ ] 14-04-PLAN.md -- UI cosmetic fixes and bundle pricing mode toggle (gap closure)
 
 ## Progress
 
@@ -125,4 +127,4 @@ Phases execute in numeric order: 11 -> 12 -> 13 -> 14
 | 11. Bundle Bug Fix and Foundation | 1/1 | Complete    | 2026-03-08 | - |
 | 12. Bundle Component Editing | 2/2 | Complete    | 2026-03-08 | - |
 | 13. Quote API Integration | 3/3 | Complete    | 2026-03-14 | - |
-| 14. Quote Detail and Line Items | 2/2 | Complete    | 2026-03-14 | - |
+| 14. Quote Detail and Line Items | 2/4 | Gap Closure | - | - |
