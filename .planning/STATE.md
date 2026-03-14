@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Bundles & Quotes
 status: completed
-stopped_at: Completed 14-03-PLAN.md -- gap closure fixes
-last_updated: "2026-03-14T20:27:25Z"
-last_activity: 2026-03-14 -- Completed 14-03 API correctness fixes (percentageOf bug + soft delete)
+stopped_at: Completed 14-04-PLAN.md -- UI polish and bundle pricing strategy
+last_updated: "2026-03-14T20:33:39Z"
+last_activity: 2026-03-14 -- Completed 14-04 UI polish and bundle pricing strategy selector
 progress:
   total_phases: 4
   completed_phases: 4
-  total_plans: 9
-  completed_plans: 9
+  total_plans: 10
+  completed_plans: 10
   percent: 100
 ---
 
@@ -26,16 +26,16 @@ See: .planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: 14 of 14 (Quote Detail and Line Items) -- 4 of 4 in v1.2
-Plan: 3 of 3 in current phase
-Status: Phase 14 complete -- gap closure fixes applied
-Last activity: 2026-03-14 -- Completed 14-03 API correctness fixes (percentageOf bug + soft delete)
+Plan: 4 of 4 in current phase
+Status: Phase 14 complete -- all gap closure plans applied
+Last activity: 2026-03-14 -- Completed 14-04 UI polish and bundle pricing strategy selector
 
 Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity (cumulative):**
-- Total plans completed: 29 (16 v1.0 + 6 v1.1 + 7 v1.2)
+- Total plans completed: 30 (16 v1.0 + 6 v1.1 + 8 v1.2)
 - Average duration: 6min
 - Total execution time: ~2.5 hours
 
@@ -45,7 +45,7 @@ Progress: [██████████] 100%
 |-----------|--------|-------|---------------|----------|
 | v1.0 Scheduling | 8 | 16 | 1.5 hours | 6min |
 | v1.1 Item Tax Rate Linkage | 2 | 6 | ~1 hour | 4min |
-| v1.2 Bundles & Quotes | 4 | 9 | 20min | 3min |
+| v1.2 Bundles & Quotes | 4 | 10 | 23min | 3min |
 | Phase 12 P01 | 4min | 2 tasks | 6 files |
 | Phase 12 P02 | 4min | 3 tasks | 3 files |
 | Phase 13 P01 | 6min | 3 tasks | 13 files |
@@ -54,6 +54,7 @@ Progress: [██████████] 100%
 | Phase 14 P01 | 5min | 2 tasks | 9 files |
 | Phase 14 P02 | 3min | 2 tasks | 5 files |
 | Phase 14 P03 | 3min | 2 tasks | 6 files |
+| Phase 14 P04 | 3min | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,9 @@ Key decisions archived in PROJECT.md Key Decisions table.
 - 14-03: Pure numeric percentageOf calculation avoids Dinero integer division precision loss
 - 14-03: Soft delete via DELETED status enum rather than hard delete or deletedAt timestamp
 - 14-03: Added updateMany to MongoDbWriter for batch soft-delete of bundle child line items
+- 14-04: CSS grid for bundle component alignment instead of flex layout
+- 14-04: Two-step add flow for bundles overrides locked immediate-add decision (per UAT gap diagnosis)
+- 14-04: priceStrategy override uses spread to merge with bundleConfig
 
 ### Pending Todos
 
@@ -102,6 +106,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-14T20:27:25Z
-Stopped at: Completed 14-03-PLAN.md -- gap closure fixes
-Resume file: None -- gap closure complete
+Last session: 2026-03-14T20:33:39Z
+Stopped at: Completed 14-04-PLAN.md -- UI polish and bundle pricing strategy
+Resume file: None -- all gap closure plans complete
