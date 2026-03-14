@@ -16,10 +16,10 @@ Requirements for Bundles & Quotes milestone. Each maps to roadmap phases.
 
 ### Quote Management
 
-- [ ] **QUOT-01**: User can create a new quote linked to a job and customer
+- [x] **QUOT-01**: User can create a new quote linked to a job and customer
 - [ ] **QUOT-02**: User can view a list of all quotes with real API data (replacing mock data)
 - [ ] **QUOT-03**: User can view quote detail with line items and calculated totals
-- [ ] **QUOT-04**: User can transition quote status (Draft → Sent → Accepted/Rejected)
+- [x] **QUOT-04**: User can transition quote status (Draft → Sent → Accepted/Rejected)
 
 ### Quote Line Items
 
@@ -70,10 +70,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BNDL-02 | Phase 12 | Complete |
 | BNDL-03 | Phase 11 | Complete |
 | BNDL-04 | Phase 12 | Complete |
-| QUOT-01 | Phase 13 | Pending |
+| QUOT-01 | Phase 13 | Complete |
 | QUOT-02 | Phase 13 | Pending |
 | QUOT-03 | Phase 14 | Pending |
-| QUOT-04 | Phase 13 | Pending |
+| QUOT-04 | Phase 13 | Complete |
 | QLIT-01 | Phase 14 | Pending |
 | QLIT-02 | Phase 14 | Pending |
 | QLIT-03 | Phase 14 | Pending |
