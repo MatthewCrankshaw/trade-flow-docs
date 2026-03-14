@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Bundles & Quotes
 status: completed
-stopped_at: Completed 14-05-PLAN.md -- bundle alignment and tax-inclusive totals
-last_updated: "2026-03-14T21:06:27.479Z"
-last_activity: 2026-03-14 -- Completed 14-05 bundle alignment and tax-inclusive line totals
+stopped_at: Completed 14-06-PLAN.md
+last_updated: "2026-03-14T21:06:49.325Z"
+last_activity: 2026-03-14 -- Completed 14-06 bundle pricing strategy relocation to item form
 progress:
   total_phases: 4
   completed_phases: 4
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: 14 of 14 (Quote Detail and Line Items) -- 4 of 4 in v1.2
-Plan: 5 of 5 in current phase
-Status: Phase 14 complete -- all gap closure plans applied including 14-05
-Last activity: 2026-03-14 -- Completed 14-05 bundle alignment and tax-inclusive line totals
+Plan: 6 of 6 in current phase
+Status: Phase 14 complete -- all gap closure plans applied including 14-06
+Last activity: 2026-03-14 -- Completed 14-06 bundle pricing strategy relocation to item form
 
 Progress: [██████████] 100%
 
@@ -56,6 +56,7 @@ Progress: [██████████] 100%
 | Phase 14 P03 | 3min | 2 tasks | 6 files |
 | Phase 14 P04 | 3min | 3 tasks | 8 files |
 | Phase 14 P05 | 2min | 1 tasks | 2 files |
+| Phase 14 P06 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -90,6 +91,7 @@ Key decisions archived in PROJECT.md Key Decisions table.
 - 14-04: priceStrategy override uses spread to merge with bundleConfig
 - 14-05: Replaced CSS grid colSpan with native TableRow sub-rows for bundle component column alignment
 - 14-05: lineTotalIncTax helper centralises tax-inclusive calculation for display
+- [Phase 14]: 14-06: Pricing strategy is item-level setting, not per-quote -- API uses bundleConfig.priceStrategy when no override sent
 
 ### Pending Todos
 
@@ -109,6 +111,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-14T21:03:31Z
-Stopped at: Completed 14-05-PLAN.md -- bundle alignment and tax-inclusive totals
-Resume file: None -- all gap closure plans complete
+Last session: 2026-03-14T21:06:49.323Z
+Stopped at: Completed 14-06-PLAN.md
+Resume file: None
