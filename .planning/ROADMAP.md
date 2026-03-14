@@ -125,5 +125,5 @@ Phases execute in numeric order: 11 -> 12 -> 13 -> 14
 | 10. Item Tax Rate UI | v1.1 | 2/2 | Complete | 2026-03-08 |
 | 11. Bundle Bug Fix and Foundation | 1/1 | Complete    | 2026-03-08 | - |
 | 12. Bundle Component Editing | 2/2 | Complete    | 2026-03-08 | - |
-| 13. Quote API Integration | 1/3 | In Progress|  | - |
+| 13. Quote API Integration | 2/3 | In Progress|  | - |
 | 14. Quote Detail and Line Items | v1.2 | 0/3 | Not started | - |
