@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Bundles & Quotes
-status: completed
-stopped_at: Phase 14 context gathered
-last_updated: "2026-03-14T19:15:23.316Z"
-last_activity: 2026-03-14 -- Completed 13-03 quote creation dialog and detail page
+status: in-progress
+stopped_at: Completed 14-01-PLAN.md
+last_updated: "2026-03-14T19:39:11Z"
+last_activity: 2026-03-14 -- Completed 14-01 API and data foundation for line items
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 6
-  completed_plans: 6
-  percent: 100
+  total_plans: 8
+  completed_plans: 7
+  percent: 88
 ---
 
 # Project State
@@ -21,21 +21,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-08)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** v1.2 Bundles & Quotes -- Phase 13 in progress (3 of 4 phases)
+**Current focus:** v1.2 Bundles & Quotes -- Phase 14 in progress (4 of 4 phases)
 
 ## Current Position
 
-Phase: 13 of 14 (Quote API Integration) -- 3 of 4 in v1.2
-Plan: 3 of 3 in current phase (PHASE COMPLETE)
-Status: Phase 13 complete -- ready for Phase 14
-Last activity: 2026-03-14 -- Completed 13-03 quote creation dialog and detail page
+Phase: 14 of 14 (Quote Detail and Line Items) -- 4 of 4 in v1.2
+Plan: 1 of 2 in current phase
+Status: Plan 14-01 complete -- ready for Plan 14-02
+Last activity: 2026-03-14 -- Completed 14-01 API and data foundation for line items
 
-Progress: [██████████] 100%
+Progress: [████████░░] 88%
 
 ## Performance Metrics
 
 **Velocity (cumulative):**
-- Total plans completed: 26 (16 v1.0 + 6 v1.1 + 4 v1.2)
+- Total plans completed: 27 (16 v1.0 + 6 v1.1 + 5 v1.2)
 - Average duration: 6min
 - Total execution time: ~2.5 hours
 
@@ -45,12 +45,13 @@ Progress: [██████████] 100%
 |-----------|--------|-------|---------------|----------|
 | v1.0 Scheduling | 8 | 16 | 1.5 hours | 6min |
 | v1.1 Item Tax Rate Linkage | 2 | 6 | ~1 hour | 4min |
-| v1.2 Bundles & Quotes | 4 | 9 | 12min | 4min |
+| v1.2 Bundles & Quotes | 4 | 9 | 17min | 4min |
 | Phase 12 P01 | 4min | 2 tasks | 6 files |
 | Phase 12 P02 | 4min | 3 tasks | 3 files |
 | Phase 13 P01 | 6min | 3 tasks | 13 files |
 | Phase 13 P02 | 3min | 3 tasks | 11 files |
 | Phase 13 P03 | 7min | 2 tasks | 7 files |
+| Phase 14 P01 | 5min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,9 @@ Key decisions archived in PROJECT.md Key Decisions table.
 - 13-02: formatDecimal for quote totals since API returns major units via toMajorUnits()
 - [Phase 13-03]: Inner form component pattern for dialog state reset (avoids setState-in-effect lint error)
 - [Phase 13-03]: AlertDialog confirmations only for irreversible transitions (Accept, Reject); Send is immediate
+- 14-01: Totals not persisted in quote entity -- recalculated from line items on every read
+- 14-01: Bundle component deletion cascades from parent -- cannot delete components individually
+- 14-01: Line item update recalculates lineTotal and discountAmount server-side
 
 ### Pending Todos
 
@@ -90,6 +94,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-14T19:15:23.312Z
-Stopped at: Phase 14 context gathered
-Resume file: .planning/phases/14-quote-detail-and-line-items/14-CONTEXT.md
+Last session: 2026-03-14T19:39:11Z
+Stopped at: Completed 14-01-PLAN.md
+Resume file: .planning/phases/14-quote-detail-and-line-items/14-02-PLAN.md

@@ -125,4 +125,4 @@ Phases execute in numeric order: 11 -> 12 -> 13 -> 14
 | 11. Bundle Bug Fix and Foundation | 1/1 | Complete    | 2026-03-08 | - |
 | 12. Bundle Component Editing | 2/2 | Complete    | 2026-03-08 | - |
 | 13. Quote API Integration | 3/3 | Complete    | 2026-03-14 | - |
-| 14. Quote Detail and Line Items | v1.2 | 0/2 | Not started | - |
+| 14. Quote Detail and Line Items | 1/2 | In Progress|  | - |

@@ -23,10 +23,10 @@ Requirements for Bundles & Quotes milestone. Each maps to roadmap phases.
 
 ### Quote Line Items
 
-- [ ] **QLIT-01**: User can add standard items (material, labour, fee) to a quote
-- [ ] **QLIT-02**: User can add bundle items to a quote (creates parent + component line items)
+- [x] **QLIT-01**: User can add standard items (material, labour, fee) to a quote
+- [x] **QLIT-02**: User can add bundle items to a quote (creates parent + component line items)
 - [ ] **QLIT-03**: User can view bundle line items as a rolled-up line that expands to show individual components
-- [ ] **QLIT-04**: User can view quote totals (subtotal, tax, total) calculated from line items
+- [x] **QLIT-04**: User can view quote totals (subtotal, tax, total) calculated from line items
 
 ## Future Requirements
 
@@ -74,10 +74,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QUOT-02 | Phase 13 | Complete |
 | QUOT-03 | Phase 14 | Pending |
 | QUOT-04 | Phase 13 | Complete |
-| QLIT-01 | Phase 14 | Pending |
-| QLIT-02 | Phase 14 | Pending |
+| QLIT-01 | Phase 14 | Complete |
+| QLIT-02 | Phase 14 | Complete |
 | QLIT-03 | Phase 14 | Pending |
-| QLIT-04 | Phase 14 | Pending |
+| QLIT-04 | Phase 14 | Complete |
 
 **Coverage:**
 - v1.2 requirements: 12 total
