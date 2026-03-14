@@ -98,13 +98,15 @@ Plans:
   3. User can add bundle items to a quote and see them as a single rolled-up line
   4. User can expand a bundle line item to reveal its individual component breakdown
   5. User can view quote totals (subtotal, tax, total) calculated from line items with correct bundle handling (no double-counting)
-**Plans**: 4 plans
+**Plans**: 6 plans
 
 Plans:
 - [x] 14-01-PLAN.md -- API update/delete endpoints, UI types, RTK Query mutations, SearchableItemPicker bundle support
 - [x] 14-02-PLAN.md -- Line items table/cards with add, inline edit, delete, expandable bundles, wired into QuoteDetailPage
-- [ ] 14-03-PLAN.md -- Fix percentageOf math bug and implement soft delete for line items (gap closure)
-- [ ] 14-04-PLAN.md -- UI cosmetic fixes and bundle pricing mode toggle (gap closure)
+- [x] 14-03-PLAN.md -- Fix percentageOf math bug and implement soft delete for line items (gap closure)
+- [x] 14-04-PLAN.md -- UI cosmetic fixes and bundle pricing mode toggle (gap closure)
+- [ ] 14-05-PLAN.md -- Fix bundle component alignment and display tax-inclusive line totals (gap closure)
+- [ ] 14-06-PLAN.md -- Move pricing strategy to item form, restore immediate bundle add in quotes (gap closure)
 
 ## Progress
 
@@ -127,4 +129,4 @@ Phases execute in numeric order: 11 -> 12 -> 13 -> 14
 | 11. Bundle Bug Fix and Foundation | 1/1 | Complete    | 2026-03-08 | - |
 | 12. Bundle Component Editing | 2/2 | Complete    | 2026-03-08 | - |
 | 13. Quote API Integration | 3/3 | Complete    | 2026-03-14 | - |
-| 14. Quote Detail and Line Items | 4/4 | Complete    | 2026-03-14 | - |
+| 14. Quote Detail and Line Items | 4/6 | In Progress | 2026-03-14 | - |
