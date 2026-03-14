@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Bundles & Quotes
 status: completed
-stopped_at: Completed 14-02-PLAN.md -- v1.2 milestone complete
-last_updated: "2026-03-14T19:50:25.118Z"
-last_activity: 2026-03-14 -- Completed 14-02 Quote line items UI components
+stopped_at: Completed 14-03-PLAN.md -- gap closure fixes
+last_updated: "2026-03-14T20:27:25Z"
+last_activity: 2026-03-14 -- Completed 14-03 API correctness fixes (percentageOf bug + soft delete)
 progress:
   total_phases: 4
   completed_phases: 4
-  total_plans: 8
-  completed_plans: 8
+  total_plans: 9
+  completed_plans: 9
   percent: 100
 ---
 
@@ -26,16 +26,16 @@ See: .planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: 14 of 14 (Quote Detail and Line Items) -- 4 of 4 in v1.2
-Plan: 2 of 2 in current phase
-Status: Phase 14 complete -- v1.2 milestone complete
-Last activity: 2026-03-14 -- Completed 14-02 Quote line items UI components
+Plan: 3 of 3 in current phase
+Status: Phase 14 complete -- gap closure fixes applied
+Last activity: 2026-03-14 -- Completed 14-03 API correctness fixes (percentageOf bug + soft delete)
 
 Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity (cumulative):**
-- Total plans completed: 28 (16 v1.0 + 6 v1.1 + 6 v1.2)
+- Total plans completed: 29 (16 v1.0 + 6 v1.1 + 7 v1.2)
 - Average duration: 6min
 - Total execution time: ~2.5 hours
 
@@ -53,6 +53,7 @@ Progress: [██████████] 100%
 | Phase 13 P03 | 7min | 2 tasks | 7 files |
 | Phase 14 P01 | 5min | 2 tasks | 9 files |
 | Phase 14 P02 | 3min | 2 tasks | 5 files |
+| Phase 14 P03 | 3min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,9 @@ Key decisions archived in PROJECT.md Key Decisions table.
 - 14-02: Inline edit uses defaultValue with key={id+value} pattern for server-driven input reset
 - 14-02: No delete confirmation on line items -- immediate delete, user can re-add
 - 14-02: Bundle rows show dashes for unit price and tax columns (details on component rows)
+- 14-03: Pure numeric percentageOf calculation avoids Dinero integer division precision loss
+- 14-03: Soft delete via DELETED status enum rather than hard delete or deletedAt timestamp
+- 14-03: Added updateMany to MongoDbWriter for batch soft-delete of bundle child line items
 
 ### Pending Todos
 
@@ -98,6 +102,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-14T19:45:26Z
-Stopped at: Completed 14-02-PLAN.md -- v1.2 milestone complete
-Resume file: None -- milestone complete
+Last session: 2026-03-14T20:27:25Z
+Stopped at: Completed 14-03-PLAN.md -- gap closure fixes
+Resume file: None -- gap closure complete
