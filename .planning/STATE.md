@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Bundles & Quotes
-status: in-progress
-stopped_at: Completed 14-02-PLAN.md
-last_updated: "2026-03-14T19:45:26Z"
+status: completed
+stopped_at: Completed 14-02-PLAN.md -- v1.2 milestone complete
+last_updated: "2026-03-14T19:50:25.118Z"
 last_activity: 2026-03-14 -- Completed 14-02 Quote line items UI components
 progress:
   total_phases: 4
