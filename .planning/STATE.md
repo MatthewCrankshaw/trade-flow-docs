@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Bundles & Quotes
 status: completed
-stopped_at: Completed 14-04-PLAN.md -- UI polish and bundle pricing strategy
-last_updated: "2026-03-14T20:39:02.862Z"
-last_activity: 2026-03-14 -- Completed 14-04 UI polish and bundle pricing strategy selector
+stopped_at: Completed 14-05-PLAN.md -- bundle alignment and tax-inclusive totals
+last_updated: "2026-03-14T21:06:27.479Z"
+last_activity: 2026-03-14 -- Completed 14-05 bundle alignment and tax-inclusive line totals
 progress:
   total_phases: 4
   completed_phases: 4
-  total_plans: 10
-  completed_plans: 10
+  total_plans: 12
+  completed_plans: 12
   percent: 100
 ---
 
@@ -26,16 +26,16 @@ See: .planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: 14 of 14 (Quote Detail and Line Items) -- 4 of 4 in v1.2
-Plan: 4 of 4 in current phase
-Status: Phase 14 complete -- all gap closure plans applied
-Last activity: 2026-03-14 -- Completed 14-04 UI polish and bundle pricing strategy selector
+Plan: 5 of 5 in current phase
+Status: Phase 14 complete -- all gap closure plans applied including 14-05
+Last activity: 2026-03-14 -- Completed 14-05 bundle alignment and tax-inclusive line totals
 
 Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity (cumulative):**
-- Total plans completed: 30 (16 v1.0 + 6 v1.1 + 8 v1.2)
+- Total plans completed: 31 (16 v1.0 + 6 v1.1 + 9 v1.2)
 - Average duration: 6min
 - Total execution time: ~2.5 hours
 
@@ -45,7 +45,7 @@ Progress: [██████████] 100%
 |-----------|--------|-------|---------------|----------|
 | v1.0 Scheduling | 8 | 16 | 1.5 hours | 6min |
 | v1.1 Item Tax Rate Linkage | 2 | 6 | ~1 hour | 4min |
-| v1.2 Bundles & Quotes | 4 | 10 | 23min | 3min |
+| v1.2 Bundles & Quotes | 4 | 11 | 25min | 3min |
 | Phase 12 P01 | 4min | 2 tasks | 6 files |
 | Phase 12 P02 | 4min | 3 tasks | 3 files |
 | Phase 13 P01 | 6min | 3 tasks | 13 files |
@@ -55,6 +55,7 @@ Progress: [██████████] 100%
 | Phase 14 P02 | 3min | 2 tasks | 5 files |
 | Phase 14 P03 | 3min | 2 tasks | 6 files |
 | Phase 14 P04 | 3min | 3 tasks | 8 files |
+| Phase 14 P05 | 2min | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,8 @@ Key decisions archived in PROJECT.md Key Decisions table.
 - 14-04: CSS grid for bundle component alignment instead of flex layout
 - 14-04: Two-step add flow for bundles overrides locked immediate-add decision (per UAT gap diagnosis)
 - 14-04: priceStrategy override uses spread to merge with bundleConfig
+- 14-05: Replaced CSS grid colSpan with native TableRow sub-rows for bundle component column alignment
+- 14-05: lineTotalIncTax helper centralises tax-inclusive calculation for display
 
 ### Pending Todos
 
@@ -106,6 +109,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-14T20:33:39Z
-Stopped at: Completed 14-04-PLAN.md -- UI polish and bundle pricing strategy
+Last session: 2026-03-14T21:03:31Z
+Stopped at: Completed 14-05-PLAN.md -- bundle alignment and tax-inclusive totals
 Resume file: None -- all gap closure plans complete
