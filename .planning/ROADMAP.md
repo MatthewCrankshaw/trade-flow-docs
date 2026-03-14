@@ -81,11 +81,12 @@ Plans:
   1. User can create a new quote linked to a job and customer via a creation dialog
   2. User can view a list of all quotes populated from real API data (no mock/hardcoded data)
   3. User can transition a quote through its status lifecycle (Draft to Sent to Accepted/Rejected)
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 13-01: TBD
-- [ ] 13-02: TBD
+- [ ] 13-01-PLAN.md -- Extend quote API with jobId, quoteDate, number generation, transition endpoint
+- [ ] 13-02-PLAN.md -- Wire QuotesPage and job detail quotes tab to real API data
+- [ ] 13-03-PLAN.md -- CreateQuoteDialog and QuoteDetailPage with status transitions
 
 ### Phase 14: Quote Detail and Line Items
 **Goal**: Users can view full quote details with line items, add items and bundles to quotes, and see calculated totals
@@ -124,5 +125,5 @@ Phases execute in numeric order: 11 -> 12 -> 13 -> 14
 | 10. Item Tax Rate UI | v1.1 | 2/2 | Complete | 2026-03-08 |
 | 11. Bundle Bug Fix and Foundation | 1/1 | Complete    | 2026-03-08 | - |
 | 12. Bundle Component Editing | 2/2 | Complete    | 2026-03-08 | - |
-| 13. Quote API Integration | v1.2 | 0/2 | Not started | - |
+| 13. Quote API Integration | v1.2 | 0/3 | Not started | - |
 | 14. Quote Detail and Line Items | v1.2 | 0/3 | Not started | - |
