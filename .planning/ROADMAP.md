@@ -69,10 +69,11 @@ Full details: `.planning/milestones/v1.2-ROADMAP.md`
   2. User sees a confirmation dialog before deletion proceeds
   3. Deleted quote no longer appears in the quote list
   4. User cannot delete a quote that is in Sent, Accepted, or Rejected status
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 15-01: TBD
+- [ ] 15-01-PLAN.md — Add DELETED status, transition, deletedAt field, filter from list (API)
+- [ ] 15-02-PLAN.md — Delete UI on detail page and list page with confirmation dialog
 
 ### Phase 16: Token Infrastructure and Public API
 **Goal**: Secure foundation for customers to access quotes without logging in
@@ -167,7 +168,7 @@ Phases execute in numeric order: 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 12. Bundle Component Editing | v1.2 | 2/2 | Complete | 2026-03-08 |
 | 13. Quote API Integration | v1.2 | 3/3 | Complete | 2026-03-14 |
 | 14. Quote Detail and Line Items | v1.2 | 6/6 | Complete | 2026-03-14 |
-| 15. Quote Deletion | v1.3 | 0/0 | Not started | - |
+| 15. Quote Deletion | v1.3 | 0/2 | Not started | - |
 | 16. Token Infrastructure and Public API | v1.3 | 0/0 | Not started | - |
 | 17. Customer Quote Page | v1.3 | 0/0 | Not started | - |
 | 18. Quote Email Sending | v1.3 | 0/0 | Not started | - |
