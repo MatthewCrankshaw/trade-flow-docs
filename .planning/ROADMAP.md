@@ -52,7 +52,7 @@ Full details: `.planning/milestones/v1.2-ROADMAP.md`
 **Milestone Goal:** Enable tradespeople to send quotes to customers via email and receive automatic accept/reject responses back into Trade Flow.
 
 - [x] **Phase 15: Quote Deletion** - Tradesperson can delete draft quotes with confirmation (completed 2026-03-15)
-- [ ] **Phase 16: Token Infrastructure and Public API** - Secure token system for customer quote access without login
+- [x] **Phase 16: Token Infrastructure and Public API** - Secure token system for customer quote access without login (completed 2026-03-15)
 - [ ] **Phase 17: Customer Quote Page** - Customer can view a quote online via secure link
 - [ ] **Phase 18: Quote Email Sending** - Tradesperson can send quotes to customers via email
 - [ ] **Phase 19: Customer Response** - Customer can accept or reject a quote and tradesperson is notified
@@ -170,7 +170,7 @@ Phases execute in numeric order: 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 13. Quote API Integration | v1.2 | 3/3 | Complete | 2026-03-14 |
 | 14. Quote Detail and Line Items | v1.2 | 6/6 | Complete | 2026-03-14 |
 | 15. Quote Deletion | 2/2 | Complete    | 2026-03-15 | - |
-| 16. Token Infrastructure and Public API | 1/2 | In Progress|  | - |
+| 16. Token Infrastructure and Public API | 2/2 | Complete   | 2026-03-15 | - |
 | 17. Customer Quote Page | v1.3 | 0/0 | Not started | - |
 | 18. Quote Email Sending | v1.3 | 0/0 | Not started | - |
 | 19. Customer Response | v1.3 | 0/0 | Not started | - |
