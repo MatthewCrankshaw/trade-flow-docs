@@ -5,7 +5,7 @@ milestone_name: Bundles & Quotes
 status: completed
 stopped_at: Milestone v1.2 shipped
 last_updated: "2026-03-15"
-last_activity: 2026-03-15 - Completed quick task 3: Fix bundle fixed-price: add bundlePrice input field and validation
+last_activity: 2026-03-15 - Completed quick task 4: Fix quote money display - convert minor units with formatAmount
 progress:
   total_phases: 4
   completed_phases: 4
@@ -64,9 +64,10 @@ None.
 | 1 | Enforce Luxon DateTime usage in DTOs for dates and durations in trade-flow-api | 2026-03-01 | 67894c5 | [1-enforce-luxon-datetime-usage-in-dtos-for](./quick/1-enforce-luxon-datetime-usage-in-dtos-for/) |
 | 2 | Merge schedule date and startTime into startDateTime | 2026-03-01 | 0b2933f | [2-merge-schedule-date-and-starttime-into-a](./quick/2-merge-schedule-date-and-starttime-into-a/) |
 | 3 | Fix bundle fixed-price: add bundlePrice input field | 2026-03-15 | ef4ec77, fcbae3c | [3-fix-bundle-fixed-price-add-bundleprice-i](./quick/3-fix-bundle-fixed-price-add-bundleprice-i/) |
+| 4 | Fix quote money display: formatDecimal -> formatAmount | 2026-03-15 | a34dbea, 2e4d839 | [4-fix-quote-money-display-convert-minor-un](./quick/4-fix-quote-money-display-convert-minor-un/) |
 
 ## Session Continuity
 
 Last session: 2026-03-15
-Stopped at: Completed quick task 3 (bundle fixed-price bundlePrice input)
+Stopped at: Completed quick task 4 (fix quote money display - formatAmount)
 Resume file: None
