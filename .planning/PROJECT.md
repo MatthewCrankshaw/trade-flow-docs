@@ -10,9 +10,16 @@ Two independent codebases: `trade-flow-api` (NestJS/MongoDB) and `trade-flow-ui`
 
 A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment in one simple, structured system.
 
-## Current State
+## Current Milestone: v1.3 Send Quotes
 
-Shipped v1.2 Bundles & Quotes (2026-03-15). No active milestone — ready for next milestone planning.
+**Goal:** Enable tradespeople to send quotes to customers via email and receive automatic accept/reject responses back into Trade Flow.
+
+**Target features:**
+- Quote email delivery via SendGrid
+- Customer quote response (accept/reject — approach informed by research)
+- Automatic quote status updates from customer response
+- Quote PDF generation
+- Quote deletion
 
 ## Requirements
 
@@ -67,17 +74,20 @@ Shipped v1.2 Bundles & Quotes (2026-03-15). No active milestone — ready for ne
 
 ### Active
 
-<!-- Requirements for next milestone -- to be defined via /gsd:new-milestone -->
+<!-- Requirements for v1.3 Send Quotes -- defined via /gsd:new-milestone -->
 
-(None — run `/gsd:new-milestone` to define next milestone)
+- [ ] Send quotes to customers via email (SendGrid)
+- [ ] Customer can view and accept/reject a quote
+- [ ] Quote status updates automatically from customer response
+- [ ] Quote PDF generation
+- [ ] Quote deletion
 
 ### Out of Scope
 
 <!-- Explicit boundaries. -->
 
-- Quote deletion, duplication -- next milestone candidate
-- Quote-level discounts -- next milestone candidate
-- Quote PDF export -- next milestone candidate
+- Quote duplication -- future milestone candidate
+- Quote-level discounts -- future milestone candidate
 - Invoice generation and management -- next milestone candidate
 - Payment tracking -- next milestone candidate
 - Standalone calendar or "Today" screen -- future milestone (schedules show on job page only)
@@ -148,4 +158,4 @@ Shipped v1.2 Bundles & Quotes (2026-03-15). No active milestone — ready for ne
 | lineTotalIncTax helper for display calculation | Tax-inclusive totals centralised; column header "Total (inc. tax)" | ✓ Good -- clear UX |
 
 ---
-*Last updated: 2026-03-15 after v1.2 milestone*
+*Last updated: 2026-03-15 after v1.3 milestone start*
