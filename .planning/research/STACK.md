@@ -1,171 +1,194 @@
-# Technology Stack
+# Stack Research
 
-**Project:** Trade Flow v1.2 - Bundles & Quotes
-**Researched:** 2026-03-08
+**Domain:** Quote email delivery, customer response flow, PDF generation, quote deletion
+**Researched:** 2026-03-15
+**Confidence:** HIGH
 
-## Verdict: No New Dependencies Required
+## Recommended Stack
 
-The existing stack already contains every library needed for this milestone. All three major UI capabilities (searchable combobox, expandable rows, bundle component management) are already installed and partially in use.
+### Core Technologies
 
-## Existing Stack (Already Installed - USE THESE)
+No new core frameworks needed. All new features build on the existing NestJS/MongoDB/React stack. The additions below are library-level, not framework-level.
 
-### Searchable/Filterable Item Dropdown
+### New Backend Libraries
 
-| Technology | Version | Purpose | Status |
-|------------|---------|---------|--------|
-| `cmdk` | 1.1.1 | Command menu with fuzzy search, keyboard navigation | Already installed, wraps `Command` UI component |
-| `radix-ui` (Popover) | 1.4.3 | Popover container for combobox pattern | Already installed, `Popover` UI component exists |
+| Technology | Version | Purpose | Why Recommended |
+|------------|---------|---------|-----------------|
+| pdfmake | ^0.3.6 | Server-side PDF generation for quotes | Declarative JSON document definitions fit perfectly for structured quote documents (line items table, totals, headers). No browser/Puppeteer dependency means no headless Chrome in production. Pure JS, zero native dependencies. Built on PDFKit but with a declarative API that maps naturally to quote data structures. |
+| @types/pdfmake | ^0.2.x | TypeScript types for pdfmake | Required for type-safe document definitions in the strict TypeScript codebase. |
+| handlebars | ^4.7.8 | Server-side HTML email template compilation | Compiles HTML templates with dynamic data (customer name, quote number, totals, action URLs). Same templating syntax SendGrid Dynamic Templates use internally (Handlebars), so the mental model is consistent. Mature, stable, zero-dependency templating. |
 
-**Why no new library:** The project already has a working `Command + Popover` combobox pattern in `CreateJobDialog.tsx` (lines 289-473). This exact pattern -- Popover trigger button, Command with `shouldFilter={false}`, manual search/filter via `useMemo`, CommandInput + CommandList + CommandItem -- should be reused directly for the bundle item picker. The `CreateJobDialog` implementation includes search, "create new" inline options, and selection state management. The bundle item picker is simpler (no "create new" flow, just select existing items).
+### No New Frontend Libraries
 
-**Confidence:** HIGH (verified against `trade-flow-ui/src/features/jobs/components/CreateJobDialog.tsx`)
+The customer-facing quote response page and any UI additions use the existing React/Vite/Tailwind/Radix stack. No new frontend dependencies are needed.
 
-**How to apply for bundle components:**
-- Replace the current `<Select>` in `BundleComponentsList.tsx` (line 120-136) with the `Popover + Command` pattern
-- Use `shouldFilter={false}` and filter manually with `useMemo` (matches existing pattern)
-- Filter to `type !== "bundle"` and `status === "active"` (already done in `availableItemsForBundle`)
-- Show item name, unit, and price in each CommandItem for better selection context
+### No New Infrastructure
 
-### Expandable Table Rows (Quote Bundle Lines)
+SendGrid is already integrated (`@sendgrid/mail` ^8.1.6 in package.json). The existing `EmailSenderService` already supports HTML email sending. The new features extend it, not replace it.
 
-| Technology | Version | Purpose | Status |
-|------------|---------|---------|--------|
-| `@radix-ui/react-collapsible` | 1.1.12 | Animate expand/collapse of content regions | Already installed, `Collapsible` UI component exists |
-| shadcn `Table` components | n/a | Standard table primitives (Table, TableRow, TableCell, etc.) | Already installed |
+## Integration Points with Existing Code
 
-**Why no new library:** The API already returns bundle line items with a nested `components` array (see `IQuoteLineItemResponse.components`). The UI needs a clickable row that expands to show child component rows. This is a `Collapsible` wrapping additional `TableRow` elements -- no data table library needed.
+### SendGrid Email (Existing -- Extend)
 
-**Confidence:** HIGH (verified against `trade-flow-ui/src/components/ui/collapsible.tsx` and `trade-flow-api/src/quote/responses/quote.responses.ts`)
+The existing `EmailSenderService` sends emails with inline HTML via `@sendgrid/mail`. For quote emails:
 
-**Implementation pattern:**
-```tsx
-// Collapsible wrapping table rows for bundle expansion
-<Collapsible>
-  <TableRow>
-    <TableCell>
-      <CollapsibleTrigger>
-        <ChevronRight className="transition-transform data-[state=open]:rotate-90" />
-      </CollapsibleTrigger>
-    </TableCell>
-    <TableCell>{bundleItem.name}</TableCell>
-    <TableCell>{formatCurrency(bundleItem.lineTotal)}</TableCell>
-  </TableRow>
-  <CollapsibleContent asChild>
-    <>
-      {bundleItem.components.map(component => (
-        <TableRow key={component.id} className="bg-muted/30">
-          <TableCell /> {/* indent spacer */}
-          <TableCell className="pl-8">{component.name}</TableCell>
-          <TableCell>{formatCurrency(component.lineTotal)}</TableCell>
-        </TableRow>
-      ))}
-    </>
-  </CollapsibleContent>
-</Collapsible>
-```
+**Approach: Inline HTML compiled from Handlebars templates**
+- Compile Handlebars templates server-side into HTML strings
+- Pass compiled HTML to existing `EmailSenderService.sendEmail()` method
+- Templates live as `.hbs` files in the API codebase (e.g., `src/quote/templates/quote-email.hbs`)
+- Full control over templates in version control, no SendGrid dashboard dependency, testable in unit tests, works with the existing `sendEmail(html)` pattern
 
-### Quote UI Integration
+The existing `SendEmailDto` interface needs updating -- it currently has `senderName` and `wishlistUrl` fields that are artifacts from earlier work. These should be cleaned up or a new quote-specific DTO created.
 
-| Technology | Version | Purpose | Status |
-|------------|---------|---------|--------|
-| RTK Query | via `@reduxjs/toolkit` | API data fetching, caching, mutations | Already installed, `"Quote"` tag defined but no endpoints yet |
-| `react-hook-form` | 7.71.1 | Form state management for quote creation | Already installed |
-| `valibot` | 1.2.0 | Schema validation for quote forms | Already installed |
-| `@hookform/resolvers` | installed | Bridges valibot schemas to react-hook-form | Already installed |
+### Quote Entity (Existing -- Extend)
 
-**Confidence:** HIGH (verified against `trade-flow-ui/src/services/api.ts` and `trade-flow-api/src/quote/controllers/quote.controller.ts`)
+The `IQuoteEntity` already has `sentAt`, `acceptedAt`, `rejectedAt` fields and `QuoteStatus` enum with DRAFT/SENT/ACCEPTED/REJECTED/EXPIRED values. The data model is ready for the send/respond flow. Only a new `responseToken` field needs to be added.
 
-**What needs to be BUILT (not installed):**
+### Customer Entity (Existing -- Read)
 
-1. **RTK Query endpoints** for quotes -- the `api.ts` has a `"Quote"` tag but no quote endpoints yet. Required:
-   - `getQuotes(businessId)` -- GET `business/:businessId/quotes`
-   - `getQuote(quoteId)` -- GET `quote/:quoteId`
-   - `createQuote({ businessId, data })` -- POST `business/:businessId/quote`
-   - `addQuoteLineItem({ businessId, quoteId, data })` -- POST `business/:businessId/quote/:quoteId/line-item`
+`ICustomerEntity` has `email: string | null` and `name: string`. Email sending must validate that the customer has an email address before allowing quote send.
 
-2. **Quote detail page** -- route, layout, line items display with expandable bundles
+### Business Entity (Existing -- Read)
 
-3. **Quote creation form** -- customer selector (reuse Combobox pattern from CreateJobDialog), title, notes
+`BusinessEntity` has `name`, `currency`, `country`. These appear in the quote email and PDF header (business name, currency formatting).
 
-### Bundle Component Display & Editing
+### Authentication (Existing -- Bypass for Customer Response)
 
-| Technology | Version | Purpose | Status |
-|------------|---------|---------|--------|
-| `lucide-react` | installed | Icons (ChevronRight, Package, Plus, Trash2, etc.) | Already installed |
-| shadcn `Badge` | n/a | "optional" badges on components, status badges | Already installed |
-| shadcn `Card` | n/a | Mobile card layout for quotes | Already installed |
+Firebase JWT auth protects all current endpoints. Customer accept/reject endpoints must be **unauthenticated** -- customers don't have Trade Flow accounts. Use secure token-based access instead (see below).
 
-**What needs to change in BundleComponentsList:**
-- Current `isReadOnly = mode === "edit"` on line 53 blocks component editing. This guard must be removed to enable add/remove/update in edit mode.
-- Replace `<Select>` (lines 120-136) with `Popover + Command` combobox for searchable item selection.
-- Remove the "Component editing is not yet available" placeholder message (lines 164-166).
+## New Architectural Components
 
-## Libraries Explicitly NOT Needed
+### Secure Token for Customer Quote Response
 
-| Library | Why Considered | Why Not |
-|---------|---------------|---------|
-| `@tanstack/react-table` | Expandable rows, sorting | Overkill for simple quote line items table (typically <20 rows, 5-7 columns). No other tables in the project use it. Collapsible + Table primitives achieve the same result with zero new deps. |
-| `downshift` | Combobox/autocomplete | Already have cmdk + Popover pattern working in CreateJobDialog; switching adds no value |
-| `react-select` | Searchable dropdown | Heavy (27KB min+gz), style-opinionated; cmdk is lighter and already integrated with shadcn theming |
-| `react-pdf` / PDF libraries | Quote PDF generation | Out of scope for v1.2; quote acceptance/invoicing is next milestone |
-| `@dnd-kit/core` | Drag-and-drop line item reordering | Over-engineering; line items don't need reordering in v1.2 |
-| `decimal.js` / `dinero.js` | Currency math | API already handles Money value objects server-side; UI just displays pre-calculated values |
+**Approach: Cryptographic random token using Node.js built-in `crypto`**
 
-## Currency Formatting
+Generate a token from `crypto.randomBytes(32).toString('hex')` stored on the quote document. The customer response URL includes this token as the sole authentication mechanism.
 
-The project already has a `useCurrency` hook. The quote UI should use this for formatting `unitPrice`, `lineTotal`, `subTotal`, `taxTotal`, and `total` values returned by the API (already in major units as numbers).
+| Aspect | Decision | Rationale |
+|--------|----------|-----------|
+| Token generation | `crypto.randomBytes(32)` | Built-in Node.js, cryptographically secure, no additional dependency needed |
+| Token storage | New `responseToken` field on Quote entity | Simple, queryable, one token per quote |
+| Token format | 64-character hex string | URL-safe, no encoding issues |
+| Expiration | Use existing `validUntil` field on quote | Already on the quote entity, natural business logic alignment |
+| Endpoint pattern | `GET /quotes/respond/:token` (view) + `POST /quotes/respond/:token` (accept/reject) | Public endpoints, no Firebase auth guard |
 
-## Integration Points
+**Why NOT JWT for tokens:** JWTs are self-contained and can't be revoked server-side without a blocklist. A simple random token stored in the database can be invalidated by clearing it. Simpler, more secure for this one-time-use case.
 
-### API Response Structure (Already Built)
+**Why NOT a separate tokens collection:** One token per quote, strict 1:1 relationship. Adding a field to the existing quote document is simpler than a separate collection with a foreign key.
 
-The quote API returns line items with nested `components` for bundles:
+### PDF Generation Service
 
-```typescript
-// IQuoteResponse.lineItems structure:
-{
-  id: string;
-  itemId: string;
-  quantity: number;
-  unit: string;
-  unitPrice: number;      // major units (e.g., 25.50)
-  lineTotal: number;       // major units
-  taxRate: number;          // percentage (e.g., 20)
-  type: "material" | "labour" | "bundle";
-  components?: IQuoteLineItemResponse[];  // only for bundles
-}
-```
+**Approach: pdfmake with declarative document definitions**
 
-The frontend does NOT need to compute totals or resolve bundle components -- the API handles all pricing and returns a nested structure ready for display.
+A new `QuotePdfGenerator` service in the quote module that:
+1. Takes a quote DTO with line items and totals
+2. Builds a pdfmake document definition (JSON object with table, headers, footer)
+3. Returns a `Buffer` containing the PDF bytes
 
-### RTK Query Cache Strategy
+| Aspect | Decision | Rationale |
+|--------|----------|-----------|
+| Library | pdfmake | Declarative JSON API maps directly to quote structure (header with business/customer info, line items table, totals row, notes section). No HTML/CSS rendering needed. |
+| Output | Buffer (not file) | Stream directly to HTTP response or attach to email. No filesystem writes needed. |
+| Fonts | pdfmake built-in Roboto | Professional, readable, no font file management required |
+| Template | Code-defined document definition | Quote layout is structured tabular data, not freeform content. A JSON definition is more maintainable than HTML-to-PDF for invoice-style documents. |
+| Storage | Generate on-the-fly, do not persist | PDFs are deterministic from quote data. Regenerate on demand rather than storing in MongoDB or S3. |
 
-Follow the existing pattern: queries tagged with `"Quote"`, mutations invalidate `"Quote"` tag. The `addLineItem` mutation should invalidate the specific quote's cache entry to refresh totals after a line item is added.
+### Customer Response Page (Frontend)
 
-### Combobox Reuse Strategy
+**Approach: New public route in the existing React app**
 
-Extract the Popover + Command pattern from `CreateJobDialog` into a reusable `ComboboxSelect` component (or just follow the pattern inline). It will be used in at least two places:
-1. Bundle component item picker (replacing `<Select>`)
-2. Quote creation customer selector
+A route like `/quote/respond/:token` that:
+1. Fetches quote details from a public API endpoint (no auth required)
+2. Displays quote summary (business name, line items, totals)
+3. Provides Accept/Reject buttons that POST to the public API endpoint
 
-Both use the same pattern: trigger button with chevron, Command with `shouldFilter={false}`, manual filtering via `useMemo`, CommandItem with check mark for selected state.
+| Aspect | Decision | Rationale |
+|--------|----------|-----------|
+| Hosting | Same React app, public route | No separate app to deploy. React Router already handles routing. |
+| Auth bypass | Route outside protected route wrapper | Customer does not need a Trade Flow account |
+| Styling | Same Tailwind/Radix components | Consistent professional look, no additional CSS framework |
+| State | Local fetch or simple RTK Query endpoint | One-off page with minimal state requirements |
+
+### Quote Deletion
+
+**Approach: Hard delete for DRAFT quotes only**
+
+No new libraries needed. This is pure business logic in the existing service layer. Only DRAFT status quotes should be deletable (sent/accepted/rejected quotes have business significance and should be preserved).
 
 ## Installation
 
 ```bash
-# No new packages to install.
-# All required dependencies are already in package.json.
+# In trade-flow-api/
+npm install pdfmake handlebars
+npm install -D @types/pdfmake
 ```
+
+No new packages needed in `trade-flow-ui/`.
+
+## Alternatives Considered
+
+| Recommended | Alternative | When to Use Alternative |
+|-------------|-------------|-------------------------|
+| pdfmake (declarative JSON) | Puppeteer (headless Chrome) | When PDF must pixel-perfectly match an HTML/CSS design mockup. Not this case -- quotes are structured tabular data. Puppeteer adds ~300MB Chrome dependency and is significantly slower. |
+| pdfmake (declarative JSON) | PDFKit (imperative drawing API) | When you need pixel-level control over every drawn element. Not this case -- pdfmake wraps PDFKit with a declarative API that is better suited for document-style PDFs with tables. |
+| pdfmake (declarative JSON) | @react-pdf/renderer | When PDF generation happens client-side or you want JSX syntax for templates. Not this case -- generation is server-side in NestJS. |
+| Handlebars (server-side compile) | SendGrid Dynamic Templates | When non-developers need to edit email templates via a visual UI dashboard. Not this case -- solo dev, templates should live in version control and be unit-testable. |
+| Handlebars (server-side compile) | MJML (responsive email framework) | When building a large library of responsive email templates with complex layouts. Overkill for 1-2 transactional quote emails. Adds a compilation step and new DSL. |
+| crypto.randomBytes token | JWT token in URL | When token needs to carry claims without a DB lookup. Not this case -- revocability matters and the DB lookup is cheap (indexed field). |
+| Public route in existing React app | Separate static page / standalone app | When the response page needs to be extremely lightweight or hosted on a different domain. Not this case -- reusing existing UI components is faster to build and maintain. |
+
+## What NOT to Use
+
+| Avoid | Why | Use Instead |
+|-------|-----|-------------|
+| Puppeteer / Playwright for PDF | 300MB+ Chrome dependency, slow cold start, heavy memory usage, overkill for structured documents | pdfmake -- zero native dependencies, fast, declarative |
+| MJML for email templates | Adds build step, new template DSL to learn, overkill for 1-2 transactional emails | Handlebars compiling inline HTML -- simpler, already sufficient |
+| SendGrid Dynamic Templates | Templates live outside codebase, cannot be version-controlled, cannot be unit tested, adds dashboard dependency | Handlebars server-side compilation with existing inline HTML sending pattern |
+| Separate microservice for PDF | Architecture overhead for a single feature within an existing module | Service class within existing quote module |
+| nodemailer | Already using SendGrid SDK; adding nodemailer creates two competing email paths | Existing @sendgrid/mail integration |
+| uuid for tokens | 122 bits of entropy vs 256 bits from crypto.randomBytes; adds unnecessary dependency | crypto.randomBytes(32) -- built-in Node.js, more secure |
+| Storing PDFs in MongoDB/S3 | Adds storage management complexity; PDFs are deterministic and can be regenerated on demand from quote data | Generate on-the-fly from quote data |
+| html-pdf / wkhtmltopdf | Deprecated, relies on QtWebKit, security issues, no active maintenance | pdfmake -- actively maintained, pure JS |
+
+## Version Compatibility
+
+| Package | Compatible With | Notes |
+|---------|-----------------|-------|
+| pdfmake@0.3.6 | Node.js 22.x | Pure JS, no native dependencies, broad Node.js compatibility |
+| handlebars@4.7.8 | Node.js 22.x | Stable for years, no known compatibility issues. Last published 2023 but fully functional -- templating is a solved problem. |
+| @types/pdfmake@0.2.x | TypeScript 5.9.x | Verify type definitions match pdfmake 0.3.x API after install |
+| @sendgrid/mail@8.1.6 | Already installed | No changes needed; existing version supports inline HTML and dynamic template features |
+
+## Summary of Changes by Repo
+
+### trade-flow-api (2 new packages)
+- `pdfmake` + `@types/pdfmake` for PDF generation
+- `handlebars` for email template compilation
+- New `responseToken` field on quote entity
+- New public (unauthenticated) controller endpoints for customer response
+- New `QuotePdfGenerator` service
+- New `QuoteEmailSender` service (uses existing `EmailSenderService`)
+- Handlebars template files in `src/quote/templates/`
+
+### trade-flow-ui (0 new packages)
+- New public route `/quote/respond/:token`
+- New `QuoteResponsePage` component (uses existing Tailwind/Radix components)
+- Quote detail page additions (Send button, PDF download button, Delete button)
 
 ## Sources
 
-- Codebase: `trade-flow-ui/src/features/jobs/components/CreateJobDialog.tsx` -- Command+Popover combobox pattern (HIGH confidence)
-- Codebase: `trade-flow-ui/src/components/ui/command.tsx` -- cmdk 1.1.1 wrapper (HIGH confidence)
-- Codebase: `trade-flow-ui/src/components/ui/collapsible.tsx` -- Radix Collapsible component (HIGH confidence)
-- Codebase: `trade-flow-ui/src/features/items/components/forms/shared/BundleComponentsList.tsx` -- current Select-based picker (HIGH confidence)
-- Codebase: `trade-flow-api/src/quote/controllers/quote.controller.ts` -- existing API endpoints with nested line item mapping (HIGH confidence)
-- Codebase: `trade-flow-api/src/quote/responses/quote.responses.ts` -- nested `components` array structure (HIGH confidence)
-- Codebase: `trade-flow-ui/package.json` -- verified installed versions (HIGH confidence)
+- [pdfmake on npm](https://www.npmjs.com/package/pdfmake) -- version 0.3.6 verified, HIGH confidence
+- [pdfmake GitHub](https://github.com/bpampuch/pdfmake) -- capability and API verification, HIGH confidence
+- [SendGrid Dynamic Templates docs](https://docs.sendgrid.com/ui/sending-email/how-to-send-an-email-with-dynamic-templates) -- template API reference, HIGH confidence
+- [SendGrid Node.js transactional templates](https://github.com/sendgrid/sendgrid-nodejs/blob/main/docs/use-cases/transactional-templates.md) -- code examples, HIGH confidence
+- [Handlebars official site](https://handlebarsjs.com/) -- API reference, HIGH confidence
+- [Node.js Crypto documentation](https://nodejs.org/api/crypto.html) -- randomBytes API, HIGH confidence
+- [JS PDF library comparison (DEV Community)](https://dev.to/handdot/generate-a-pdf-in-js-summary-and-comparison-of-libraries-3k0p) -- pdfmake vs alternatives, MEDIUM confidence
+- [Top JS PDF libraries 2026 (Nutrient)](https://www.nutrient.io/blog/top-js-pdf-libraries/) -- ecosystem overview, MEDIUM confidence
+- Codebase: `trade-flow-api/src/email/services/email-sender.service.ts` -- existing SendGrid integration pattern, HIGH confidence
+- Codebase: `trade-flow-api/src/quote/entities/quote.entity.ts` -- existing quote data model, HIGH confidence
+- Codebase: `trade-flow-api/package.json` -- existing dependency versions, HIGH confidence
 
 ---
-*Research completed: 2026-03-08*
+*Stack research for: Trade Flow v1.3 -- Send Quotes*
+*Researched: 2026-03-15*

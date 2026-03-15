@@ -1,284 +1,174 @@
-# Domain Pitfalls: Bundles & Quotes (v1.2)
+# Domain Pitfalls: Send Quotes (v1.3)
 
-**Domain:** Bundle editing, searchable item pickers, and quote management in a NestJS/React business management app
-**Researched:** 2026-03-08
+**Domain:** Quote email delivery, customer response flow, PDF generation, secure tokens for existing NestJS/React trade management system
+**Researched:** 2026-03-15
 
 ## Critical Pitfalls
 
-Mistakes that cause rewrites or major issues.
+Mistakes that cause rewrites, security vulnerabilities, or major user-facing failures.
 
-### Pitfall 1: Bundle Component Edits Not Propagating to Existing Quote Line Items
+### Pitfall 1: Customer Email is Nullable -- Send Fails at Runtime
 
-**What goes wrong:** A user edits a bundle's components (adds a component, removes one, changes quantities) through the item management UI. Existing quotes that use this bundle still have the OLD component line items. The user expects the quote to reflect the updated bundle, but it does not -- or worse, the quote totals are now inconsistent with the bundle definition.
+**What goes wrong:** The `ICustomerEntity.email` field is `string | null`. Attempting to send a quote email to a customer with no email address causes a SendGrid API error or, worse, sends to `null`/empty string which SendGrid may accept silently and count against your quota.
+**Why it happens:** The quote creation flow does not require a customer email. The "Send Quote" button would appear regardless of whether the customer has an email.
+**Consequences:** Runtime errors on send, confused users, wasted SendGrid credits, potential bounce reputation damage.
+**Prevention:** Validate customer has a non-null, non-empty email before allowing the Draft-to-Sent transition. Disable/hide the "Send Quote" button in the UI when customer email is missing. Show a clear prompt: "Add an email address for [Customer Name] to send this quote."
+**Detection:** Unit test the send service to reject sends when customer email is null. E2E test the send flow with a customer that has no email.
 
-**Why it happens:** The quote system snapshots bundle data at the time a bundle is added to a quote. The `QuoteBundleLineItemFactory` creates parent + child line items with `parentLineItemId` references, storing concrete `unitPrice`, `lineTotal`, `discountAmount`, and `taxRate` values. These are intentionally decoupled from the source item -- quotes are point-in-time snapshots. But developers (and users) may not realize this and expect edits to cascade.
+### Pitfall 2: Public Token Endpoint Bypasses Auth but Reuses Auth-Required Services
 
-**Consequences:** If you try to "sync" bundle edits to existing quotes, you break the snapshot model and introduce complex recalculation cascades. If you do not sync, users may be confused when their quote does not match the current bundle definition.
+**What goes wrong:** The customer accept/reject endpoint must be public (no Firebase JWT) since customers are not app users. But the existing `QuoteTransitionService` calls `accessControllerFactory.create(this.quotePolicy)` which requires an `IUserDto` (the authenticated user). Passing `null` or a fake user object causes authorization checks to fail or, worse, silently bypasses business scoping.
+**Why it happens:** Every existing service method takes `authUser: IUserDto` as the first parameter. The developer either (a) hacks around this by creating a synthetic user, which breaks the security model, or (b) duplicates the transition logic in a new service, which causes divergence.
+**Consequences:** Security holes if a fake "system user" has overly broad permissions. Logic duplication if transition code is copied. Broken transitions if the workaround is fragile.
+**Prevention:** Create a dedicated `QuotePublicResponseService` that performs the token-scoped transition directly via the repository, bypassing the policy layer entirely. The token itself IS the authorization (it proves the customer received the quote). This service should ONLY allow accept/reject transitions on quotes in SENT status -- hardcode this constraint rather than reusing the generic transition map. Keep the existing `QuoteTransitionService` untouched for internal (authenticated) status changes.
+**Detection:** Code review flag: any public endpoint that constructs a fake `IUserDto`. Integration test: ensure public endpoint cannot transition quotes that are not in SENT status.
 
+### Pitfall 3: Token Security -- Guessable, Never-Expiring, or Logged Tokens
+
+**What goes wrong:** Using predictable tokens (e.g., base64-encoded quoteId, sequential IDs, or short tokens) allows anyone to accept/reject quotes by guessing URLs. Tokens that never expire remain valid forever, even after the quote is superseded. Tokens in URL query parameters get logged in server access logs, browser history, and analytics tools.
+**Why it happens:** Developer uses a simple encoding scheme for speed ("just base64 the quote ID"), forgets to add expiry, or puts the token as a query parameter (`?token=abc`) which gets logged everywhere.
+**Consequences:** Unauthorized quote acceptance/rejection. Stale tokens allow actions on quotes the tradesperson has already re-sent. Token leakage via logs or referrer headers.
 **Prevention:**
-- Do NOT retroactively update existing quote line items when a bundle is edited. Quotes are snapshots. Document this decision in the UI with a clear message: "Changes to this bundle will not affect existing quotes."
-- When displaying a bundle on a quote, show the snapshotted data, not the current item definition
-- Consider adding a "refresh from current item" action on individual quote line items in a future milestone, but do NOT build it now -- it introduces recalculation complexity that is out of v1.2 scope
+- Generate tokens with `crypto.randomBytes(32).toString('hex')` -- 256-bit unguessable tokens.
+- Store a hash of the token (not the token itself) in the database alongside the quoteId, expiry, and a `usedAt` timestamp.
+- Set token expiry (30 days is reasonable for quotes -- matches typical quote validity).
+- Use path-based tokens (`/quote/respond/:token`) not query params (`/quote?token=...`) to reduce logging exposure.
+- Mark tokens as used after accept/reject (one-time use).
+- When a quote is re-sent, invalidate previous tokens.
+**Detection:** Security review: grep for `Buffer.from` or `btoa` on quote IDs. Check that tokens are stored hashed. Verify expiry is enforced in the lookup query.
 
-**Detection:** Manual testing: create a quote with a bundle, edit the bundle's components, verify the quote is unchanged.
+### Pitfall 4: Race Condition on Quote Status Transition (Double Accept/Reject)
 
-**Phase relevance:** Bundle editing phase -- must make the deliberate decision NOT to sync, and communicate this in the UI.
-
----
-
-### Pitfall 2: BundleItemForm Skips bundleConfig on Edit (Existing Bug)
-
-**What goes wrong:** The current `BundleItemForm.tsx` (line 90-93) explicitly skips `bundleConfig` when `isEditMode` is true:
+**What goes wrong:** Customer clicks "Accept" twice quickly, or clicks accept while the tradesperson is simultaneously re-sending the quote. Two concurrent requests both read status as SENT, both pass the transition check, and both write. The quote ends up with inconsistent timestamps or the tradesperson's re-send overwrites the customer's acceptance.
+**Why it happens:** The current `QuoteTransitionService` does a read-then-write: `findByIdOrFail` followed by `quoteRepository.update`. There is no atomic check-and-set. MongoDB does not provide document-level locking by default.
+**Consequences:** Lost status transitions. Quote accepted but sentAt timestamp overwritten. Customer sees "accepted" but tradesperson sees "sent".
+**Prevention:** Use MongoDB's atomic `findOneAndUpdate` with a status precondition:
 ```typescript
-if (!isEditMode) {
-  itemData.bundleConfig = {
-    priceStrategy: "component_based",
-    bundlePrice: null,
-    components: values.components,
-  };
+// Instead of: read quote, check status, then update
+// Do: atomic update with status guard
+const result = await this.quoteModel.findOneAndUpdate(
+  { _id: quoteId, status: 'sent' },  // precondition
+  { $set: { status: 'accepted', acceptedAt: new Date() } },
+  { new: true }
+);
+if (!result) {
+  // Either quote not found or status already changed
+  throw new ConflictError('Quote has already been responded to');
 }
 ```
-When enabling component editing, developers must change this guard. But naively including `bundleConfig` on every edit means the API `PATCH` endpoint must handle partial `bundleConfig` updates -- replacing the entire `bundleConfig` object versus merging individual fields.
+This pattern ensures only one transition succeeds. The second request gets a null result and returns a clear error.
+**Detection:** Load test: fire 10 concurrent accept requests at the same quote. Verify exactly one succeeds and nine get conflict errors.
 
-**Why it happens:** The original code deliberately excluded `bundleConfig` from edits because component editing was not yet built. The `BundleComponentsList` component also sets `isReadOnly = mode === "edit"` (line 53), preventing any interaction. Removing these guards requires coordinated changes across form, component list, submit handler, and API merge logic.
+### Pitfall 5: SendGrid "From" Address Domain Mismatch
 
-**Consequences:** If you only remove the `isReadOnly` guard but forget the submit handler guard, the form renders editable components but submits without them. If you include `bundleConfig` but the API merge utility does not handle it, the entire config gets overwritten or lost.
+**What goes wrong:** The existing `EmailSenderService` accepts a `from` address via `SendEmailDto`. When sending quote emails, developers use the tradesperson's personal email as the "from" address to make it feel personal. But SendGrid requires the from address domain to match an authenticated sender domain. Emails silently fail or land in spam.
+**Why it happens:** Wanting the customer to see "from: mike@mikesplumbing.co.uk" instead of "from: noreply@tradeflow.app". The developer sets the from field to the business owner's email without checking SendGrid domain authentication.
+**Consequences:** Emails rejected by SendGrid (403 Forbidden). Emails that do send land in spam because SPF/DKIM do not match. Deliverability reputation damaged.
+**Prevention:** Always send from a verified domain (e.g., `quotes@tradeflow.app` or `noreply@tradeflow.app`). Use the `reply-to` header to set the tradesperson's email so customer replies go to the right place. This is the standard pattern for SaaS transactional email.
+**Detection:** Integration test: verify the `from` address uses the app domain. Monitor SendGrid activity feed for 403 or bounce events after first deploy.
 
-**Prevention:**
-- Remove both guards in the same commit: the submit handler's `if (!isEditMode)` check AND the `BundleComponentsList`'s `isReadOnly` logic
-- The API's item update merge utility (`mergeExistingItemWithChanges`) must handle `bundleConfig` as a full replacement (not a deep merge) -- the UI should always send the complete component list when editing
-- Validate that the updated `bundleConfig.components` array is non-empty (existing `BundleConfigValidator.ensureComponentsPresent()` handles this server-side)
-- Add a Valibot schema validation on the form ensuring at least one component before submit
+### Pitfall 6: PDF Money Formatting Mismatch with UI
 
-**Detection:** Edit a bundle, change a component quantity, submit -- verify the API receives the updated `bundleConfig` and the bundle's components reflect the change.
-
-**Phase relevance:** Bundle component editing phase -- this is the first thing to fix.
-
----
-
-### Pitfall 3: Double-Counting Bundle Components in Quote Totals
-
-**What goes wrong:** The `QuoteTotalsCalculator` (line 14) skips line items with `parentLineItemId` to avoid double-counting -- it only sums parent (bundle-level) line items. But if the `parentLineItemId` field is not set correctly during bundle line item creation, component line items get counted BOTH as standalone items AND through their parent's total, inflating the quote total.
-
-**Why it happens:** The `QuoteBundleLineItemFactory.buildComponentLineItem()` currently sets `parentLineItemId: null` (line 118) -- the parent ID is assigned later when the component is persisted. If the persistence step does not correctly set `parentLineItemId` on each component, the totals calculator includes them as top-level line items.
-
-**Consequences:** Quote totals are 2x the actual amount for all bundle components. This is a financial correctness bug that directly affects customer-facing quotes.
-
-**Prevention:**
-- Trace the full pipeline: factory creates line items -> creator persists them -> ensure `parentLineItemId` is set on every component BEFORE `QuoteTotalsCalculator.calculateTotals()` runs
-- The factory returns `IBundleLineItemGroupDto { parent, components }` -- the caller (quote creator) must set `parentLineItemId = parent.id` on each component before persisting
-- Write a test that adds a 3-component bundle to a quote and asserts: (a) totals include the bundle parent only, (b) each component has `parentLineItemId` set, (c) the quote total equals `parent.lineTotal * (1 + taxRate/100)`
-
-**Detection:** Unit test on `QuoteTotalsCalculator` with mixed standalone and bundle line items. Integration test on quote creation with bundles.
-
-**Phase relevance:** Quote line item management phase -- validate this works end-to-end when wiring the quote UI to the API.
-
----
-
-### Pitfall 4: RTK Query Cache Invalidation for Nested Quote Data
-
-**What goes wrong:** A quote contains nested line items. When a line item is added/removed/updated via a mutation, the quote detail cache does not automatically refresh. The user adds an item to a quote, the mutation succeeds, but the quote detail view still shows the old line items (missing the new one) until a manual page refresh.
-
-**Why it happens:** RTK Query's tag-based invalidation works at the entity level. If the "add line item" mutation only invalidates `QuoteLineItem` tags but not the `Quote` tag for the parent quote, the quote detail query (which includes line items in its response) stays stale. Conversely, if quote detail and line items are fetched separately, the invalidation strategy must cover both.
-
-**Consequences:** Users think their changes were not saved. They may add the same item twice, or navigate away and lose trust in the system.
-
-**Prevention:**
-- Decide on ONE data fetching strategy for quote details:
-  - **Option A (recommended):** The quote detail API returns the full quote with embedded line items (the backend already does this via `IQuoteDto.lineItems`). The "add line item" mutation invalidates `{ type: "Quote", id: quoteId }`, which triggers a refetch of the full quote detail
-  - **Option B:** Fetch line items separately. Then BOTH `Quote` and `QuoteLineItem` tags must be invalidated on mutations. This adds complexity for no benefit
-- Follow Option A: single quote detail endpoint returns everything, mutations invalidate the parent quote tag
-- Tag structure: `providesTags: (result) => [{ type: "Quote", id: result.id }, "Quote"]`
-- Mutation: `invalidatesTags: (result, error, arg) => [{ type: "Quote", id: arg.quoteId }]`
-
-**Detection:** Add a line item to a quote, verify the quote detail view updates without manual refresh.
-
-**Phase relevance:** Quote UI wiring phase -- define the cache strategy before building components.
-
----
+**What goes wrong:** The PDF shows "$100" but the UI shows "$100.00". Or the PDF shows "100.5" instead of "100.50". Or bundle component line totals in the PDF do not match the expandable rows in the UI because the PDF calculates totals differently.
+**Why it happens:** The existing system uses `Money` value objects (Dinero.js) with minor units on the API side. The API response returns `toMajorUnits()` which is a raw number (e.g., `100.5` not `100.50`). The UI formats this with `Intl.NumberFormat` or similar. The PDF generation code does its own formatting without using the same formatter.
+**Consequences:** Customer sees different numbers on screen vs PDF. Loss of trust. Potential disputes over quoted amounts.
+**Prevention:** Create a shared server-side formatting utility used by the PDF generator. Use `Intl.NumberFormat` with the business's currency and locale. Ensure the PDF generation receives the same `Money` objects (not pre-formatted strings) so rounding is identical. The business entity has `currency` field -- use it. Write snapshot tests comparing PDF output against expected formatted values.
+**Detection:** Visual regression test: generate a PDF for a known quote and compare money values against expected formatted output. Test with edge cases: 0.10, 0.01, 1000.00, amounts requiring comma separators.
 
 ## Moderate Pitfalls
 
-### Pitfall 5: Searchable Dropdown Performance with Large Item Lists
+### Pitfall 7: Puppeteer/Chromium Deployment Headaches
 
-**What goes wrong:** The current `BundleComponentsList` renders ALL available items in a `<Select>` dropdown. For a tradesperson with 50-200 items, this works. But as the list grows, the dropdown becomes unusable -- no search, no filtering, slow rendering. The `<SelectContent>` from shadcn/ui renders all options in the DOM at once.
+**What goes wrong:** PDF generation works locally but fails in production. Puppeteer downloads a 150MB+ Chromium binary. Docker images balloon in size. Alpine Linux images lack required system libraries (libX11, libatk, etc.). Cloud Functions time out on cold start.
+**Prevention:** Use PDFKit or pdfmake instead of Puppeteer for structured quote documents. Quotes are data-driven tabular documents (line items, totals, business info) -- not complex web pages. PDFKit generates PDFs directly from data without a browser, is lightweight (~2MB vs ~150MB), has no cold start penalty, and works in any Node.js environment without system dependencies. Only use Puppeteer if pixel-perfect HTML-to-PDF rendering of complex layouts is required (it is not for quotes).
 
-**Why it happens:** The current implementation uses shadcn's basic `<Select>` component, which is built on Radix UI's Select primitive. It does not support filtering or search out of the box. Developers often reach for a `<Combobox>` pattern (Command + Popover) but implement it incorrectly -- e.g., opening a full dialog instead of an inline dropdown, or not handling keyboard navigation.
+### Pitfall 8: Email Send Failure Leaves Quote in Limbo Status
 
-**Prevention:**
-- Use shadcn/ui's `Combobox` pattern: `<Popover>` + `<Command>` (from cmdk library, already a shadcn dependency). This provides built-in search, keyboard navigation, and virtualized rendering
-- Filter items client-side (the full item list is already in the RTK Query cache). Do NOT add a server-side search endpoint for this -- the item count per business is small enough for client-side filtering
-- Filter OUT: (a) items with `type === "bundle"` (bundles cannot contain bundles), (b) items with `status !== "active"`, (c) items already selected as components in this bundle (prevent duplicates)
-- Debounce the search input if implementing custom filtering (300ms is sufficient)
+**What goes wrong:** The "Send Quote" action transitions the quote to SENT status, then attempts to send the email. The email send fails (SendGrid outage, invalid email, rate limit). The quote is now in SENT status but the customer never received the email. The tradesperson thinks it was sent.
+**Prevention:** Send email first, then transition status. If email fails, status stays DRAFT and user gets a clear error. Downside: if the status update fails after email sends, email is sent but status is wrong -- but this is far less bad than the reverse (tradesperson can re-send, and the customer having received the email is the more important truth). Keep it simple for v1.3.
 
-**Detection:** Load the item picker with 100+ items, verify search filters instantly, verify keyboard navigation works (arrow keys, enter to select, escape to close).
+### Pitfall 9: Token Endpoint Exposes Internal Data
 
-**Phase relevance:** Searchable item picker phase -- replace `<Select>` with `<Combobox>` pattern.
+**What goes wrong:** The public endpoint that serves the customer-facing quote view returns full quote data including internal fields (businessId, jobId, internal notes, line item IDs, internal statuses). An attacker with a valid token can see business internals.
+**Prevention:** Create a dedicated response DTO for the public quote view that includes ONLY what the customer needs: business name, business contact info, quote number, quote date, validity date, line items (description, quantity, unit price, line total), totals, and accept/reject actions. Never expose internal IDs, job details, or internal notes on the public endpoint.
 
----
+### Pitfall 10: Customer-Facing Page Routing Conflicts with SPA Auth
 
-### Pitfall 6: Duplicate Components in Bundle Config
+**What goes wrong:** The customer quote response page (e.g., `/quote/respond/:token`) lives in the same React SPA as the authenticated tradesperson app. The React router renders the full app shell (nav bar, sidebar) before realizing this is a public page. Or worse, the auth check redirects the customer to the login page.
+**Prevention:** Add a `/public/*` route prefix that renders a minimal layout (no nav, no auth check). The React router checks for `/public/` prefix before applying auth guards. Use a `PublicLayout` component with no auth wrapper -- distinct from the authenticated `AppLayout`. This is one codebase but two separate layout trees.
 
-**What goes wrong:** A user adds the same item as a component twice in a bundle. The current UI does not prevent this -- the dropdown allows selecting the same `itemId` multiple times. The API may accept this, resulting in a bundle with two rows for "Copper Pipe" (e.g., quantity 5 and quantity 3) instead of one row with quantity 8.
+### Pitfall 11: Quote Deletion Ignoring Status Guards
 
-**Why it happens:** There is no uniqueness check on `component.itemId` in either the form validation (`bundleItemFormSchema`) or the API validation (`BundleConfigValidator`). The `BundleComponentsList` uses `index` as the key (line 116), which hides the duplication in React rendering.
+**What goes wrong:** Allowing deletion of quotes in any status. A tradesperson accidentally deletes an ACCEPTED quote, losing the agreement record. Or deletes a SENT quote while the customer is reviewing it.
+**Prevention:** Only allow deletion of DRAFT quotes. SENT/ACCEPTED/REJECTED quotes should not be deletable (they are business records). The existing `QuotePolicy.canDelete` returns `false` for all cases -- this needs to be updated to allow deletion of DRAFT quotes only. The UI should only show the delete button on DRAFT quotes.
 
-**Consequences:** Duplicate components create confusing bundle displays. On quotes, the same item appears twice as separate child line items. Pricing calculations may be correct numerically but the UX is confusing.
+### Pitfall 12: Re-Send Creates Duplicate Tokens Without Invalidating Old Ones
 
-**Prevention:**
-- Client-side: In the searchable dropdown, disable or hide items that are already selected as components. The `availableItemsForBundle` memo already filters by type and status -- add a filter to exclude `itemIds` that are already in the `components` array
-- Client-side: Add Valibot validation that `components` has unique `itemId` values: `v.custom((components) => new Set(components.map(c => c.itemId)).size === components.length, "Duplicate components")`
-- Server-side: Add a uniqueness check in `BundleConfigValidator` or the item update service. Throw `InvalidRequestError` with a clear message
-- Use `component.itemId` as the React key instead of `index` when the item is selected
+**What goes wrong:** Tradesperson sends a quote, customer does not respond, tradesperson edits the quote and sends again. Now two valid tokens exist -- the old one pointing to stale quote data (or the current data, which is different from what was originally sent). Customer uses the old link and accepts a quote with different terms than what they originally received.
+**Prevention:** When a quote is re-sent, invalidate ALL previous tokens for that quote before generating a new one. The customer should only ever be able to respond via the most recent send. The transition map already allows SENT -> SENT (re-send). The token invalidation should happen as part of this transition.
 
-**Detection:** Try adding the same item twice in the bundle form. Verify it is prevented or visually warned.
+### Pitfall 13: SendGrid Dynamic Template Variable Gotcha
 
-**Phase relevance:** Bundle component editing phase -- add the constraint when enabling editing.
-
----
-
-### Pitfall 7: Expandable Bundle Lines UX Confusion
-
-**What goes wrong:** On the quote detail view, bundle line items show as a single rolled-up row (the parent) with an expand/collapse toggle to reveal components. Users do not understand what the expand icon means, or they think the components are separate billable items on top of the bundle price. The total appears to "not add up" visually.
-
-**Why it happens:** The parent line item's `lineTotal` IS the bundle total (either fixed price or sum of components). The component line items are breakdowns, not additional charges. But without clear visual hierarchy, users (especially the tradesperson's customers who receive the quote) may misread the structure.
-
-**Consequences:** Users distrust the quote totals. They may manually override prices to "fix" what they perceive as a calculation error. Customer-facing quotes look confusing.
-
-**Prevention:**
-- Visual hierarchy is critical:
-  - Parent row: normal styling, shows bundle total, has a chevron/expand icon with "View components" tooltip
-  - Child rows: indented (left padding or border), muted/secondary text color, smaller font or `text-muted-foreground`
-  - Child rows should NOT show individual prices if the bundle uses `fixed` pricing strategy (the per-component prices are internal allocations, not meaningful to the customer)
-  - For `component_based` pricing, child rows can show individual prices since they sum to the parent total
-- Add a subtle label on the parent row: "Bundle" badge similar to the existing `ItemType` badge pattern
-- On collapse, show the component count: "3 components" as secondary text on the parent row
-- Do NOT show component totals in the quote summary/totals section -- only parent line items contribute to totals (the calculator already handles this)
-
-**Detection:** Create a quote with a bundle (3 components) and a standalone item. Verify: (a) the total is bundle total + standalone total, (b) expanding the bundle shows components with clear visual nesting, (c) collapsing hides components cleanly.
-
-**Phase relevance:** Quote detail UI phase -- design the component expansion before coding.
-
----
-
-### Pitfall 8: Money Value Object Serialization Between API and UI
-
-**What goes wrong:** The API uses a `Money` value object for all price fields (`unitPrice`, `lineTotal`, `discountAmount`, etc. on `IQuoteLineItemDto`). The UI receives these as serialized objects (likely `{ amount: number, currency: string }` or similar). If the UI treats these as raw numbers, arithmetic operations produce wrong results due to floating-point issues.
-
-**Why it happens:** The API's `Money` class handles precision internally (likely using minor units / cents). When serialized to JSON, the structure may not be obvious. Frontend developers may do `lineItem.unitPrice * lineItem.quantity` directly on the serialized values, bypassing the precision guarantees.
-
-**Prevention:**
-- Check exactly how `Money` serializes in the API response (read `money.value-object.ts` and the response mapper). Ensure the UI type definitions match the serialized shape
-- On the UI, use a consistent formatting utility (`formatCurrency` from `useCurrency` hook) for display -- never do raw arithmetic on money values in the frontend
-- The quote totals should be calculated server-side ONLY (via `QuoteTotalsCalculator`). The UI should display the pre-calculated `totals.subTotal`, `totals.taxTotal`, `totals.total` from the API response, NOT recalculate them client-side
-- If any client-side price preview is needed (e.g., showing estimated total before saving), round to 2 decimal places and label it as "estimated"
-
-**Detection:** Add a bundle with components that have fractional prices (e.g., $1.33 each, quantity 3). Verify the displayed total matches the API-calculated total exactly.
-
-**Phase relevance:** Quote UI wiring phase -- establish the pattern for displaying money values early.
-
----
-
-### Pitfall 9: Item Deletion or Deactivation After Adding to Quote
-
-**What goes wrong:** A user creates a quote with a bundle. Later, they deactivate or delete one of the bundle's component items. The quote still references the item by `itemId`. When displaying the quote, the UI tries to look up the item name and gets a 404 or shows "Unknown Item."
-
-**Why it happens:** Quote line items store `itemId` as a reference but the line item itself is a snapshot (it has its own `unitPrice`, `unit`, `type`). The problem is display-only: the line item data is self-contained for pricing, but the UI may fetch the item name from the items cache to display a friendly name instead of an ID.
-
-**Prevention:**
-- Store the item name on the quote line item at creation time (snapshot pattern). This may require adding a `name` or `description` field to `IQuoteLineItemDto`. If this is too much schema change for v1.2, handle it in the UI:
-- UI fallback: If the item lookup from RTK Query cache fails, display the line item with generic text like "Item (removed)" rather than crashing or showing an ID
-- Do NOT prevent item deactivation based on quote references -- that creates tight coupling and frustrates users
-
-**Detection:** Create a quote with items, deactivate one of the items, view the quote. Verify the display degrades gracefully.
-
-**Phase relevance:** Quote detail UI phase -- handle graceful degradation for deleted/deactivated items.
-
----
-
-### Pitfall 10: Bundle Creation Bug (Unit Field Defaulting to "bundle")
-
-**What goes wrong:** This is an existing known bug listed in the milestone scope. When creating a bundle item, the `unit` field defaults to "bundle" (from the `ItemType` enum value leaking into the unit field). This produces nonsensical display: "1 bundle" instead of "1 each" or "1 pkg."
-
-**Why it happens:** Likely in the API's item creation path, the `unit` field is being set from the `type` field when not provided. For non-bundle items this works (e.g., "hour" for labour), but for bundles the type name leaks into the unit.
-
-**Prevention:**
-- Fix in the API: bundle items should default `unit` to "each" or "pkg" (or whatever the business convention is), not inherit from the type name
-- Validate: the `CreateItemRequest` should NOT accept `type` as a valid value for `unit` when type is "bundle"
-- Fix existing bad data: consider a migration or lazy fix (update on next edit) for any bundles already created with `unit: "bundle"`
-
-**Detection:** Create a bundle item without specifying a unit. Verify it defaults to a sensible value like "each."
-
-**Phase relevance:** First phase -- fix this bug before building on top of bundles.
-
----
+**What goes wrong:** Developer builds quote email content as HTML and passes it as a template variable. SendGrid escapes HTML in dynamic template variables -- the customer sees raw `<br>` tags and `<table>` markup instead of formatted content.
+**Prevention:** Use SendGrid Dynamic Templates for the email layout. Pass ONLY data values (strings, numbers) as template variables -- never HTML fragments. The template itself (designed in SendGrid's visual editor) handles the HTML structure and cross-client compatibility (Outlook, Gmail, Apple Mail all render differently). Template variables should be: `customerName`, `businessName`, `quoteNumber`, `quoteTotal`, `quoteLinkUrl`, `validUntilDate`. The template renders these into the pre-designed layout.
 
 ## Minor Pitfalls
 
-### Pitfall 11: Form State Reset When Switching Between Create and Edit Modes
+### Pitfall 14: Missing Business Branding Data for PDF
 
-**What goes wrong:** The `ItemFormDialog` may reuse the same form component for both create and edit. If the dialog opens for "create bundle," user fills in data, closes without saving, then opens "edit bundle" -- the form still has the unsaved create data instead of the bundle's actual data.
+**What goes wrong:** The PDF is generated with quote data but no business address, phone number, or logo. The customer receives a quote with no indication of who sent it beyond the business name.
+**Prevention:** The `BusinessEntity` currently has name, country, currency, and trade. It does NOT have address, phone, or logo fields. For v1.3, use what is available: business name + tradesperson email (from user record) as the "from" info on the PDF. Accept minimal branding for v1.3 and plan a "business profile" enhancement as a future milestone. Do not block PDF generation on adding new fields to the business entity.
 
-**Prevention:**
-- Reset form state when the dialog opens by using `useForm` with `defaultValues` derived from the `item` prop
-- Add a `key` prop to the form component that changes between create/edit (e.g., `key={item?.id ?? "create"}`) to force React to remount the form
-- Alternatively, call `form.reset(defaultValues)` in a `useEffect` when the `item` prop changes
+### Pitfall 15: Missing Customer Email Validation on Save
 
-**Phase relevance:** Bundle editing phase -- verify form reset behavior when enabling edit mode.
+**What goes wrong:** Customer email field contains a malformed address (e.g., "john@" or "not-an-email"). SendGrid rejects it or sends to the malformed address, causing a hard bounce that damages sender reputation.
+**Prevention:** Validate email format when saving customer records (verify this exists). Additionally validate before sending -- SendGrid errors on malformed addresses should be caught and surfaced as user-friendly errors ("Invalid email address for this customer").
 
----
+### Pitfall 16: Two-Repo Coordination -- Feature Branch Drift
 
-### Pitfall 12: Optimistic Updates vs. Server Recalculation for Quote Totals
+**What goes wrong:** API and UI feature branches get out of sync. API ships the send endpoint but the UI branch is not ready. Or the UI calls an endpoint signature that changed in a later API commit. Integration testing catches this late.
+**Prevention:** Define the API contract (endpoint paths, request/response shapes) before coding either side. Document in the planning docs. Deploy API changes first (backward compatible), then UI changes. Test against the deployed API, not mocked responses, before merging UI changes.
 
-**What goes wrong:** After adding a line item to a quote, the UI could optimistically update the displayed totals before the server response arrives. But the server-calculated totals (using `Money` precision, bundle pricing allocation, blended tax rates) may differ from the client's naive arithmetic. The totals "flash" -- showing one value, then correcting to another.
+### Pitfall 17: Accept/Reject Page Has No Feedback After Action
 
-**Prevention:**
-- Do NOT implement optimistic updates for quote totals. The calculation logic (bundle pricing plans, proportional discount allocation, blended tax rates) is too complex to replicate client-side
-- Show a loading state on the totals section while the mutation is in flight. A simple spinner or skeleton on the totals row is sufficient
-- The response from the "add line item" mutation (or the refetched quote detail) provides the authoritative totals -- display those
-
-**Phase relevance:** Quote UI wiring phase -- avoid the temptation to optimize perceived performance with optimistic updates on calculated fields.
-
----
-
-### Pitfall 13: Quantity Validation Edge Cases on Bundle Components
-
-**What goes wrong:** The quantity input on bundle components accepts `0`, negative values, or non-numeric strings. `parseFloat(e.target.value) || 1` (current code, line 149) handles empty/NaN by falling back to 1, but does not prevent 0 or negative quantities. The API's `BundleConfigValidator` checks for empty components but does not validate individual component quantities.
-
-**Prevention:**
-- Client-side: Valibot schema should enforce `quantity > 0` on each component: `v.number([v.minValue(0.01, "Quantity must be greater than zero")])`
-- Server-side: Add a quantity check in `BundleConfigValidator` or in the item creator/updater service -- each component must have `quantity > 0`
-- The quantity input should use `min="0.01"` (already present) but also clamp on blur, not just on change, to catch paste/autofill edge cases
-
-**Phase relevance:** Bundle component editing phase -- tighten validation when enabling editing.
-
----
+**What goes wrong:** Customer clicks "Accept" on the public quote page. The request succeeds, but the page does not update. Customer clicks again (creating race condition, see Pitfall 4). Or the page shows a generic "success" with no context -- customer is unsure what just happened.
+**Prevention:** After a successful accept/reject action: (a) disable both buttons immediately on click (optimistic disable), (b) show a clear confirmation state: "You have accepted this quote. [Business Name] has been notified." (c) On page load, if the token is already used or the quote is already accepted/rejected, show the current state rather than the action buttons. The public endpoint should return the quote status so the page can render appropriately for already-responded quotes.
 
 ## Phase-Specific Warnings
 
 | Phase Topic | Likely Pitfall | Mitigation |
 |-------------|---------------|------------|
-| Bundle creation bug fix | Unit defaults to "bundle" (Pitfall 10) | Fix default unit value for bundle type in API |
-| Bundle component editing | Submit handler skips bundleConfig on edit (Pitfall 2) | Remove both UI guards (submit handler + read-only flag) in same commit |
-| Bundle component editing | Duplicate components allowed (Pitfall 6) | Add uniqueness validation client-side and server-side |
-| Bundle component editing | Quantity edge cases (Pitfall 13) | Enforce quantity > 0 in Valibot schema and API validator |
-| Searchable item picker | Performance with basic Select (Pitfall 5) | Use Combobox pattern (Popover + Command) from shadcn/ui |
-| Quote line item management | Double-counting bundle components (Pitfall 3) | Verify parentLineItemId is set before totals calculation |
-| Quote UI wiring | Cache invalidation for nested data (Pitfall 4) | Single quote detail endpoint; mutations invalidate parent Quote tag |
-| Quote UI wiring | Money serialization mismatch (Pitfall 8) | Display server-calculated totals only; use formatCurrency for display |
-| Quote UI wiring | Optimistic update temptation (Pitfall 12) | Do not optimistically update totals; show loading state instead |
-| Quote detail view | Expandable bundles confuse users (Pitfall 7) | Clear visual hierarchy: indented, muted child rows; "Bundle" badge on parent |
-| Quote detail view | Deleted items break display (Pitfall 9) | Graceful fallback for missing item references |
-| All editing phases | Bundle edits do not affect existing quotes (Pitfall 1) | Intentional design: quotes are snapshots; communicate in UI |
-| All form phases | Form state not resetting (Pitfall 11) | Use key prop or form.reset() on dialog open |
+| Email delivery (SendGrid) | From address domain mismatch (#5), customer email null (#1), send failure status limbo (#8), template variable escaping (#13) | Validate customer email before send, use app domain + reply-to, send-then-transition, data-only template variables |
+| Token generation and security | Guessable tokens (#3), never-expiring tokens (#3), re-send stale tokens (#12) | crypto.randomBytes, stored hashed with expiry, invalidate on re-send |
+| Public customer endpoint | Auth bypass breaks services (#2), data over-exposure (#9), SPA routing conflict (#10), no post-action feedback (#17) | Dedicated public service, scoped response DTO, PublicLayout route group, clear confirmation states |
+| Quote status transitions | Race condition double-accept (#4), email failure status mismatch (#8) | Atomic findOneAndUpdate with status precondition, send-first pattern |
+| PDF generation | Money formatting mismatch (#6), Puppeteer deployment (#7), missing business info (#14) | Shared formatters, use PDFKit not Puppeteer, accept minimal branding for v1.3 |
+| Quote deletion | Deleting non-draft quotes (#11) | Status guard: only DRAFT quotes deletable |
+| Two-repo coordination | Feature branch drift (#16) | Define API contract first, deploy API before UI |
 
-## Summary: Top 3 Risks
+## Summary: Top 5 Risks
 
 | Risk | Likelihood | Impact | Mitigation |
 |------|-----------|--------|------------|
-| Submit handler silently drops bundleConfig on edit (Pitfall 2) | HIGH | Bundle component editing appears to work but saves nothing | Remove the `if (!isEditMode)` guard; update API merge utility |
-| Cache not refreshing after quote line item changes (Pitfall 4) | HIGH | Users think changes were not saved; may duplicate work | Define tag invalidation strategy upfront; mutations invalidate parent Quote tag |
-| Bundle component double-counting in totals (Pitfall 3) | MEDIUM | Quote totals 2x actual amount; financial correctness issue | Verify parentLineItemId pipeline end-to-end; write explicit tests |
+| Public endpoint reuses auth-required services (#2) | HIGH | Security hole or authorization failure | Dedicated QuotePublicResponseService with token-as-auth |
+| Race condition on double accept/reject (#4) | HIGH | Inconsistent quote state; lost transitions | Atomic findOneAndUpdate with status precondition |
+| Guessable or never-expiring tokens (#3) | HIGH | Unauthorized quote manipulation | crypto.randomBytes, hashed storage, expiry, one-time use |
+| Email send failure leaves quote in SENT status (#8) | MEDIUM | Tradesperson thinks quote was sent; customer never received it | Send email first, then transition status |
+| PDF money formatting mismatch with UI (#6) | MEDIUM | Customer distrust; disputes over quoted amounts | Shared formatting utility; snapshot tests |
+
+## Sources
+
+- Trade Flow codebase analysis: `quote-transitions.ts`, `quote-transition.service.ts`, `auth.guard.ts`, `quote.policy.ts`, `email-sender.service.ts`, `customer.entity.ts`, `business.entity.ts`, `money.value-object.ts`
+- [SendGrid Deliverability Best Practices](https://support.sendgrid.com/hc/en-us/articles/360041790453-Best-Practices-for-Email-Deliverability) - HIGH confidence
+- [SendGrid HTML Formatting Issues](https://docs.sendgrid.com/ui/sending-email/formatting-html) - HIGH confidence
+- [Dynamic Template Dropped Emails](https://support.sendgrid.com/hc/en-us/articles/41862241312155-Dynamic-Template-Issue-Leading-to-Dropped-Emails) - HIGH confidence
+- [NestJS Public Route Decorator Pattern](https://dev.to/dannypule/exclude-route-from-nest-js-authgaurd-h0) - MEDIUM confidence
+- [MongoDB Atomic Operations for Race Conditions](https://medium.com/tales-from-nimilandia/handling-race-conditions-and-concurrent-resource-updates-in-node-and-mongodb-by-performing-atomic-9f1a902bd5fa) - MEDIUM confidence
+- [Token Security Best Practices](https://auth0.com/docs/secure/tokens/token-best-practices) - HIGH confidence
+- [Session Token in URL Risks](https://medium.com/@jaycees10000/session-token-in-url-11e85b613010) - MEDIUM confidence
+- [PDF Generation in Node.js Tips and Gotchas](https://joyfill.io/blog/integrating-pdf-generation-into-node-js-backends-tips-gotchas) - MEDIUM confidence
+- [Puppeteer vs PDFKit Comparison](https://www.leadwithskills.com/blogs/pdf-generation-nodejs-puppeteer-pdfkit) - MEDIUM confidence
+- [SendGrid Deliverability 2026](https://www.mailmodo.com/guides/sendgrid-deliverability/) - MEDIUM confidence
 
 ---
-*Research completed: 2026-03-08*
+*Research completed: 2026-03-15*

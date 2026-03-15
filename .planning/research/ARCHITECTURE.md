@@ -1,620 +1,559 @@
 # Architecture Research
 
-**Domain:** Bundle completion and quote integration for trade business management
-**Researched:** 2026-03-08
-**Confidence:** HIGH (brownfield -- all patterns derived from existing codebase)
+**Domain:** Quote email delivery, customer-facing public pages, PDF generation, and quote deletion for existing Trade Flow system
+**Researched:** 2026-03-15
+**Confidence:** HIGH
 
 ## System Overview
 
 ```
-                         TRADE FLOW v1.2 -- NEW & MODIFIED COMPONENTS
-                         =============================================
-
-  UI (React/Vite)                                API (NestJS/MongoDB)
-  ===============                                ====================
-
-  ┌──────────────────────┐                       ┌──────────────────────────────┐
-  │  QuoteDetailPage     │ ─── GET quote/:id ──> │  QuoteController             │
-  │  (NEW page)          │                       │    + PATCH quote/:id     NEW │
-  │  ┌────────────────┐  │                       │    + DELETE line-item    NEW │
-  │  │ LineItemsList   │  │                       │    + PATCH status        NEW │
-  │  │ ┌────────────┐ │  │                       ├──────────────────────────────┤
-  │  │ │BundleExpand│ │  │                       │  QuoteUpdater                │
-  │  │ │ (NEW comp) │ │  │                       │    + updateQuote()       NEW │
-  │  │ └────────────┘ │  │                       │    + removeLineItem()    NEW │
-  │  │ AddLineItem     │  │                       ├──────────────────────────────┤
-  │  │ (NEW dialog)    │  │                       │  QuoteTransitionService  NEW │
-  │  └────────────────┘  │                       │    (follows schedule pattern)│
-  ├──────────────────────┤                       └──────────────────────────────┘
-  │  BundleItemForm      │
-  │  (MODIFY: enable     │                       ┌──────────────────────────────┐
-  │   component editing) │ ─── PATCH item/:id ─> │  ItemController              │
-  │  ┌────────────────┐  │                       │    (existing -- extend       │
-  │  │ SearchableItem │  │                       │     UpdateItemRequest to     │
-  │  │ Picker (NEW)   │  │                       │     accept components[])     │
-  │  └────────────────┘  │                       ├──────────────────────────────┤
-  ├──────────────────────┤                       │  ItemUpdaterService          │
-  │  quoteApi.ts    NEW  │                       │    + validateComponents() NEW│
-  │  (RTK Query)         │                       └──────────────────────────────┘
-  └──────────────────────┘
+                         AUTHENTICATED (existing)                    PUBLIC (new)
+                    ┌──────────────────────────────┐         ┌──────────────────────┐
+                    │    Trade Flow UI (React)      │         │  Customer Quote Page  │
+                    │  /quotes/:id  (detail page)   │         │  /q/:token            │
+                    │  Send Quote button             │         │  (no auth required)   │
+                    │  Delete Quote button            │         │  Accept / Reject      │
+                    └──────────┬───────────────────┘         └──────────┬───────────┘
+                               │                                        │
+                    Firebase JWT │                          Token in URL  │
+                               │                                        │
+┌──────────────────────────────┴────────────────────────────────────────┴──────────────┐
+│                              Trade Flow API (NestJS)                                  │
+│                                                                                       │
+│  ┌─────────────────────────────────┐    ┌──────────────────────────────────┐           │
+│  │  QuoteController (existing)     │    │  PublicQuoteController (NEW)     │           │
+│  │  @UseGuards(JwtAuthGuard)       │    │  No auth guard                   │           │
+│  │                                 │    │  Token-based access              │           │
+│  │  POST .../send        (NEW)     │    │  GET  /v1/public/quote/:token    │           │
+│  │  DELETE .../quote/:id  (NEW)    │    │  POST /v1/public/quote/:token/   │           │
+│  │  GET .../quote/:id/pdf (NEW)    │    │       respond                    │           │
+│  └────────┬────────────────────────┘    └────────┬─────────────────────────┘           │
+│           │                                       │                                    │
+│  ┌────────┴───────────────────────────────────────┴─────────────────────────────┐      │
+│  │                           Quote Services Layer                                │      │
+│  │                                                                               │      │
+│  │  QuoteSender (NEW)          QuoteTokenService (NEW)                           │      │
+│  │  QuotePdfGenerator (NEW)    QuotePublicRetriever (NEW)                        │      │
+│  │  QuoteDeleter (NEW)         QuotePublicResponder (NEW)                        │      │
+│  └──────────┬──────────────────────────────────┬────────────────────────────────┘      │
+│             │                                   │                                      │
+│  ┌──────────┴──────────┐             ┌─────────┴──────────┐                            │
+│  │  EmailSenderService │             │  QuoteRepository   │                            │
+│  │  (existing)         │             │  (existing)        │                            │
+│  └─────────┬───────────┘             └─────────┬──────────┘                            │
+│            │                                    │                                      │
+└────────────┼────────────────────────────────────┼──────────────────────────────────────┘
+             │                                    │
+     ┌───────┴───────┐                  ┌────────┴────────┐
+     │   SendGrid    │                  │    MongoDB      │
+     │               │                  │  quotes         │
+     └───────────────┘                  │  quote_tokens   │
+                                        └─────────────────┘
 ```
 
 ### Component Responsibilities
 
-| Component | Responsibility | New vs Modified |
+| Component | Responsibility | New vs Existing |
 |-----------|----------------|-----------------|
-| **QuoteDetailPage** | Full quote view with header, line items, totals, status actions | NEW page |
-| **LineItemsList** | Renders line items with parent/child grouping for bundles | NEW component |
-| **BundleExpandRow** | Collapsible row showing bundle component line items | NEW component |
-| **AddLineItemDialog** | Item picker + quantity input to add line items to a quote | NEW component |
-| **SearchableItemPicker** | Combobox/Command for filtering items by name/type | NEW shared component |
-| **quoteApi.ts** | RTK Query endpoints for all quote CRUD operations | NEW API slice |
-| **BundleItemForm** | Remove edit-mode read-only restriction on components | MODIFY |
-| **BundleComponentsList** | Replace Select with SearchableItemPicker, enable in edit mode | MODIFY |
-| **QuoteController** | Add PATCH quote, DELETE line-item, PATCH status endpoints | MODIFY |
-| **QuoteUpdater** | Add updateQuote(), removeLineItem() methods | MODIFY |
-| **QuoteTransitionService** | Status transition validation (mirrors ScheduleTransitionService) | NEW service |
-| **UpdateItemRequest** | Accept `components[]` in bundleConfig for PATCH | MODIFY |
-| **ItemUpdaterService** | Validate component references on bundle update | MODIFY |
+| **QuoteController** | Authenticated quote operations (send, delete, PDF download) | MODIFY -- add 3 endpoints |
+| **PublicQuoteController** | Unauthenticated customer-facing quote view and respond | NEW controller |
+| **QuoteSender** | Orchestrates sending: generate token, build email, send via SendGrid, transition status | NEW service |
+| **QuoteTokenService** | Generate and validate HMAC-signed tokens for public quote access | NEW service |
+| **QuotePublicRetriever** | Retrieve quote data for public display (no auth user, token-based) | NEW service |
+| **QuotePublicResponder** | Accept/reject quote from customer response, update status | NEW service |
+| **QuotePdfGenerator** | Generate PDF buffer from quote data using Puppeteer | NEW service |
+| **QuoteDeleter** | Delete quote and associated line items | NEW service |
+| **EmailSenderService** | Send emails via SendGrid | EXISTING -- no changes needed |
+| **QuoteRepository** | Quote persistence | EXISTING -- add token field queries |
+| **QuoteTokenRepository** | Token persistence and lookup | NEW repository |
+| **Customer Quote Page** | Public React page at `/q/:token` showing quote + accept/reject buttons | NEW page (frontend) |
+
+## Recommended Architecture
+
+### 1. Token-Based Public Access (HMAC-Signed Tokens)
+
+**Pattern:** HMAC-signed opaque token stored in a separate `quote_tokens` collection.
+
+**Why not just a UUID?** A bare UUID is guessable with enough attempts and provides no cryptographic guarantee. An HMAC-signed token ties the token to the quote ID and a server-side secret, making forgery impossible without the secret key.
+
+**Why not a JWT?** JWTs are self-contained and cannot be revoked without a blacklist. A database-backed token can be invalidated when the quote is re-sent, deleted, or expired. JWTs also expose payload data in the URL (base64-encoded), which is undesirable.
+
+**Token design:**
+
+```typescript
+// quote_tokens collection
+interface IQuoteTokenEntity {
+  _id: ObjectId;
+  token: string;          // HMAC-SHA256 hex string (64 chars)
+  quoteId: ObjectId;
+  businessId: ObjectId;
+  expiresAt: Date;        // Token expiry (e.g., 30 days from send)
+  createdAt: Date;
+  revokedAt?: Date;       // Set when quote is re-sent or deleted
+}
+```
+
+**Token generation:**
+
+```typescript
+import { createHmac, randomBytes } from 'crypto';
+
+// Generate: HMAC-SHA256(secret, quoteId + nonce)
+const nonce = randomBytes(16).toString('hex');
+const token = createHmac('sha256', QUOTE_TOKEN_SECRET)
+  .update(`${quoteId}:${nonce}`)
+  .digest('hex');
+```
+
+**URL format:** `https://app.tradeflow.com/q/{token}`
+
+- 64-character hex string -- long enough to be unguessable, short enough for email links
+- Single path segment -- clean URL, no query parameters to strip
+- Token is the only identifier -- no quote ID exposed in URL
+
+**Validation flow:**
+
+```
+1. Customer clicks link -> GET /v1/public/quote/:token
+2. API looks up token in quote_tokens collection
+3. Checks: not revoked, not expired
+4. Returns quote data (subset -- no internal IDs exposed)
+```
+
+### 2. Public API Endpoints (New Controller)
+
+**Pattern:** Separate controller with NO auth guard, using token-based access instead.
+
+```typescript
+@Controller("v1/public")
+export class PublicQuoteController {
+  // NO @UseGuards(JwtAuthGuard) -- intentionally public
+
+  @Get("quote/:token")
+  async viewQuote(@Req() request: { params: { token: string } }) {
+    // Token validation replaces auth
+  }
+
+  @Post("quote/:token/respond")
+  async respondToQuote(
+    @Req() request: { params: { token: string } },
+    @Body() body: QuoteResponseRequest,  // { action: "accept" | "reject" }
+  ) {
+    // Token validation + one-time action
+  }
+}
+```
+
+**Why a separate controller?** Mixing public and authenticated endpoints in the same controller creates confusion about which guard applies. A dedicated `PublicQuoteController` makes the security boundary explicit and auditable.
+
+**Public response format:** Same `{ data: T[] }` structure, but with a restricted response type:
+
+```typescript
+// Only expose what the customer needs to see
+interface IPublicQuoteResponse {
+  businessName: string;
+  quoteNumber: string;
+  quoteDate: string;
+  validUntil?: string;
+  title: string;
+  notes?: string;
+  status: string;
+  lineItems: IPublicLineItemResponse[];
+  totals: { subTotal: number; taxTotal: number; total: number };
+}
+
+// No internal IDs, no businessId, no customerId
+interface IPublicLineItemResponse {
+  description: string;      // Item name (resolved)
+  quantity: number;
+  unit: string;
+  unitPrice: number;
+  lineTotal: number;
+  taxRate: number;
+  components?: IPublicLineItemResponse[];
+}
+```
+
+### 3. Quote Email Delivery
+
+**Data flow:**
+
+```
+Tradesperson clicks "Send Quote" on QuoteDetailPage
+    |
+Frontend: POST /v1/business/:bid/quote/:qid/send
+    |
+QuoteController.sendQuote()
+    |
+QuoteSender.send(authUser, quoteId, businessId)
+    |-- 1. Validate quote is in DRAFT or SENT status
+    |-- 2. Fetch quote + customer + business data
+    |-- 3. Validate customer has email address
+    |-- 4. Generate token via QuoteTokenService (revoke old tokens)
+    |-- 5. Build email HTML (inline CSS, business name, quote summary, CTA link)
+    |-- 6. Send via EmailSenderService
+    |-- 7. Transition quote to SENT status (via QuoteTransitionService)
+    |
+Response: updated quote with status=SENT, sentAt timestamp
+```
+
+**Email construction:** Build HTML server-side using template literals with inline CSS. No external template engine needed for a single transactional email template. SendGrid dynamic templates add UI management overhead that is not justified for one template.
+
+**Email content:**
+- From: Business name (via SendGrid sender identity)
+- Subject: "Quote {Q-YYYY-NNN} from {Business Name}"
+- Body: Business name, quote summary (number, date, total), "View Quote" CTA button linking to `/q/{token}`
+- No PDF attachment in the email itself (customer views interactive page instead)
+
+### 4. Customer Response Flow
+
+**Data flow:**
+
+```
+Customer clicks "View Quote" link in email
+    |
+Browser: GET https://app.tradeflow.com/q/{token}
+    |
+React Router: renders CustomerQuotePage (public, no auth)
+    |
+CustomerQuotePage: GET /v1/public/quote/{token}
+    |
+PublicQuoteController.viewQuote()
+    |-- QuoteTokenService.validateToken(token) -> quoteId
+    |-- QuotePublicRetriever.getForPublicDisplay(quoteId) -> quote + business + items
+    |-- Returns IPublicQuoteResponse
+    |
+Customer sees quote details + Accept/Reject buttons
+    |
+Customer clicks "Accept" (or "Reject")
+    |
+CustomerQuotePage: POST /v1/public/quote/{token}/respond { action: "accept" }
+    |
+PublicQuoteController.respondToQuote()
+    |-- QuoteTokenService.validateToken(token) -> quoteId
+    |-- QuotePublicResponder.respond(quoteId, action)
+    |   |-- Validate quote is in SENT status
+    |   |-- Transition to ACCEPTED or REJECTED
+    |   |-- Set acceptedAt or rejectedAt timestamp
+    |-- Returns success confirmation
+    |
+CustomerQuotePage shows confirmation message ("Quote accepted" / "Quote rejected")
+```
+
+**Idempotency:** If a quote has already been accepted/rejected, subsequent attempts return the current state rather than error. The customer sees "This quote has already been accepted" rather than a 422 error.
+
+**No re-vote:** Once accepted or rejected, the status is terminal (matches existing transition rules where ACCEPTED and REJECTED have no valid outgoing transitions).
+
+### 5. PDF Generation
+
+**Technology:** Puppeteer (headless Chrome) for HTML-to-PDF conversion.
+
+**Why Puppeteer over PDFKit:**
+- Quote layout is already defined in HTML/CSS on the frontend
+- Puppeteer renders real HTML/CSS to pixel-perfect PDF
+- PDFKit requires manually constructing every element programmatically -- high effort for a layout that already exists as HTML
+- Quote PDF is generated on-demand (not high-volume), so Puppeteer's memory overhead is acceptable
+
+**Implementation pattern:**
+
+```typescript
+@Injectable()
+export class QuotePdfGenerator {
+  async generate(quote: IQuoteDto, business: IBusinessDto, customer: ICustomerDto): Promise<Buffer> {
+    const html = this.buildQuoteHtml(quote, business, customer);
+    const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+    const pdf = await page.pdf({ format: 'A4', printBackground: true });
+    await browser.close();
+    return Buffer.from(pdf);
+  }
+}
+```
+
+**Endpoint:** `GET /v1/business/:bid/quote/:qid/pdf` (authenticated -- tradesperson downloads PDF)
+
+**Response:** Binary PDF with `Content-Type: application/pdf` and `Content-Disposition: attachment; filename="Q-2026-001.pdf"`
+
+**Note:** This endpoint does NOT return the standard `{ data: T[] }` JSON format because it returns a binary file. This is an intentional exception documented in the controller.
+
+**HTML template:** Self-contained HTML string with inline CSS. No external assets. Includes: business name, quote number/date, customer details, line items table, totals, notes.
+
+### 6. Quote Deletion
+
+**Pattern:** Hard delete (remove quote document and all associated line items from database).
+
+**Why hard delete, not soft delete?** The existing line item soft delete (DELETED status enum) is for individual line items within an active quote. Quote-level deletion removes the entire quote because:
+- A tradesperson deleting a quote means "this should not exist"
+- No business requirement for deleted quote history (out of scope)
+- Keeps the data model simple
+- If audit logging is needed later (noted as out of scope), it can be added as a separate concern
+
+**Data flow:**
+
+```
+Tradesperson clicks "Delete Quote" on QuoteDetailPage -> confirmation dialog
+    |
+Frontend: DELETE /v1/business/:bid/quote/:qid
+    |
+QuoteController.deleteQuote()
+    |
+QuoteDeleter.delete(authUser, quoteId, businessId)
+    |-- 1. Fetch quote, validate ownership
+    |-- 2. Validate quote is in deletable status (DRAFT only, or DRAFT + SENT)
+    |-- 3. Revoke any active tokens (via QuoteTokenService)
+    |-- 4. Delete all quote_line_items for this quoteId
+    |-- 5. Delete the quote document
+    |
+Response: 200 with empty data array { data: [] }
+Frontend: invalidate quote cache, navigate to /quotes list
+```
+
+**Deletable statuses:** Only DRAFT quotes should be deletable. Once a quote is SENT (customer may have seen it), ACCEPTED, or REJECTED, deletion should be blocked. This prevents the tradesperson from deleting a quote the customer is actively viewing.
+
+## Data Flow
+
+### New MongoDB Collections
+
+```
+quote_tokens
+|-- _id: ObjectId
+|-- token: string (indexed, unique)
+|-- quoteId: ObjectId (indexed)
+|-- businessId: ObjectId
+|-- expiresAt: Date (TTL index for automatic cleanup)
+|-- createdAt: Date
+|-- revokedAt: Date | null
+```
+
+### Modified Collections
+
+**quotes** -- No schema changes needed. The existing entity already has `sentAt`, `acceptedAt`, `rejectedAt`, and `status` fields.
+
+**quote_line_items** -- No schema changes needed. Deletion will use `deleteMany({ quoteId })`.
+
+### New Indexes
+
+| Collection | Index | Purpose |
+|------------|-------|---------|
+| `quote_tokens` | `{ token: 1 }` unique | Token lookup for public access |
+| `quote_tokens` | `{ quoteId: 1 }` | Revoke tokens when quote is re-sent/deleted |
+| `quote_tokens` | `{ expiresAt: 1 }` TTL | Automatic cleanup of expired tokens |
 
 ## Architectural Patterns
 
-### Pattern 1: Full Component Array Replacement for Bundle Editing
+### Pattern 1: Separate Public Controller
 
-**What:** When editing bundle components via PATCH, the client sends the entire `bundleConfig.components[]` array. The API replaces the stored array wholesale -- no granular add/remove endpoints.
+**What:** A dedicated controller for unauthenticated endpoints, clearly separated from authenticated controllers.
+**When to use:** When adding public-facing endpoints to an otherwise fully authenticated API.
+**Trade-offs:** Slight duplication in response mapping vs. crystal-clear security boundary.
 
-**When to use:** When the sub-resource (components) is small, tightly coupled to the parent, and always edited as a unit.
+### Pattern 2: Token-as-Capability
 
-**Why this over granular endpoints:**
-- Components are embedded in the Item document (not a separate collection) -- MongoDB naturally replaces embedded arrays atomically
-- The existing `mergeExistingItemWithChanges` utility already handles partial PATCH merging -- extending it to merge components is consistent
-- Component lists are small (typically 2-10 items) -- no performance concern with full replacement
-- The UI already manages components as local form state with add/remove/update operations -- submitting the final array is the natural contract
-- Granular endpoints (POST component, DELETE component, PATCH component) would triple the API surface for no user benefit, since the form always submits all components together
+**What:** The token itself grants access to a specific resource and action. Possession of the token = authorization.
+**When to use:** When unauthenticated users need scoped access to a single resource (email links, share links).
+**Trade-offs:** Token leakage = unauthorized access (mitigated by expiry and HTTPS). Cannot revoke in transit (mitigated by server-side revocation check).
 
-**Trade-offs:** If two users edit the same bundle simultaneously, last-write-wins. Acceptable for a solo-operator product.
+### Pattern 3: Service-per-Action
 
-**API contract:**
+**What:** Each new operation (send, delete, PDF generate, public respond) gets its own service class, following the existing Creator/Retriever/Updater/Deleter pattern.
+**When to use:** Always -- this is the established project convention.
+**Trade-offs:** More files, but each is small, testable, and single-responsibility.
+
+## Frontend Architecture
+
+### New Components (trade-flow-ui)
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| **CustomerQuotePage** | `src/pages/CustomerQuotePage.tsx` | Public page at `/q/:token` |
+| **PublicQuoteView** | `src/features/quotes/components/PublicQuoteView.tsx` | Quote display for customers |
+| **QuoteResponseButtons** | `src/features/quotes/components/QuoteResponseButtons.tsx` | Accept/Reject CTA |
+| **QuoteResponseConfirmation** | `src/features/quotes/components/QuoteResponseConfirmation.tsx` | Post-response message |
+| **SendQuoteDialog** | `src/features/quotes/components/SendQuoteDialog.tsx` | Confirmation before sending |
+| **DeleteQuoteDialog** | `src/features/quotes/components/DeleteQuoteDialog.tsx` | Confirmation before deleting |
+
+### Modified Components
+
+| Component | Change |
+|-----------|--------|
+| **QuoteActionStrip** | Add "Send Quote" and "Delete Quote" buttons |
+| **QuoteDetailPage** | Wire up send/delete actions, add PDF download button |
+| **quoteApi.ts** | Add `sendQuote`, `deleteQuote`, `downloadQuotePdf` mutations/queries |
+
+### Routing Changes
+
+```tsx
+// In App.tsx -- add BEFORE the catch-all redirect
+<Route path="/q/:token" element={<CustomerQuotePage />} />
+
+// This route sits OUTSIDE AuthenticatedLayout (no ProtectedRoute wrapper)
+```
+
+**Important:** The `/q/:token` route must NOT be inside the `AuthenticatedLayout` wrapper. It needs:
+- Redux Provider (for RTK Query to work)
+- ErrorBoundary
+- But NOT AuthProvider/ProtectedRoute/OnboardingProvider
+
+### RTK Query for Public Endpoints
 
 ```typescript
-// PATCH /v1/business/:businessId/item/:itemId
-// Extends existing UpdateItemRequest
-{
-  "name": "Updated Bundle Name",           // optional, existing
-  "bundleConfig": {                         // optional, existing object
-    "priceStrategy": "component_based",     // existing
-    "bundlePrice": null,                    // existing
-    "components": [                         // NEW -- full replacement
-      { "itemId": "abc123", "quantity": 2, "isOptional": false },
-      { "itemId": "def456", "quantity": 1, "isOptional": true }
-    ]
-  }
-}
-```
-
-**Implementation changes:**
-
-```typescript
-// update-item.request.ts -- extend UpdateBundleConfigRequest
-export class UpdateBundleComponentRequest {
-  @IsString() @IsNotEmpty() itemId: string;
-  @IsNumber() @Min(0) quantity: number;
-  @IsBoolean() isOptional: boolean;
-}
-
-export class UpdateBundleConfigRequest {
-  @IsEnum(PriceStrategy) priceStrategy: PriceStrategy;
-  @ValidateIf((o) => o.priceStrategy === PriceStrategy.FIXED)
-  @IsNumber() @Min(0) bundlePrice: number | null;
-
-  @IsOptional()  // NEW -- optional so priceStrategy-only updates still work
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => UpdateBundleComponentRequest)
-  components?: UpdateBundleComponentRequest[];
-}
-```
-
-```typescript
-// merge-existing-item-with-changes.utility.ts -- extend mergeBundleConfig
-const mergeBundleConfig = (existing, changes) => {
-  if (changes) {
-    // ... existing priceStrategy/bundlePrice merge ...
-    // NEW: if components provided, replace entirely
-    components: changes.components ?? existing.components,
-  }
-  return existing;
-};
-```
-
-```typescript
-// item-updater.service.ts -- add component validation
-private async validateComponents(components: IBundleComponentDto[]): Promise<void> {
-  // 1. All referenced itemIds exist and belong to same business
-  // 2. No component is itself a bundle (no nested bundles)
-  // 3. At least one component required
-  // 4. No duplicate itemIds
-}
-```
-
-### Pattern 2: Quote Detail Page with Expandable Bundle Lines
-
-**What:** The quote detail page renders line items as a flat list where bundle parent lines show a chevron. Clicking expands to reveal child component lines indented beneath the parent. Components are always loaded (they come in the API response's `components[]` array on bundle line items) -- expansion is purely a UI toggle.
-
-**When to use:** When hierarchical data is already returned by the API and the nesting is at most one level deep.
-
-**Why this approach:**
-- The API already structures the response with `components?: IQuoteLineItemResponse[]` on bundle line items (see `mapLineItems` in QuoteController) -- no additional API calls needed for expansion
-- One level of nesting (parent bundle -> child components) maps cleanly to a collapsible row pattern
-- Keeps the line item list scannable -- users see the rolled-up bundle price by default
-
-**Component structure:**
-
-```
-QuoteDetailPage
-├── QuoteHeader (title, number, status badge, customer, dates)
-├── QuoteStatusActions (transition buttons based on current status)
-├── LineItemsSection
-│   ├── LineItemRow (standard item -- flat row)
-│   ├── BundleLineItemRow (bundle parent -- row with expand chevron)
-│   │   └── BundleComponentRows (child lines, shown when expanded)
-│   └── AddLineItemButton (opens AddLineItemDialog)
-├── QuoteTotals (subtotal, tax, total)
-└── QuoteNotes (optional notes display)
-```
-
-**UI rendering logic:**
-
-```typescript
-// LineItemsList.tsx
-function LineItemsList({ lineItems }: { lineItems: QuoteLineItem[] }) {
-  return (
-    <div>
-      {lineItems.map((lineItem) =>
-        lineItem.type === "bundle" ? (
-          <BundleLineItemRow key={lineItem.id} lineItem={lineItem} />
-        ) : (
-          <StandardLineItemRow key={lineItem.id} lineItem={lineItem} />
-        )
-      )}
-    </div>
-  );
-}
-
-// BundleLineItemRow.tsx
-function BundleLineItemRow({ lineItem }: { lineItem: QuoteLineItem }) {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  return (
-    <>
-      <div onClick={() => setIsExpanded(!isExpanded)} className="cursor-pointer">
-        <ChevronRight className={cn("transition-transform", isExpanded && "rotate-90")} />
-        {/* bundle name, qty, total */}
-      </div>
-      {isExpanded && lineItem.components?.map((component) => (
-        <div key={component.id} className="pl-8 bg-muted/30">
-          {/* component name, qty, unit price, total -- indented, muted */}
-        </div>
-      ))}
-    </>
-  );
-}
-```
-
-### Pattern 3: RTK Query Cache Strategy for Quotes with Nested Line Items
-
-**What:** Use quote-level cache tags with list invalidation. Do NOT attempt to cache individual line items separately -- treat the quote (with its embedded line items) as a single cache unit.
-
-**Why this approach:**
-- The API returns quotes with line items embedded (not as separate resources) -- the cache should mirror the API contract
-- Line items only exist in the context of a quote -- there is no standalone line item endpoint
-- Adding/removing a line item returns the full updated quote -- perfect for RTK Query's `transformResponse` to replace the cached quote
-- Avoids the complexity of normalized line item caching which would require manual cache updates
-
-**Implementation:**
-
-```typescript
-// quoteApi.ts
-export const quoteApi = apiSlice.injectEndpoints({
+// New: publicQuoteApi.ts -- separate from quoteApi.ts
+// Does NOT inject Firebase auth token (public endpoints)
+const publicApiSlice = createApi({
+  reducerPath: 'publicApi',
+  baseQuery: fetchBaseQuery({ baseUrl: VITE_API_BASE_URL }),  // No auth headers
   endpoints: (builder) => ({
-    getQuotes: builder.query<Quote[], string>({
-      query: (businessId) => `/v1/business/${businessId}/quotes`,
-      transformResponse: (response: StandardResponse<Quote>) => response.data,
-      providesTags: (result) =>
-        result
-          ? [
-              ...result.map(({ id }) => ({ type: "Quote" as const, id })),
-              { type: "Quote", id: "LIST" },
-            ]
-          : [{ type: "Quote", id: "LIST" }],
+    getPublicQuote: builder.query({
+      query: (token: string) => `/v1/public/quote/${token}`,
     }),
-
-    getQuote: builder.query<Quote, string>({
-      query: (quoteId) => `/v1/quote/${quoteId}`,
-      transformResponse: (response: StandardResponse<Quote>) => response.data[0],
-      providesTags: (_result, _error, id) => [{ type: "Quote", id }],
-    }),
-
-    createQuote: builder.mutation<
-      Quote,
-      { businessId: string; data: CreateQuoteRequest }
-    >({
-      query: ({ businessId, data }) => ({
-        url: `/v1/business/${businessId}/quote`,
-        method: "POST",
-        body: data,
+    respondToQuote: builder.mutation({
+      query: ({ token, action }) => ({
+        url: `/v1/public/quote/${token}/respond`,
+        method: 'POST',
+        body: { action },
       }),
-      transformResponse: (response: StandardResponse<Quote>) => response.data[0],
-      invalidatesTags: [{ type: "Quote", id: "LIST" }],
-    }),
-
-    addLineItem: builder.mutation<
-      Quote,
-      { businessId: string; quoteId: string; data: AddLineItemRequest }
-    >({
-      query: ({ businessId, quoteId, data }) => ({
-        url: `/v1/business/${businessId}/quote/${quoteId}/line-item`,
-        method: "POST",
-        body: data,
-      }),
-      transformResponse: (response: StandardResponse<Quote>) => response.data[0],
-      // Invalidate both the specific quote and the list (totals change)
-      invalidatesTags: (_result, _error, { quoteId }) => [
-        { type: "Quote", id: quoteId },
-        { type: "Quote", id: "LIST" },
-      ],
-    }),
-
-    removeLineItem: builder.mutation<
-      Quote,
-      { businessId: string; quoteId: string; lineItemId: string }
-    >({
-      query: ({ businessId, quoteId, lineItemId }) => ({
-        url: `/v1/business/${businessId}/quote/${quoteId}/line-item/${lineItemId}`,
-        method: "DELETE",
-      }),
-      transformResponse: (response: StandardResponse<Quote>) => response.data[0],
-      invalidatesTags: (_result, _error, { quoteId }) => [
-        { type: "Quote", id: quoteId },
-        { type: "Quote", id: "LIST" },
-      ],
-    }),
-
-    updateQuoteStatus: builder.mutation<
-      Quote,
-      { quoteId: string; status: QuoteStatus }
-    >({
-      query: ({ quoteId, status }) => ({
-        url: `/v1/quote/${quoteId}/status`,
-        method: "PATCH",
-        body: { status },
-      }),
-      transformResponse: (response: StandardResponse<Quote>) => response.data[0],
-      invalidatesTags: (_result, _error, { quoteId }) => [
-        { type: "Quote", id: quoteId },
-        { type: "Quote", id: "LIST" },
-      ],
     }),
   }),
 });
 ```
 
-**Key cache decisions:**
-- **Quote-level granularity:** Each quote (with all its line items) is one cache entry. Adding a line item invalidates that quote's tag, triggering a refetch that replaces the entire quote object including updated line items and recalculated totals.
-- **List invalidation on mutations:** All mutations that change a quote also invalidate `{ type: "Quote", id: "LIST" }` because the quotes list page shows totals and status which may change.
-- **No optimistic updates initially:** The API returns the full updated quote on every mutation. Let RTK Query refetch via tag invalidation. Optimistic updates can be added later if latency is a problem (it will not be at this scale).
-
-### Pattern 4: Quote Status Transitions (Mirroring Schedule Pattern)
-
-**What:** A dedicated `QuoteTransitionService` with a `ALLOWED_TRANSITIONS` map, following the exact pattern established by `ScheduleTransitionService` and `schedule-transitions.ts`.
-
-**Why:** The schedule transition pattern is proven, tested, and understood. Quote status transitions have the same shape: a state machine with valid transitions and terminal states.
-
-**Status transition map:**
-
-```
-                   ┌─────────┐
-                   │  DRAFT  │
-                   └────┬────┘
-                        │
-                   ┌────▼────┐
-              ┌────│  SENT   │────┐
-              │    └────┬────┘    │
-              │         │         │
-         ┌────▼────┐    │    ┌────▼─────┐
-         │ACCEPTED │    │    │ REJECTED │
-         └─────────┘    │    └──────────┘
-                        │
-                   ┌────▼────┐
-                   │ EXPIRED │
-                   └─────────┘
-```
-
-**Implementation:**
-
-```typescript
-// quote-transitions.ts (NEW file -- mirrors schedule-transitions.ts)
-export const ALLOWED_TRANSITIONS: ReadonlyMap<QuoteStatus, readonly QuoteStatus[]> = new Map([
-  [QuoteStatus.DRAFT, [QuoteStatus.SENT]],
-  [QuoteStatus.SENT, [QuoteStatus.ACCEPTED, QuoteStatus.REJECTED, QuoteStatus.EXPIRED]],
-  [QuoteStatus.ACCEPTED, []],   // terminal
-  [QuoteStatus.REJECTED, []],   // terminal
-  [QuoteStatus.EXPIRED, []],    // terminal
-]);
-
-export const isValidTransition = (from: QuoteStatus, to: QuoteStatus): boolean => {
-  const allowed = ALLOWED_TRANSITIONS.get(from);
-  return allowed !== undefined && allowed.includes(to);
-};
-
-export const getValidTransitions = (from: QuoteStatus): readonly QuoteStatus[] => {
-  return ALLOWED_TRANSITIONS.get(from) ?? [];
-};
-```
-
-```typescript
-// quote-transition.service.ts (NEW -- mirrors schedule-transition.service.ts)
-@Injectable()
-export class QuoteTransitionService {
-  constructor(
-    private readonly quoteRepository: QuoteRepository,
-    private readonly quotePolicy: QuotePolicy,
-    private readonly accessControllerFactory: AccessControllerFactory,
-  ) {}
-
-  public async transition(
-    authUser: IUserDto,
-    existing: IQuoteDto,
-    targetStatus: QuoteStatus,
-  ): Promise<IQuoteDto> {
-    const accessController = this.accessControllerFactory.create(this.quotePolicy);
-    accessController.canUpdate(authUser, existing);
-
-    if (!isValidTransition(existing.status, targetStatus)) {
-      const validNext = getValidTransitions(existing.status);
-      throw new InvalidRequestError(
-        ErrorCodes.QUOTE_INVALID_TRANSITION,
-        `Cannot transition from '${existing.status}' to '${targetStatus}'. Valid: ${validNext.join(", ") || "none"}`,
-      );
-    }
-
-    const updated: IQuoteDto = {
-      ...existing,
-      status: targetStatus,
-      ...this.getTimestampUpdates(targetStatus),
-    };
-    return this.quoteRepository.update(updated);
-  }
-
-  private getTimestampUpdates(targetStatus: QuoteStatus): Partial<IQuoteDto> {
-    const now = DateTime.now();
-    switch (targetStatus) {
-      case QuoteStatus.SENT: return { sentAt: now };
-      case QuoteStatus.ACCEPTED: return { acceptedAt: now };
-      case QuoteStatus.REJECTED: return { rejectedAt: now };
-      default: return {};
-    }
-  }
-}
-```
-
-**API endpoint:**
-
-```typescript
-// QuoteController -- add status transition endpoint
-@UseGuards(JwtAuthGuard)
-@Patch("quote/:quoteId/status")
-public async updateStatus(
-  @Req() request: { user: IUserDto; params: { quoteId: string } },
-  @Body() body: { status: QuoteStatus },
-): Promise<IResponse<IQuoteResponse>> {
-  // Fetch, transition, return
-}
-```
-
-**UI integration:**
-
-```typescript
-// QuoteStatusActions.tsx -- renders available transition buttons
-function QuoteStatusActions({ quote }: { quote: Quote }) {
-  const [updateStatus] = useUpdateQuoteStatusMutation();
-
-  // Derive available transitions from current status
-  const transitions: Record<string, QuoteStatus[]> = {
-    draft: ["sent"],
-    sent: ["accepted", "rejected"],
-  };
-
-  const available = transitions[quote.status] ?? [];
-
-  return (
-    <div className="flex gap-2">
-      {available.includes("sent") && (
-        <Button onClick={() => updateStatus({ quoteId: quote.id, status: "sent" })}>
-          Mark as Sent
-        </Button>
-      )}
-      {available.includes("accepted") && (
-        <Button onClick={() => updateStatus({ quoteId: quote.id, status: "accepted" })}>
-          Accept
-        </Button>
-      )}
-      {available.includes("rejected") && (
-        <Button
-          variant="destructive"
-          onClick={() => updateStatus({ quoteId: quote.id, status: "rejected" })}
-        >
-          Reject
-        </Button>
-      )}
-    </div>
-  );
-}
-```
-
-## Data Flow
-
-### Adding a Line Item to a Quote (Existing + New UI)
-
-```
-User clicks "Add Line Item" on QuoteDetailPage
-    |
-AddLineItemDialog opens
-    |
-SearchableItemPicker shows items (from cached getItems query)
-    |
-User selects item + sets quantity, clicks Add
-    |
-addLineItem mutation fires
-    POST /v1/business/:bid/quote/:qid/line-item { itemId, quantity }
-    |
-QuoteUpdater.addLineItem()
-    |-- fetches item
-    |-- if BUNDLE: QuoteBundleLineItemFactory creates parent + child line items
-    |-- if STANDARD: QuoteStandardLineItemFactory creates single line item
-    |-- QuoteLineItemCreator persists to MongoDB
-    |-- QuoteTotalsCalculator recalculates
-    |-- returns full IQuoteDto with all line items + totals
-    |
-Response returns full quote
-    |
-RTK Query invalidates { Quote, id: quoteId } + { Quote, id: "LIST" }
-    |
-QuoteDetailPage re-renders with new line item visible
-```
-
-### Editing Bundle Components (New Flow)
-
-```
-User opens BundleItemForm in edit mode
-    |
-BundleComponentsList now editable (removing isReadOnly restriction)
-    |
-SearchableItemPicker replaces Select for item selection
-    |
-User adds/removes/reorders components locally (form state)
-    |
-User clicks "Update"
-    |
-PATCH /v1/business/:bid/item/:itemId
-    { bundleConfig: { priceStrategy, bundlePrice, components: [...full array] } }
-    |
-mergeExistingItemWithChanges() replaces components array
-    |
-ItemUpdaterService.update()
-    |-- validateComponents(): all itemIds exist, none are bundles, no duplicates
-    |-- itemRepository.update()
-    |
-RTK Query invalidates { Item, id: itemId } + { Item, id: "LIST" }
-```
-
-### Quote Status Transition
-
-```
-User clicks "Mark as Sent" on QuoteDetailPage
-    |
-updateQuoteStatus mutation fires
-    PATCH /v1/quote/:quoteId/status { status: "sent" }
-    |
-QuoteTransitionService.transition()
-    |-- validates transition (draft -> sent is valid)
-    |-- sets sentAt timestamp
-    |-- persists via quoteRepository.update()
-    |
-RTK Query invalidates Quote tags
-    |
-QuoteDetailPage re-renders with new status badge + different action buttons
-```
-
-## Integration Points
-
-### New API Endpoints Required
-
-| Endpoint | Method | Purpose | Returns |
-|----------|--------|---------|---------|
-| `/v1/quote/:quoteId/status` | PATCH | Status transition | Full quote |
-| `/v1/business/:bid/quote/:qid/line-item/:lineItemId` | DELETE | Remove line item | Full quote |
-| `/v1/business/:bid/quote/:qid` | PATCH | Update quote metadata (title, notes, validUntil) | Full quote |
-
-### Modified API Endpoints
-
-| Endpoint | Change | Impact |
-|----------|--------|--------|
-| `PATCH /v1/business/:bid/item/:itemId` | Accept `bundleConfig.components[]` in request body | Backward compatible -- components is optional |
-
-### Cross-Module Dependencies
-
-| Boundary | Communication | Notes |
-|----------|---------------|-------|
-| Quote -> Item | QuoteUpdater fetches items via ItemRetrieverService | Existing dependency, no change |
-| Quote -> TaxRate | Bundle factory resolves tax rates | Existing dependency, no change |
-| UI Items -> UI Quotes | SearchableItemPicker shared by BundleItemForm and AddLineItemDialog | NEW shared component in `src/components/` or `src/features/items/components/` |
-| BundleItemForm -> itemApi | Edit mode now sends PATCH with components | MODIFY -- form submit handler changes |
-| QuoteDetailPage -> quoteApi | All new page, consumes new RTK Query endpoints | NEW |
-| QuoteDetailPage -> itemApi | Uses `useGetItemsQuery` to populate SearchableItemPicker in AddLineItemDialog | Existing API, new consumer |
+**Why a separate API slice?** The existing `apiSlice` injects Firebase auth tokens in `prepareHeaders`. Public endpoints must NOT send auth tokens (the customer does not have a Firebase account). A separate slice with no auth header injection keeps the separation clean.
 
 ## Anti-Patterns
 
-### Anti-Pattern 1: Separate Cache Entries for Line Items
+### Anti-Pattern 1: Reusing JwtAuthGuard with Optional Auth
 
-**What people do:** Create a separate RTK Query tag type for line items (e.g., `QuoteLineItem`) and try to update individual line items in the cache.
-**Why it's wrong:** Line items are not independent resources -- they exist only within a quote. The API does not expose standalone line item endpoints. Separate caching creates sync issues between the quote cache and line item cache (e.g., totals not updating when a line item changes).
-**Do this instead:** Cache at the quote level. Every mutation returns the full quote. Let tag invalidation handle refetching.
+**What people do:** Make the auth guard optional (`@UseGuards(OptionalJwtAuthGuard)`) and check `request.user` inside the handler.
+**Why it is wrong:** Muddies the security contract. Every developer reading the code must understand "optional" means "sometimes unauthenticated." The existing `JwtAuthGuard` also creates users on first auth -- running it on public endpoints would fail.
+**Do this instead:** Use a completely separate controller with no guard. Token validation is explicit in the service layer.
 
-### Anti-Pattern 2: Granular Component Editing Endpoints
+### Anti-Pattern 2: Exposing Internal IDs in Public Response
 
-**What people do:** Create `POST bundle/:id/component`, `DELETE bundle/:id/component/:componentId`, `PATCH bundle/:id/component/:componentId` endpoints.
-**Why it's wrong:** Components are embedded in the Item document. Granular endpoints suggest they are independent resources, create unnecessary API surface, and make the UI responsible for orchestrating multiple calls.
-**Do this instead:** Full array replacement via the existing PATCH item endpoint. The UI manages component state locally and submits the final result.
+**What people do:** Return the same `IQuoteResponse` (with `businessId`, `customerId`, `jobId`) to public endpoints.
+**Why it is wrong:** Leaks internal identifiers to unauthenticated users. A customer should not see MongoDB ObjectIds for business/customer/job records.
+**Do this instead:** Create a restricted `IPublicQuoteResponse` that only includes display data (business name, quote number, line items with descriptions, totals).
 
-### Anti-Pattern 3: Client-Side Transition Validation Only
+### Anti-Pattern 3: PDF Generation as Background Job for On-Demand Downloads
 
-**What people do:** Only check valid transitions in the UI (disabling buttons) without server validation.
-**Why it's wrong:** Any HTTP client can call the API directly. Status transitions are a business rule that must be enforced server-side.
-**Do this instead:** Validate transitions on both sides. The UI uses the transition map to show/hide action buttons (good UX). The API uses the same map to enforce the rules (security).
+**What people do:** Generate PDFs asynchronously and store them, then serve from storage.
+**Why it is wrong for this use case:** Over-engineering. The tradesperson clicks "Download PDF" and expects it immediately. Quote data may change between generation and download. Storing PDFs creates a cache invalidation problem.
+**Do this instead:** Generate on-demand when the download endpoint is hit. Puppeteer can generate a simple quote PDF in under 2 seconds.
 
-### Anti-Pattern 4: Optimistic Updates for Quote Mutations
+### Anti-Pattern 4: Sending PDF as Email Attachment
 
-**What people do:** Use RTK Query's `onQueryStarted` with `updateQueryData` to optimistically update the quote cache before the server responds.
-**Why it's wrong for this product:** Quote mutations involve server-side calculations (totals, tax, pricing). Optimistic updates would show stale/incorrect totals. The solo-operator scale means latency is negligible.
-**Do this instead:** Let mutations invalidate tags and trigger refetches. The response is fast enough that the UX difference is imperceptible.
+**What people do:** Attach the PDF to the email so the customer has it immediately.
+**Why it is wrong:** Email attachments increase email size (deliverability risk), PDFs cannot contain interactive accept/reject buttons, and the customer cannot respond without visiting the app. The PDF also becomes stale if the quote is updated and re-sent.
+**Do this instead:** Email contains a link to the interactive quote page. PDF download is available on that page if the customer wants a copy.
+
+## Integration Points
+
+### External Services
+
+| Service | Integration Pattern | Notes |
+|---------|---------------------|-------|
+| **SendGrid** | Existing `EmailSenderService.sendEmail()` | Add QuoteModule import of EmailModule. Build HTML in QuoteSender, pass to EmailSenderService |
+| **Puppeteer** | New dependency, launched per PDF request | `npm install puppeteer`. Headless Chrome downloads ~300MB on first install. In production, use `puppeteer-core` + system Chrome to reduce bundle size |
+
+### Internal Module Dependencies (New)
+
+| Boundary | Communication | Notes |
+|----------|---------------|-------|
+| QuoteModule -> EmailModule | Direct service injection | QuoteModule imports EmailModule to access EmailSenderService |
+| QuoteModule -> BusinessModule | Direct service injection | QuoteSender needs business name for email. Already used pattern (CustomerModule imports exist) |
+| QuoteModule -> CustomerModule | Direct service injection | Already imported. QuoteSender needs customer email address |
+| PublicQuoteController -> QuoteTokenService | Direct injection | Token validation on every public request |
+| PublicQuoteController -> QuotePublicRetriever | Direct injection | Fetches quote without auth user |
+| PublicQuoteController -> QuotePublicResponder | Direct injection | Handles accept/reject |
+
+### New Environment Variables
+
+| Variable | Purpose | Required |
+|----------|---------|----------|
+| `QUOTE_TOKEN_SECRET` | HMAC signing secret for quote access tokens | YES -- generate with `openssl rand -hex 32` |
+| `QUOTE_TOKEN_EXPIRY_DAYS` | Token expiry in days (default: 30) | NO -- sensible default |
+| `APP_BASE_URL` | Frontend URL for constructing quote links in emails | YES -- e.g., `https://app.tradeflow.com` |
+
+### New API Endpoints
+
+| Endpoint | Method | Auth | Purpose | Returns |
+|----------|--------|------|---------|---------|
+| `/v1/business/:bid/quote/:qid/send` | POST | JWT | Send quote email to customer | Updated quote (status=SENT) |
+| `/v1/business/:bid/quote/:qid` | DELETE | JWT | Delete quote and line items | Empty data `{ data: [] }` |
+| `/v1/business/:bid/quote/:qid/pdf` | GET | JWT | Download quote as PDF | Binary PDF |
+| `/v1/public/quote/:token` | GET | None (token) | Customer views quote | Public quote response |
+| `/v1/public/quote/:token/respond` | POST | None (token) | Customer accepts/rejects | Confirmation |
 
 ## Suggested Build Order
 
-Build order is driven by dependencies -- each step produces something the next step needs.
+Build order based on dependency analysis:
 
-| Order | What | Depends On | Rationale |
-|-------|------|------------|-----------|
-| 1 | Fix bundle creation bug (unit field) | Nothing | Unblocks everything else, standalone fix |
-| 2 | Extend UpdateItemRequest with components[] + validation | Step 1 | API contract needed before UI can send components |
-| 3 | SearchableItemPicker component | Nothing | Shared component needed by steps 4 and 8 |
-| 4 | BundleComponentsList edit mode + BundleItemForm changes | Steps 2, 3 | UI can now edit bundle components |
-| 5 | Improved bundle display (components section with qty x unit) | Step 1 | Standalone UI improvement, no API change |
-| 6 | quoteApi.ts RTK Query endpoints | Nothing (API already exists for create/list/get/add-line-item) | Wire UI to existing API |
-| 7 | QuoteDetailPage (read-only: header, line items, totals, bundle expand) | Step 6 | Core quote detail experience |
-| 8 | AddLineItemDialog on QuoteDetailPage | Steps 3, 6, 7 | Add items to quotes from the detail page |
-| 9 | Quote status transitions (API: QuoteTransitionService + endpoint) | Nothing | Independent API work |
-| 10 | QuoteStatusActions on QuoteDetailPage | Steps 7, 9 | Status buttons on detail page |
-| 11 | Remove line item (API endpoint + UI button) | Steps 6, 7 | Polish -- less critical than adding |
+```
+Phase 1: Quote Deletion (no external deps)
+    |-- QuoteDeleter service
+    |-- DELETE endpoint on QuoteController
+    |-- DeleteQuoteDialog + QuoteActionStrip changes (frontend)
+    |-- RTK Query deleteQuote mutation
 
-**Parallelization opportunities:**
-- Steps 1, 3, 6, 9 can all start in parallel (no dependencies on each other)
-- Steps 2 and 5 can run in parallel after step 1
-- Steps 7 and 4 can run in parallel after their respective dependencies
+Phase 2: Token Infrastructure + Public API
+    |-- quote_tokens collection + QuoteTokenRepository
+    |-- QuoteTokenService (generate, validate, revoke)
+    |-- PublicQuoteController + PublicQuoteResponse types
+    |-- QuotePublicRetriever service
+    |-- No frontend yet (test with curl/Postman)
+
+Phase 3: Customer Quote Page (frontend)
+    |-- Public route /q/:token in App.tsx
+    |-- publicQuoteApi.ts (separate RTK Query slice)
+    |-- CustomerQuotePage + PublicQuoteView components
+    |-- Accept/Reject UI (no backend wiring yet if Phase 4 not done)
+
+Phase 4: Quote Email Sending
+    |-- QuoteSender service (orchestrates token + email + transition)
+    |-- POST .../send endpoint on QuoteController
+    |-- Email HTML template construction
+    |-- SendQuoteDialog + QuoteActionStrip changes (frontend)
+    |-- RTK Query sendQuote mutation
+
+Phase 5: Customer Response (Accept/Reject)
+    |-- QuotePublicResponder service
+    |-- POST .../respond endpoint on PublicQuoteController
+    |-- QuoteResponseButtons + confirmation UI (frontend)
+    |-- Wire respondToQuote mutation in publicQuoteApi
+
+Phase 6: PDF Generation
+    |-- Install Puppeteer
+    |-- QuotePdfGenerator service
+    |-- GET .../pdf endpoint on QuoteController
+    |-- PDF HTML template
+    |-- Download button on QuoteDetailPage (frontend)
+```
+
+**Rationale for this order:**
+1. **Deletion first** -- standalone feature, no deps on other new features, quick win
+2. **Token infra before email** -- email needs tokens to generate links, so token system must exist first
+3. **Public page before email** -- the page the email links to must exist before sending emails makes sense
+4. **Email sending next** -- depends on tokens (Phase 2) and public page (Phase 3)
+5. **Customer response after email** -- customers need to receive emails before they can respond
+6. **PDF last** -- standalone feature, heaviest dependency (Puppeteer), lowest priority
 
 ## Sources
 
-- Existing codebase analysis (HIGH confidence -- all patterns derived from existing code):
-  - `trade-flow-api/src/schedule/services/schedule-transition.service.ts` -- transition pattern
-  - `trade-flow-api/src/schedule/enum/schedule-transitions.ts` -- transition map pattern
-  - `trade-flow-api/src/quote/controllers/quote.controller.ts` -- existing response structure with nested line items
-  - `trade-flow-api/src/quote/services/quote-updater.service.ts` -- existing addLineItem flow
-  - `trade-flow-api/src/item/controllers/mappers/merge-existing-item-with-changes.utility.ts` -- PATCH merge pattern
-  - `trade-flow-api/src/item/requests/update-item.request.ts` -- existing bundle config update structure
-  - `trade-flow-ui/src/features/items/api/itemApi.ts` -- RTK Query tag/cache pattern
-  - `trade-flow-ui/src/features/items/components/forms/shared/BundleComponentsList.tsx` -- current read-only edit mode
-  - `trade-flow-ui/src/services/api.ts` -- base API slice with "Quote" tag already registered
+- [NestJS Authorization Documentation](https://docs.nestjs.com/security/authorization) -- guard patterns, public decorator approach
+- [URL Protection Through HMAC](https://blog.cyril.email/posts/2025-03-12/url-protection-through-hmac.html) -- HMAC token signing pattern
+- [HMAC Verification Tokens](https://rotational.io/blog/hmac-verification-tokens/) -- token-as-capability pattern
+- [Puppeteer HTML to PDF](https://blog.risingstack.com/pdf-from-html-node-js-puppeteer/) -- PDF generation with Puppeteer
+- [NestJS + Puppeteer PDF Generation](https://medium.com/@mprasad96/from-html-templates-to-well-formatted-pdfs-using-puppeteer-and-nestjs-1263bdff641c) -- NestJS-specific implementation
+- [SendGrid Dynamic Templates](https://www.twilio.com/docs/sendgrid/ui/sending-email/how-to-send-an-email-with-dynamic-templates) -- evaluated but not recommended for single template
+- [Best HTML to PDF Libraries for Node.js](https://blog.logrocket.com/best-html-pdf-libraries-node-js/) -- library comparison
+- Existing codebase patterns (HIGH confidence -- all integration points verified against actual code):
+  - `trade-flow-api/src/quote/controllers/quote.controller.ts` -- existing controller structure, response mapping
+  - `trade-flow-api/src/quote/enums/quote-transitions.ts` -- existing ALLOWED_TRANSITIONS map (SENT->SENT already allowed for re-send)
+  - `trade-flow-api/src/quote/services/quote-transition.service.ts` -- existing transition with timestamp setting
+  - `trade-flow-api/src/email/services/email-sender.service.ts` -- existing SendGrid integration
+  - `trade-flow-api/src/auth/auth.guard.ts` -- existing JwtAuthGuard with user creation side effects
+  - `trade-flow-ui/src/App.tsx` -- existing routing structure with AuthenticatedLayout wrapper
 
 ---
-*Architecture research for: v1.2 Bundle Completion & Quote Integration*
-*Researched: 2026-03-08*
+*Architecture research for: Trade Flow v1.3 Send Quotes*
+*Researched: 2026-03-15*
