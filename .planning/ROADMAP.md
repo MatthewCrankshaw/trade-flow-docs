@@ -84,10 +84,11 @@ Plans:
   2. Public API endpoint returns quote data when given a valid token (no authentication required)
   3. Expired or revoked tokens return a clear error, not quote data
   4. Public endpoint exposes only customer-safe fields (no internal IDs, no business-sensitive data)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 16-01: TBD
+- [ ] 16-01-PLAN.md — QuoteToken module: entity, DTO, repository, creator/retriever/revoker services, unit tests
+- [ ] 16-02-PLAN.md — Public endpoint, response mapping, rate limiting, deletion-revocation integration, controller tests
 
 ### Phase 17: Customer Quote Page
 **Goal**: Customer can view a quote online and see that their visit was recorded
@@ -169,7 +170,7 @@ Phases execute in numeric order: 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 13. Quote API Integration | v1.2 | 3/3 | Complete | 2026-03-14 |
 | 14. Quote Detail and Line Items | v1.2 | 6/6 | Complete | 2026-03-14 |
 | 15. Quote Deletion | 2/2 | Complete    | 2026-03-15 | - |
-| 16. Token Infrastructure and Public API | v1.3 | 0/0 | Not started | - |
+| 16. Token Infrastructure and Public API | v1.3 | 0/2 | Not started | - |
 | 17. Customer Quote Page | v1.3 | 0/0 | Not started | - |
 | 18. Quote Email Sending | v1.3 | 0/0 | Not started | - |
 | 19. Customer Response | v1.3 | 0/0 | Not started | - |
