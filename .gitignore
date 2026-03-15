@@ -1,0 +1,6 @@
+trade-flow-api
+trade-flow-ui
+
+.vscode/
+.DS_Store
+trade-flow.code-workspace
