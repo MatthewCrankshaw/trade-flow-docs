@@ -5,7 +5,7 @@ milestone_name: Bundles & Quotes
 status: completed
 stopped_at: Milestone v1.2 shipped
 last_updated: "2026-03-15"
-last_activity: 2026-03-15 -- Milestone v1.2 Bundles & Quotes shipped and archived
+last_activity: 2026-03-15 - Completed quick task 3: Fix bundle fixed-price: add bundlePrice input field and validation
 progress:
   total_phases: 4
   completed_phases: 4
