@@ -5,9 +5,9 @@ milestone_name: Send Quotes
 status: active
 stopped_at: null
 last_updated: "2026-03-15"
-last_activity: 2026-03-15 - Milestone v1.3 started
+last_activity: 2026-03-15 - Roadmap created for v1.3 (6 phases, 17 requirements)
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,14 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-15)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Planning next milestone
+**Current focus:** Phase 15: Quote Deletion (ready to plan)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 15 (1 of 6 in v1.3) — Quote Deletion
 Plan: —
-Status: Defining requirements
-Last activity: 2026-03-15 — Milestone v1.3 started
+Status: Ready to plan
+Last activity: 2026-03-15 — Roadmap created for v1.3 Send Quotes
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -57,7 +59,7 @@ None.
 
 ### Blockers/Concerns
 
-None.
+- SendGrid "from" address must be verified before Phase 18 (email sending) -- ops concern, not code
 
 ### Quick Tasks Completed
 
@@ -73,5 +75,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-15
-Stopped at: Completed quick task 6 (show bundle unit price in quote line items)
+Stopped at: Roadmap created for v1.3 Send Quotes milestone
 Resume file: None

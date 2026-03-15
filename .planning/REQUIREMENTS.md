@@ -87,29 +87,29 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DLVR-01 | — | Pending |
-| DLVR-02 | — | Pending |
-| DLVR-03 | — | Pending |
-| DLVR-04 | — | Pending |
-| DLVR-05 | — | Pending |
-| RESP-01 | — | Pending |
-| RESP-02 | — | Pending |
-| RESP-03 | — | Pending |
-| RESP-04 | — | Pending |
-| RESP-05 | — | Pending |
-| NOTF-01 | — | Pending |
-| NOTF-02 | — | Pending |
-| PDF-01 | — | Pending |
-| QMGT-01 | — | Pending |
-| AUTO-01 | — | Pending |
-| AUTO-02 | — | Pending |
-| AUTO-03 | — | Pending |
+| QMGT-01 | Phase 15 | Pending |
+| RESP-01 | Phase 16 + 17 | Pending |
+| DLVR-05 | Phase 17 | Pending |
+| RESP-05 | Phase 17 | Pending |
+| DLVR-01 | Phase 18 | Pending |
+| DLVR-02 | Phase 18 | Pending |
+| DLVR-03 | Phase 18 | Pending |
+| DLVR-04 | Phase 18 | Pending |
+| AUTO-01 | Phase 18 | Pending |
+| RESP-02 | Phase 19 | Pending |
+| RESP-03 | Phase 19 | Pending |
+| RESP-04 | Phase 19 | Pending |
+| AUTO-02 | Phase 19 | Pending |
+| AUTO-03 | Phase 19 | Pending |
+| NOTF-01 | Phase 19 | Pending |
+| NOTF-02 | Phase 19 | Pending |
+| PDF-01 | Phase 20 | Pending |
 
 **Coverage:**
 - v1.3 requirements: 17 total
-- Mapped to phases: 0
-- Unmapped: 17 ⚠️
+- Mapped to phases: 17
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-15*
-*Last updated: 2026-03-15 after initial definition*
+*Last updated: 2026-03-15 after roadmap creation*
