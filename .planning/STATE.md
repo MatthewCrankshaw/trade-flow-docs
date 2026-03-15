@@ -5,7 +5,7 @@ milestone_name: Bundles & Quotes
 status: completed
 stopped_at: Milestone v1.2 shipped
 last_updated: "2026-03-15"
-last_activity: 2026-03-15 - Completed quick task 5: Fix Dinero.js invalid amount - round non-integer values
+last_activity: 2026-03-15 - Completed quick task 6: Show bundle unit price in quote line items
 progress:
   total_phases: 4
   completed_phases: 4
@@ -66,9 +66,10 @@ None.
 | 3 | Fix bundle fixed-price: add bundlePrice input field | 2026-03-15 | ef4ec77, fcbae3c | [3-fix-bundle-fixed-price-add-bundleprice-i](./quick/3-fix-bundle-fixed-price-add-bundleprice-i/) |
 | 4 | Fix quote money display: formatDecimal -> formatAmount | 2026-03-15 | a34dbea, 2e4d839 | [4-fix-quote-money-display-convert-minor-un](./quick/4-fix-quote-money-display-convert-minor-un/) |
 | 5 | Fix Dinero.js invalid amount: round non-integer values | 2026-03-15 | 30247f4 | [5-fix-dinero-js-invalid-amount-round-non-i](./quick/5-fix-dinero-js-invalid-amount-round-non-i/) |
+| 6 | Show bundle unit price in quote line items | 2026-03-15 | ee013fe, 0def7cc | [6-show-bundle-unit-price-in-quote-line-ite](./quick/6-show-bundle-unit-price-in-quote-line-ite/) |
 
 ## Session Continuity
 
 Last session: 2026-03-15
-Stopped at: Completed quick task 5 (fix Dinero.js invalid amount - round non-integer values)
+Stopped at: Completed quick task 6 (show bundle unit price in quote line items)
 Resume file: None
