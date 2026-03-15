@@ -31,16 +31,13 @@ Declared values from project design system (see `trade-flow-ui/.github/copilot-i
 
 | Token | Value | Tailwind | Usage in this phase |
 |-------|-------|----------|---------------------|
-| 3xs | 2px | `0.5` | Not used this phase |
-| 2xs | 4px | `1` | Icon-text gap within badges |
-| xs | 6px | `1.5` | Icon-text pairing in buttons |
+| 2xs | 4px | `1` | Icon-text gap within badges, icon-text pairing in buttons |
 | sm | 8px | `2` | Field-level spacing within line item rows |
-| md | 12px | `3` | Stacked mobile card list items (`space-y-3`) |
-| base | 16px | `4` | Card content rhythm, grid gaps |
+| base | 16px | `4` | Card content rhythm, grid gaps, stacked mobile card list items (`space-y-4`) |
 | lg | 24px | `6` | Section-level spacing between card sections |
 | xl | 48px | `12` | Error/empty state vertical padding |
 
-Exceptions: none — standard project scale applies.
+Exceptions: none — all values are multiples of 4.
 
 ---
 
@@ -51,11 +48,11 @@ All values from project design system (see `trade-flow-ui/.github/copilot-instru
 | Role | Size | Weight | Line Height | Usage in this phase |
 |------|------|--------|-------------|---------------------|
 | Body | 14px (`text-sm`) | 400 (`font-normal`) | default (`leading-normal`) | Line item descriptions, quote details body copy |
-| Label | 14px (`text-sm`) | 500 (`font-medium`) | none (`leading-none`) | Table header cells, field labels (Qty, Unit Price, etc.) |
+| Label | 14px (`text-sm`) | 400 (`font-normal`) | none (`leading-none`) | Table header cells, field labels (Qty, Unit Price, etc.) |
 | Section heading | 18px (`text-lg`) | 600 (`font-semibold`) | none (`leading-none`) | Business name in card header, section titles |
-| Page heading | 24px (`text-2xl`) | 700 (`font-bold`) | default | Quote number/title display |
-| Metadata | 12px (`text-xs`) | 500 (`font-medium`) | default | Date labels, validity date, status badge text, timestamps |
-| Status banner | 14px (`text-sm`) | 500 (`font-medium`) | default | Accepted/rejected status banner text |
+| Page heading | 24px (`text-2xl`) | 600 (`font-semibold`) | default | Quote number/title display |
+| Metadata | 12px (`text-xs`) | 400 (`font-normal`) | default | Date labels, validity date, status badge text, timestamps |
+| Status banner | 14px (`text-sm`) | 400 (`font-normal`) | default | Accepted/rejected status banner text |
 
 ---
 
@@ -100,6 +97,8 @@ No new shadcn components need to be installed.
 ## Page Layout Contract
 
 ### Public Quote Page (`/quote/view/:token`)
+
+**Focal point:** The quote card itself is the single focal point -- centered on a neutral background with no competing navigation or chrome.
 
 **Route placement:** Outside `AuthenticatedLayout` in `App.tsx`. No sidebar, no header, no Trade Flow app chrome.
 
@@ -182,7 +181,7 @@ Skeleton matching card layout sections:
 | Invalid/unknown token | Centered error card | Heading: "Quote not found". Body: "This quote link is not valid. It may have been removed or the link is incorrect." |
 | Expired token | Centered error card with business name | Heading: "Quote expired". Body: "This quote from {businessName} has expired. Please contact them for an updated quote." |
 | Revoked token | Centered error card with business name | Heading: "Quote no longer available". Body: "This quote from {businessName} is no longer available. Please contact them for more information." |
-| Network error | Centered error card | Heading: "Something went wrong". Body: "We couldn't load this quote. Please check your internet connection and try again." Retry button: "Try Again" |
+| Network error | Centered error card | Heading: "Something went wrong". Body: "We couldn't load this quote. Please check your internet connection and try again." Retry button: "Reload Quote" |
 
 Error card layout: centered on page (`max-w-md mx-auto`), icon (`AlertCircle` or `FileX` at `h-12 w-12 text-muted-foreground`), heading, body text, optional action button. Follows existing empty state pattern spacing (`py-12`).
 
@@ -206,7 +205,7 @@ Banner positioned at top of card content, before business header. Full quote con
 | Item | left | Item name + type badge (`Badge variant="outline"` with text-xs: "Material", "Labour", "Fee") |
 | Qty | right | Quantity number |
 | Unit Price | right | Formatted currency via `useCurrency` |
-| Total | right | Formatted currency via `useCurrency`, `font-medium` |
+| Total | right | Formatted currency via `useCurrency`, `font-semibold` |
 
 Bundles display as single rolled-up lines. Customer does not see bundle components.
 
@@ -221,10 +220,10 @@ Follow `QuoteLineItemsCardList` pattern. Each line item as a card:
 └──────────────────────────────┘
 ```
 
-- Item name: `font-medium`
+- Item name: `font-semibold`
 - Type badge: `Badge variant="outline"` size small
 - Quantity x unit price: `text-sm text-muted-foreground`
-- Line total: `text-sm font-medium`, right-aligned
+- Line total: `text-sm font-semibold`, right-aligned
 
 ---
 
@@ -237,7 +236,7 @@ Right-aligned totals block at bottom of line items area:
 | Subtotal | `text-sm text-muted-foreground` | `text-sm` |
 | Tax ({taxName}) | `text-sm text-muted-foreground` | `text-sm` |
 | Separator | `Separator` component spanning totals width | — |
-| Total | `text-base font-bold` | `text-base font-bold` |
+| Total | `text-base font-semibold` | `text-base font-semibold` |
 
 Totals container: `flex flex-col items-end space-y-2`, with each row as `flex justify-between gap-8 w-full max-w-xs`.
 
@@ -288,7 +287,7 @@ Phase 20 will enable this button and wire it to the real PDF endpoint.
 | Error: revoked — body | "This quote from {businessName} is no longer available. Please contact them for more information." |
 | Error: network — heading | "Something went wrong" |
 | Error: network — body | "We couldn't load this quote. Please check your internet connection and try again." |
-| Error: network — action | "Try Again" |
+| Error: network — action | "Reload Quote" |
 | Status: accepted | "You accepted this quote on {date}" |
 | Status: rejected | "You declined this quote on {date}" |
 | Validity display | "Valid until {date}" |
