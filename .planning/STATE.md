@@ -5,7 +5,7 @@ milestone_name: Send Quotes
 status: completed
 stopped_at: Completed 15-02-PLAN.md
 last_updated: "2026-03-15T18:03:12.679Z"
-last_activity: 2026-03-15 — Completed 15-02 (delete UI with confirmation, optimistic updates)
+last_activity: 2026-03-15 — Completed quick task 7: Fix quote price input showing minor units instead of dollar values
 progress:
   total_phases: 6
   completed_phases: 1
