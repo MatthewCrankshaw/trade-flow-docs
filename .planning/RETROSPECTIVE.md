@@ -86,6 +86,54 @@
 
 ---
 
+## Milestone: v1.2 -- Bundles & Quotes
+
+**Shipped:** 2026-03-15
+**Phases:** 4 | **Plans:** 12 | **Execution time:** ~30 min
+
+### What Was Built
+- Bundle creation bug fix (unit: "bundle") and reusable SearchableItemPicker (Popover+Command combobox)
+- Bundle component editing: API update with full replacement semantics, validation, two-line display with type badges across edit form/table/cards
+- Quote system: entity with jobId/quoteDate, auto-generated Q-YYYY-NNN numbers, status transitions (Draft/Sent/Accepted/Rejected), creation dialog, list with real data and tab filtering
+- Quote detail page: line item CRUD (add/edit/delete), expandable bundle rows with native table sub-rows, inline qty/price editing, responsive mobile card layout
+- Tax-inclusive line totals, Money.percentageOf math fix, soft-delete for line items
+- Pricing strategy as item-level setting (BundleItemForm radio group) with immediate-add in quote flow
+
+### What Worked
+- Parallel wave execution for plans 14-05 and 14-06 cut execution time -- both completed simultaneously
+- SearchableItemPicker designed for reuse in Phase 11 paid off immediately in Phase 14 (quote line items)
+- Gap closure cycle (plans 14-03 through 14-06) effectively addressed UAT feedback without scope creep
+- Denormalized fields (customerName, jobTitle) in quote API responses eliminated N+1 queries
+- Recalculate-on-read totals (not persisted) avoided stale data entirely
+- Soft delete pattern (DELETED status enum) kept line item history while excluding from totals/queries
+
+### What Was Inefficient
+- Phase 14 had 6 plans (4 were gap closure) -- initial plans 14-01 and 14-02 could have anticipated the soft-delete and tax-inclusive display needs, reducing gap closure rounds
+- CSS grid approach for bundle components (14-04) was immediately replaced by native TableRow (14-05) -- should have used TableRow from the start
+- Two-step bundle add flow added in 14-04 was removed in 14-06 -- design decision changed after UAT. Could have deferred pricing strategy UI to avoid rework
+- ROADMAP.md plan checkboxes still desync (plans 14-05 and 14-06 unchecked despite completion) -- same issue as v1.0 and v1.1
+
+### Patterns Established
+- Inline edit: `defaultValue` with `key={id+value}` for server-driven input reset, blur/Enter to save, Escape to reset
+- Tax-inclusive display: `lineTotalIncTax` helper centralises calculation; "Total (inc. tax)" column header for clarity
+- Soft delete: DELETED status enum + filter in repository queries + guard in calculator services
+- Dual-context dialog: same component with optional prefilled props switches between picker flow and pre-populated mode
+- Atomic MongoDB counter: `findOneAndUpdate` with `$inc` for sequential number generation
+
+### Key Lessons
+1. Plan for soft-delete from the start -- adding it later required touching repository, service, calculator, and enum layers
+2. Pricing/UX decisions that affect multiple components should be settled before implementation, not iterated through gap closure
+3. Native table layout beats CSS grid for sub-row alignment -- don't fight the browser's column layout algorithm
+4. Item-level vs quote-level settings distinction matters -- pricing strategy belongs on the item, not in the quote add flow
+5. Parallel plan execution is effective when plans touch different files with no dependency
+
+### Cost Observations
+- Model mix: opus for execution, sonnet for verification and integration checking
+- Total execution: ~30 min across 12 plans (plus gap closure planning/UAT overhead)
+- Notable: average plan time down to 3 min (from 6 min in v1.0) -- pattern maturity and codebase familiarity
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -94,11 +142,14 @@
 |-----------|---------------|--------|------------|
 | v1.0 | 1.5 hours | 8 | Established module-copy pattern, deferred v2 features cleanly |
 | v1.1 | ~1 hour | 2 | Cross-module references, gap closure cycle, entity dropdown pattern |
+| v1.2 | ~30 min | 4 | Reusable picker component, quote system, parallel execution, gap closure for UX polish |
 
 ### Top Lessons (Verified Across Milestones)
 
-1. Copy-adapt existing module patterns for new domain entities (visit-type -> schedule -> item-tax-rate)
+1. Copy-adapt existing module patterns for new domain entities (visit-type -> schedule -> item-tax-rate -> quote)
 2. Defer non-essential modes/features to keep milestones shippable
 3. Smart defaults reduce form complexity and improve UX for solo operators
-4. Cross-module validation with specific error codes catches errors early (confirmed in both v1.0 schedules and v1.1 tax rates)
-5. Plan update/delete operations explicitly from the start to avoid gap closure overhead
+4. Cross-module validation with specific error codes catches errors early (confirmed in v1.0, v1.1, and v1.2)
+5. Plan update/delete operations explicitly from the start to avoid gap closure overhead (confirmed: v1.1 tax rate updater, v1.2 line item soft-delete)
+6. Design reusable components early (SearchableItemPicker) -- pays off when the same component is needed across features
+7. Settle UX decisions (pricing strategy, display format) before implementation to avoid rework through gap closure

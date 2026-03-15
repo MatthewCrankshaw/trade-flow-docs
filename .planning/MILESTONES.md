@@ -1,5 +1,23 @@
 # Milestones
 
+## v1.2 Bundles & Quotes (Shipped: 2026-03-15)
+
+**Phases completed:** 4 phases, 12 plans, 25 tasks
+**Timeline:** 7 days (2026-03-08 to 2026-03-14)
+**Execution time:** ~30 min (avg 3min/plan)
+**Codebase:** ~19k LOC API + ~22.3k LOC UI (TypeScript)
+**Git range:** feat(11-01) to feat(14-06) — 23 feature commits across 2 repos
+
+**Key accomplishments:**
+- Fixed bundle creation bug and built reusable SearchableItemPicker component (Popover+Command combobox)
+- Full bundle component editing — add/remove/update quantities on existing bundles with two-line display and type badges
+- Quote system wired to API — creation dialog (dual-context), list with real data and tab filtering, status transitions (Draft/Sent/Accepted/Rejected)
+- Quote detail page with line item CRUD — add items/bundles, inline edit quantity/price, soft-delete, expandable bundle rows with native table sub-rows
+- Bundle pricing strategy moved to item-level setting (BundleItemForm radio group) with immediate-add in quote flow
+- Tax-inclusive line totals, correct bundle tax calculation (Money.percentageOf fix), responsive mobile card layout
+
+---
+
 ## v1.1 Item Tax Rate Linkage (Shipped: 2026-03-08)
 
 **Phases completed:** 2 phases, 6 plans

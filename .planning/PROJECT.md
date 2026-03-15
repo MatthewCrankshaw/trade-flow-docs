@@ -10,18 +10,9 @@ Two independent codebases: `trade-flow-api` (NestJS/MongoDB) and `trade-flow-ui`
 
 A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment in one simple, structured system.
 
-## Current Milestone: v1.2 Bundles & Quotes
+## Current State
 
-**Goal:** Complete the partially-built bundle feature (fix creation bug, enable component editing, searchable item picker, improved display) and wire up the quote system with bundle support (API integration, creation flow, detail view with expandable bundle lines).
-
-**Target features:**
-- Fix bundle creation bug (unit field defaulting to "bundle")
-- Bundle component editing (add/remove items, change quantities on existing bundles)
-- Searchable/filterable item dropdown for bundle component selection
-- Improved bundle component display (Components section with quantity × unit format)
-- Quote UI wired to existing API (creation, listing, detail view)
-- Quote line item management (add items/bundles, view line items)
-- Bundle quote integration (rolled-up line by default, expandable to show components)
+Shipped v1.2 Bundles & Quotes (2026-03-15). No active milestone — ready for next milestone planning.
 
 ## Requirements
 
@@ -61,18 +52,32 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - ✓ Item create/update validates referenced tax rate exists -- v1.1
 - ✓ Default items during onboarding reference the correct default tax rate -- v1.1
 - ✓ Quote line item factories resolve tax rate percentage from taxRateId -- v1.1
+- ✓ User can create a bundle item without errors (unit defaults to "bundle") -- v1.2
+- ✓ User can edit bundle components on an existing bundle (add/remove items, change quantities) -- v1.2
+- ✓ User can search and filter items when selecting bundle components via a searchable dropdown -- v1.2
+- ✓ User can view bundle components in a structured list showing item name, quantity, and unit -- v1.2
+- ✓ User can create a new quote linked to a job and customer -- v1.2
+- ✓ User can view a list of all quotes with real API data -- v1.2
+- ✓ User can view quote detail with line items and calculated totals -- v1.2
+- ✓ User can transition quote status (Draft → Sent → Accepted/Rejected) -- v1.2
+- ✓ User can add standard items (material, labour, fee) to a quote -- v1.2
+- ✓ User can add bundle items to a quote (creates parent + component line items) -- v1.2
+- ✓ User can view bundle line items as a rolled-up line that expands to show individual components -- v1.2
+- ✓ User can view quote totals (subtotal, tax, total) calculated from line items -- v1.2
 
 ### Active
 
-<!-- Requirements for v1.2 Bundles & Quotes -- to be defined -->
+<!-- Requirements for next milestone -- to be defined via /gsd:new-milestone -->
 
-(Being defined — see REQUIREMENTS.md)
+(None — run `/gsd:new-milestone` to define next milestone)
 
 ### Out of Scope
 
 <!-- Explicit boundaries. -->
 
-- Quote acceptance/rejection workflow -- next milestone candidate
+- Quote deletion, duplication -- next milestone candidate
+- Quote-level discounts -- next milestone candidate
+- Quote PDF export -- next milestone candidate
 - Invoice generation and management -- next milestone candidate
 - Payment tracking -- next milestone candidate
 - Standalone calendar or "Today" screen -- future milestone (schedules show on job page only)
@@ -101,9 +106,10 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - **API contract:** Standardized response format: `{ data: T[], pagination?, errors? }`
 - **Scheduling shipped (v1.0):** Visit types (CRUD + defaults per trade) and schedules (create/list/edit/cancel/status transitions) fully integrated into job detail page
 - **Item tax rate linkage shipped (v1.1):** Items reference tax rates by ID; API validates references; UI shows tax rate dropdown on item forms; quote factories resolve rates
+- **Bundles & Quotes shipped (v1.2):** Bundle creation/editing with SearchableItemPicker, quote system with creation dialog, list, detail view, line item management (add/edit/delete), expandable bundle rows, tax-inclusive totals, mobile-responsive card layout, status transitions (Draft/Sent/Accepted/Rejected)
 - **Two scheduling modes deferred:** Only exact start time shipped; arrival window mode deferred to v2
 - **Conflict detection deferred:** Overlap warnings deferred to v2
-- **Codebase size:** ~18.2k LOC API (TypeScript) + ~20.3k LOC UI (TypeScript/TSX)
+- **Codebase size:** ~19k LOC API (TypeScript) + ~22.3k LOC UI (TypeScript/TSX)
 
 ## Constraints
 
@@ -132,6 +138,14 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 | Client-side tax rate resolution via RTK Query cache | No server joins needed; UI resolves tax rate details from cache | ✓ Good -- simpler API |
 | TaxRateRepository directly (not RetrieverService) for validation | Avoids unnecessary auth check; item creation itself is business-scoped | ✓ Good -- simpler validation |
 | Tax rate only visible in edit form (not list/detail) | User decision: tax rate is secondary detail | ✓ Good -- clean UI |
+| SearchableItemPicker in src/components/ for reuse | Used in both bundle forms and quote add-item flow | ✓ Good -- reused across features |
+| Atomic quote_counters collection for Q-YYYY-NNN | Sequential numbering without race conditions | ✓ Good -- reliable |
+| Denormalized customerName/jobTitle in quote response | Avoids N+1 queries on quote list | ✓ Good -- fast list rendering |
+| Quote totals recalculated on every read (not persisted) | Single source of truth from line items; no stale totals | ✓ Good -- always correct |
+| Soft delete via DELETED status enum | Preserves line item history; totals exclude deleted items | ✓ Good -- clean audit trail |
+| Pricing strategy is item-level (not per-quote) | API reads bundleConfig.priceStrategy when no override sent | ✓ Good -- simpler quote flow |
+| Native TableRow sub-rows for bundle components | Browser table layout aligns columns automatically | ✓ Good -- replaced CSS grid hack |
+| lineTotalIncTax helper for display calculation | Tax-inclusive totals centralised; column header "Total (inc. tax)" | ✓ Good -- clear UX |
 
 ---
-*Last updated: 2026-03-08 after v1.2 milestone started*
+*Last updated: 2026-03-15 after v1.2 milestone*
