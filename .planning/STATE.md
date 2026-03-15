@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Send Quotes
-status: planning
-stopped_at: Phase 15 context gathered
-last_updated: "2026-03-15T17:36:19.471Z"
-last_activity: 2026-03-15 — Roadmap created for v1.3 Send Quotes
+status: executing
+stopped_at: Completed 15-01-PLAN.md
+last_updated: "2026-03-15T17:53:15.993Z"
+last_activity: 2026-03-15 — Completed 15-01 (soft-delete API foundation)
 progress:
   total_phases: 6
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 2
+  completed_plans: 1
+  percent: 50
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-15)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 15: Quote Deletion (ready to plan)
+**Current focus:** Phase 15: Quote Deletion (executing)
 
 ## Current Position
 
 Phase: 15 (1 of 6 in v1.3) — Quote Deletion
-Plan: —
-Status: Ready to plan
-Last activity: 2026-03-15 — Roadmap created for v1.3 Send Quotes
+Plan: 1 of 2 complete
+Status: Executing
+Last activity: 2026-03-15 — Completed 15-01 (soft-delete API foundation)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
@@ -46,12 +46,16 @@ Progress: [░░░░░░░░░░] 0%
 | v1.0 Scheduling | 8 | 16 | 1.5 hours | 6min |
 | v1.1 Item Tax Rate Linkage | 2 | 6 | ~1 hour | 4min |
 | v1.2 Bundles & Quotes | 4 | 12 | ~30 min | 3min |
+| Phase 15 P01 | 2min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
 ### Decisions
 
 Key decisions archived in PROJECT.md Key Decisions table.
+
+- (15-01) Followed existing soft-delete-via-status-enum pattern from QuoteLineItemStatus.DELETED
+- (15-01) deletedAt field added alongside sentAt/acceptedAt/rejectedAt pattern
 
 ### Pending Todos
 
@@ -74,6 +78,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-15T17:36:19.468Z
-Stopped at: Phase 15 context gathered
-Resume file: .planning/phases/15-quote-deletion/15-CONTEXT.md
+Last session: 2026-03-15T17:53:15.584Z
+Stopped at: Completed 15-01-PLAN.md
+Resume file: None

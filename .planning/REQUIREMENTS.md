@@ -34,7 +34,7 @@ Requirements for Send Quotes milestone. Each maps to roadmap phases.
 
 ### Quote Management
 
-- [ ] **QMGT-01**: User can delete a quote (soft delete, only from Draft status)
+- [x] **QMGT-01**: User can delete a quote (soft delete, only from Draft status)
 
 ### Status Automation
 
@@ -87,7 +87,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| QMGT-01 | Phase 15 | Pending |
+| QMGT-01 | Phase 15 | Complete |
 | RESP-01 | Phase 16 + 17 | Pending |
 | DLVR-05 | Phase 17 | Pending |
 | RESP-05 | Phase 17 | Pending |
