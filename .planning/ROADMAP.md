@@ -170,7 +170,7 @@ Phases execute in numeric order: 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 13. Quote API Integration | v1.2 | 3/3 | Complete | 2026-03-14 |
 | 14. Quote Detail and Line Items | v1.2 | 6/6 | Complete | 2026-03-14 |
 | 15. Quote Deletion | 2/2 | Complete    | 2026-03-15 | - |
-| 16. Token Infrastructure and Public API | v1.3 | 0/2 | Not started | - |
+| 16. Token Infrastructure and Public API | 1/2 | In Progress|  | - |
 | 17. Customer Quote Page | v1.3 | 0/0 | Not started | - |
 | 18. Quote Email Sending | v1.3 | 0/0 | Not started | - |
 | 19. Customer Response | v1.3 | 0/0 | Not started | - |

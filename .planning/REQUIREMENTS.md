@@ -17,7 +17,7 @@ Requirements for Send Quotes milestone. Each maps to roadmap phases.
 
 ### Customer Response
 
-- [ ] **RESP-01**: Customer can view the full quote online via a secure link without logging in
+- [x] **RESP-01**: Customer can view the full quote online via a secure link without logging in
 - [ ] **RESP-02**: Customer can accept a quote with one click from the online view
 - [ ] **RESP-03**: Customer can decline a quote with one click from the online view
 - [ ] **RESP-04**: Customer can provide an optional reason when declining a quote
@@ -88,7 +88,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | QMGT-01 | Phase 15 | Complete |
-| RESP-01 | Phase 16 + 17 | Pending |
+| RESP-01 | Phase 16 + 17 | Complete |
 | DLVR-05 | Phase 17 | Pending |
 | RESP-05 | Phase 17 | Pending |
 | DLVR-01 | Phase 18 | Pending |

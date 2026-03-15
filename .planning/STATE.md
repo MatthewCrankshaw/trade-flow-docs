@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Send Quotes
-status: completed
-stopped_at: Phase 16 context gathered
-last_updated: "2026-03-15T19:11:47.789Z"
-last_activity: 2026-03-15 — Completed 15-02 (delete UI with confirmation, optimistic updates)
+status: executing
+stopped_at: Completed 16-01-PLAN.md
+last_updated: "2026-03-15T19:32:59.771Z"
+last_activity: 2026-03-15 — Completed 16-01 (QuoteToken module with entity, DTO, repository, services, tests)
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
-  percent: 100
+  total_plans: 4
+  completed_plans: 3
+  percent: 75
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-15)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 15: Quote Deletion (executing)
+**Current focus:** Phase 16: Token Infrastructure and Public API (executing)
 
 ## Current Position
 
-Phase: 15 (1 of 6 in v1.3) — Quote Deletion
-Plan: 2 of 2 complete
-Status: Phase Complete
-Last activity: 2026-03-15 — Completed 15-02 (delete UI with confirmation, optimistic updates)
+Phase: 16 (2 of 6 in v1.3) — Token Infrastructure and Public API
+Plan: 1 of 2 complete
+Status: Executing
+Last activity: 2026-03-15 — Completed 16-01 (QuoteToken module with entity, DTO, repository, services, tests)
 
-Progress: [██████████] 100%
+Progress: [████████░░] 75%
 
 ## Performance Metrics
 
@@ -48,6 +48,7 @@ Progress: [██████████] 100%
 | v1.2 Bundles & Quotes | 4 | 12 | ~30 min | 3min |
 | Phase 15 P01 | 2min | 2 tasks | 7 files |
 | Phase 15 P02 | 4min | 2 tasks | 9 files |
+| Phase 16 P01 | 3min | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -59,6 +60,7 @@ Key decisions archived in PROJECT.md Key Decisions table.
 - (15-01) deletedAt field added alongside sentAt/acceptedAt/rejectedAt pattern
 - (15-02) Confirmation dialog owned by parent (QuotesPage) for list deletes, by QuoteActionStrip for detail page deletes
 - (15-02) Used buttonVariants({ variant: "destructive" }) for red delete button in AlertDialogAction
+- (16-01) Used `as never` casts for MongoDB filter/update type constraints in revokeAllForQuote
 
 ### Pending Todos
 
@@ -82,6 +84,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-15T19:11:47.786Z
-Stopped at: Phase 16 context gathered
-Resume file: .planning/phases/16-token-infrastructure-and-public-api/16-CONTEXT.md
+Last session: 2026-03-15T19:32:07Z
+Stopped at: Completed 16-01-PLAN.md
+Resume file: .planning/phases/16-token-infrastructure-and-public-api/16-02-PLAN.md
