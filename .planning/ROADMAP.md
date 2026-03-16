@@ -99,10 +99,11 @@ Plans:
   2. Customer can download the quote as a PDF from the online view (placeholder until Phase 20 delivers real PDF -- shows download button wired to endpoint)
   3. Tradesperson can see when a customer has viewed the quote (viewed indicator with timestamp on quote detail page)
   4. Page displays cleanly on mobile devices (tradespeople's customers often view on phones)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 17-01: TBD
+- [ ] 17-01-PLAN.md — Backend: firstViewedAt on token, error enrichment with business name, viewedAt in authenticated response
+- [ ] 17-02-PLAN.md — Frontend: public quote page (API slice, components, routing), viewed badge on tradesperson detail page
 
 ### Phase 18: Quote Email Sending
 **Goal**: Tradesperson can send a quote to their customer via email with one action
@@ -171,7 +172,7 @@ Phases execute in numeric order: 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 14. Quote Detail and Line Items | v1.2 | 6/6 | Complete | 2026-03-14 |
 | 15. Quote Deletion | 2/2 | Complete    | 2026-03-15 | - |
 | 16. Token Infrastructure and Public API | 2/2 | Complete    | 2026-03-15 | - |
-| 17. Customer Quote Page | v1.3 | 0/0 | Not started | - |
+| 17. Customer Quote Page | v1.3 | 0/2 | Not started | - |
 | 18. Quote Email Sending | v1.3 | 0/0 | Not started | - |
 | 19. Customer Response | v1.3 | 0/0 | Not started | - |
 | 20. PDF Generation | v1.3 | 0/0 | Not started | - |
