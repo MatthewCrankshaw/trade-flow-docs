@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Send Quotes
 status: completed
-stopped_at: Phase 17 context gathered
-last_updated: "2026-03-15T20:14:20.412Z"
+stopped_at: Phase 17 UI-SPEC approved
+last_updated: "2026-03-15T20:25:57.211Z"
 last_activity: 2026-03-15 — Completed 16-02 (Public quote endpoint, rate limiting, token revocation on deletion)
 progress:
   total_phases: 6
@@ -87,6 +87,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-15T20:14:20.409Z
-Stopped at: Phase 17 context gathered
-Resume file: .planning/phases/17-customer-quote-page/17-CONTEXT.md
+Last session: 2026-03-15T20:25:57.208Z
+Stopped at: Phase 17 UI-SPEC approved
+Resume file: .planning/phases/17-customer-quote-page/17-UI-SPEC.md
