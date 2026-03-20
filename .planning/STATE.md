@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Send Quotes
-status: unknown
-stopped_at: Completed 17-03-PLAN.md
-last_updated: "2026-03-20T19:52:11.122Z"
+status: phase-complete
+stopped_at: Completed 17-04-PLAN.md (Phase 17 complete)
+last_updated: "2026-03-20T19:57:51.676Z"
 progress:
   total_phases: 6
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 8
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Project State
@@ -23,8 +23,8 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 
 ## Current Position
 
-Phase: 17 (customer-quote-page) — EXECUTING
-Plan: 4 of 4
+Phase: 17 (customer-quote-page) — COMPLETE
+Plan: 4 of 4 (all complete)
 
 ## Performance Metrics
 
@@ -48,6 +48,7 @@ Plan: 4 of 4
 | Phase 17 P01 | 4min | 2 tasks | 9 files |
 | Phase 17 P02 | 3min | 2 tasks | 12 files |
 | Phase 17-03 P03 | 3min | 2 tasks | 5 files |
+| Phase 17-04 P04 | 3min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -66,6 +67,7 @@ Key decisions archived in PROJECT.md Key Decisions table.
 - [Phase 17]: viewedAt sourced from latest non-revoked token sorted by createdAt descending
 - [Phase 17]: Separate publicQuoteApi RTK Query slice for unauthenticated public endpoints (no auth header leakage)
 - [Phase 17-03]: Guard attaches tokenDto to request.quoteToken for downstream controller access
+- [Phase 17-04]: Guard spec uses helper for mock ExecutionContext; service spec uses Money.fromMajorUnits/DtoCollection.create for realistic mocks
 
 ### Pending Todos
 
@@ -89,6 +91,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-20T19:52:11.119Z
-Stopped at: Completed 17-03-PLAN.md
+Last session: 2026-03-20T19:57:51.672Z
+Stopped at: Completed 17-04-PLAN.md (Phase 17 complete)
 Resume file: None
