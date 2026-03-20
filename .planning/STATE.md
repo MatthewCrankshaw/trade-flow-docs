@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Send Quotes
 status: unknown
-stopped_at: Completed 17-01-PLAN.md
-last_updated: "2026-03-20T19:20:24.526Z"
+stopped_at: Completed 17-02-PLAN.md
+last_updated: "2026-03-20T19:25:42.263Z"
 progress:
   total_phases: 6
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 6
-  completed_plans: 5
+  completed_plans: 6
 ---
 
 # Project State
@@ -46,6 +46,7 @@ Plan: 2 of 2
 | Phase 16 P01 | 3min | 2 tasks | 13 files |
 | Phase 16 P02 | 7min | 2 tasks | 11 files |
 | Phase 17 P01 | 4min | 2 tasks | 9 files |
+| Phase 17 P02 | 3min | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -62,6 +63,7 @@ Key decisions archived in PROJECT.md Key Decisions table.
 - (16-02) Exported repositories from domain modules for public controller direct access (bypassing auth-wrapped retrievers)
 - [Phase 17]: Used $exists: false filter for atomic first-view-only update on firstViewedAt
 - [Phase 17]: viewedAt sourced from latest non-revoked token sorted by createdAt descending
+- [Phase 17]: Separate publicQuoteApi RTK Query slice for unauthenticated public endpoints (no auth header leakage)
 
 ### Pending Todos
 
@@ -85,6 +87,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-20T19:20:24.524Z
-Stopped at: Completed 17-01-PLAN.md
+Last session: 2026-03-20T19:25:42.260Z
+Stopped at: Completed 17-02-PLAN.md
 Resume file: None

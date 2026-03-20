@@ -53,7 +53,7 @@ Full details: `.planning/milestones/v1.2-ROADMAP.md`
 
 - [x] **Phase 15: Quote Deletion** - Tradesperson can delete draft quotes with confirmation (completed 2026-03-15)
 - [x] **Phase 16: Token Infrastructure and Public API** - Secure token system for customer quote access without login (completed 2026-03-15)
-- [ ] **Phase 17: Customer Quote Page** - Customer can view a quote online via secure link
+- [x] **Phase 17: Customer Quote Page** - Customer can view a quote online via secure link (completed 2026-03-20)
 - [ ] **Phase 18: Quote Email Sending** - Tradesperson can send quotes to customers via email
 - [ ] **Phase 19: Customer Response** - Customer can accept or reject a quote and tradesperson is notified
 - [ ] **Phase 20: PDF Generation** - Professional PDF generated for quotes with download and email attachment
@@ -172,7 +172,7 @@ Phases execute in numeric order: 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 14. Quote Detail and Line Items | v1.2 | 6/6 | Complete | 2026-03-14 |
 | 15. Quote Deletion | 2/2 | Complete    | 2026-03-15 | - |
 | 16. Token Infrastructure and Public API | 2/2 | Complete    | 2026-03-15 | - |
-| 17. Customer Quote Page | 1/2 | In Progress|  | - |
+| 17. Customer Quote Page | 2/2 | Complete   | 2026-03-20 | - |
 | 18. Quote Email Sending | v1.3 | 0/0 | Not started | - |
 | 19. Customer Response | v1.3 | 0/0 | Not started | - |
 | 20. PDF Generation | v1.3 | 0/0 | Not started | - |
