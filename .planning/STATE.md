@@ -2,16 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Send Quotes
-status: completed
-stopped_at: Phase 17 UI-SPEC approved
-last_updated: "2026-03-15T20:25:57.211Z"
-last_activity: 2026-03-15 — Completed 16-02 (Public quote endpoint, rate limiting, token revocation on deletion)
+status: unknown
+stopped_at: Completed 17-01-PLAN.md
+last_updated: "2026-03-20T19:20:24.526Z"
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  total_plans: 6
+  completed_plans: 5
 ---
 
 # Project State
@@ -21,20 +19,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-15)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 16: Token Infrastructure and Public API (executing)
+**Current focus:** Phase 17 — customer-quote-page
 
 ## Current Position
 
-Phase: 16 (2 of 6 in v1.3) — Token Infrastructure and Public API
-Plan: 2 of 2 complete
-Status: Phase Complete
-Last activity: 2026-03-15 — Completed 16-02 (Public quote endpoint, rate limiting, token revocation on deletion)
-
-Progress: [██████████] 100%
+Phase: 17 (customer-quote-page) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
 **Velocity (cumulative):**
+
 - Total plans completed: 34 (16 v1.0 + 6 v1.1 + 12 v1.2)
 - Average duration: 5min
 - Total execution time: ~3 hours
@@ -50,6 +45,7 @@ Progress: [██████████] 100%
 | Phase 15 P02 | 4min | 2 tasks | 9 files |
 | Phase 16 P01 | 3min | 2 tasks | 13 files |
 | Phase 16 P02 | 7min | 2 tasks | 11 files |
+| Phase 17 P01 | 4min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -64,6 +60,8 @@ Key decisions archived in PROJECT.md Key Decisions table.
 - (16-01) Used `as never` casts for MongoDB filter/update type constraints in revokeAllForQuote
 - (16-02) Used forwardRef for QuoteModule <-> QuoteTokenModule circular dependency
 - (16-02) Exported repositories from domain modules for public controller direct access (bypassing auth-wrapped retrievers)
+- [Phase 17]: Used $exists: false filter for atomic first-view-only update on firstViewedAt
+- [Phase 17]: viewedAt sourced from latest non-revoked token sorted by createdAt descending
 
 ### Pending Todos
 
@@ -87,6 +85,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-15T20:25:57.208Z
-Stopped at: Phase 17 UI-SPEC approved
-Resume file: .planning/phases/17-customer-quote-page/17-UI-SPEC.md
+Last session: 2026-03-20T19:20:24.524Z
+Stopped at: Completed 17-01-PLAN.md
+Resume file: None

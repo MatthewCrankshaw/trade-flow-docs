@@ -13,7 +13,7 @@ Requirements for Send Quotes milestone. Each maps to roadmap phases.
 - [ ] **DLVR-02**: User can configure a default quote email template in business settings with variable placeholders (customer name, job title, business name, user name)
 - [ ] **DLVR-03**: User can review and edit the pre-filled email message in a send dialog before sending, with template variables automatically resolved
 - [ ] **DLVR-04**: User can re-send a quote that is already in Sent status
-- [ ] **DLVR-05**: User can see when a customer has viewed the quote online (viewed indicator with timestamp)
+- [x] **DLVR-05**: User can see when a customer has viewed the quote online (viewed indicator with timestamp)
 
 ### Customer Response
 
@@ -89,7 +89,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | QMGT-01 | Phase 15 | Complete |
 | RESP-01 | Phase 16 + 17 | Complete |
-| DLVR-05 | Phase 17 | Pending |
+| DLVR-05 | Phase 17 | Complete |
 | RESP-05 | Phase 17 | Pending |
 | DLVR-01 | Phase 18 | Pending |
 | DLVR-02 | Phase 18 | Pending |
