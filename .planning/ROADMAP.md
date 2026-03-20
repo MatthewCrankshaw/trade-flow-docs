@@ -53,7 +53,7 @@ Full details: `.planning/milestones/v1.2-ROADMAP.md`
 
 - [x] **Phase 15: Quote Deletion** - Tradesperson can delete draft quotes with confirmation (completed 2026-03-15)
 - [x] **Phase 16: Token Infrastructure and Public API** - Secure token system for customer quote access without login (completed 2026-03-15)
-- [x] **Phase 17: Customer Quote Page** - Customer can view a quote online via secure link (completed 2026-03-20)
+- [ ] **Phase 17: Customer Quote Page** - Customer can view a quote online via secure link (gap closure in progress)
 - [ ] **Phase 18: Quote Email Sending** - Tradesperson can send quotes to customers via email
 - [ ] **Phase 19: Customer Response** - Customer can accept or reject a quote and tradesperson is notified
 - [ ] **Phase 20: PDF Generation** - Professional PDF generated for quotes with download and email attachment
@@ -99,11 +99,13 @@ Plans:
   2. Customer can download the quote as a PDF from the online view (placeholder until Phase 20 delivers real PDF -- shows download button wired to endpoint)
   3. Tradesperson can see when a customer has viewed the quote (viewed indicator with timestamp on quote detail page)
   4. Page displays cleanly on mobile devices (tradespeople's customers often view on phones)
-**Plans**: 2 plans
+**Plans**: 4 plans
 
 Plans:
-- [ ] 17-01-PLAN.md — Backend: firstViewedAt on token, error enrichment with business name, viewedAt in authenticated response
-- [ ] 17-02-PLAN.md — Frontend: public quote page (API slice, components, routing), viewed badge on tradesperson detail page
+- [x] 17-01-PLAN.md — Backend: firstViewedAt on token, error enrichment with business name, viewedAt in authenticated response
+- [x] 17-02-PLAN.md — Frontend: public quote page (API slice, components, routing), viewed badge on tradesperson detail page
+- [ ] 17-03-PLAN.md — Gap closure: Extract QuoteSessionAuthGuard and PublicQuoteRetriever service, refactor controller layering
+- [ ] 17-04-PLAN.md — Gap closure: Test specs for guard, service, and slimmed controller
 
 ### Phase 18: Quote Email Sending
 **Goal**: Tradesperson can send a quote to their customer via email with one action
@@ -172,7 +174,7 @@ Phases execute in numeric order: 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 14. Quote Detail and Line Items | v1.2 | 6/6 | Complete | 2026-03-14 |
 | 15. Quote Deletion | 2/2 | Complete    | 2026-03-15 | - |
 | 16. Token Infrastructure and Public API | 2/2 | Complete    | 2026-03-15 | - |
-| 17. Customer Quote Page | 2/2 | Complete   | 2026-03-20 | - |
+| 17. Customer Quote Page | v1.3 | 2/4 | Gap closure | - |
 | 18. Quote Email Sending | v1.3 | 0/0 | Not started | - |
 | 19. Customer Response | v1.3 | 0/0 | Not started | - |
 | 20. PDF Generation | v1.3 | 0/0 | Not started | - |
