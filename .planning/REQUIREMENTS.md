@@ -10,7 +10,7 @@ Requirements for Send Quotes milestone. Each maps to roadmap phases.
 ### Quote Delivery
 
 - [x] **DLVR-01a**: User can send a quote to a customer via email with a link to view the quote online
-- [ ] **DLVR-01b**: Sent quote emails include the PDF as an attachment (see also PDF-01)
+- ~~**DLVR-01b**~~: *(deferred — PDF generation removed from v1.3)*
 - [x] **DLVR-02**: User can configure a default quote email template in business settings with variable placeholders (customer name, job title, business name, user name)
 - [x] **DLVR-03**: User can review and edit the pre-filled email message in a send dialog before sending, with template variables automatically resolved
 - [x] **DLVR-04**: User can re-send a quote that is already in Sent status
@@ -22,16 +22,16 @@ Requirements for Send Quotes milestone. Each maps to roadmap phases.
 - [x] **RESP-02**: Customer can accept a quote with one click from the online view
 - [x] **RESP-03**: Customer can decline a quote with one click from the online view
 - [x] **RESP-04**: Customer can provide an optional reason when declining a quote
-- [x] **RESP-05**: Customer can download the quote as a PDF from the online view
+- ~~**RESP-05**~~: *(deferred — PDF generation removed from v1.3)*
 
 ### Notifications
 
 - [x] **NOTF-01**: Tradesperson receives an email notification when a customer accepts a quote
 - [x] **NOTF-02**: Tradesperson receives an email notification when a customer declines a quote
 
-### PDF Generation
+### ~~PDF Generation~~ *(deferred)*
 
-- [ ] **PDF-01**: System generates a professional PDF for a quote showing business details, customer details, quote number/date, line items, bundle summaries, subtotal/tax/total, and validity date
+- ~~**PDF-01**~~: *(deferred — PDF generation removed from v1.3)*
 
 ### Quote Management
 
@@ -61,6 +61,12 @@ Deferred to future release. Tracked but not in current roadmap.
 
 - **CUST-01**: Persistent customer login/portal for all quotes and invoices
 - **CUST-02**: Electronic signature capture on quote acceptance
+
+### PDF Generation
+
+- **PDF-01**: System generates a professional PDF for a quote showing business details, customer details, quote number/date, line items, bundle summaries, subtotal/tax/total, and validity date
+- **DLVR-01b**: Sent quote emails include the PDF as an attachment
+- **RESP-05**: Customer can download the quote as a PDF from the online view
 
 ### Quote Options
 
@@ -93,7 +99,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DLVR-05 | Phase 17 | Complete |
 | RESP-05 | Phase 17 | Complete |
 | DLVR-01a | Phase 18 | Complete |
-| DLVR-01b | Phase 20 | Pending |
+| DLVR-01b | Deferred | — |
 | DLVR-02 | Phase 18 | Complete |
 | DLVR-03 | Phase 18 | Complete |
 | DLVR-04 | Phase 18 | Complete |
@@ -105,7 +111,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTO-03 | Phase 19 | Complete |
 | NOTF-01 | Phase 19 | Complete |
 | NOTF-02 | Phase 19 | Complete |
-| PDF-01 | Phase 20 | Pending |
+| PDF-01 | Deferred | — |
+| RESP-05 | Deferred | — |
 
 **Coverage:**
 - v1.3 requirements: 18 total
