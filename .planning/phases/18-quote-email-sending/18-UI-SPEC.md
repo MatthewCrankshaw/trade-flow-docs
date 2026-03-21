@@ -32,8 +32,7 @@ Declared values from project design system (see `trade-flow-ui/.github/copilot-i
 | Token | Value | Tailwind | Usage in this phase |
 |-------|-------|----------|---------------------|
 | 2xs | 4px | `1` | Icon-text gap inside buttons, toolbar button spacing in rich text editor |
-| xs | 6px | `1.5` | Icon-text pairing inside toolbar toggle buttons |
-| sm | 8px | `2` | Field-level spacing (label to input, form field internals), button group gaps, toolbar border padding |
+| sm | 8px | `2` | Field-level spacing (label to input, form field internals), button group gaps, toolbar border padding, icon-text pairing inside toolbar toggle buttons |
 | base | 16px | `4` | Form field spacing (`space-y-4`), grid gaps, dialog content rhythm, rich text editor min internal padding |
 | lg | 24px | `6` | Section-level spacing between settings card sections, dialog section breaks |
 | xl | 48px | `12` | Empty state vertical padding in business settings |
@@ -49,11 +48,11 @@ All values from project design system (see `trade-flow-ui/.github/copilot-instru
 | Role | Size | Weight | Line Height | Usage in this phase |
 |------|------|--------|-------------|---------------------|
 | Body | 14px (`text-sm`) | 400 (`font-normal`) | default (`leading-normal`) | Form field values, dialog description text, settings help text |
-| Label | 14px (`text-sm`) | 500 (`font-medium`) | none (`leading-none`) | Form field labels (To, Subject, Message), settings section labels |
+| Label | 14px (`text-sm`) | 600 (`font-semibold`) | none (`leading-none`) | Form field labels (To, Subject, Message), settings section labels |
 | Section heading | 18px (`text-lg`) | 600 (`font-semibold`) | none (`leading-none`) | Dialog title ("Send Quote"), settings card title ("Quote Email Template") |
 | Metadata | 12px (`text-xs`) | 400 (`font-normal`) | default | Template variable help text, character hints, "Sent via Trade Flow" footer |
 | Rich text content | 14px (`text-sm`) | 400 (`font-normal`) | relaxed (`leading-relaxed`) | Tiptap editor content area (prose-sm) |
-| Warning text | 14px (`text-sm`) | 500 (`font-medium`) | default | "No email on file for this customer" inline warning |
+| Warning text | 14px (`text-sm`) | 600 (`font-semibold`) | default | "No email on file for this customer" inline warning |
 
 ---
 
@@ -85,7 +84,7 @@ Components needed for this phase, sourced from existing shadcn/ui primitives:
 | Component | Source | Usage |
 |-----------|--------|-------|
 | `Dialog`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogFooter` | `ui/dialog.tsx` | SendQuoteDialog modal |
-| `Button` | `ui/button.tsx` | Send/Re-send trigger in QuoteActionStrip, Send Quote CTA in dialog footer, Cancel button, toolbar toggles |
+| `Button` | `ui/button.tsx` | Send/Re-send trigger in QuoteActionStrip, Send Quote CTA in dialog footer, Keep Editing button, toolbar toggles |
 | `Input` | `ui/input.tsx` | To (email) field, Subject field |
 | `Label` | `ui/label.tsx` | Form field labels |
 | `Card`, `CardHeader`, `CardTitle`, `CardContent` | `ui/card.tsx` | Quote Email Template settings section |
@@ -145,7 +144,7 @@ No new shadcn components need to be installed via `npx shadcn add`. Checkbox com
 |  | Mike                                 ||
 |  +--------------------------------------+|
 |                                          |
-|              [Cancel]  [Send Quote]      |
+|          [Keep Editing]  [Send Quote]    |
 +------------------------------------------+
 ```
 
@@ -166,7 +165,7 @@ Per D-05: focus lands on the message body (Tiptap editor) when the dialog opens.
 When `customer.email` is null:
 - To field renders empty
 - Below To field: `Alert` component with `warning` variant -- icon `AlertTriangle` (`h-4 w-4`) + text "No email on file for this customer"
-- Below alert: Checkbox row -- `[ ] Save email to customer record` (`text-sm font-medium`)
+- Below alert: Checkbox row -- `[ ] Save email to customer record` (`text-sm font-semibold`)
 - Checkbox always visible when To field has a value (regardless of whether customer had an email), unchecked by default, checked by default when customer had no email
 
 ### Send button states
@@ -195,17 +194,18 @@ Location: `src/components/ui/rich-text-editor.tsx`
 
 Minimal toolbar with 3 formatting options only:
 
-| Button | Icon | Toggle | Keyboard shortcut |
-|--------|------|--------|-------------------|
-| Bold | `Bold` (lucide) `h-4 w-4` | `toggleBold` | Cmd+B |
-| Italic | `Italic` (lucide) `h-4 w-4` | `toggleItalic` | Cmd+I |
-| Link | `Link` (lucide) `h-4 w-4` | `toggleLink` (prompts for URL) | Cmd+K |
+| Button | Icon | Toggle | Keyboard shortcut | Accessibility label |
+|--------|------|--------|-------------------|---------------------|
+| Bold | `Bold` (lucide) `h-4 w-4` | `toggleBold` | Cmd+B | `aria-label="Bold (Cmd+B)"` |
+| Italic | `Italic` (lucide) `h-4 w-4` | `toggleItalic` | Cmd+I | `aria-label="Italic (Cmd+I)"` |
+| Link | `Link` (lucide) `h-4 w-4` | `toggleLink` (prompts for URL) | Cmd+K | `aria-label="Insert link (Cmd+K)"` |
 
 ### Toolbar styling
 
 - Container: `flex gap-1 border-b border-border px-2 py-1`
 - Toggle buttons: `Button variant="ghost" size="icon"` with `h-8 w-8` sizing
 - Active state: `bg-accent text-accent-foreground` (standard shadcn toggle pattern)
+- Active toggle buttons include `aria-pressed="true"`
 - Inactive state: `text-muted-foreground`
 
 ### Editor area styling
@@ -346,6 +346,7 @@ No full empty state illustration needed -- the settings form is always visible w
 | Re-send CTA (action strip) | "Re-send Quote" |
 | Dialog title | "Send Quote" |
 | Dialog description | "Review and send this quote to your customer." |
+| Dialog cancel button | "Keep Editing" |
 | To field label | "To" |
 | Subject field label | "Subject" |
 | Message field label | "Message" |
