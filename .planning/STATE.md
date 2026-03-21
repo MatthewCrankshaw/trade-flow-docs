@@ -1,38 +1,35 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.3
-milestone_name: Send Quotes
-status: unknown
-stopped_at: Completed 19-03-PLAN.md
-last_updated: "2026-03-21T20:52:50.714Z"
+milestone: null
+milestone_name: null
+status: between_milestones
+last_updated: "2026-03-21"
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 18
-  completed_plans: 18
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-15)
+See: .planning/PROJECT.md (updated 2026-03-21)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 19 — customer-response
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 20
-Plan: Not started
+Between milestones. v1.3 Send Quotes shipped 2026-03-21.
 
 ## Performance Metrics
 
 **Velocity (cumulative):**
 
-- Total plans completed: 34 (16 v1.0 + 6 v1.1 + 12 v1.2)
-- Average duration: 5min
-- Total execution time: ~3 hours
+- Total plans completed: 52 (16 v1.0 + 6 v1.1 + 12 v1.2 + 18 v1.3)
+- Total execution time: ~4 hours
 
 **By Milestone:**
 
@@ -41,24 +38,7 @@ Plan: Not started
 | v1.0 Scheduling | 8 | 16 | 1.5 hours | 6min |
 | v1.1 Item Tax Rate Linkage | 2 | 6 | ~1 hour | 4min |
 | v1.2 Bundles & Quotes | 4 | 12 | ~30 min | 3min |
-| Phase 15 P01 | 2min | 2 tasks | 7 files |
-| Phase 15 P02 | 4min | 2 tasks | 9 files |
-| Phase 16 P01 | 3min | 2 tasks | 13 files |
-| Phase 16 P02 | 7min | 2 tasks | 11 files |
-| Phase 17 P01 | 4min | 2 tasks | 9 files |
-| Phase 17 P02 | 3min | 2 tasks | 12 files |
-| Phase 17-03 P03 | 3min | 2 tasks | 5 files |
-| Phase 17-04 P04 | 3min | 2 tasks | 3 files |
-| Phase 18 P01 | 7min | 2 tasks | 22 files |
-| Phase 18 P03 | 2min | 1 tasks | 3 files |
-| Phase 18 P02 | 4min | 2 tasks | 10 files |
-| Phase 18 P04 | 2min | 2 tasks | 3 files |
-| Phase 18 P05 | 4min | 2 tasks | 24 files |
-| Phase 18 P06 | 3min | 2 tasks | 8 files |
-| Phase 18 P07 | 2min | 2 tasks | 9 files |
-| Phase 19 P01 | 4min | 2 tasks | 17 files |
-| Phase 19 P02 | 2min | 2 tasks | 6 files |
-| Phase 19 P03 | 3min | 2 tasks | 3 files |
+| v1.3 Send Quotes | 5 | 18 | ~1 hour | 3min |
 
 ## Accumulated Context
 
@@ -66,44 +46,13 @@ Plan: Not started
 
 Key decisions archived in PROJECT.md Key Decisions table.
 
-- (15-01) Followed existing soft-delete-via-status-enum pattern from QuoteLineItemStatus.DELETED
-- (15-01) deletedAt field added alongside sentAt/acceptedAt/rejectedAt pattern
-- (15-02) Confirmation dialog owned by parent (QuotesPage) for list deletes, by QuoteActionStrip for detail page deletes
-- (15-02) Used buttonVariants({ variant: "destructive" }) for red delete button in AlertDialogAction
-- (16-01) Used `as never` casts for MongoDB filter/update type constraints in revokeAllForQuote
-- (16-02) Used forwardRef for QuoteModule <-> QuoteTokenModule circular dependency
-- (16-02) Exported repositories from domain modules for public controller direct access (bypassing auth-wrapped retrievers)
-- [Phase 17]: Used $exists: false filter for atomic first-view-only update on firstViewedAt
-- [Phase 17]: viewedAt sourced from latest non-revoked token sorted by createdAt descending
-- [Phase 17]: Separate publicQuoteApi RTK Query slice for unauthenticated public endpoints (no auth header leakage)
-- [Phase 17-03]: Guard attaches tokenDto to request.quoteToken for downstream controller access
-- [Phase 17-04]: Guard spec uses helper for mock ExecutionContext; service spec uses Money.fromMajorUnits/DtoCollection.create for realistic mocks
-- [Phase 18]: Used dynamic import for ESM-only Maizzle in CommonJS NestJS with graceful fallback
-- [Phase 18]: Exported CustomerUpdater from CustomerModule for save-email in QuoteEmailSender
-- [Phase 18]: Added quoteEmailSubject/quoteEmailBody to UI types (Business and UpdateBusinessRequest) since Plan 01 only added them API-side
-- [Phase 18]: Customer data fetched in QuoteDetailPage via useGetCustomerQuery for email pre-fill
-- [Phase 18]: QuoteActionStrip receives send dialog data as props (pure component, no internal fetching)
-- [Phase 18-04]: Placeholder API key detected via pattern matching; SendGrid errors return 502 BAD_GATEWAY
-- [Phase 18-04]: DLVR-01 split into DLVR-01a (email link, Phase 18) and DLVR-01b (PDF attachment, Phase 20)
-- [Phase 18]: Upsert pattern for QuoteSettings: $setOnInsert for first-create, $set for subsequent updates
-- [Phase 18]: GET /quote-settings returns empty defaults when no settings exist (no 404)
-- [Phase 18]: Used ref-based state sync instead of useEffect+setState for RTK Query data hydration
-- [Phase 18]: Removed Tabs wrapper from SettingsPage; only Profile card remains after Quote Email tab relocation
-- [Phase 18-07]: Resend SDK replaces SendGrid with simpler { data, error } pattern instead of try/catch
-- [Phase 19]: UserRepository.findById (nullable) used with graceful null check instead of findByIdOrFail in QuoteResponseHandler
-- [Phase 19]: QuoteTransitionService exported from QuoteModule for public transition reuse by QuoteTokenModule
-- [Phase 19]: Public mutation endpoints use stricter rate limiting (10/min) vs GET (60/min); notification emails are failure-tolerant
-- [Phase 19]: Optimistic local state (responseQuote/displayQuote) for immediate UI feedback after mutation
-- [Phase 19]: useParams for token access in PublicQuoteCard rather than prop drilling
-- [Phase 19-03]: Direct instantiation for NotificationEmailRenderer (no DI -- no injected deps); expect.any(DateTime) for timestamp assertions
-
 ### Pending Todos
 
 None.
 
 ### Blockers/Concerns
 
-- SendGrid "from" address must be verified before Phase 18 (email sending) -- ops concern, not code
+None.
 
 ### Quick Tasks Completed
 
@@ -119,6 +68,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-21T18:35:07.701Z
-Stopped at: Completed 19-03-PLAN.md
+Last session: 2026-03-21
+Stopped at: v1.3 milestone completed
 Resume file: None

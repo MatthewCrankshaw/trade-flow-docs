@@ -2,24 +2,13 @@
 
 ## What This Is
 
-A business management application for sole tradespeople -- plumbers, electricians, builders, and other independent contractors -- that replaces scattered tools (paper notes, spreadsheets, generic invoicing apps, WhatsApp, calendar apps) with one streamlined system built around how trades actually work. Everything connects to the job: quotes, schedules, materials, labour, invoices, payments, and customer history.
+A business management application for sole tradespeople -- plumbers, electricians, builders, and other independent contractors -- that replaces scattered tools (paper notes, spreadsheets, generic invoicing apps, WhatsApp, calendar apps) with one streamlined system built around how trades actually work. Everything connects to the job: quotes, schedules, materials, labour, invoices, payments, and customer history. Tradespeople can now send quotes to customers via email, and customers can accept or reject quotes directly from a secure online link.
 
 Two independent codebases: `trade-flow-api` (NestJS/MongoDB) and `trade-flow-ui` (React/Vite), each with their own git repo, managed and deployed independently. Feature branches are created in both repos for coordinated feature work.
 
 ## Core Value
 
 A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment in one simple, structured system.
-
-## Current Milestone: v1.3 Send Quotes
-
-**Goal:** Enable tradespeople to send quotes to customers via email and receive automatic accept/reject responses back into Trade Flow.
-
-**Target features:**
-- Quote email delivery via SendGrid
-- Customer quote response (accept/reject — approach informed by research)
-- Automatic quote status updates from customer response
-- Quote PDF generation
-- Quote deletion
 
 ## Requirements
 
@@ -36,7 +25,7 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - ✓ User can create quotes on jobs -- existing (basic display)
 - ✓ Default job types and items generated per trade on business creation -- existing
 - ✓ Onboarding flow guides new users through setup -- existing
-- ✓ Email sending via SendGrid for verification and notifications -- existing
+- ✓ Email sending via Resend for verification and notifications -- existing (migrated from SendGrid in v1.3)
 - ✓ User can create schedule entries on a job with date, start time, and duration -- v1.0
 - ✓ User can view all schedule entries for a job in chronological order -- v1.0
 - ✓ User can edit existing schedule entries (date, time, duration, visit type) -- v1.0
@@ -71,21 +60,29 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - ✓ User can add bundle items to a quote (creates parent + component line items) -- v1.2
 - ✓ User can view bundle line items as a rolled-up line that expands to show individual components -- v1.2
 - ✓ User can view quote totals (subtotal, tax, total) calculated from line items -- v1.2
+- ✓ User can delete a quote (soft delete, only from Draft status) -- v1.3
+- ✓ User can send a quote to a customer via email with a link to view the quote online -- v1.3
+- ✓ User can configure a default quote email template in business settings with variable placeholders -- v1.3
+- ✓ User can review and edit the pre-filled email message in a send dialog before sending -- v1.3
+- ✓ User can re-send a quote already in Sent status -- v1.3
+- ✓ User can see when a customer has viewed the quote online (viewed indicator with timestamp) -- v1.3
+- ✓ Customer can view the full quote online via a secure link without logging in -- v1.3
+- ✓ Customer can accept a quote with one click from the online view -- v1.3
+- ✓ Customer can decline a quote with one click and provide an optional reason -- v1.3
+- ✓ Quote status automatically transitions based on actions (Draft→Sent on send, Sent→Accepted/Rejected on customer response) -- v1.3
+- ✓ Tradesperson receives email notification when a customer accepts or declines a quote -- v1.3
 
 ### Active
 
-<!-- Requirements for v1.3 Send Quotes -- defined via /gsd:new-milestone -->
+<!-- Requirements for next milestone -- defined via /gsd:new-milestone -->
 
-- [ ] Send quotes to customers via email (SendGrid)
-- [ ] Customer can view and accept/reject a quote
-- [ ] Quote status updates automatically from customer response
-- [ ] Quote PDF generation
-- [ ] Quote deletion
+(None yet -- run `/gsd:new-milestone` to define next milestone requirements)
 
 ### Out of Scope
 
 <!-- Explicit boundaries. -->
 
+- Quote PDF generation -- deferred from v1.3, future milestone candidate
 - Quote duplication -- future milestone candidate
 - Quote-level discounts -- future milestone candidate
 - Invoice generation and management -- next milestone candidate
@@ -106,6 +103,11 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - Recurring schedules / templates -- trades jobs are mostly one-off
 - Customer-facing booking portal -- tradespeople get work via calls/referrals
 - Google Calendar integration -- schedules are job-centric, not calendar-centric
+- Customer account/login system -- token-based access is frictionless
+- Electronic signature on quote acceptance -- legal complexity varies by jurisdiction
+- Automated follow-up reminder emails -- adds scheduling infrastructure; premature
+- Rich HTML quote template builder -- template builders are entire products
+- Deposit collection on acceptance -- requires invoicing system (not yet built)
 
 ## Context
 
@@ -114,12 +116,13 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - **Frontend pattern:** Feature-based modules with Redux RTK Query for server state
 - **Auth:** Firebase JWT (RS256) with server-side public key validation
 - **API contract:** Standardized response format: `{ data: T[], pagination?, errors? }`
+- **Email:** Resend SDK for transactional email (quote delivery, notifications) with Maizzle HTML templates
+- **Public access:** Cryptographic token-based access for customer-facing quote pages (no login required)
 - **Scheduling shipped (v1.0):** Visit types (CRUD + defaults per trade) and schedules (create/list/edit/cancel/status transitions) fully integrated into job detail page
 - **Item tax rate linkage shipped (v1.1):** Items reference tax rates by ID; API validates references; UI shows tax rate dropdown on item forms; quote factories resolve rates
 - **Bundles & Quotes shipped (v1.2):** Bundle creation/editing with SearchableItemPicker, quote system with creation dialog, list, detail view, line item management (add/edit/delete), expandable bundle rows, tax-inclusive totals, mobile-responsive card layout, status transitions (Draft/Sent/Accepted/Rejected)
-- **Two scheduling modes deferred:** Only exact start time shipped; arrival window mode deferred to v2
-- **Conflict detection deferred:** Overlap warnings deferred to v2
-- **Codebase size:** ~19k LOC API (TypeScript) + ~22.3k LOC UI (TypeScript/TSX)
+- **Send Quotes shipped (v1.3):** Quote deletion, token infrastructure, customer-facing quote page with view tracking, email sending with configurable templates and Tiptap rich text editor, customer accept/decline with notification emails
+- **Codebase size:** ~21.9k LOC API (TypeScript) + ~23.9k LOC UI (TypeScript/TSX)
 
 ## Constraints
 
@@ -156,6 +159,14 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 | Pricing strategy is item-level (not per-quote) | API reads bundleConfig.priceStrategy when no override sent | ✓ Good -- simpler quote flow |
 | Native TableRow sub-rows for bundle components | Browser table layout aligns columns automatically | ✓ Good -- replaced CSS grid hack |
 | lineTotalIncTax helper for display calculation | Tax-inclusive totals centralised; column header "Total (inc. tax)" | ✓ Good -- clear UX |
+| Token-based public access (no customer login) | Frictionless for tradespeople's customers; one-time interactions per quote | ✓ Good -- zero friction |
+| Separate QuoteSettings module (not Business entity) | Email template fields don't belong on Business; clean separation of concerns | ✓ Good -- cleaner architecture |
+| Resend SDK instead of SendGrid | Simpler { data, error } pattern; better DX | ✓ Good -- cleaner integration |
+| Maizzle + Tailwind for email templates | Aligns with frontend design system; proper email CSS inlining | ✓ Good -- consistent styling |
+| Separate publicQuoteApi RTK Query slice | Unauthenticated endpoints must not send Firebase JWT headers | ✓ Good -- no auth leakage |
+| QuoteSessionAuthGuard for public endpoints | Reusable guard for token validation, expiry, first-view tracking | ✓ Good -- DRY |
+| Failure-tolerant notification emails | Email failure doesn't block status transition; try/catch with logging | ✓ Good -- resilient |
+| PDF generation deferred from v1.3 | Reduced scope to ship core send/respond flow faster | — Pending review |
 
 ---
-*Last updated: 2026-03-21 after Phase 19 (Customer Response) complete — accept/decline endpoints, status transitions, notification emails, frontend response UI*
+*Last updated: 2026-03-21 after v1.3 milestone completion*
