@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Send Quotes
 status: unknown
-stopped_at: Completed 18-04-PLAN.md
-last_updated: "2026-03-21T09:27:26.847Z"
+stopped_at: Completed 18-05-PLAN.md
+last_updated: "2026-03-21T09:30:41.761Z"
 progress:
   total_phases: 6
   completed_phases: 3
   total_plans: 14
-  completed_plans: 12
+  completed_plans: 13
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-15)
 ## Current Position
 
 Phase: 18 (quote-email-sending) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Plan: 2 of 6
 | Phase 18 P03 | 2min | 1 tasks | 3 files |
 | Phase 18 P02 | 4min | 2 tasks | 10 files |
 | Phase 18 P04 | 2min | 2 tasks | 3 files |
+| Phase 18 P05 | 4min | 2 tasks | 24 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,8 @@ Key decisions archived in PROJECT.md Key Decisions table.
 - [Phase 18]: QuoteActionStrip receives send dialog data as props (pure component, no internal fetching)
 - [Phase 18-04]: Placeholder API key detected via pattern matching; SendGrid errors return 502 BAD_GATEWAY
 - [Phase 18-04]: DLVR-01 split into DLVR-01a (email link, Phase 18) and DLVR-01b (PDF attachment, Phase 20)
+- [Phase 18]: Upsert pattern for QuoteSettings: $setOnInsert for first-create, $set for subsequent updates
+- [Phase 18]: GET /quote-settings returns empty defaults when no settings exist (no 404)
 
 ### Pending Todos
 
@@ -102,6 +105,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-21T09:27:26.843Z
-Stopped at: Completed 18-04-PLAN.md
+Last session: 2026-03-21T09:30:41.759Z
+Stopped at: Completed 18-05-PLAN.md
 Resume file: None

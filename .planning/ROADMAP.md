@@ -124,7 +124,7 @@ Plans:
 - [x] 18-02-PLAN.md — Frontend: RichTextEditor (Tiptap), SendQuoteDialog with pre-filled fields, QuoteActionStrip wiring
 - [x] 18-03-PLAN.md — Frontend: Quote Email Template settings tab in business settings page
 - [x] 18-04-PLAN.md — Gap closure: Email sending error handling and DLVR-01 requirements accuracy fix
-- [ ] 18-05-PLAN.md — Gap closure: Separate QuoteSettings entity/module (extract from business entity)
+- [x] 18-05-PLAN.md — Gap closure: Separate QuoteSettings entity/module (extract from business entity)
 - [ ] 18-06-PLAN.md — Gap closure: Frontend quote settings API migration and UI relocation to business page
 
 ### Phase 19: Customer Response
@@ -180,6 +180,6 @@ Phases execute in numeric order: 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 15. Quote Deletion | 2/2 | Complete    | 2026-03-15 | - |
 | 16. Token Infrastructure and Public API | 2/2 | Complete    | 2026-03-15 | - |
 | 17. Customer Quote Page | 4/4 | Complete   | 2026-03-20 | - |
-| 18. Quote Email Sending | v1.3 | 4/6 | In Progress|  |
+| 18. Quote Email Sending | v1.3 | 5/6 | In Progress|  |
 | 19. Customer Response | v1.3 | 0/0 | Not started | - |
 | 20. PDF Generation | v1.3 | 0/0 | Not started | - |
