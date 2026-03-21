@@ -33,7 +33,6 @@ Declared values (multiples of 4 only):
 |-------|-------|----------|-------|
 | 2xs | 4px | `1` | Tight inline gaps, micro alignment nudges |
 | sm | 8px | `2` | Field-level spacing |
-| md | 12px | `3` | Dense list/card stacking |
 | base | 16px | `4` | Component-level rhythm |
 | lg | 24px | `6` | Section-level rhythm |
 | xl | 48px | `12` | Empty state vertical padding |
@@ -45,7 +44,7 @@ Exceptions: 44px touch target minimum for Accept/Decline buttons on mobile (use 
 | Element | Spacing | Rationale |
 |---------|---------|-----------|
 | Totals to response buttons | `space-y-6` (24px) | Visual break before decision point |
-| Between Accept and Decline buttons | `gap-3` (12px) | Enough separation to prevent mis-taps on mobile |
+| Between Accept and Decline buttons | `gap-4` (16px) | Enough separation to prevent mis-taps on mobile |
 | Status banner to quote content | Card primitive default `gap-6` | Consistent with existing card spacing |
 | Decline reason textarea to submit | `space-y-4` (16px) | Standard form field rhythm |
 
@@ -231,8 +230,8 @@ Buttons appear inside `CardFooter`, below the totals section and PDF download bu
 
 ### Button Layout
 
-- Full width on mobile: both buttons stack vertically, `flex flex-col gap-3`
-- Side-by-side on sm+: `flex flex-col gap-3 sm:flex-row sm:justify-end`
+- Full width on mobile: both buttons stack vertically, `flex flex-col gap-4`
+- Side-by-side on sm+: `flex flex-col gap-4 sm:flex-row sm:justify-end`
 - Accept button appears first (left on desktop, top on mobile)
 - Both buttons use default size (`h-9`)
 - On mobile, both buttons use `w-full`; on sm+, auto width with `sm:w-auto`
