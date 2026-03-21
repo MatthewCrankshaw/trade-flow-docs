@@ -54,7 +54,7 @@ Full details: `.planning/milestones/v1.2-ROADMAP.md`
 - [x] **Phase 15: Quote Deletion** - Tradesperson can delete draft quotes with confirmation (completed 2026-03-15)
 - [x] **Phase 16: Token Infrastructure and Public API** - Secure token system for customer quote access without login (completed 2026-03-15)
 - [x] **Phase 17: Customer Quote Page** - Customer can view a quote online via secure link (gap closure in progress) (completed 2026-03-20)
-- [x] **Phase 18: Quote Email Sending** - Tradesperson can send quotes to customers via email (completed 2026-03-21)
+- [ ] **Phase 18: Quote Email Sending** - Tradesperson can send quotes to customers via email (gap closure in progress)
 - [ ] **Phase 19: Customer Response** - Customer can accept or reject a quote and tradesperson is notified
 - [ ] **Phase 20: PDF Generation** - Professional PDF generated for quotes with download and email attachment
 
@@ -117,12 +117,15 @@ Plans:
   3. User can configure a default quote email template in business settings with variable placeholders
   4. Quote status automatically transitions from Draft to Sent when the email is successfully sent
   5. User can re-send a quote that is already in Sent status (customer receives a new email)
-**Plans**: 3 plans
+**Plans**: 6 plans
 
 Plans:
 - [x] 18-01-PLAN.md — Backend: business entity email template fields, Maizzle email template, QuoteEmailRenderer, QuoteEmailSender orchestration, send endpoint, unit tests
 - [x] 18-02-PLAN.md — Frontend: RichTextEditor (Tiptap), SendQuoteDialog with pre-filled fields, QuoteActionStrip wiring
 - [x] 18-03-PLAN.md — Frontend: Quote Email Template settings tab in business settings page
+- [ ] 18-04-PLAN.md — Gap closure: Email sending error handling and DLVR-01 requirements accuracy fix
+- [ ] 18-05-PLAN.md — Gap closure: Separate QuoteSettings entity/module (extract from business entity)
+- [ ] 18-06-PLAN.md — Gap closure: Frontend quote settings API migration and UI relocation to business page
 
 ### Phase 19: Customer Response
 **Goal**: Customer can accept or reject a quote and the tradesperson is immediately notified
@@ -177,6 +180,6 @@ Phases execute in numeric order: 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 15. Quote Deletion | 2/2 | Complete    | 2026-03-15 | - |
 | 16. Token Infrastructure and Public API | 2/2 | Complete    | 2026-03-15 | - |
 | 17. Customer Quote Page | 4/4 | Complete   | 2026-03-20 | - |
-| 18. Quote Email Sending | v1.3 | 3/3 | Complete   | 2026-03-21 |
+| 18. Quote Email Sending | v1.3 | 3/6 | Gap closure | - |
 | 19. Customer Response | v1.3 | 0/0 | Not started | - |
 | 20. PDF Generation | v1.3 | 0/0 | Not started | - |
