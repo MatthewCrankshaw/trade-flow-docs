@@ -126,7 +126,7 @@ Plans:
 - [x] 18-04-PLAN.md — Gap closure: Email sending error handling and DLVR-01 requirements accuracy fix
 - [x] 18-05-PLAN.md — Gap closure: Separate QuoteSettings entity/module (extract from business entity)
 - [x] 18-06-PLAN.md — Gap closure: Frontend quote settings API migration and UI relocation to business page
-- [ ] 18-07-PLAN.md — Gap closure: Replace SendGrid with Resend email provider
+- [x] 18-07-PLAN.md — Gap closure: Replace SendGrid with Resend email provider
 
 ### Phase 19: Customer Response
 **Goal**: Customer can accept or reject a quote and the tradesperson is immediately notified
@@ -181,6 +181,6 @@ Phases execute in numeric order: 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 15. Quote Deletion | 2/2 | Complete    | 2026-03-15 | - |
 | 16. Token Infrastructure and Public API | 2/2 | Complete    | 2026-03-15 | - |
 | 17. Customer Quote Page | 4/4 | Complete   | 2026-03-20 | - |
-| 18. Quote Email Sending | v1.3 | 6/7 | In progress | - |
+| 18. Quote Email Sending | v1.3 | 7/7 | Complete   | 2026-03-21 |
 | 19. Customer Response | v1.3 | 0/0 | Not started | - |
 | 20. PDF Generation | v1.3 | 0/0 | Not started | - |
