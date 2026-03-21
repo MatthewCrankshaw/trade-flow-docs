@@ -54,7 +54,7 @@ Full details: `.planning/milestones/v1.2-ROADMAP.md`
 - [x] **Phase 15: Quote Deletion** - Tradesperson can delete draft quotes with confirmation (completed 2026-03-15)
 - [x] **Phase 16: Token Infrastructure and Public API** - Secure token system for customer quote access without login (completed 2026-03-15)
 - [x] **Phase 17: Customer Quote Page** - Customer can view a quote online via secure link (gap closure in progress) (completed 2026-03-20)
-- [ ] **Phase 18: Quote Email Sending** - Tradesperson can send quotes to customers via email (gap closure in progress)
+- [x] **Phase 18: Quote Email Sending** - Tradesperson can send quotes to customers via email (gap closure in progress) (completed 2026-03-21)
 - [ ] **Phase 19: Customer Response** - Customer can accept or reject a quote and tradesperson is notified
 - [ ] **Phase 20: PDF Generation** - Professional PDF generated for quotes with download and email attachment
 
@@ -125,7 +125,7 @@ Plans:
 - [x] 18-03-PLAN.md — Frontend: Quote Email Template settings tab in business settings page
 - [x] 18-04-PLAN.md — Gap closure: Email sending error handling and DLVR-01 requirements accuracy fix
 - [x] 18-05-PLAN.md — Gap closure: Separate QuoteSettings entity/module (extract from business entity)
-- [ ] 18-06-PLAN.md — Gap closure: Frontend quote settings API migration and UI relocation to business page
+- [x] 18-06-PLAN.md — Gap closure: Frontend quote settings API migration and UI relocation to business page
 
 ### Phase 19: Customer Response
 **Goal**: Customer can accept or reject a quote and the tradesperson is immediately notified
@@ -180,6 +180,6 @@ Phases execute in numeric order: 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 15. Quote Deletion | 2/2 | Complete    | 2026-03-15 | - |
 | 16. Token Infrastructure and Public API | 2/2 | Complete    | 2026-03-15 | - |
 | 17. Customer Quote Page | 4/4 | Complete   | 2026-03-20 | - |
-| 18. Quote Email Sending | v1.3 | 5/6 | In Progress|  |
+| 18. Quote Email Sending | v1.3 | 6/6 | Complete   | 2026-03-21 |
 | 19. Customer Response | v1.3 | 0/0 | Not started | - |
 | 20. PDF Generation | v1.3 | 0/0 | Not started | - |
