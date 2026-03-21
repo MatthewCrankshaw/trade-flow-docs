@@ -120,7 +120,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 18-01-PLAN.md — Backend: business entity email template fields, Maizzle email template, QuoteEmailRenderer, QuoteEmailSender orchestration, send endpoint, unit tests
+- [x] 18-01-PLAN.md — Backend: business entity email template fields, Maizzle email template, QuoteEmailRenderer, QuoteEmailSender orchestration, send endpoint, unit tests
 - [ ] 18-02-PLAN.md — Frontend: RichTextEditor (Tiptap), SendQuoteDialog with pre-filled fields, QuoteActionStrip wiring
 - [ ] 18-03-PLAN.md — Frontend: Quote Email Template settings tab in business settings page
 
@@ -177,6 +177,6 @@ Phases execute in numeric order: 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 15. Quote Deletion | 2/2 | Complete    | 2026-03-15 | - |
 | 16. Token Infrastructure and Public API | 2/2 | Complete    | 2026-03-15 | - |
 | 17. Customer Quote Page | 4/4 | Complete   | 2026-03-20 | - |
-| 18. Quote Email Sending | v1.3 | 0/3 | In progress | - |
+| 18. Quote Email Sending | v1.3 | 1/3 | In Progress|  |
 | 19. Customer Response | v1.3 | 0/0 | Not started | - |
 | 20. PDF Generation | v1.3 | 0/0 | Not started | - |
