@@ -134,6 +134,59 @@
 
 ---
 
+## Milestone: v1.3 -- Send Quotes
+
+**Shipped:** 2026-03-21
+**Phases:** 5 | **Plans:** 18 | **Execution time:** ~1 hour
+
+### What Was Built
+- Quote deletion: soft-delete for draft quotes with confirmation dialogs, optimistic UI removal, and token revocation cascade
+- Token infrastructure: cryptographic 32-byte base64url tokens with 30-day expiry, public API endpoint with rate limiting and customer-safe response filtering
+- Customer quote page: responsive public page with view tracking (firstViewedAt), error/expiry states, and tradesperson "Viewed" badge
+- Quote email sending: Maizzle HTML email templates, Tiptap rich text editor in send dialog, configurable email templates via QuoteSettings module, Draft→Sent status transition
+- Customer response: accept/decline endpoints with inline decline form, status banners, failure-tolerant notification emails to tradesperson
+- Email provider migration: SendGrid replaced with Resend SDK for simpler integration
+- 32+ unit tests across QuoteSessionAuthGuard, PublicQuoteRetriever, QuoteResponseHandler, NotificationEmailRenderer, and publicTransition
+
+### What Worked
+- Separate QuoteSettings module was the right call -- originally embedded in Business entity (Plan 01), gap closure (Plan 05/06) extracted it cleanly. Future features that add business settings won't bloat the Business entity
+- QuoteSessionAuthGuard extracted in gap closure (Plan 17-03) was immediately reused by Phase 19 accept/decline endpoints -- validation, expiry check, first-view recording all shared
+- Failure-tolerant notification emails (try/catch, don't block status transition) was a good defensive pattern -- email delivery shouldn't prevent customer actions
+- Public RTK Query slice (separate from authenticated slice) prevented auth header leakage to public endpoints
+- Resend migration (Plan 18-07) simplified error handling significantly -- { data, error } pattern vs try/catch around SendGrid
+- 5 E2E flows all verified wired in milestone audit -- no cross-phase integration gaps
+
+### What Was Inefficient
+- Phase 18 had 7 plans (4 were gap closure) -- initial plans 18-01, 18-02, 18-03 didn't anticipate the QuoteSettings separation or SendGrid error handling needs
+- Email template fields were added to Business entity in Plan 18-01 then extracted to QuoteSettings in Plan 18-05 -- could have used a separate module from the start
+- DLVR-01 requirements accuracy issue (PDF attachment incorrectly claimed in-scope) was only caught by verifier -- better upfront requirements parsing would have avoided the gap closure plan
+- Phase 17 initial verification found 3 architectural gaps (inline validation, repository leaking, missing tests) that required 2 gap closure plans -- stronger plan review could have caught the Controller→Service→Repository violation
+- PDF generation (Phase 20) was planned, researched via discussion, then removed -- the scope reduction was correct but the discussion time was wasted
+
+### Patterns Established
+- Token-based public access pattern: QuoteTokenCreator → QuoteSessionAuthGuard → PublicQuoteRetriever chain for unauthenticated endpoints
+- Maizzle + Tailwind email template pattern with dynamic import for ESM-only module in CommonJS NestJS
+- Rich text editor pattern: Tiptap with StarterKit + Link extensions, HTML output for email body
+- Separate settings module pattern: QuoteSettings module owns email template data independently from Business entity
+- Public mutation rate limiting: stricter limits (10/min) on write endpoints vs read endpoints (60/min)
+- Optimistic local state pattern: useState + onSuccess callback for immediate UI feedback after mutation (PublicQuoteResponseButtons)
+
+### Key Lessons
+1. Separate settings/config from core entities from the start -- embedding quoteEmail fields in Business entity caused a full extraction cycle
+2. Gap closure plans are a sign of insufficient initial planning for cross-cutting concerns (error handling, architectural layering)
+3. Token-based public access with a reusable guard is a clean pattern for customer-facing features without login
+4. Email provider choices should be evaluated early -- Resend's simpler API saved significant error handling complexity vs SendGrid
+5. Failure-tolerant side effects (notification emails) are essential for customer-facing flows -- never block the primary action
+6. Verify requirements accuracy against CONTEXT.md during planning -- the DLVR-01/PDF-attachment mismatch was avoidable
+
+### Cost Observations
+- Model mix: opus for planning and execution, sonnet for verification and integration checking
+- Total execution: ~1 hour across 18 plans (avg 3min/plan)
+- Notable: gap closure plans accounted for ~40% of total plans (7/18) -- reducing this would significantly improve velocity
+- Session count: ~6 sessions across 8 days
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -143,13 +196,16 @@
 | v1.0 | 1.5 hours | 8 | Established module-copy pattern, deferred v2 features cleanly |
 | v1.1 | ~1 hour | 2 | Cross-module references, gap closure cycle, entity dropdown pattern |
 | v1.2 | ~30 min | 4 | Reusable picker component, quote system, parallel execution, gap closure for UX polish |
+| v1.3 | ~1 hour | 5 | Email delivery + customer response, token-based public access, email provider migration, gap closure for architecture |
 
 ### Top Lessons (Verified Across Milestones)
 
-1. Copy-adapt existing module patterns for new domain entities (visit-type -> schedule -> item-tax-rate -> quote)
-2. Defer non-essential modes/features to keep milestones shippable
+1. Copy-adapt existing module patterns for new domain entities (visit-type -> schedule -> item-tax-rate -> quote -> quote-settings)
+2. Defer non-essential modes/features to keep milestones shippable (confirmed: v1.3 deferred PDF generation)
 3. Smart defaults reduce form complexity and improve UX for solo operators
-4. Cross-module validation with specific error codes catches errors early (confirmed in v1.0, v1.1, and v1.2)
-5. Plan update/delete operations explicitly from the start to avoid gap closure overhead (confirmed: v1.1 tax rate updater, v1.2 line item soft-delete)
-6. Design reusable components early (SearchableItemPicker) -- pays off when the same component is needed across features
+4. Cross-module validation with specific error codes catches errors early (confirmed in v1.0, v1.1, v1.2, v1.3)
+5. Plan update/delete operations explicitly from the start to avoid gap closure overhead (confirmed: v1.1 tax rate updater, v1.2 line item soft-delete, v1.3 QuoteSettings extraction)
+6. Design reusable components early (SearchableItemPicker, QuoteSessionAuthGuard) -- pays off when the same component is needed across features/phases
 7. Settle UX decisions (pricing strategy, display format) before implementation to avoid rework through gap closure
+8. Separate config/settings from core entities from the start -- embedding then extracting causes a full rework cycle (confirmed: v1.3 QuoteSettings)
+9. Gap closure plans should decrease over milestones -- 40% gap closure rate (v1.3) signals opportunity for better initial planning
