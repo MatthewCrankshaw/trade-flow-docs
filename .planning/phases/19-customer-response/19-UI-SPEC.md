@@ -27,13 +27,11 @@ created: 2026-03-21
 
 ## Spacing Scale
 
-Declared values (from project design system -- see `trade-flow-ui/.github/copilot-instructions/design-system/spacing.md`):
+Declared values (multiples of 4 only):
 
 | Token | Value | Tailwind | Usage |
 |-------|-------|----------|-------|
-| 3xs | 2px | `0.5` | Micro alignment nudges |
-| 2xs | 4px | `1` | Tight inline gaps |
-| xs | 6px | `1.5` | Icon-text pairing inside buttons |
+| 2xs | 4px | `1` | Tight inline gaps, micro alignment nudges |
 | sm | 8px | `2` | Field-level spacing |
 | md | 12px | `3` | Dense list/card stacking |
 | base | 16px | `4` | Component-level rhythm |
@@ -61,8 +59,10 @@ From project design system (`trade-flow-ui/.github/copilot-instructions/design-s
 |------|------|--------|-------------|----------|
 | Body | 14px | 400 (normal) | normal | `text-sm` |
 | Label | 14px | 500 (medium) | none | `text-sm font-medium leading-none` |
-| Card section title | 18px | 600 (semibold) | none | `text-lg font-semibold` |
+| Card section title | 18px | 500 (medium) | none | `text-lg font-medium` |
 | Status banner text | 14px | 400 (normal) | normal | `text-sm` |
+
+Declared weights: 400 (normal), 500 (medium). Two weights only.
 
 ### Phase-Specific Typography
 
@@ -141,7 +141,7 @@ No new shadcn components need to be installed.
 
 | State | Visual | Behavior |
 |-------|--------|----------|
-| Default | Two buttons side-by-side: "Accept Quote" (primary) + "Decline" (outline) | Both enabled |
+| Default | Two buttons side-by-side: "Accept Quote" (primary) + "Decline Quote" (outline) | Both enabled |
 | Accept loading | Accept button shows spinner, text changes to "Accepting...", both buttons disabled | POST request in flight |
 | Accept success | Buttons replaced with accepted status banner. Banner: green left border, green/10 bg, text: "You accepted this quote on {date}" | Page content remains visible below |
 | Accept error | Toast notification (top-center): "Something went wrong. Please try again." Buttons re-enabled. | Network/server error |
@@ -150,12 +150,12 @@ No new shadcn components need to be installed.
 
 | State | Visual | Behavior |
 |-------|--------|----------|
-| Decline clicked | Accept button hides. Decline button area expands to show: Textarea (optional reason) + "Submit" button (outline) + "Back" text button | Inline expansion, no modal |
+| Decline clicked | Accept button hides. Decline button area expands to show: Textarea (optional reason) + "Decline Quote" button (outline) + "Go Back" text button | Inline expansion, no modal |
 | Decline reason input | Textarea with placeholder, character counter below | 500 character limit |
-| Decline loading | Submit button shows spinner, text changes to "Submitting...", both Submit and Back disabled | POST request in flight |
+| Decline loading | Decline Quote button shows spinner, text changes to "Declining...", both Decline Quote and Go Back disabled | POST request in flight |
 | Decline success | Form replaced with declined status banner. Banner: amber left border, warning/10 bg, text: "You declined this quote on {date}" | Page content remains visible below |
 | Decline error | Toast notification: "Something went wrong. Please try again." Buttons re-enabled. | Network/server error |
-| Back clicked | Returns to two-button default state | No network request |
+| Go Back clicked | Returns to two-button default state | No network request |
 
 ### Expired Quote (D-08)
 
@@ -177,11 +177,11 @@ No new shadcn components need to be installed.
 | Element | Copy |
 |---------|------|
 | Accept CTA | "Accept Quote" |
-| Decline CTA | "Decline" |
+| Decline CTA | "Decline Quote" |
 | Accept loading label | "Accepting..." |
-| Decline submit CTA | "Submit" |
-| Decline loading label | "Submitting..." |
-| Decline back CTA | "Back" |
+| Decline submit CTA | "Decline Quote" |
+| Decline loading label | "Declining..." |
+| Decline back CTA | "Go Back" |
 | Decline reason label | "Reason (optional)" |
 | Decline reason placeholder | "Let them know why, if you'd like" |
 | Decline character limit | 500 characters, counter shows "{count}/500" only when > 0 characters entered |
@@ -225,7 +225,7 @@ Buttons appear inside `CardFooter`, below the totals section and PDF download bu
 |-----------------------------------|
 | [Download PDF]  (existing)        |
 |                                   |
-| [Accept Quote]  [Decline]         |
+| [Accept Quote]  [Decline Quote]   |
 +-----------------------------------+
 ```
 
@@ -242,8 +242,8 @@ Buttons appear inside `CardFooter`, below the totals section and PDF download bu
 - Replaces the two-button layout inline (no modal/dialog)
 - Textarea: full width, 3 rows default, max 500 characters
 - Character counter: right-aligned below textarea, `text-xs text-muted-foreground`
-- Submit + Back buttons below: `flex justify-end gap-2`
-- Submit button: `variant="outline"`, Back button: `variant="ghost"`
+- Decline Quote + Go Back buttons below: `flex justify-end gap-2`
+- Decline Quote button: `variant="outline"`, Go Back button: `variant="ghost"`
 
 ---
 
