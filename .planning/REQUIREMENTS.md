@@ -19,15 +19,15 @@ Requirements for Send Quotes milestone. Each maps to roadmap phases.
 ### Customer Response
 
 - [x] **RESP-01**: Customer can view the full quote online via a secure link without logging in
-- [ ] **RESP-02**: Customer can accept a quote with one click from the online view
-- [ ] **RESP-03**: Customer can decline a quote with one click from the online view
-- [ ] **RESP-04**: Customer can provide an optional reason when declining a quote
+- [x] **RESP-02**: Customer can accept a quote with one click from the online view
+- [x] **RESP-03**: Customer can decline a quote with one click from the online view
+- [x] **RESP-04**: Customer can provide an optional reason when declining a quote
 - [x] **RESP-05**: Customer can download the quote as a PDF from the online view
 
 ### Notifications
 
-- [ ] **NOTF-01**: Tradesperson receives an email notification when a customer accepts a quote
-- [ ] **NOTF-02**: Tradesperson receives an email notification when a customer declines a quote
+- [x] **NOTF-01**: Tradesperson receives an email notification when a customer accepts a quote
+- [x] **NOTF-02**: Tradesperson receives an email notification when a customer declines a quote
 
 ### PDF Generation
 
@@ -40,8 +40,8 @@ Requirements for Send Quotes milestone. Each maps to roadmap phases.
 ### Status Automation
 
 - [x] **AUTO-01**: Quote status automatically transitions from Draft to Sent when the user sends the quote
-- [ ] **AUTO-02**: Quote status automatically transitions from Sent to Accepted when the customer accepts
-- [ ] **AUTO-03**: Quote status automatically transitions from Sent to Rejected when the customer declines
+- [x] **AUTO-02**: Quote status automatically transitions from Sent to Accepted when the customer accepts
+- [x] **AUTO-03**: Quote status automatically transitions from Sent to Rejected when the customer declines
 
 ## Future Requirements
 
@@ -98,13 +98,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DLVR-03 | Phase 18 | Complete |
 | DLVR-04 | Phase 18 | Complete |
 | AUTO-01 | Phase 18 | Complete |
-| RESP-02 | Phase 19 | Pending |
-| RESP-03 | Phase 19 | Pending |
-| RESP-04 | Phase 19 | Pending |
-| AUTO-02 | Phase 19 | Pending |
-| AUTO-03 | Phase 19 | Pending |
-| NOTF-01 | Phase 19 | Pending |
-| NOTF-02 | Phase 19 | Pending |
+| RESP-02 | Phase 19 | Complete |
+| RESP-03 | Phase 19 | Complete |
+| RESP-04 | Phase 19 | Complete |
+| AUTO-02 | Phase 19 | Complete |
+| AUTO-03 | Phase 19 | Complete |
+| NOTF-01 | Phase 19 | Complete |
+| NOTF-02 | Phase 19 | Complete |
 | PDF-01 | Phase 20 | Pending |
 
 **Coverage:**

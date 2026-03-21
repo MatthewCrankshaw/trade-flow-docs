@@ -141,7 +141,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 19-01-PLAN.md — Backend: declineReason field, publicTransition method, QuoteResponseHandler service, notification email template/renderer, accept/decline endpoints
+- [x] 19-01-PLAN.md — Backend: declineReason field, publicTransition method, QuoteResponseHandler service, notification email template/renderer, accept/decline endpoints
 - [ ] 19-02-PLAN.md — Frontend: response types, RTK Query mutation, PublicQuoteResponseButtons, DeclineReasonForm, QuoteExpiredNotice, PublicQuoteCard wiring
 - [ ] 19-03-PLAN.md — Backend tests: QuoteResponseHandler, NotificationEmailRenderer, publicTransition unit tests
 
@@ -184,5 +184,5 @@ Phases execute in numeric order: 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 16. Token Infrastructure and Public API | 2/2 | Complete    | 2026-03-15 | - |
 | 17. Customer Quote Page | 4/4 | Complete   | 2026-03-20 | - |
 | 18. Quote Email Sending | v1.3 | 7/7 | Complete   | 2026-03-21 |
-| 19. Customer Response | v1.3 | 0/3 | Not started | - |
+| 19. Customer Response | v1.3 | 1/3 | In Progress|  |
 | 20. PDF Generation | v1.3 | 0/0 | Not started | - |
