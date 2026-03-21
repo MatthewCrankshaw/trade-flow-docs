@@ -158,4 +158,4 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 | lineTotalIncTax helper for display calculation | Tax-inclusive totals centralised; column header "Total (inc. tax)" | ✓ Good -- clear UX |
 
 ---
-*Last updated: 2026-03-21 after Phase 18 (Quote Email Sending) complete — full email delivery pipeline with SendQuoteDialog, QuoteSettings separation, error handling*
+*Last updated: 2026-03-21 after Phase 19 (Customer Response) complete — accept/decline endpoints, status transitions, notification emails, frontend response UI*
