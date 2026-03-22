@@ -1,194 +1,241 @@
 # Stack Research
 
-**Domain:** Quote email delivery, customer response flow, PDF generation, quote deletion
-**Researched:** 2026-03-15
+**Domain:** Monorepo restructure, BullMQ worker infrastructure, Redis backing store
+**Researched:** 2026-03-22
 **Confidence:** HIGH
+
+## Scope
+
+This research covers ONLY the new stack additions for v1.4. The existing validated stack (NestJS 11, MongoDB 7, Firebase Auth, Resend, class-validator, Docker Compose) is not re-evaluated.
 
 ## Recommended Stack
 
 ### Core Technologies
 
-No new core frameworks needed. All new features build on the existing NestJS/MongoDB/React stack. The additions below are library-level, not framework-level.
-
-### New Backend Libraries
-
 | Technology | Version | Purpose | Why Recommended |
 |------------|---------|---------|-----------------|
-| pdfmake | ^0.3.6 | Server-side PDF generation for quotes | Declarative JSON document definitions fit perfectly for structured quote documents (line items table, totals, headers). No browser/Puppeteer dependency means no headless Chrome in production. Pure JS, zero native dependencies. Built on PDFKit but with a declarative API that maps naturally to quote data structures. |
-| @types/pdfmake | ^0.2.x | TypeScript types for pdfmake | Required for type-safe document definitions in the strict TypeScript codebase. |
-| handlebars | ^4.7.8 | Server-side HTML email template compilation | Compiles HTML templates with dynamic data (customer name, quote number, totals, action URLs). Same templating syntax SendGrid Dynamic Templates use internally (Handlebars), so the mental model is consistent. Mature, stable, zero-dependency templating. |
+| NestJS Monorepo Mode | (CLI 11.x) | Multi-app workspace with shared code | Built into @nestjs/cli -- no extra tooling. `nest g app worker` converts the project automatically. Single `node_modules`, single `package.json`, independent build/deploy per app. |
+| @nestjs/bullmq | ^11.0.4 | NestJS integration for BullMQ queues | Official NestJS package, version-aligned with NestJS 11. Provides `BullModule.forRoot()`, `@Processor()` decorator, `WorkerHost` base class. |
+| bullmq | ^5.71.0 | Job queue library (peer dep of @nestjs/bullmq) | The modern successor to Bull. Required peer dependency (`^5.40.0`). Lua-based atomic operations, TypeScript-first, active maintenance. |
+| ioredis | ^5.6.1 | Redis client (peer dep of bullmq) | BullMQ uses ioredis internally. Must be installed as a peer dependency. Connection options passed through BullMQ config. |
+| Redis (Docker) | 7.4-alpine | Local development Redis server | Redis 7.4 is the proven stable branch. BullMQ requires minimum 6.2.0, recommends 7.0+. Use 7.4 over 8.x because 8.x is very new (released late 2025) and untested with BullMQ at scale. Alpine variant for smaller image. |
 
-### No New Frontend Libraries
+### Supporting Libraries
 
-The customer-facing quote response page and any UI additions use the existing React/Vite/Tailwind/Radix stack. No new frontend dependencies are needed.
+| Library | Version | Purpose | When to Use |
+|---------|---------|---------|-------------|
+| @nestjs/config | ^4.0.2 (existing) | Environment variable management | Already installed. Use to configure `REDIS_HOST`, `REDIS_PORT` env vars for BullMQ connection. |
+| nodemon | ^3.1.9 (existing) | Hot reload for worker service | Already installed. Create a second `nodemon-worker.json` config watching `apps/worker/src/`. |
 
-### No New Infrastructure
+### Development Tools
 
-SendGrid is already integrated (`@sendgrid/mail` ^8.1.6 in package.json). The existing `EmailSenderService` already supports HTML email sending. The new features extend it, not replace it.
-
-## Integration Points with Existing Code
-
-### SendGrid Email (Existing -- Extend)
-
-The existing `EmailSenderService` sends emails with inline HTML via `@sendgrid/mail`. For quote emails:
-
-**Approach: Inline HTML compiled from Handlebars templates**
-- Compile Handlebars templates server-side into HTML strings
-- Pass compiled HTML to existing `EmailSenderService.sendEmail()` method
-- Templates live as `.hbs` files in the API codebase (e.g., `src/quote/templates/quote-email.hbs`)
-- Full control over templates in version control, no SendGrid dashboard dependency, testable in unit tests, works with the existing `sendEmail(html)` pattern
-
-The existing `SendEmailDto` interface needs updating -- it currently has `senderName` and `wishlistUrl` fields that are artifacts from earlier work. These should be cleaned up or a new quote-specific DTO created.
-
-### Quote Entity (Existing -- Extend)
-
-The `IQuoteEntity` already has `sentAt`, `acceptedAt`, `rejectedAt` fields and `QuoteStatus` enum with DRAFT/SENT/ACCEPTED/REJECTED/EXPIRED values. The data model is ready for the send/respond flow. Only a new `responseToken` field needs to be added.
-
-### Customer Entity (Existing -- Read)
-
-`ICustomerEntity` has `email: string | null` and `name: string`. Email sending must validate that the customer has an email address before allowing quote send.
-
-### Business Entity (Existing -- Read)
-
-`BusinessEntity` has `name`, `currency`, `country`. These appear in the quote email and PDF header (business name, currency formatting).
-
-### Authentication (Existing -- Bypass for Customer Response)
-
-Firebase JWT auth protects all current endpoints. Customer accept/reject endpoints must be **unauthenticated** -- customers don't have Trade Flow accounts. Use secure token-based access instead (see below).
-
-## New Architectural Components
-
-### Secure Token for Customer Quote Response
-
-**Approach: Cryptographic random token using Node.js built-in `crypto`**
-
-Generate a token from `crypto.randomBytes(32).toString('hex')` stored on the quote document. The customer response URL includes this token as the sole authentication mechanism.
-
-| Aspect | Decision | Rationale |
-|--------|----------|-----------|
-| Token generation | `crypto.randomBytes(32)` | Built-in Node.js, cryptographically secure, no additional dependency needed |
-| Token storage | New `responseToken` field on Quote entity | Simple, queryable, one token per quote |
-| Token format | 64-character hex string | URL-safe, no encoding issues |
-| Expiration | Use existing `validUntil` field on quote | Already on the quote entity, natural business logic alignment |
-| Endpoint pattern | `GET /quotes/respond/:token` (view) + `POST /quotes/respond/:token` (accept/reject) | Public endpoints, no Firebase auth guard |
-
-**Why NOT JWT for tokens:** JWTs are self-contained and can't be revoked server-side without a blocklist. A simple random token stored in the database can be invalidated by clearing it. Simpler, more secure for this one-time-use case.
-
-**Why NOT a separate tokens collection:** One token per quote, strict 1:1 relationship. Adding a field to the existing quote document is simpler than a separate collection with a foreign key.
-
-### PDF Generation Service
-
-**Approach: pdfmake with declarative document definitions**
-
-A new `QuotePdfGenerator` service in the quote module that:
-1. Takes a quote DTO with line items and totals
-2. Builds a pdfmake document definition (JSON object with table, headers, footer)
-3. Returns a `Buffer` containing the PDF bytes
-
-| Aspect | Decision | Rationale |
-|--------|----------|-----------|
-| Library | pdfmake | Declarative JSON API maps directly to quote structure (header with business/customer info, line items table, totals row, notes section). No HTML/CSS rendering needed. |
-| Output | Buffer (not file) | Stream directly to HTTP response or attach to email. No filesystem writes needed. |
-| Fonts | pdfmake built-in Roboto | Professional, readable, no font file management required |
-| Template | Code-defined document definition | Quote layout is structured tabular data, not freeform content. A JSON definition is more maintainable than HTML-to-PDF for invoice-style documents. |
-| Storage | Generate on-the-fly, do not persist | PDFs are deterministic from quote data. Regenerate on demand rather than storing in MongoDB or S3. |
-
-### Customer Response Page (Frontend)
-
-**Approach: New public route in the existing React app**
-
-A route like `/quote/respond/:token` that:
-1. Fetches quote details from a public API endpoint (no auth required)
-2. Displays quote summary (business name, line items, totals)
-3. Provides Accept/Reject buttons that POST to the public API endpoint
-
-| Aspect | Decision | Rationale |
-|--------|----------|-----------|
-| Hosting | Same React app, public route | No separate app to deploy. React Router already handles routing. |
-| Auth bypass | Route outside protected route wrapper | Customer does not need a Trade Flow account |
-| Styling | Same Tailwind/Radix components | Consistent professional look, no additional CSS framework |
-| State | Local fetch or simple RTK Query endpoint | One-off page with minimal state requirements |
-
-### Quote Deletion
-
-**Approach: Hard delete for DRAFT quotes only**
-
-No new libraries needed. This is pure business logic in the existing service layer. Only DRAFT status quotes should be deletable (sent/accepted/rejected quotes have business significance and should be preserved).
+| Tool | Purpose | Notes |
+|------|---------|-------|
+| @nestjs/cli | ^11.0.16 (existing) | Monorepo scaffolding and builds | `nest g app worker` converts to monorepo mode. `nest build worker` and `nest start worker` target specific apps. |
+| Docker Compose | (existing) | Local Redis + MongoDB stack | Add a `redis` service to existing `docker-compose.yaml`. |
 
 ## Installation
 
 ```bash
-# In trade-flow-api/
-npm install pdfmake handlebars
-npm install -D @types/pdfmake
+# New dependencies (run from trade-flow-api root)
+npm install @nestjs/bullmq bullmq ioredis
 ```
 
-No new packages needed in `trade-flow-ui/`.
+No new dev dependencies required -- existing @nestjs/cli, nodemon, and TypeScript tooling handle the worker service.
+
+## Monorepo Conversion Details
+
+### What `nest g app worker` Does
+
+Running `nest g app worker` from the project root will:
+
+1. Move existing `src/` to `apps/api/src/` (renaming the default app to match `nest-cli.json` root)
+2. Create `apps/worker/src/` with a new `main.ts`, `app.module.ts`, and `app.controller.ts`
+3. Create `apps/worker/tsconfig.app.json`
+4. Update `nest-cli.json` to monorepo mode with `projects` map
+5. Update root `tsconfig.json` with project references
+
+### Resulting nest-cli.json Structure
+
+```json
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "monorepo": true,
+  "root": "apps/api",
+  "sourceRoot": "apps/api/src",
+  "compilerOptions": {
+    "webpack": true,
+    "tsConfigPath": "apps/api/tsconfig.app.json",
+    "assets": ["email/templates/**/*.html"],
+    "watchAssets": true,
+    "deleteOutDir": true
+  },
+  "projects": {
+    "api": {
+      "type": "application",
+      "root": "apps/api",
+      "sourceRoot": "apps/api/src",
+      "entryFile": "main",
+      "compilerOptions": {
+        "tsConfigPath": "apps/api/tsconfig.app.json",
+        "assets": ["email/templates/**/*.html"],
+        "watchAssets": true
+      }
+    },
+    "worker": {
+      "type": "application",
+      "root": "apps/worker",
+      "sourceRoot": "apps/worker/src",
+      "entryFile": "main",
+      "compilerOptions": {
+        "tsConfigPath": "apps/worker/tsconfig.app.json"
+      }
+    }
+  }
+}
+```
+
+### Resulting Directory Structure
+
+```
+trade-flow-api/
+  apps/
+    api/
+      src/           <- existing src/ moved here
+        main.ts
+        app.module.ts
+        auth/
+        business/
+        core/
+        ...
+      tsconfig.app.json
+    worker/
+      src/
+        main.ts      <- new worker entry point (no HTTP listener)
+        worker.module.ts
+      tsconfig.app.json
+  libs/              <- optional, for shared code later
+  nest-cli.json      <- updated to monorepo mode
+  tsconfig.json      <- root config with project references
+  package.json       <- single shared package.json
+  docker-compose.yaml
+  Dockerfile
+```
+
+### Critical: Webpack Switch
+
+NestJS monorepo mode switches the default builder from `tsc` to `webpack`. This means:
+
+- Build output changes from `dist/` to `dist/apps/api/main.js` and `dist/apps/worker/main.js` (single bundled files per app)
+- Path aliases (`@auth/*`, `@core/*`, etc.) are resolved by webpack at build time instead of `tsconfig-paths`
+- The `start:prod` script must update from `node dist/main` to `node dist/apps/api/main`
+- `ts-node` with `tsconfig-paths/register` (used in nodemon) still works for development
+- Asset copying (email templates) must be configured per-app in `nest-cli.json`
+
+### Path Alias Updates
+
+All existing `@module/*` path aliases in `tsconfig.json` must update from `./src/module/*` to `./apps/api/src/module/*`. The worker can import shared modules by referencing the API's source directly or via a `libs/` shared library.
+
+## Docker Compose Addition
+
+```yaml
+# Add to existing docker-compose.yaml services:
+redis:
+  container_name: trade-flow-redis
+  image: redis:7.4-alpine
+  ports:
+    - "6379:6379"
+  volumes:
+    - redis-data:/data
+  networks:
+    - app-network
+  healthcheck:
+    test: ["CMD", "redis-cli", "ping"]
+    interval: 10s
+    timeout: 5s
+    retries: 5
+
+# Add to volumes:
+volumes:
+  mongo-data:
+  node_modules:
+  redis-data:
+```
+
+The `api` and future `worker` services add `depends_on: redis: condition: service_healthy`.
+
+## Environment Variables
+
+| Variable | Default (dev) | Purpose |
+|----------|---------------|---------|
+| `REDIS_HOST` | `localhost` (local) / `redis` (Docker) | Redis connection host |
+| `REDIS_PORT` | `6379` | Redis connection port |
+
+No Redis password needed for local development. Production Redis (Railway or similar) will provide a connection URL.
 
 ## Alternatives Considered
 
 | Recommended | Alternative | When to Use Alternative |
 |-------------|-------------|-------------------------|
-| pdfmake (declarative JSON) | Puppeteer (headless Chrome) | When PDF must pixel-perfectly match an HTML/CSS design mockup. Not this case -- quotes are structured tabular data. Puppeteer adds ~300MB Chrome dependency and is significantly slower. |
-| pdfmake (declarative JSON) | PDFKit (imperative drawing API) | When you need pixel-level control over every drawn element. Not this case -- pdfmake wraps PDFKit with a declarative API that is better suited for document-style PDFs with tables. |
-| pdfmake (declarative JSON) | @react-pdf/renderer | When PDF generation happens client-side or you want JSX syntax for templates. Not this case -- generation is server-side in NestJS. |
-| Handlebars (server-side compile) | SendGrid Dynamic Templates | When non-developers need to edit email templates via a visual UI dashboard. Not this case -- solo dev, templates should live in version control and be unit-testable. |
-| Handlebars (server-side compile) | MJML (responsive email framework) | When building a large library of responsive email templates with complex layouts. Overkill for 1-2 transactional quote emails. Adds a compilation step and new DSL. |
-| crypto.randomBytes token | JWT token in URL | When token needs to carry claims without a DB lookup. Not this case -- revocability matters and the DB lookup is cheap (indexed field). |
-| Public route in existing React app | Separate static page / standalone app | When the response page needs to be extremely lightweight or hosted on a different domain. Not this case -- reusing existing UI components is faster to build and maintain. |
+| NestJS built-in monorepo | Nx workspace | If you need build caching, dependency graph visualization, or 5+ apps. Overkill for 2 apps. Adds significant tooling complexity. |
+| NestJS built-in monorepo | Turborepo | If each app had its own `package.json`. NestJS monorepo shares one `package.json` by design -- Turborepo adds nothing here. |
+| @nestjs/bullmq | @nestjs/bull (legacy) | Never. @nestjs/bull wraps the deprecated `bull` package. @nestjs/bullmq wraps the actively maintained `bullmq`. |
+| BullMQ | Agenda.js | If you needed MongoDB-backed queues (avoid adding Redis). Not recommended -- BullMQ is significantly more mature for job processing, and Redis is needed for future features anyway (caching, rate limiting). |
+| Redis 7.4 | Redis 8.x | When Redis 8 has been stable for 6+ months and BullMQ explicitly tests against it. Currently too new. |
+| Redis 7.4 | Upstash (serverless Redis) | For production only, if Railway doesn't offer managed Redis. Not needed for local dev. |
+| Webpack (monorepo default) | SWC builder | For faster builds. NestJS SWC support in monorepo mode has reported issues (see nestjs/nest#12977). Stick with webpack until SWC monorepo support matures. |
 
 ## What NOT to Use
 
 | Avoid | Why | Use Instead |
 |-------|-----|-------------|
-| Puppeteer / Playwright for PDF | 300MB+ Chrome dependency, slow cold start, heavy memory usage, overkill for structured documents | pdfmake -- zero native dependencies, fast, declarative |
-| MJML for email templates | Adds build step, new template DSL to learn, overkill for 1-2 transactional emails | Handlebars compiling inline HTML -- simpler, already sufficient |
-| SendGrid Dynamic Templates | Templates live outside codebase, cannot be version-controlled, cannot be unit tested, adds dashboard dependency | Handlebars server-side compilation with existing inline HTML sending pattern |
-| Separate microservice for PDF | Architecture overhead for a single feature within an existing module | Service class within existing quote module |
-| nodemailer | Already using SendGrid SDK; adding nodemailer creates two competing email paths | Existing @sendgrid/mail integration |
-| uuid for tokens | 122 bits of entropy vs 256 bits from crypto.randomBytes; adds unnecessary dependency | crypto.randomBytes(32) -- built-in Node.js, more secure |
-| Storing PDFs in MongoDB/S3 | Adds storage management complexity; PDFs are deterministic and can be regenerated on demand from quote data | Generate on-the-fly from quote data |
-| html-pdf / wkhtmltopdf | Deprecated, relies on QtWebKit, security issues, no active maintenance | pdfmake -- actively maintained, pure JS |
+| `@nestjs/bull` | Wraps deprecated `bull` package (unmaintained). @nestjs/bullmq is the modern replacement. | `@nestjs/bullmq` |
+| `bull` | Superseded by `bullmq`. No new features, limited TypeScript support. | `bullmq` |
+| `redis` (npm package) | BullMQ requires `ioredis`, not the `redis` npm package. They are incompatible. | `ioredis` |
+| Nx / Turborepo | Adds a build orchestration layer on top of NestJS's built-in monorepo support. Unnecessary complexity for 2 apps. | NestJS built-in monorepo mode |
+| Separate `package.json` per app | NestJS monorepo mode uses a single shared `package.json`. Fighting this pattern creates dependency management headaches. | Single root `package.json` |
+| Redis Cluster (local dev) | BullMQ supports clusters but single-node Redis is sufficient for this scale. Cluster adds operational complexity with no benefit. | Single Redis instance |
+| `bull-board` or `@bull-board/nestjs` | Admin UI for queue monitoring. Premature -- add only when debugging queue issues in production. | Console logging via Pino |
 
 ## Version Compatibility
 
 | Package | Compatible With | Notes |
 |---------|-----------------|-------|
-| pdfmake@0.3.6 | Node.js 22.x | Pure JS, no native dependencies, broad Node.js compatibility |
-| handlebars@4.7.8 | Node.js 22.x | Stable for years, no known compatibility issues. Last published 2023 but fully functional -- templating is a solved problem. |
-| @types/pdfmake@0.2.x | TypeScript 5.9.x | Verify type definitions match pdfmake 0.3.x API after install |
-| @sendgrid/mail@8.1.6 | Already installed | No changes needed; existing version supports inline HTML and dynamic template features |
+| @nestjs/bullmq@^11.0.4 | @nestjs/core@^11.x, bullmq@^5.40.0 | Version 11.x aligns with NestJS 11. Peer dep on bullmq 5.40+. |
+| bullmq@^5.71.0 | ioredis@^5.x, Redis 6.2+ | Uses ioredis internally. Recommends Redis 7.0+ for full feature support. |
+| ioredis@^5.6.1 | Redis 2.8+ (basic), 6.0+ (streams) | Mature Redis client. BullMQ passes connection options through to ioredis constructor. |
+| Redis 7.4 | bullmq@^5.x | BullMQ has version-specific optimizations for Redis 7.0.8+. |
+| @nestjs/cli@^11.0.16 | NestJS 11 monorepo mode | `nest g app`, `nest build`, `nest start` all support monorepo project targeting. |
+| webpack (NestJS default) | NestJS 11 monorepo mode | Auto-configured when monorepo mode is enabled. No manual webpack config needed. |
 
-## Summary of Changes by Repo
+## Worker Service Architecture Notes
 
-### trade-flow-api (2 new packages)
-- `pdfmake` + `@types/pdfmake` for PDF generation
-- `handlebars` for email template compilation
-- New `responseToken` field on quote entity
-- New public (unauthenticated) controller endpoints for customer response
-- New `QuotePdfGenerator` service
-- New `QuoteEmailSender` service (uses existing `EmailSenderService`)
-- Handlebars template files in `src/quote/templates/`
+The worker service is a separate NestJS application (its own `main.ts`) that:
 
-### trade-flow-ui (0 new packages)
-- New public route `/quote/respond/:token`
-- New `QuoteResponsePage` component (uses existing Tailwind/Radix components)
-- Quote detail page additions (Send button, PDF download button, Delete button)
+- Does NOT listen on an HTTP port (no `app.listen()`)
+- Imports shared modules from the API source (or from `libs/` if extracted)
+- Registers `BullModule.forRoot()` with same Redis connection
+- Uses `@Processor('queue-name')` decorated classes extending `WorkerHost`
+- Runs independently via `nest start worker --watch` or a dedicated nodemon config
+
+The API service produces jobs via `@InjectQueue('queue-name')` and `queue.add()`. The worker service consumes them via `@Processor()` classes. Both connect to the same Redis instance.
 
 ## Sources
 
-- [pdfmake on npm](https://www.npmjs.com/package/pdfmake) -- version 0.3.6 verified, HIGH confidence
-- [pdfmake GitHub](https://github.com/bpampuch/pdfmake) -- capability and API verification, HIGH confidence
-- [SendGrid Dynamic Templates docs](https://docs.sendgrid.com/ui/sending-email/how-to-send-an-email-with-dynamic-templates) -- template API reference, HIGH confidence
-- [SendGrid Node.js transactional templates](https://github.com/sendgrid/sendgrid-nodejs/blob/main/docs/use-cases/transactional-templates.md) -- code examples, HIGH confidence
-- [Handlebars official site](https://handlebarsjs.com/) -- API reference, HIGH confidence
-- [Node.js Crypto documentation](https://nodejs.org/api/crypto.html) -- randomBytes API, HIGH confidence
-- [JS PDF library comparison (DEV Community)](https://dev.to/handdot/generate-a-pdf-in-js-summary-and-comparison-of-libraries-3k0p) -- pdfmake vs alternatives, MEDIUM confidence
-- [Top JS PDF libraries 2026 (Nutrient)](https://www.nutrient.io/blog/top-js-pdf-libraries/) -- ecosystem overview, MEDIUM confidence
-- Codebase: `trade-flow-api/src/email/services/email-sender.service.ts` -- existing SendGrid integration pattern, HIGH confidence
-- Codebase: `trade-flow-api/src/quote/entities/quote.entity.ts` -- existing quote data model, HIGH confidence
-- Codebase: `trade-flow-api/package.json` -- existing dependency versions, HIGH confidence
+- [NestJS Monorepo Documentation](https://docs.nestjs.com/cli/monorepo) -- Official monorepo mode configuration (HIGH confidence)
+- [NestJS Libraries Documentation](https://docs.nestjs.com/cli/libraries) -- Shared library patterns (HIGH confidence)
+- [BullMQ NestJS Integration Guide](https://docs.bullmq.io/guide/nestjs) -- Official @nestjs/bullmq setup (HIGH confidence)
+- [BullMQ Redis Compatibility](https://docs.bullmq.io/guide/redis-tm-compatibility) -- Minimum Redis version requirements (HIGH confidence)
+- [@nestjs/bullmq Releases](https://github.com/nestjs/bull/releases) -- Version 11.0.4 release notes, bullmq peer dep ^5.40.0 (HIGH confidence)
+- [NestJS Monorepo SWC Issue #12977](https://github.com/nestjs/nest/issues/12977) -- SWC builder limitation in monorepo mode (MEDIUM confidence)
+- [Redis Docker Hub](https://hub.docker.com/_/redis/) -- Official Redis Docker images, 7.4-alpine available (HIGH confidence)
+- Codebase: `trade-flow-api/package.json` -- existing dependency versions (HIGH confidence)
+- Codebase: `trade-flow-api/nest-cli.json` -- current standard mode config (HIGH confidence)
+- Codebase: `trade-flow-api/tsconfig.json` -- existing path aliases (HIGH confidence)
+- Codebase: `trade-flow-api/docker-compose.yaml` -- existing Docker services (HIGH confidence)
+- Codebase: `trade-flow-api/nodemon.json` -- current hot reload config (HIGH confidence)
 
 ---
-*Stack research for: Trade Flow v1.3 -- Send Quotes*
-*Researched: 2026-03-15*
+*Stack research for: Trade Flow v1.4 -- Monorepo & Worker Infrastructure*
+*Researched: 2026-03-22*

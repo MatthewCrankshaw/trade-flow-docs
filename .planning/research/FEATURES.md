@@ -1,174 +1,174 @@
 # Feature Research
 
-**Domain:** Quote delivery and customer response for trade/contractor business management
-**Researched:** 2026-03-15
+**Domain:** NestJS monorepo restructure, BullMQ worker service, Redis queue infrastructure
+**Researched:** 2026-03-22
 **Confidence:** HIGH
 
 ## Feature Landscape
 
 ### Table Stakes (Users Expect These)
 
-Features users assume exist. Missing these = product feels incomplete.
+Infrastructure features that must work correctly for the monorepo and worker to be useful. "Users" here means the developer (you) and future deployment pipelines.
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Email quote to customer | Every competitor (Tradify, Fergus, Jobber, ServiceM8, Xero) sends quotes via email. This is the core action -- "send the quote" must work. | MEDIUM | Existing `EmailSenderService` with SendGrid already handles transactional emails. Need: HTML email template with quote summary, link to view full quote, PDF attachment. SendGrid recommends link-to-hosted over attachment-only for deliverability, but tradespeople expect a PDF in the email too -- do both. |
-| Customer can view quote online (no login) | All competitors use a token-based link -- customer clicks link in email, sees the quote immediately. No account creation, no password. Jobber calls it "client hub", ServiceM8 uses a "branded online quote acceptance portal". Friction kills quote acceptance rates. | MEDIUM | New public (unauthenticated) API endpoint with a secure token. Token stored on quote entity. Customer-facing page is a standalone React route (no app chrome/navigation). Must show: business name/logo, quote number, line items, totals, validity date. |
-| Customer can accept quote online | Every competitor has an "Accept" button on the customer view. Fergus, ServiceM8, Jobber, and Xero all support one-click acceptance. This is the whole point -- reduce back-and-forth phone/text/email chasing. | LOW | Button on customer view page hits a public API endpoint that transitions quote from SENT to ACCEPTED. Existing `quote-transition.service.ts` already validates SENT -> ACCEPTED. `acceptedAt` field already exists on entity. |
-| Customer can decline quote online | Xero, Jobber, and ServiceM8 all include a decline/reject option alongside accept. Tradespeople need to know a "no" quickly so they can move on. Without it, quotes just go silent. | LOW | Same pattern as accept. SENT -> REJECTED transition already exists in `quote-transitions.ts`. `rejectedAt` field already exists on entity. |
-| Tradesperson notified when customer responds | Tradify: "notified instantly". Fergus: "notification as soon as customer approves". ServiceM8: "prompt a notification in your account". Xero: "instantly get notified". Universal expectation across all competitors. | LOW | Send notification email to tradesperson when customer accepts or rejects. Reuse existing `EmailSenderService`. In-app real-time notification is future scope -- email is sufficient for v1.3. |
-| Quote PDF generation | Every competitor generates PDF quotes. Tradify, ServiceM8, and Xero all produce professional branded PDFs. Customers expect a document they can save, print, or forward to a partner/spouse for approval. | MEDIUM | Generate PDF server-side. Must include: business details, customer details, quote number/date, line items with quantities/prices, bundle summaries, subtotal/tax/total, validity date, notes. Serve via API endpoint for both email attachment and customer download. |
-| Automatic status update from customer action | When customer clicks Accept/Reject on the online view, the quote status must update automatically in the tradesperson's app. Manual status toggling after customer email response defeats the entire purpose of digital delivery. | LOW | Already handled by accept/reject endpoints updating the quote entity. UI refreshes via RTK Query cache invalidation. No new infrastructure needed. |
-| Quote deletion | Tradespeople create test quotes, duplicate quotes, or quotes for jobs that fall through. Need to clean up their quote list. Every competitor supports this. | LOW | Existing `DELETED` status pattern established in PROJECT.md ("Soft delete via DELETED status enum"). Only allow deletion from DRAFT status to prevent deleting sent/accepted quotes with audit significance. Exclude DELETED from default list queries. |
-| Customizable email message | Tradify and Fergus let you edit the email body before sending. Xero pre-fills but allows editing. Tradespeople want to add a personal note ("Hi Dave, here's the quote for the bathroom reno we discussed"). | LOW | Pre-fill email with template (greeting, quote summary, link) but let tradesperson edit the message body before sending via a send dialog. |
+| Feature | Why Expected | Complexity | Dependencies on Existing |
+|---------|--------------|------------|--------------------------|
+| `nest generate app worker` monorepo conversion | NestJS CLI's built-in monorepo mode relocates existing `src/` under `apps/api/`, creates `apps/worker/` as a sibling. Without this, no shared code. | MEDIUM | Requires canonical NestJS project structure (src/ and test/ at root). Existing trade-flow-api follows this. |
+| `nest-cli.json` monorepo configuration | Sets `"monorepo": true`, defines `"projects"` map with `api` (default) and `worker` entries, each with own `tsconfig.app.json` and entry point. | LOW | Replaces current single-app nest-cli.json. Must preserve existing compiler options. |
+| `nest generate library shared` for shared code | Creates `libs/shared/` with barrel exports, auto-registers path alias `@app/shared` in root tsconfig. Allows worker to import existing API modules (CoreModule, database config, repositories). | MEDIUM | Existing modules like CoreModule, MongoDbFetcher, AppLogger must be extractable to shared lib without breaking API imports. |
+| BullModule.forRoot() with Redis connection | `@nestjs/bullmq` integration in both API and worker apps. API produces jobs, worker consumes them. Configured via `@nestjs/config` environment variables. | LOW | Depends on existing ConfigModule/ConfigService pattern already used for MongoDB, Firebase, Resend config. |
+| BullModule.registerQueue() for named queues | Register at least one queue (e.g., `email` or `default`) so the infrastructure is testable end-to-end. Queue name shared between producer (API) and consumer (worker). | LOW | None beyond BullModule.forRoot(). |
+| @Processor worker class extending WorkerHost | Worker app registers processor classes with `@Processor('queueName')` decorator, extending `WorkerHost` with `async process(job)` method. This is the BullMQ consumption pattern. | LOW | Worker app must import the queue module and any shared services the processor needs. |
+| Redis in Docker Compose | Add `redis:7-alpine` service to existing `docker-compose.yaml` alongside MongoDB. Expose port 6379. | LOW | Existing docker-compose.yaml already has MongoDB service. Redis is an additive service. |
+| Environment variables for Redis | `REDIS_HOST`, `REDIS_PORT` (minimum). Added to `.env.example` and loaded via ConfigService. | LOW | Follows existing pattern of env vars for MongoDB (`MONGODB_URI`), Firebase, Resend. |
+| Worker entry point (`apps/worker/src/main.ts`) | Standalone NestJS application bootstrap (no HTTP listener) that initializes the worker app module and starts processing queues. | MEDIUM | Must bootstrap NestJS app without Express/Fastify. Uses `NestFactory.createApplicationContext()` or standard `NestFactory.create()` without `app.listen()`. |
+| Nodemon hot reload for worker | Separate nodemon config (or npm script) that watches `apps/worker/src/` and `libs/` for changes and restarts the worker process. | LOW | Existing nodemon.json watches `src/`. Must be updated for monorepo paths, or create per-app configs. |
 
 ### Differentiators (Competitive Advantage)
 
-Features that set the product apart. Not required, but valuable.
+Features that make this infrastructure particularly well-suited for Trade Flow's future needs (PDF generation, Stripe webhooks, scheduled emails). Not required for v1.4 but should be designed-for.
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| Customer comment on decline | Xero lets customers leave a comment when declining. Knowing WHY a quote was rejected (too expensive, wrong scope, went with competitor) is gold for improving future quotes. Most competitors skip this. | LOW | Optional text field on the decline action. Store as `rejectionReason` on quote entity. Display to tradesperson on quote detail. Small add with outsized value. |
-| PDF download from customer view | Let the customer download the PDF directly from the online quote view page. Customers often need to forward to a spouse/partner or print for records. | LOW | Add download button to customer view page that serves the same PDF generated for the email. The PDF endpoint already exists for the email attachment -- just expose it publicly via the same token auth. |
-| Re-send quote | Emails get lost, go to spam, or customer asks to see it again. "Send again" button on a quote that is already in SENT status. | LOW | Same send flow, available when status is already SENT. Tradify re-populates all previous recipients. Keep simple: same customer email, re-send with fresh link. The transition map already allows SENT -> SENT. |
-| Quote viewed indicator | Know if the customer actually opened the quote vs. ignoring the email. Reduces "did they get it?" anxiety that leads to awkward follow-up calls. | LOW | Record `viewedAt` timestamp when customer loads the quote view page. Show a "Viewed" badge or timestamp on the quote detail in the tradesperson's app. Cheap to implement alongside the customer view page. |
+| Queue-per-concern naming convention | Name queues by domain (`email`, `pdf`, `billing`) rather than a single `default` queue. Enables independent scaling and monitoring per concern. | LOW | Define the convention now even if only one queue exists. Worker registers multiple processors. |
+| Job retry with exponential backoff | BullMQ supports per-queue and per-job `attempts` and `backoff` configuration. Critical for email sending (Resend API transient failures) and future Stripe webhooks. | LOW | Built into BullMQ. Configure `defaultJobOptions: { attempts: 3, backoff: { type: 'exponential', delay: 1000 } }` on queue registration. |
+| Job progress and event tracking | `@OnWorkerEvent('completed')`, `@OnWorkerEvent('failed')` decorators for logging job outcomes. Integrates with existing Pino logging. | LOW | Valuable for debugging in production. Wire to AppLogger. |
+| Shared library for DTOs/interfaces | Extract shared types (e.g., job payload interfaces, queue name constants) into `libs/shared/` so both API and worker have a single source of truth. | MEDIUM | Prevents drift between what API enqueues and what worker expects. |
+| BullModule.forRootAsync() with ConfigService | Async configuration reads Redis connection from ConfigService rather than hardcoded values. Supports different Redis configs per environment. | LOW | Matches existing pattern: `MongooseModule.forRootAsync()` already uses ConfigService. |
+| Dead Letter Queue (DLQ) pattern | Failed jobs after max retries move to a DLQ for manual inspection. Prevents silent data loss on persistent failures. | MEDIUM | BullMQ supports this natively via `removeOnFail` and custom failed-job handlers. Defer implementation to when first real queue use case ships, but design the processor base class to support it. |
+| Bull Board admin UI (development only) | Web dashboard at `/admin/queues` showing queue status, job counts, retry/fail rates. Only enabled in development. | LOW | `@bull-board/nestjs` and `@bull-board/api` packages. Wire to existing Express adapter. Guards prevent production exposure. |
 
 ### Anti-Features (Commonly Requested, Often Problematic)
 
-Features that seem good but create problems.
-
 | Feature | Why Requested | Why Problematic | Alternative |
 |---------|---------------|-----------------|-------------|
-| Customer account/login system | "Customers should have a portal" | Massive scope. Customers interact with a tradesperson's quote once or twice per job. Nobody wants another login. Jobber's "client hub" works specifically because it does NOT require a password. | Token-based access link with cryptographically secure token. No account, no password, no friction. |
-| Quote versioning/options | Fergus and ServiceM8 support multiple quote versions. "Give customer 3 options to choose from." | Significant UI and data model complexity. Sole tradespeople typically send one quote, maybe revise once. Multi-version is a team/enterprise feature. | Edit the quote in draft, re-send. If versioning demand is validated later, add as future milestone. |
-| Electronic signature on acceptance | ServiceM8 supports remote signature. "Make it legally binding." | Legal complexity varies by jurisdiction. Adds signature pad UI. A simple Accept click with timestamp and IP address is sufficient evidence for trade quote values (not construction megaprojects). | Record acceptance timestamp, customer email, and IP address as proof of acceptance. Signature is a future add-on. |
-| Automated follow-up reminders | ServiceM8 has quote follow-up automation. "Automatically chase customers who haven't responded." | Adds scheduling infrastructure (cron jobs, timers), risk of annoying customers, and configuration UI. Premature for a solo tradesperson tool. | Show "days since sent" on quote list so tradesperson can manually follow up. Automation is a future milestone. |
-| Real-time notifications (WebSocket/push) | "I want to know the instant a customer accepts" | WebSocket infrastructure is significant new territory. Email notification covers 95% of the need. Sole tradespeople check their phone periodically, not staring at a dashboard. | Email notification on accept/reject. In-app status updates on next page load via normal RTK Query refetch. |
-| Rich HTML quote template builder | "Let me design my own quote layout" | Template builders are entire products themselves (think Canva/Mailchimp). Tradespeople want professional-looking quotes, not a design tool. | One well-designed, clean PDF template with business branding (name, contact info). Template customization limited to what is already in the business entity. |
+| Nx or Turborepo for monorepo management | "Better caching, dependency graphs, affected commands" | Massive tooling overhead for a 2-app monorepo. NestJS CLI's built-in monorepo mode handles the use case natively. Adds learning curve, config complexity, and another dependency to maintain. | Use NestJS CLI monorepo mode (`nest generate app/lib`). It handles the apps/libs structure, tsconfig management, and build orchestration out of the box. Revisit Nx only if you add 5+ apps. |
+| Redis Sentinel or Cluster for HA | "Production Redis needs high availability" | Solo tradesperson app with low traffic. Redis Sentinel adds operational complexity (3+ nodes minimum). Railway.app provides managed Redis with built-in persistence. | Use single Redis instance (Railway managed Redis or Docker for dev). Add Sentinel only when actual uptime SLA demands it. |
+| BullMQ sandboxed processors | "Run processors in child processes for isolation" | Adds process management complexity, harder debugging, slower startup. Sandboxed processors lose access to NestJS dependency injection. | Use standard in-process WorkerHost processors. The worker is already a separate NestJS app from the API -- that IS the isolation boundary. |
+| Microservice transport (e.g., Redis pub/sub via @nestjs/microservices) | "NestJS has a microservices module, use it" | BullMQ already provides the job queue pattern. Adding @nestjs/microservices for Redis transport introduces a second communication mechanism. Overengineered for "API enqueues job, worker processes it." | Stick with BullMQ queues as the sole inter-service communication mechanism. It handles persistence, retries, and backpressure. Microservice transport is for request-reply patterns you don't need. |
+| Shared database connection pool between API and worker | "Both apps connect to same MongoDB, share the connection" | Each NestJS app must manage its own connection lifecycle. Sharing connections across processes is not possible (separate OS processes). | Each app (API and worker) independently connects to MongoDB via its own MongooseModule.forRootAsync(). Same connection string, independent pools. |
+| Publishing shared libs to npm registry | "Proper package management for shared code" | Single repo, single team (you). Registry publishing adds versioning ceremony, publish steps, and version drift risk for zero benefit. | NestJS monorepo libs are resolved via tsconfig path aliases at compile time. No publishing needed. |
 
 ## Feature Dependencies
 
 ```
-[Quote PDF Generation]
-    +--required by--> [Email Quote to Customer] (PDF attached to email)
-    +--required by--> [Customer Quote View] (download button)
+[Redis in Docker Compose]
+    └──requires──> [Environment variables for Redis]
+                       └──requires──> [BullModule.forRoot() config]
+                                          └──requires──> [BullModule.registerQueue()]
+                                                             └──requires──> [@Processor worker class]
 
-[Customer Quote View (public token-based page)]
-    +--required by--> [Customer Accept Quote]
-    +--required by--> [Customer Decline Quote]
-    +--required by--> [Quote Viewed Indicator]
+[nest generate app worker (monorepo conversion)]
+    └──requires──> [nest-cli.json monorepo config]
+                       └──enables──> [nest generate library shared]
+                                         └──enables──> [Worker imports shared modules]
 
-[Customer Accept/Decline]
-    +--required by--> [Tradesperson Notification Email]
-    +--triggers-----> [Automatic Status Update] (same operation)
+[Worker entry point (main.ts)]
+    └──requires──> [monorepo conversion complete]
+    └──requires──> [BullModule config in worker app module]
 
-[Email Quote to Customer]
-    +--requires--> [Quote PDF Generation]
-    +--requires--> [Customizable Email Message] (send dialog)
-    +--triggers---> [Quote Status: DRAFT -> SENT]
-    +--generates--> [Customer View Token] (stored on quote)
-
-[Quote Deletion]
-    +--independent--> (no dependencies on other new features)
+[Nodemon hot reload for worker]
+    └──requires──> [Worker entry point exists]
+    └──requires──> [monorepo directory structure finalized]
 ```
 
 ### Dependency Notes
 
-- **PDF generation must come first:** Both the email (attachment) and the customer view (download) depend on having a working PDF. Build this before the email sending flow.
-- **Customer view page is the gateway:** Accept/reject buttons live on this page. Must be built before the customer response flow works end-to-end.
-- **Quote deletion is fully independent:** No dependencies on other v1.3 features. Good first or parallel task.
-- **Notification depends on customer response:** Tradesperson notification emails are triggered by accept/reject actions, so those endpoints must exist first.
-- **Email sending triggers status transition:** Sending a quote should automatically transition it from DRAFT to SENT. The transition logic and allowed transitions already exist in `quote-transitions.ts`.
-- **Existing infrastructure reduces scope:** `EmailSenderService`, `QuoteTransitionService`, quote entity fields (`sentAt`, `acceptedAt`, `rejectedAt`, `validUntil`) are all already in place.
+- **Monorepo conversion must happen first:** Everything else depends on the apps/libs directory structure being in place. This is a structural change that touches every import path in the existing API.
+- **Redis infra before BullMQ config:** Docker Compose Redis service and env vars must exist before BullModule.forRoot() can connect.
+- **Shared library before worker processors:** Worker processors need to import shared modules (CoreModule for logging, database access) to do useful work.
+- **Worker entry point depends on both monorepo structure AND BullMQ config:** The worker app module imports BullModule and registers processors.
 
 ## MVP Definition
 
-### Launch With (v1.3)
+### Launch With (v1.4)
 
-Minimum viable milestone -- what is needed to close the "send quote" loop.
+Minimum viable infrastructure -- what's needed so that v1.5+ can enqueue actual jobs.
 
-- [ ] Quote PDF generation -- professional PDF with business/customer/line item details
-- [ ] Email quote to customer -- SendGrid email with quote summary, view link, and PDF attachment
-- [ ] Customizable email message -- editable body text via send dialog before sending
-- [ ] Customer quote view (public, no login) -- token-based access to read-only quote page
-- [ ] Customer accept button -- one-click acceptance with automatic status update
-- [ ] Customer decline button -- one-click rejection with automatic status update
-- [ ] Tradesperson notification email -- email sent when customer accepts or rejects
-- [ ] Quote deletion -- soft delete for DRAFT quotes
-- [ ] PDF download from customer view -- download button on the public page
+- [x] Monorepo conversion via `nest generate app worker` -- structural foundation for everything
+- [x] `nest-cli.json` updated for monorepo mode with `api` and `worker` projects
+- [x] Shared library (`libs/shared/`) with CoreModule extraction (logging, config)
+- [x] Redis service in Docker Compose (`redis:7-alpine`)
+- [x] Environment variables (`REDIS_HOST`, `REDIS_PORT`) via ConfigService
+- [x] `BullModule.forRootAsync()` configured in both API and worker app modules
+- [x] At least one registered queue (e.g., `default` or `email`) to prove end-to-end
+- [x] One @Processor class in worker that logs received jobs (smoke test)
+- [x] Worker `main.ts` entry point bootstrapping NestJS app context
+- [x] Nodemon config for worker hot reload in development
+- [x] API can enqueue a job that the worker picks up and processes (integration proof)
 
-### Add After Validation (v1.x)
+### Add After Validation (v1.5+)
 
-Features to add once core send/respond flow is working and validated.
+Features to add when first real queue use case ships (likely email or PDF).
 
-- [ ] Customer comment on decline -- optional rejection reason field (small scope, high value)
-- [ ] Re-send quote -- "send again" for quotes already in SENT status
-- [ ] Quote viewed indicator -- record and display when customer opened the quote
-- [ ] "Days since sent" display -- show aging on quote list for manual follow-up prioritization
+- [ ] Email queue -- move Resend email sending from synchronous API call to async worker job
+- [ ] Queue-per-concern naming (`email`, `pdf`, `billing`)
+- [ ] Dead Letter Queue pattern for failed jobs
+- [ ] Bull Board admin UI (development only)
+- [ ] Job progress tracking and structured logging of outcomes
+- [ ] PDF generation queue (quote PDF rendering in worker)
 
 ### Future Consideration (v2+)
 
-Features to defer until product-market fit is established.
+Features to defer until queue usage patterns are proven.
 
-- [ ] Quote versioning/options -- multiple quote versions per job
-- [ ] Electronic signature -- signature capture on acceptance
-- [ ] Automated follow-up reminders -- scheduled reminder emails for unresponded quotes
-- [ ] Customer portal/login -- persistent customer access to all their quotes/invoices
-- [ ] SMS quote delivery -- send via text message as well as email
-- [ ] Deposit collection on acceptance -- requires invoicing system (not yet built)
+- [ ] Scheduled/recurring jobs via BullMQ's `repeat` option (e.g., reminder emails)
+- [ ] Multiple worker instances with concurrency tuning
+- [ ] Redis persistence configuration (AOF/RDB) for production
+- [ ] Queue metrics and alerting integration
+- [ ] Stripe webhook processing queue
 
 ## Feature Prioritization Matrix
 
 | Feature | User Value | Implementation Cost | Priority |
 |---------|------------|---------------------|----------|
-| Quote PDF generation | HIGH | MEDIUM | P1 |
-| Email quote to customer | HIGH | MEDIUM | P1 |
-| Customer quote view (public) | HIGH | MEDIUM | P1 |
-| Customer accept/decline | HIGH | LOW | P1 |
-| Automatic status update | HIGH | LOW | P1 |
-| Tradesperson notification | HIGH | LOW | P1 |
-| Customizable email message | MEDIUM | LOW | P1 |
-| Quote deletion | MEDIUM | LOW | P1 |
-| PDF download from customer view | MEDIUM | LOW | P1 |
-| Customer comment on decline | MEDIUM | LOW | P2 |
-| Re-send quote | MEDIUM | LOW | P2 |
-| Quote viewed indicator | LOW | LOW | P3 |
-| Days since sent display | LOW | LOW | P3 |
+| Monorepo conversion | HIGH | MEDIUM | P1 |
+| nest-cli.json config | HIGH | LOW | P1 |
+| Shared library (libs/shared) | HIGH | MEDIUM | P1 |
+| Redis in Docker Compose | HIGH | LOW | P1 |
+| Redis env vars + ConfigService | HIGH | LOW | P1 |
+| BullModule.forRootAsync() | HIGH | LOW | P1 |
+| Queue registration (at least one) | HIGH | LOW | P1 |
+| Worker entry point (main.ts) | HIGH | MEDIUM | P1 |
+| @Processor smoke-test class | HIGH | LOW | P1 |
+| Nodemon worker hot reload | MEDIUM | LOW | P1 |
+| End-to-end job enqueue/process proof | HIGH | LOW | P1 |
+| Bull Board admin (dev only) | LOW | LOW | P2 |
+| DLQ pattern | MEDIUM | MEDIUM | P2 |
+| Email queue migration | HIGH | MEDIUM | P2 (v1.5) |
+| Queue-per-concern convention | MEDIUM | LOW | P2 |
 
 **Priority key:**
-- P1: Must have for v1.3 launch
-- P2: Should have, add if time allows within v1.3 or next patch
+- P1: Must have for v1.4 -- infrastructure foundation
+- P2: Should have, add in v1.5 when first real queue use case ships
 - P3: Nice to have, future consideration
 
-## Competitor Feature Analysis
+## Existing Feature Impact Analysis
 
-| Feature | Tradify | Fergus | Jobber | ServiceM8 | Xero | Our Approach (v1.3) |
-|---------|---------|--------|--------|-----------|------|---------------------|
-| Email delivery | Templates with variables | Editable subject/body | Via client hub link | PDF attached to email | With file attachments | Email with editable body + PDF attachment + view link |
-| Customer view (no login) | Online approval page | Email link, no account | Client hub, email-only auth | Branded portal via unique URL | Link in email | Token-based public page, no login |
-| Accept online | Yes, instant notification | Yes, auto-creates site visit | Yes, with optional deposit | Yes, with optional signature | Yes, one click | One-click accept, auto status update |
-| Decline online | Implied | Implied | Yes, can request changes | Implied | Yes, with comment | One-click decline with optional reason |
-| Notification | Instant notification | Notification on approval | Email notification | In-app notification | Email notification | Email to tradesperson |
-| PDF generation | Yes | Yes | Yes | Yes (template-based) | Yes (branded) | Yes, clean professional template |
-| Quote versioning | No | Yes (multiple versions) | No | Yes (versions + options) | No | No (future milestone) |
-| Signature | No | No | Yes (on approval) | Yes (remote signature) | No | No (future milestone) |
-| Follow-up automation | No | No | Yes (reminders) | Yes (automation add-on) | No (third-party) | No (future milestone) |
-| Deposit on accept | No | Yes (auto invoice) | Yes (Jobber Payments) | No | No | No (requires invoicing) |
+How the monorepo restructure affects what's already built.
+
+| Existing Feature | Impact | Migration Effort |
+|------------------|--------|------------------|
+| All API modules (business, customer, job, quote, etc.) | File paths change from `src/` to `apps/api/src/`. All internal imports remain the same thanks to tsconfig path aliases. | LOW -- `nest generate app` handles relocation automatically. |
+| Docker Compose (MongoDB) | Additive change only -- Redis service added alongside existing MongoDB service. | LOW -- add service block, no changes to MongoDB config. |
+| Nodemon dev reload | Must update watched paths from `src/` to `apps/api/src/`. Or create per-app nodemon configs. | LOW |
+| tsconfig path aliases (@auth/*, @business/*, etc.) | These are project-relative and should survive relocation. Verify after conversion. | LOW -- but verify |
+| Environment config (.env, ConfigModule) | Additive -- new REDIS_* vars alongside existing MONGODB_*, FIREBASE_*, RESEND_* vars. | LOW |
+| npm scripts (start:dev, build, test) | Must be updated to specify which app to run: `nest start api --watch`, `nest start worker --watch`. | LOW |
+| Husky pre-commit hooks + lint-staged | Continue to work at repo root level. May need glob updates if lint-staged targets `src/`. | LOW -- verify globs |
+| Jest test configuration | Each app gets its own `tsconfig.app.json`. Test config may need `roots` or `moduleNameMapper` updates. | MEDIUM -- test carefully |
 
 ## Sources
 
-- [Tradify: Email a Quote](https://help.tradifyhq.com/hc/en-us/articles/360034729013-Email-a-Quote)
-- [Tradify: Email Templates](https://help.tradifyhq.com/hc/en-us/articles/360015909494-Email-Templates-in-Tradify)
-- [Fergus: Quoting Software](https://fergus.com/features/quoting/)
-- [Fergus: Quote Versions](https://help.fergus.com/en/articles/10614319-quote-versions)
-- [Jobber: Quote Approvals](https://help.getjobber.com/hc/en-us/articles/115012715008-Quote-Approvals)
-- [Jobber: Client Hub](https://help.getjobber.com/hc/en-us/articles/1500011237822-What-Do-Your-Clients-See-in-Client-Hub)
-- [ServiceM8: How to use quote acceptance](https://support.servicem8.com/hc/en-us/articles/115000282726-How-to-use-a-quote-acceptance)
-- [ServiceM8: Send quotes for remote signature](https://support.servicem8.com/hc/en-us/articles/360002067216-How-to-send-quotes-for-remote-signature)
-- [Xero: Send Quotes](https://www.xero.com/us/accounting-software/send-quotes/)
-- [Xero: Mark quote as accepted or declined](https://central.xero.com/s/article/Mark-a-quote-as-accepted-or-declined)
-- [SendGrid: Best Practices for Deliverability](https://support.sendgrid.com/hc/en-us/articles/360041790453-Best-Practices-for-Email-Deliverability)
+- [NestJS CLI Monorepo Documentation](https://docs.nestjs.com/cli/monorepo) -- official docs on monorepo mode, nest-cli.json config, generate app/lib commands
+- [BullMQ NestJS Guide](https://docs.bullmq.io/guide/nestjs) -- official BullMQ integration pattern for NestJS
+- [NestJS Queues Documentation](https://docs.nestjs.com/techniques/queues) -- official NestJS docs on @nestjs/bullmq, BullModule, processors
+- [BullMQ Connections Guide](https://docs.bullmq.io/guide/connections) -- Redis connection options, ioredis config, retry strategies
+- [BullMQ Going to Production](https://docs.bullmq.io/guide/going-to-production) -- production Redis configuration, maxRetriesPerRequest, enableReadyCheck
+- [NestJS Standalone BullMQ Worker](https://medium.com/@omarae00/nestjs-standalone-bullmq-worker-6f44faefaf6b) -- pattern for separate worker NestJS app
+- [Running NestJS Queues in a Separate Process](https://medium.com/s1seven/running-nestjs-queues-in-a-separate-process-948f414c4b41) -- architecture for API + worker separation
+- [NestJS Monorepo Setup (DEV Community)](https://dev.to/asibul_hasan_5fe57cd945b8/setup-monorepo-in-nestjs-dj4) -- practical walkthrough of nest generate app conversion
+- [NestJS Monorepos Without the Meltdown](https://medium.com/@bhagyarana80/nestjs-monorepos-without-the-meltdown-3a155795ea94) -- best practices for NestJS monorepo structure
 
 ---
-*Feature research for: Quote delivery and customer response in Trade Flow v1.3*
-*Researched: 2026-03-15*
+*Feature research for: NestJS monorepo, BullMQ worker service, Redis queue infrastructure*
+*Researched: 2026-03-22*
