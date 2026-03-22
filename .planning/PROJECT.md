@@ -79,7 +79,7 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - [ ] Monorepo directory restructure for API + worker services with shared code
 - [x] BullMQ integration via @nestjs/bullmq with Redis backing (REDIS_URL) -- Validated in Phase 20
 - [x] Redis added to Docker Compose for local development -- Validated in Phase 20
-- [ ] Worker service scaffold with own NestJS application entry point
+- [x] Worker service scaffold with own NestJS application entry point -- Validated in Phase 22
 - [ ] Shared module pattern allowing worker to import API services
 - [x] Environment variables and configuration for Redis connection -- Validated in Phase 20
 - [ ] Nodemon hot reload for worker service in development
@@ -203,4 +203,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-22 after Phase 21 (Queue Module) completed*
+*Last updated: 2026-03-22 after Phase 22 (Worker Service Scaffold) completed*
