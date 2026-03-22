@@ -77,11 +77,11 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 <!-- Requirements for v1.4 -- defined via /gsd:new-milestone -->
 
 - [ ] Monorepo directory restructure for API + worker services with shared code
-- [ ] BullMQ integration via @nestjs/bullmq with Redis backing (REDIS_URL)
-- [ ] Redis added to Docker Compose for local development
+- [x] BullMQ integration via @nestjs/bullmq with Redis backing (REDIS_URL) -- Validated in Phase 20
+- [x] Redis added to Docker Compose for local development -- Validated in Phase 20
 - [ ] Worker service scaffold with own NestJS application entry point
 - [ ] Shared module pattern allowing worker to import API services
-- [ ] Environment variables and configuration for Redis connection
+- [x] Environment variables and configuration for Redis connection -- Validated in Phase 20
 - [ ] Nodemon hot reload for worker service in development
 
 ## Current Milestone: v1.4 Monorepo & Worker Infrastructure
@@ -203,4 +203,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-22 after v1.4 milestone started*
+*Last updated: 2026-03-22 after Phase 20 (Infrastructure Foundation) completed*
