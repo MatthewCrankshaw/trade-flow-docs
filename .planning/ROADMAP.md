@@ -124,11 +124,11 @@ Plans:
   2. `npm run worker:prod` starts the worker from compiled `dist/worker.js` for production deployment
   3. `docker compose up` starts API, worker, MongoDB, and Redis as four separate services, with worker processing jobs enqueued by the API
   4. Multi-stage Dockerfile builds a production worker image that runs `node dist/worker.js` without dev dependencies
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 23-01: TBD
-- [ ] 23-02: TBD
+- [ ] 23-01-PLAN.md — Worker nodemon config and npm scripts (worker:dev, worker:prod, build:all)
+- [ ] 23-02-PLAN.md — Docker Compose worker service and Dockerfile worker production stage
 
 ## Progress
 
@@ -156,4 +156,4 @@ Plans:
 | 20. Infrastructure Foundation | v1.4 | 2/2 | Complete    | 2026-03-22 |
 | 21. Queue Module | v1.4 | 1/1 | Complete    | 2026-03-22 |
 | 22. Worker Service Scaffold | v1.4 | 2/2 | Complete    | 2026-03-22 |
-| 23. Developer Experience | v1.4 | 0/? | Not started | - |
+| 23. Developer Experience | v1.4 | 0/2 | Not started | - |
