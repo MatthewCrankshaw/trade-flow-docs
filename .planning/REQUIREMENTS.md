@@ -11,8 +11,8 @@ Requirements for Monorepo & Worker Infrastructure milestone. Each maps to roadma
 
 - [x] **INFRA-01**: Redis 7.4 service runs in Docker Compose with `maxmemory-policy noeviction`
 - [x] **INFRA-02**: `REDIS_URL` environment variable configured via existing ConfigService pattern
-- [ ] **INFRA-03**: `@nestjs/bullmq`, `bullmq`, and `ioredis` npm dependencies installed with correct versions
-- [ ] **INFRA-04**: `@queue/*` and `@worker/*` path aliases added to tsconfig.json, tsconfig.build.json, tsconfig-check.json, and Jest moduleNameMapper
+- [x] **INFRA-03**: `@nestjs/bullmq`, `bullmq`, and `ioredis` npm dependencies installed with correct versions
+- [x] **INFRA-04**: `@queue/*` and `@worker/*` path aliases added to tsconfig.json, tsconfig.build.json, tsconfig-check.json, and Jest moduleNameMapper
 
 ### Queue System
 
@@ -80,8 +80,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | INFRA-01 | Phase 20 | Complete |
 | INFRA-02 | Phase 20 | Complete |
-| INFRA-03 | Phase 20 | Pending |
-| INFRA-04 | Phase 20 | Pending |
+| INFRA-03 | Phase 20 | Complete |
+| INFRA-04 | Phase 20 | Complete |
 | QUEUE-01 | Phase 21 | Pending |
 | QUEUE-02 | Phase 21 | Pending |
 | QUEUE-03 | Phase 21 | Pending |

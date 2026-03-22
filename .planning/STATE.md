@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Monorepo & Worker Infrastructure
 status: unknown
-stopped_at: Completed 20-02-PLAN.md
-last_updated: "2026-03-22T14:47:58.952Z"
+stopped_at: Completed 20-01-PLAN.md
+last_updated: "2026-03-22T14:48:48.728Z"
 progress:
   total_phases: 4
   completed_phases: 0
@@ -42,6 +42,7 @@ Plan: 2 of 2
 | v1.2 Bundles & Quotes | 4 | 12 | ~30 min | 3min |
 | v1.3 Send Quotes | 5 | 18 | ~1 hour | 3min |
 | Phase 20-infrastructure-foundation P02 | 1min | 2 tasks | 2 files |
+| Phase 20-infrastructure-foundation P01 | 2min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -54,6 +55,7 @@ Recent decisions affecting current work:
 - [v1.4]: Redis `maxmemory-policy noeviction` required from day one -- BullMQ silently loses jobs otherwise
 - [v1.4]: Worker uses `createApplicationContext()` -- no HTTP server needed
 - [Phase 20-02]: No Redis volume -- ephemeral storage for transient BullMQ jobs
+- [Phase 20-infrastructure-foundation]: BullMQ packages as production deps; path aliases only in tsconfig.json (build/check inherit via extends)
 
 ### Pending Todos
 
@@ -79,6 +81,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-22T14:47:58.949Z
-Stopped at: Completed 20-02-PLAN.md
+Last session: 2026-03-22T14:48:48.725Z
+Stopped at: Completed 20-01-PLAN.md
 Resume file: None
