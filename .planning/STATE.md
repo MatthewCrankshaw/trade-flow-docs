@@ -1,9 +1,9 @@
 ---
 gsd_state_version: 1.0
-milestone: null
-milestone_name: null
-status: between_milestones
-last_updated: "2026-03-21"
+milestone: v1.4
+milestone_name: Monorepo & Worker Infrastructure
+status: defining_requirements
+last_updated: "2026-03-22"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -15,14 +15,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-21)
+See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Planning next milestone
+**Current focus:** Defining requirements for v1.4 Monorepo & Worker Infrastructure
 
 ## Current Position
 
-Between milestones. v1.3 Send Quotes shipped 2026-03-21.
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-22 — Milestone v1.4 started
 
 ## Performance Metrics
 

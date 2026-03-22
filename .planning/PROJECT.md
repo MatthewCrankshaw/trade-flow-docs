@@ -74,9 +74,25 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 
 ### Active
 
-<!-- Requirements for next milestone -- defined via /gsd:new-milestone -->
+<!-- Requirements for v1.4 -- defined via /gsd:new-milestone -->
 
-(None yet -- run `/gsd:new-milestone` to define next milestone requirements)
+- [ ] Monorepo directory restructure for API + worker services with shared code
+- [ ] BullMQ integration via @nestjs/bullmq with Redis backing
+- [ ] Redis added to Docker Compose for local development
+- [ ] Worker service scaffold with own NestJS application entry point
+- [ ] Shared module pattern allowing worker to import API services
+- [ ] Environment variables and configuration for Redis connection
+- [ ] Nodemon hot reload for worker service in development
+
+## Current Milestone: v1.4 Monorepo & Worker Infrastructure
+
+**Goal:** Prepare trade-flow-api as a monorepo with two independently deployable NestJS services -- the existing API and a new background worker -- connected via BullMQ/Redis.
+
+**Target features:**
+- Monorepo directory restructure (API + worker as sibling services, shared code access)
+- BullMQ queue integration with @nestjs/bullmq and Redis
+- Worker service scaffold (own main.ts, own NestJS app, nodemon hot reload)
+- Docker Compose and environment config for Redis
 
 ### Out of Scope
 
@@ -123,6 +139,7 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - **Bundles & Quotes shipped (v1.2):** Bundle creation/editing with SearchableItemPicker, quote system with creation dialog, list, detail view, line item management (add/edit/delete), expandable bundle rows, tax-inclusive totals, mobile-responsive card layout, status transitions (Draft/Sent/Accepted/Rejected)
 - **Send Quotes shipped (v1.3):** Quote deletion, token infrastructure, customer-facing quote page with view tracking, email sending with configurable templates and Tiptap rich text editor, customer accept/decline with notification emails
 - **Codebase size:** ~21.9k LOC API (TypeScript) + ~23.9k LOC UI (TypeScript/TSX)
+- **Monetization roadmap:** Future milestones will add Stripe subscription billing, async payment processing via BullMQ queues, and scheduled reminder emails -- v1.4 lays the infrastructure foundation
 
 ## Constraints
 
@@ -168,5 +185,22 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 | Failure-tolerant notification emails | Email failure doesn't block status transition; try/catch with logging | ✓ Good -- resilient |
 | PDF generation deferred from v1.3 | Reduced scope to ship core send/respond flow faster | — Pending review |
 
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd:transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd:complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
 ---
-*Last updated: 2026-03-21 after v1.3 milestone completion*
+*Last updated: 2026-03-22 after v1.4 milestone started*
