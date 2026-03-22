@@ -93,12 +93,12 @@ Plans:
 **Requirements**: QUEUE-01, QUEUE-02, QUEUE-03
 **Success Criteria** (what must be TRUE):
   1. `src/queue/queue.module.ts` exports `BullModule.forRootAsync()` configured via ConfigService for Redis connection
-  2. Queue name constants in `src/queue/queue.constants.ts` define at least one queue name used by both producer and consumer code
+  2. Queue name constants in `src/queue/queue.constant.ts` define at least one queue name used by both producer and consumer code
   3. The existing API (`npm run start:dev`) boots without errors with QueueModule imported into AppModule, and connects to Redis on startup
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 21-01: TBD
+- [ ] 21-01-PLAN.md — Create QueueModule, QueueProducer service, queue constants, and wire into AppModule
 
 ### Phase 22: Worker Service Scaffold
 **Goal**: A standalone worker process boots as a separate NestJS application context, picks up jobs from the queue, and logs them -- proving end-to-end queue flow
@@ -154,6 +154,6 @@ Plans:
 | 18. Quote Email Sending | v1.3 | 7/7 | Complete | 2026-03-21 |
 | 19. Customer Response | v1.3 | 3/3 | Complete | 2026-03-21 |
 | 20. Infrastructure Foundation | v1.4 | 2/2 | Complete    | 2026-03-22 |
-| 21. Queue Module | v1.4 | 0/? | Not started | - |
+| 21. Queue Module | v1.4 | 0/1 | Not started | - |
 | 22. Worker Service Scaffold | v1.4 | 0/? | Not started | - |
 | 23. Developer Experience | v1.4 | 0/? | Not started | - |
