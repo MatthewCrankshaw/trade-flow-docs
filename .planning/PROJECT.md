@@ -77,7 +77,7 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 <!-- Requirements for v1.4 -- defined via /gsd:new-milestone -->
 
 - [ ] Monorepo directory restructure for API + worker services with shared code
-- [ ] BullMQ integration via @nestjs/bullmq with Redis backing
+- [ ] BullMQ integration via @nestjs/bullmq with Redis backing (REDIS_URL)
 - [ ] Redis added to Docker Compose for local development
 - [ ] Worker service scaffold with own NestJS application entry point
 - [ ] Shared module pattern allowing worker to import API services

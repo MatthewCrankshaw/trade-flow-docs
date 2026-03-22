@@ -6,6 +6,7 @@
 - v1.1 Item Tax Rate Linkage -- Phases 9-10 (shipped 2020-03-08)
 - v1.2 Bundles & Quotes -- Phases 11-14 (shipped 2020-03-15)
 - v1.3 Send Quotes -- Phases 15-19 (shipped 2026-03-21)
+- v1.4 Monorepo & Worker Infrastructure -- Phases 20-23 (in progress)
 
 ## Phases
 
@@ -60,6 +61,75 @@ Full details: `.planning/milestones/v1.3-ROADMAP.md`
 
 </details>
 
+### v1.4 Monorepo & Worker Infrastructure (In Progress)
+
+**Milestone Goal:** Prepare trade-flow-api as a monorepo with two independently deployable NestJS services -- the existing API and a new background worker -- connected via BullMQ/Redis.
+
+- [ ] **Phase 20: Infrastructure Foundation** - Redis, npm dependencies, path aliases, and environment config
+- [ ] **Phase 21: Queue Module** - Shared BullMQ configuration and queue name constants wired into API
+- [ ] **Phase 22: Worker Service Scaffold** - Worker entry point, WorkerModule, and echo processor proving end-to-end flow
+- [ ] **Phase 23: Developer Experience** - Hot reload, production scripts, Docker Compose worker service, and Dockerfile stage
+
+## Phase Details
+
+### Phase 20: Infrastructure Foundation
+**Goal**: All prerequisites for BullMQ queue processing are installed and configured -- Redis runs locally, dependencies are available, and path aliases resolve correctly
+**Depends on**: Nothing (first phase of v1.4)
+**Requirements**: INFRA-01, INFRA-02, INFRA-03, INFRA-04
+**Success Criteria** (what must be TRUE):
+  1. `docker compose up` starts a Redis 7.4 container alongside MongoDB with `maxmemory-policy noeviction` confirmed via `redis-cli CONFIG GET maxmemory-policy`
+  2. `REDIS_URL` environment variable is read via ConfigService and documented in `.env.example`
+  3. `@nestjs/bullmq`, `bullmq`, and `ioredis` are installed and `npm run validate` passes with zero TypeScript errors
+  4. Imports using `@queue/*` and `@worker/*` path aliases compile successfully across `tsc`, Jest, and NestJS build
+**Plans**: TBD
+
+Plans:
+- [ ] 20-01: TBD
+- [ ] 20-02: TBD
+
+### Phase 21: Queue Module
+**Goal**: A shared queue module connects the API to Redis via BullMQ, with queue name constants as a single source of truth for producers and consumers
+**Depends on**: Phase 20
+**Requirements**: QUEUE-01, QUEUE-02, QUEUE-03
+**Success Criteria** (what must be TRUE):
+  1. `src/queue/queue.module.ts` exports `BullModule.forRootAsync()` configured via ConfigService for Redis connection
+  2. Queue name constants in `src/queue/queue.constants.ts` define at least one queue name used by both producer and consumer code
+  3. The existing API (`npm run start:dev`) boots without errors with QueueModule imported into AppModule, and connects to Redis on startup
+**Plans**: TBD
+
+Plans:
+- [ ] 21-01: TBD
+
+### Phase 22: Worker Service Scaffold
+**Goal**: A standalone worker process boots as a separate NestJS application context, picks up jobs from the queue, and logs them -- proving end-to-end queue flow
+**Depends on**: Phase 21
+**Requirements**: WORK-01, WORK-02, WORK-03, WORK-04
+**Success Criteria** (what must be TRUE):
+  1. `src/worker.ts` boots via `NestFactory.createApplicationContext(WorkerModule)` without starting an HTTP server, and shuts down cleanly on SIGTERM
+  2. `WorkerModule` imports only CoreModule, ConfigModule, LoggerModule, and QueueModule -- not AppModule or any HTTP-related modules
+  3. An echo `@Processor` receives a test job enqueued by the API and logs the payload, proving end-to-end queue flow from API to worker
+  4. `nest build --config worker-cli.json` produces a separate `dist/worker.js` entry point that runs independently of `dist/main.js`
+**Plans**: TBD
+
+Plans:
+- [ ] 22-01: TBD
+- [ ] 22-02: TBD
+
+### Phase 23: Developer Experience
+**Goal**: Both API and worker can be developed and deployed independently with hot reload, production scripts, and containerized local development
+**Depends on**: Phase 22
+**Requirements**: DEVX-01, DEVX-02, DEVX-03, DEVX-04
+**Success Criteria** (what must be TRUE):
+  1. `npm run worker:dev` starts the worker with nodemon hot reload -- saving a file in `src/` triggers automatic restart
+  2. `npm run worker:prod` starts the worker from compiled `dist/worker.js` for production deployment
+  3. `docker compose up` starts API, worker, MongoDB, and Redis as four separate services, with worker processing jobs enqueued by the API
+  4. Multi-stage Dockerfile builds a production worker image that runs `node dist/worker.js` without dev dependencies
+**Plans**: TBD
+
+Plans:
+- [ ] 23-01: TBD
+- [ ] 23-02: TBD
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -83,3 +153,7 @@ Full details: `.planning/milestones/v1.3-ROADMAP.md`
 | 17. Customer Quote Page | v1.3 | 4/4 | Complete | 2026-03-20 |
 | 18. Quote Email Sending | v1.3 | 7/7 | Complete | 2026-03-21 |
 | 19. Customer Response | v1.3 | 3/3 | Complete | 2026-03-21 |
+| 20. Infrastructure Foundation | v1.4 | 0/? | Not started | - |
+| 21. Queue Module | v1.4 | 0/? | Not started | - |
+| 22. Worker Service Scaffold | v1.4 | 0/? | Not started | - |
+| 23. Developer Experience | v1.4 | 0/? | Not started | - |

@@ -10,7 +10,7 @@ Requirements for Monorepo & Worker Infrastructure milestone. Each maps to roadma
 ### Infrastructure
 
 - [ ] **INFRA-01**: Redis 7.4 service runs in Docker Compose with `maxmemory-policy noeviction`
-- [ ] **INFRA-02**: `REDIS_HOST` and `REDIS_PORT` environment variables configured via existing ConfigService pattern
+- [ ] **INFRA-02**: `REDIS_URL` environment variable configured via existing ConfigService pattern
 - [ ] **INFRA-03**: `@nestjs/bullmq`, `bullmq`, and `ioredis` npm dependencies installed with correct versions
 - [ ] **INFRA-04**: `@queue/*` and `@worker/*` path aliases added to tsconfig.json, tsconfig.build.json, tsconfig-check.json, and Jest moduleNameMapper
 
@@ -78,27 +78,27 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | — | Pending |
-| INFRA-02 | — | Pending |
-| INFRA-03 | — | Pending |
-| INFRA-04 | — | Pending |
-| QUEUE-01 | — | Pending |
-| QUEUE-02 | — | Pending |
-| QUEUE-03 | — | Pending |
-| WORK-01 | — | Pending |
-| WORK-02 | — | Pending |
-| WORK-03 | — | Pending |
-| WORK-04 | — | Pending |
-| DEVX-01 | — | Pending |
-| DEVX-02 | — | Pending |
-| DEVX-03 | — | Pending |
-| DEVX-04 | — | Pending |
+| INFRA-01 | Phase 20 | Pending |
+| INFRA-02 | Phase 20 | Pending |
+| INFRA-03 | Phase 20 | Pending |
+| INFRA-04 | Phase 20 | Pending |
+| QUEUE-01 | Phase 21 | Pending |
+| QUEUE-02 | Phase 21 | Pending |
+| QUEUE-03 | Phase 21 | Pending |
+| WORK-01 | Phase 22 | Pending |
+| WORK-02 | Phase 22 | Pending |
+| WORK-03 | Phase 22 | Pending |
+| WORK-04 | Phase 22 | Pending |
+| DEVX-01 | Phase 23 | Pending |
+| DEVX-02 | Phase 23 | Pending |
+| DEVX-03 | Phase 23 | Pending |
+| DEVX-04 | Phase 23 | Pending |
 
 **Coverage:**
 - v1.4 requirements: 15 total
-- Mapped to phases: 0
-- Unmapped: 15 ⚠️
+- Mapped to phases: 15
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-22*
-*Last updated: 2026-03-22 after initial definition*
+*Last updated: 2026-03-22 after roadmap creation*

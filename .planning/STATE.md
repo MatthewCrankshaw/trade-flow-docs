@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Monorepo & Worker Infrastructure
-status: defining_requirements
+status: ready_to_plan
 last_updated: "2026-03-22"
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -18,14 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Defining requirements for v1.4 Monorepo & Worker Infrastructure
+**Current focus:** Phase 20 - Infrastructure Foundation (v1.4)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-22 — Milestone v1.4 started
+Phase: 20 (1 of 4 in v1.4) — Infrastructure Foundation
+Plan: 0 of ? in current phase
+Status: Ready to plan
+Last activity: 2026-03-22 — Roadmap created for v1.4
+
+Progress (v1.4): [..........] 0%
 
 ## Performance Metrics
 
@@ -48,6 +50,11 @@ Last activity: 2026-03-22 — Milestone v1.4 started
 ### Decisions
 
 Key decisions archived in PROJECT.md Key Decisions table.
+Recent decisions affecting current work:
+
+- [v1.4]: Dual entry-point pattern over NestJS CLI monorepo mode -- preserves 20+ path aliases, avoids webpack
+- [v1.4]: Redis `maxmemory-policy noeviction` required from day one -- BullMQ silently loses jobs otherwise
+- [v1.4]: Worker uses `createApplicationContext()` -- no HTTP server needed
 
 ### Pending Todos
 
@@ -73,6 +80,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-21
-Stopped at: Completed 260321-tua quick task
+Last session: 2026-03-22
+Stopped at: Roadmap created for v1.4 milestone
 Resume file: None
