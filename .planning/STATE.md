@@ -2,8 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Monorepo & Worker Infrastructure
-status: ready_to_plan
-last_updated: "2026-03-22"
+status: unknown
+stopped_at: Completed 20-02-PLAN.md
+last_updated: "2026-03-22T14:47:58.952Z"
 progress:
   total_phases: 4
   completed_phases: 0
@@ -18,16 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 20 - Infrastructure Foundation (v1.4)
+**Current focus:** Phase 20 — infrastructure-foundation
 
 ## Current Position
 
-Phase: 20 (1 of 4 in v1.4) — Infrastructure Foundation
-Plan: 0 of ? in current phase
-Status: Ready to plan
-Last activity: 2026-03-22 — Roadmap created for v1.4
-
-Progress (v1.4): [..........] 0%
+Phase: 20 (infrastructure-foundation) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -44,6 +41,7 @@ Progress (v1.4): [..........] 0%
 | v1.1 Item Tax Rate Linkage | 2 | 6 | ~1 hour | 4min |
 | v1.2 Bundles & Quotes | 4 | 12 | ~30 min | 3min |
 | v1.3 Send Quotes | 5 | 18 | ~1 hour | 3min |
+| Phase 20-infrastructure-foundation P02 | 1min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -55,6 +53,7 @@ Recent decisions affecting current work:
 - [v1.4]: Dual entry-point pattern over NestJS CLI monorepo mode -- preserves 20+ path aliases, avoids webpack
 - [v1.4]: Redis `maxmemory-policy noeviction` required from day one -- BullMQ silently loses jobs otherwise
 - [v1.4]: Worker uses `createApplicationContext()` -- no HTTP server needed
+- [Phase 20-02]: No Redis volume -- ephemeral storage for transient BullMQ jobs
 
 ### Pending Todos
 
@@ -80,6 +79,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-22
-Stopped at: Roadmap created for v1.4 milestone
+Last session: 2026-03-22T14:47:58.949Z
+Stopped at: Completed 20-02-PLAN.md
 Resume file: None

@@ -85,7 +85,7 @@ Full details: `.planning/milestones/v1.3-ROADMAP.md`
 
 Plans:
 - [ ] 20-01-PLAN.md — Install BullMQ dependencies and register path aliases
-- [ ] 20-02-PLAN.md — Add Redis Docker service and configure REDIS_URL environment
+- [x] 20-02-PLAN.md — Add Redis Docker service and configure REDIS_URL environment
 
 ### Phase 21: Queue Module
 **Goal**: A shared queue module connects the API to Redis via BullMQ, with queue name constants as a single source of truth for producers and consumers
@@ -153,7 +153,7 @@ Plans:
 | 17. Customer Quote Page | v1.3 | 4/4 | Complete | 2026-03-20 |
 | 18. Quote Email Sending | v1.3 | 7/7 | Complete | 2026-03-21 |
 | 19. Customer Response | v1.3 | 3/3 | Complete | 2026-03-21 |
-| 20. Infrastructure Foundation | v1.4 | 0/2 | Not started | - |
+| 20. Infrastructure Foundation | v1.4 | 1/2 | In Progress|  |
 | 21. Queue Module | v1.4 | 0/? | Not started | - |
 | 22. Worker Service Scaffold | v1.4 | 0/? | Not started | - |
 | 23. Developer Experience | v1.4 | 0/? | Not started | - |
