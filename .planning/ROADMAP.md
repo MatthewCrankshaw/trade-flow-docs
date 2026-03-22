@@ -155,5 +155,5 @@ Plans:
 | 19. Customer Response | v1.3 | 3/3 | Complete | 2026-03-21 |
 | 20. Infrastructure Foundation | v1.4 | 2/2 | Complete    | 2026-03-22 |
 | 21. Queue Module | v1.4 | 1/1 | Complete    | 2026-03-22 |
-| 22. Worker Service Scaffold | v1.4 | 2/2 | Complete   | 2026-03-22 |
+| 22. Worker Service Scaffold | v1.4 | 2/2 | Complete    | 2026-03-22 |
 | 23. Developer Experience | v1.4 | 0/? | Not started | - |
