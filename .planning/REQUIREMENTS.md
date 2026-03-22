@@ -31,8 +31,8 @@ Requirements for Monorepo & Worker Infrastructure milestone. Each maps to roadma
 
 - [x] **DEVX-01**: `nodemon-worker.json` and `npm run worker:dev` script for hot-reload development
 - [x] **DEVX-02**: `npm run worker:prod` script for production worker startup
-- [ ] **DEVX-03**: Worker runs as separate Docker Compose service in local dev environment
-- [ ] **DEVX-04**: Multi-stage Dockerfile updated with worker production stage
+- [x] **DEVX-03**: Worker runs as separate Docker Compose service in local dev environment
+- [x] **DEVX-04**: Multi-stage Dockerfile updated with worker production stage
 
 ## Future Requirements
 
@@ -91,8 +91,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | WORK-04 | Phase 22 | Complete |
 | DEVX-01 | Phase 23 | Complete |
 | DEVX-02 | Phase 23 | Complete |
-| DEVX-03 | Phase 23 | Pending |
-| DEVX-04 | Phase 23 | Pending |
+| DEVX-03 | Phase 23 | Complete |
+| DEVX-04 | Phase 23 | Complete |
 
 **Coverage:**
 - v1.4 requirements: 15 total
