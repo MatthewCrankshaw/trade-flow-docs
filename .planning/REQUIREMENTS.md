@@ -22,10 +22,10 @@ Requirements for Monorepo & Worker Infrastructure milestone. Each maps to roadma
 
 ### Worker Service
 
-- [ ] **WORK-01**: `src/worker.ts` entry point using `NestFactory.createApplicationContext()` with SIGTERM graceful shutdown
-- [ ] **WORK-02**: `WorkerModule` imports only CoreModule, ConfigModule, LoggerModule, and QueueModule (not full AppModule)
-- [ ] **WORK-03**: Echo `@Processor` that logs received jobs, proving end-to-end queue flow
-- [ ] **WORK-04**: `worker-cli.json` with `entryFile: "worker"` for independent build/start
+- [x] **WORK-01**: `src/worker.ts` entry point using `NestFactory.createApplicationContext()` with SIGTERM graceful shutdown
+- [x] **WORK-02**: `WorkerModule` imports only CoreModule, ConfigModule, LoggerModule, and QueueModule (not full AppModule)
+- [x] **WORK-03**: Echo `@Processor` that logs received jobs, proving end-to-end queue flow
+- [x] **WORK-04**: `worker-cli.json` with `entryFile: "worker"` for independent build/start
 
 ### Developer Experience
 
@@ -85,10 +85,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QUEUE-01 | Phase 21 | Complete |
 | QUEUE-02 | Phase 21 | Complete |
 | QUEUE-03 | Phase 21 | Complete |
-| WORK-01 | Phase 22 | Pending |
-| WORK-02 | Phase 22 | Pending |
-| WORK-03 | Phase 22 | Pending |
-| WORK-04 | Phase 22 | Pending |
+| WORK-01 | Phase 22 | Complete |
+| WORK-02 | Phase 22 | Complete |
+| WORK-03 | Phase 22 | Complete |
+| WORK-04 | Phase 22 | Complete |
 | DEVX-01 | Phase 23 | Pending |
 | DEVX-02 | Phase 23 | Pending |
 | DEVX-03 | Phase 23 | Pending |

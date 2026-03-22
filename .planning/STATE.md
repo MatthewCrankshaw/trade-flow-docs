@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Monorepo & Worker Infrastructure
 status: unknown
-stopped_at: Completed 21-01-PLAN.md
-last_updated: "2026-03-22T15:43:08.228Z"
+stopped_at: Completed 22-01-PLAN.md
+last_updated: "2026-03-22T15:51:42.702Z"
 progress:
   total_phases: 4
   completed_phases: 0
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 21 — queue-module
+**Current focus:** Phase 22 — worker-service-scaffold
 
 ## Current Position
 
-Phase: 22
-Plan: Not started
+Phase: 22 (worker-service-scaffold) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -44,6 +44,8 @@ Plan: Not started
 | Phase 20-infrastructure-foundation P02 | 1min | 2 tasks | 2 files |
 | Phase 20-infrastructure-foundation P01 | 2min | 2 tasks | 5 files |
 | Phase 21-queue-module P01 | 4min | 2 tasks | 5 files |
+| Phase 22 P01 | 2min | 2 tasks | 7 files |
+| Phase 22 P02 | 2min | 1 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -58,6 +60,9 @@ Recent decisions affecting current work:
 - [Phase 20-02]: No Redis volume -- ephemeral storage for transient BullMQ jobs
 - [Phase 20-infrastructure-foundation]: BullMQ packages as production deps; path aliases only in tsconfig.json (build/check inherit via extends)
 - [Phase 21-queue-module]: IORedis instance cast to ConnectionOptions via as unknown as to resolve type mismatch between top-level ioredis and bullmq bundled ioredis
+- [Phase 22]: CoreModule included in WorkerModule -- MongoConnectionService requires MONGO_URL
+- [Phase 22]: ThrottlerGuard overridden in unit test following PublicQuoteController test pattern
+- [Phase 22]: deleteOutDir:false in worker-cli.json prevents clobbering dist/main.js during worker build
 
 ### Pending Todos
 
@@ -83,6 +88,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-22T15:38:05.117Z
-Stopped at: Completed 21-01-PLAN.md
+Last session: 2026-03-22T15:51:42.700Z
+Stopped at: Completed 22-01-PLAN.md
 Resume file: None

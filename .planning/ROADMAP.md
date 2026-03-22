@@ -67,7 +67,7 @@ Full details: `.planning/milestones/v1.3-ROADMAP.md`
 
 - [x] **Phase 20: Infrastructure Foundation** - Redis, npm dependencies, path aliases, and environment config (completed 2026-03-22)
 - [x] **Phase 21: Queue Module** - Shared BullMQ configuration and queue name constants wired into API (completed 2026-03-22)
-- [ ] **Phase 22: Worker Service Scaffold** - Worker entry point, WorkerModule, and echo processor proving end-to-end flow
+- [x] **Phase 22: Worker Service Scaffold** - Worker entry point, WorkerModule, and echo processor proving end-to-end flow (completed 2026-03-22)
 - [ ] **Phase 23: Developer Experience** - Hot reload, production scripts, Docker Compose worker service, and Dockerfile stage
 
 ## Phase Details
@@ -112,8 +112,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 22-01-PLAN.md — Worker entry point, WorkerModule, EchoProcessor, logger config, and worker-cli.json build
-- [ ] 22-02-PLAN.md — QueueController with POST /v1/queue/test-echo diagnostic endpoint
+- [x] 22-01-PLAN.md — Worker entry point, WorkerModule, EchoProcessor, logger config, and worker-cli.json build
+- [x] 22-02-PLAN.md — QueueController with POST /v1/queue/test-echo diagnostic endpoint
 
 ### Phase 23: Developer Experience
 **Goal**: Both API and worker can be developed and deployed independently with hot reload, production scripts, and containerized local development
@@ -155,5 +155,5 @@ Plans:
 | 19. Customer Response | v1.3 | 3/3 | Complete | 2026-03-21 |
 | 20. Infrastructure Foundation | v1.4 | 2/2 | Complete    | 2026-03-22 |
 | 21. Queue Module | v1.4 | 1/1 | Complete    | 2026-03-22 |
-| 22. Worker Service Scaffold | v1.4 | 0/2 | Not started | - |
+| 22. Worker Service Scaffold | v1.4 | 2/2 | Complete   | 2026-03-22 |
 | 23. Developer Experience | v1.4 | 0/? | Not started | - |
