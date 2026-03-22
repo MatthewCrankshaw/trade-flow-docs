@@ -82,7 +82,8 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - [x] Worker service scaffold with own NestJS application entry point -- Validated in Phase 22
 - [ ] Shared module pattern allowing worker to import API services
 - [x] Environment variables and configuration for Redis connection -- Validated in Phase 20
-- [ ] Nodemon hot reload for worker service in development
+- [x] Nodemon hot reload for worker service in development -- Validated in Phase 23
+- [x] Worker Docker Compose service and Dockerfile production stage -- Validated in Phase 23
 
 ## Current Milestone: v1.4 Monorepo & Worker Infrastructure
 
@@ -203,4 +204,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-22 after Phase 22 (Worker Service Scaffold) completed*
+*Last updated: 2026-03-22 after Phase 23 (Developer Experience) completed*
