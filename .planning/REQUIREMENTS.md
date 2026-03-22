@@ -16,9 +16,9 @@ Requirements for Monorepo & Worker Infrastructure milestone. Each maps to roadma
 
 ### Queue System
 
-- [ ] **QUEUE-01**: Shared `QueueModule` with `BullModule.forRootAsync()` using ConfigService for Redis connection
-- [ ] **QUEUE-02**: Queue name constants file (`QUEUE_NAMES`) as single source of truth for producer and consumer
-- [ ] **QUEUE-03**: `QueueModule` imported into `AppModule` -- API connects to Redis and can enqueue jobs
+- [x] **QUEUE-01**: Shared `QueueModule` with `BullModule.forRootAsync()` using ConfigService for Redis connection
+- [x] **QUEUE-02**: Queue name constants file (`QUEUE_NAMES`) as single source of truth for producer and consumer
+- [x] **QUEUE-03**: `QueueModule` imported into `AppModule` -- API connects to Redis and can enqueue jobs
 
 ### Worker Service
 
@@ -82,9 +82,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-02 | Phase 20 | Complete |
 | INFRA-03 | Phase 20 | Complete |
 | INFRA-04 | Phase 20 | Complete |
-| QUEUE-01 | Phase 21 | Pending |
-| QUEUE-02 | Phase 21 | Pending |
-| QUEUE-03 | Phase 21 | Pending |
+| QUEUE-01 | Phase 21 | Complete |
+| QUEUE-02 | Phase 21 | Complete |
+| QUEUE-03 | Phase 21 | Complete |
 | WORK-01 | Phase 22 | Pending |
 | WORK-02 | Phase 22 | Pending |
 | WORK-03 | Phase 22 | Pending |

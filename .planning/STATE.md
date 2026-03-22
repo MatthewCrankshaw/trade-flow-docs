@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Monorepo & Worker Infrastructure
 status: unknown
-stopped_at: Completed 20-01-PLAN.md
-last_updated: "2026-03-22T14:52:00.831Z"
+stopped_at: Completed 21-01-PLAN.md
+last_updated: "2026-03-22T15:38:05.119Z"
 progress:
   total_phases: 4
   completed_phases: 0
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 20 — infrastructure-foundation
+**Current focus:** Phase 21 — queue-module
 
 ## Current Position
 
-Phase: 21
-Plan: Not started
+Phase: 21 (queue-module) — EXECUTING
+Plan: 1 of 1
 
 ## Performance Metrics
 
@@ -43,6 +43,7 @@ Plan: Not started
 | v1.3 Send Quotes | 5 | 18 | ~1 hour | 3min |
 | Phase 20-infrastructure-foundation P02 | 1min | 2 tasks | 2 files |
 | Phase 20-infrastructure-foundation P01 | 2min | 2 tasks | 5 files |
+| Phase 21-queue-module P01 | 4min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -56,6 +57,7 @@ Recent decisions affecting current work:
 - [v1.4]: Worker uses `createApplicationContext()` -- no HTTP server needed
 - [Phase 20-02]: No Redis volume -- ephemeral storage for transient BullMQ jobs
 - [Phase 20-infrastructure-foundation]: BullMQ packages as production deps; path aliases only in tsconfig.json (build/check inherit via extends)
+- [Phase 21-queue-module]: IORedis instance cast to ConnectionOptions via as unknown as to resolve type mismatch between top-level ioredis and bullmq bundled ioredis
 
 ### Pending Todos
 
@@ -81,6 +83,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-22T14:48:48.725Z
-Stopped at: Completed 20-01-PLAN.md
+Last session: 2026-03-22T15:38:05.117Z
+Stopped at: Completed 21-01-PLAN.md
 Resume file: None

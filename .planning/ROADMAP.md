@@ -66,7 +66,7 @@ Full details: `.planning/milestones/v1.3-ROADMAP.md`
 **Milestone Goal:** Prepare trade-flow-api as a monorepo with two independently deployable NestJS services -- the existing API and a new background worker -- connected via BullMQ/Redis.
 
 - [x] **Phase 20: Infrastructure Foundation** - Redis, npm dependencies, path aliases, and environment config (completed 2026-03-22)
-- [ ] **Phase 21: Queue Module** - Shared BullMQ configuration and queue name constants wired into API
+- [x] **Phase 21: Queue Module** - Shared BullMQ configuration and queue name constants wired into API (completed 2026-03-22)
 - [ ] **Phase 22: Worker Service Scaffold** - Worker entry point, WorkerModule, and echo processor proving end-to-end flow
 - [ ] **Phase 23: Developer Experience** - Hot reload, production scripts, Docker Compose worker service, and Dockerfile stage
 
@@ -98,7 +98,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 21-01-PLAN.md — Create QueueModule, QueueProducer service, queue constants, and wire into AppModule
+- [x] 21-01-PLAN.md — Create QueueModule, QueueProducer service, queue constants, and wire into AppModule
 
 ### Phase 22: Worker Service Scaffold
 **Goal**: A standalone worker process boots as a separate NestJS application context, picks up jobs from the queue, and logs them -- proving end-to-end queue flow
@@ -154,6 +154,6 @@ Plans:
 | 18. Quote Email Sending | v1.3 | 7/7 | Complete | 2026-03-21 |
 | 19. Customer Response | v1.3 | 3/3 | Complete | 2026-03-21 |
 | 20. Infrastructure Foundation | v1.4 | 2/2 | Complete    | 2026-03-22 |
-| 21. Queue Module | v1.4 | 0/1 | Not started | - |
+| 21. Queue Module | v1.4 | 1/1 | Complete   | 2026-03-22 |
 | 22. Worker Service Scaffold | v1.4 | 0/? | Not started | - |
 | 23. Developer Experience | v1.4 | 0/? | Not started | - |
