@@ -109,11 +109,11 @@ Plans:
   2. `WorkerModule` imports only CoreModule, ConfigModule, LoggerModule, and QueueModule -- not AppModule or any HTTP-related modules
   3. An echo `@Processor` receives a test job enqueued by the API and logs the payload, proving end-to-end queue flow from API to worker
   4. `nest build --config worker-cli.json` produces a separate `dist/worker.js` entry point that runs independently of `dist/main.js`
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 22-01: TBD
-- [ ] 22-02: TBD
+- [ ] 22-01-PLAN.md — Worker entry point, WorkerModule, EchoProcessor, logger config, and worker-cli.json build
+- [ ] 22-02-PLAN.md — QueueController with POST /v1/queue/test-echo diagnostic endpoint
 
 ### Phase 23: Developer Experience
 **Goal**: Both API and worker can be developed and deployed independently with hot reload, production scripts, and containerized local development
@@ -155,5 +155,5 @@ Plans:
 | 19. Customer Response | v1.3 | 3/3 | Complete | 2026-03-21 |
 | 20. Infrastructure Foundation | v1.4 | 2/2 | Complete    | 2026-03-22 |
 | 21. Queue Module | v1.4 | 1/1 | Complete    | 2026-03-22 |
-| 22. Worker Service Scaffold | v1.4 | 0/? | Not started | - |
+| 22. Worker Service Scaffold | v1.4 | 0/2 | Not started | - |
 | 23. Developer Experience | v1.4 | 0/? | Not started | - |
