@@ -1,5 +1,23 @@
 # Milestones
 
+## v1.4 Monorepo & Worker Infrastructure (Shipped: 2026-03-22)
+
+**Phases completed:** 4 phases, 7 plans
+**Timeline:** 1 day (2026-03-22)
+**Codebase:** ~21.9k LOC API (TypeScript)
+
+**Key accomplishments:**
+
+- BullMQ/ioredis npm dependencies installed and `@queue/*`/`@worker/*` TypeScript path aliases registered across all compile targets (tsc, Jest, NestJS build)
+- Redis 7.4 Alpine container added to Docker Compose with `maxmemory-policy noeviction` and `REDIS_URL` environment variable via ConfigService
+- `QueueModule` with `BullModule.forRootAsync()`, `QueueProducer` service, and `QUEUE_NAMES` constants wired into `AppModule` as shared queue infrastructure
+- `src/worker.ts` entry point via `NestFactory.createApplicationContext(WorkerModule)` with graceful SIGTERM/SIGINT shutdown and separate `worker-cli.json` build producing `dist/worker.js`
+- `EchoProcessor` consuming echo queue via `@nestjs/bullmq WorkerHost` and `POST /v1/queue/test-echo` diagnostic endpoint proving end-to-end queue flow
+- `nodemon-worker.json` with `worker:dev`, `worker:prod`, and `build:all` npm scripts for independent worker development and production startup
+- Worker added as fourth Docker Compose service with multi-stage Dockerfile producing a production worker image running `node dist/worker.js`
+
+---
+
 ## v1.3 Send Quotes (Shipped: 2026-03-21)
 
 **Phases completed:** 5 phases, 18 plans, 35 tasks

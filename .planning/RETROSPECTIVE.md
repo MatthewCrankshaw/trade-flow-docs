@@ -187,6 +187,50 @@
 
 ---
 
+## Milestone: v1.4 -- Monorepo & Worker Infrastructure
+
+**Shipped:** 2026-03-22
+**Phases:** 4 | **Plans:** 7 | **Execution time:** ~15 min
+
+### What Was Built
+- Redis 7.4 in Docker Compose with `maxmemory-policy noeviction`, `@queue/*`/`@worker/*` path aliases across all compile targets
+- `QueueModule` with `BullModule.forRootAsync`, `QueueProducer` service, and `QUEUE_NAMES` constants wired into `AppModule`
+- `src/worker.ts` via `NestFactory.createApplicationContext(WorkerModule)` with SIGTERM shutdown and separate `worker-cli.json` producing `dist/worker.js`
+- `EchoProcessor` consuming echo queue and `POST /v1/queue/test-echo` diagnostic endpoint proving end-to-end flow
+- `worker:dev` (nodemon hot reload), `worker:prod`, `build:all` npm scripts and worker as fourth Docker Compose service with production Dockerfile stage
+
+### What Worked
+- Infrastructure-first milestone was clean -- each phase built on the previous with no circular dependencies or rework
+- Dual entry-point pattern (preserving all existing path aliases) was exactly the right choice over NestJS CLI monorepo mode -- zero existing code changed
+- Phases were small and focused (1-2 plans each) with zero gap closure needed -- clearest milestone yet with lowest plan count per outcome
+- Key decisions resolved early (maxmemory-policy, createApplicationContext, deleteOutDir:false) prevented surprises during execution
+- IORedis type mismatch (`as unknown as`) was a known BullMQ integration quirk resolved cleanly in Phase 21 without extra plans
+
+### What Was Inefficient
+- No milestone audit -- could have caught the 2 undelivered PROJECT.md active requirements (monorepo restructure, shared module pattern) before completing
+- Echo processor and test-echo endpoint are infrastructure leftovers -- should probably be guarded/removed before real traffic arrives
+
+### Patterns Established
+- Dual entry-point NestJS pattern: `src/main.ts` + `src/worker.ts` with separate `nest-cli.json` configs producing independent `dist/` entries
+- Queue name constants as single source of truth: `QUEUE_NAMES` in `src/queue/queue.constant.ts` shared by producer and consumer
+- Worker module isolation: `WorkerModule` imports only the minimum (CoreModule, ConfigModule, LoggerModule, QueueModule) -- no HTTP modules
+- Debug port separation: API on 9229, worker on 9230
+- `deleteOutDir:false` in worker build config: required pattern when two CLI configs share the same `dist/` output directory
+
+### Key Lessons
+1. Pure infrastructure milestones benefit from tight phase scoping -- fewer plans per phase = fewer context switches and zero gap closure
+2. The "what goes in WorkerModule" decision deserves explicit upfront design -- discovered CoreModule was required (MONGO_URL) only during Phase 22
+3. Run milestone audit before completing even infrastructure milestones -- the 2 deferred requirements (restructure + shared modules) should have been explicitly scoped out or planned
+4. NestJS dual-entry-point is production-viable for small monorepos -- NestJS CLI monorepo mode is not worth the webpack migration cost
+5. IORedis type incompatibility with BullMQ bundled ioredis is a known issue -- `as unknown as ConnectionOptions` is the accepted workaround, not a code smell
+
+### Cost Observations
+- Model mix: opus for execution and planning
+- Total execution: ~15 min across 7 plans (avg 2min/plan) -- fastest milestone velocity yet
+- Notable: zero gap closure plans -- infrastructure phases with clear acceptance criteria are the easiest to execute correctly first time
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -197,6 +241,7 @@
 | v1.1 | ~1 hour | 2 | Cross-module references, gap closure cycle, entity dropdown pattern |
 | v1.2 | ~30 min | 4 | Reusable picker component, quote system, parallel execution, gap closure for UX polish |
 | v1.3 | ~1 hour | 5 | Email delivery + customer response, token-based public access, email provider migration, gap closure for architecture |
+| v1.4 | ~15 min | 4 | Infrastructure-only milestone, dual entry-point pattern, zero gap closure, lowest plan count per outcome |
 
 ### Top Lessons (Verified Across Milestones)
 
@@ -208,4 +253,5 @@
 6. Design reusable components early (SearchableItemPicker, QuoteSessionAuthGuard) -- pays off when the same component is needed across features/phases
 7. Settle UX decisions (pricing strategy, display format) before implementation to avoid rework through gap closure
 8. Separate config/settings from core entities from the start -- embedding then extracting causes a full rework cycle (confirmed: v1.3 QuoteSettings)
-9. Gap closure plans should decrease over milestones -- 40% gap closure rate (v1.3) signals opportunity for better initial planning
+9. Gap closure plans should decrease over milestones -- 40% gap closure rate (v1.3) → 0% (v1.4): infrastructure phases with clear acceptance criteria execute cleanly
+10. Infrastructure milestones (v1.4) unlock future product milestones -- tight scope + no gap closure = fastest shipping rate yet

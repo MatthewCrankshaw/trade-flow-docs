@@ -71,29 +71,17 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - ✓ Customer can decline a quote with one click and provide an optional reason -- v1.3
 - ✓ Quote status automatically transitions based on actions (Draft→Sent on send, Sent→Accepted/Rejected on customer response) -- v1.3
 - ✓ Tradesperson receives email notification when a customer accepts or declines a quote -- v1.3
+- ✓ BullMQ/ioredis queue infrastructure installed with Redis 7.4 in Docker Compose -- v1.4
+- ✓ QueueModule with BullModule.forRootAsync, QueueProducer, and QUEUE_NAMES constants -- v1.4
+- ✓ Worker entry point (src/worker.ts) via createApplicationContext with SIGTERM shutdown -- v1.4
+- ✓ WorkerModule with EchoProcessor proving end-to-end queue flow -- v1.4
+- ✓ Dual entry-point build (dist/main.js + dist/worker.js) via worker-cli.json -- v1.4
+- ✓ worker:dev (nodemon hot reload), worker:prod, build:all npm scripts -- v1.4
+- ✓ Worker as fourth Docker Compose service with multi-stage production Dockerfile -- v1.4
 
 ### Active
 
-<!-- Requirements for v1.4 -- defined via /gsd:new-milestone -->
-
-- [ ] Monorepo directory restructure for API + worker services with shared code
-- [x] BullMQ integration via @nestjs/bullmq with Redis backing (REDIS_URL) -- Validated in Phase 20
-- [x] Redis added to Docker Compose for local development -- Validated in Phase 20
-- [x] Worker service scaffold with own NestJS application entry point -- Validated in Phase 22
-- [ ] Shared module pattern allowing worker to import API services
-- [x] Environment variables and configuration for Redis connection -- Validated in Phase 20
-- [x] Nodemon hot reload for worker service in development -- Validated in Phase 23
-- [x] Worker Docker Compose service and Dockerfile production stage -- Validated in Phase 23
-
-## Current Milestone: v1.4 Monorepo & Worker Infrastructure
-
-**Goal:** Prepare trade-flow-api as a monorepo with two independently deployable NestJS services -- the existing API and a new background worker -- connected via BullMQ/Redis.
-
-**Target features:**
-- Monorepo directory restructure (API + worker as sibling services, shared code access)
-- BullMQ queue integration with @nestjs/bullmq and Redis
-- Worker service scaffold (own main.ts, own NestJS app, nodemon hot reload)
-- Docker Compose and environment config for Redis
+<!-- Requirements for next milestone -- defined via /gsd:new-milestone -->
 
 ### Out of Scope
 
@@ -140,6 +128,7 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - **Bundles & Quotes shipped (v1.2):** Bundle creation/editing with SearchableItemPicker, quote system with creation dialog, list, detail view, line item management (add/edit/delete), expandable bundle rows, tax-inclusive totals, mobile-responsive card layout, status transitions (Draft/Sent/Accepted/Rejected)
 - **Send Quotes shipped (v1.3):** Quote deletion, token infrastructure, customer-facing quote page with view tracking, email sending with configurable templates and Tiptap rich text editor, customer accept/decline with notification emails
 - **Codebase size:** ~21.9k LOC API (TypeScript) + ~23.9k LOC UI (TypeScript/TSX)
+- **Worker infrastructure shipped (v1.4):** Dual entry-point NestJS monorepo with API + background worker connected via BullMQ/Redis. `npm run worker:dev` (hot reload) and `docker compose up` start all four services. Echo processor proves end-to-end queue flow; real processors (email, PDF) ship in future milestones
 - **Monetization roadmap:** Future milestones will add Stripe subscription billing, async payment processing via BullMQ queues, and scheduled reminder emails -- v1.4 lays the infrastructure foundation
 
 ## Constraints
@@ -185,6 +174,13 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 | QuoteSessionAuthGuard for public endpoints | Reusable guard for token validation, expiry, first-view tracking | ✓ Good -- DRY |
 | Failure-tolerant notification emails | Email failure doesn't block status transition; try/catch with logging | ✓ Good -- resilient |
 | PDF generation deferred from v1.3 | Reduced scope to ship core send/respond flow faster | — Pending review |
+| Dual entry-point over NestJS CLI monorepo mode | CLI monorepo switches to webpack, breaking 20+ path aliases; massive migration for zero benefit | ✓ Good -- clean solution |
+| Redis maxmemory-policy noeviction from day one | BullMQ silently loses jobs if Redis evicts keys under memory pressure | ✓ Good -- avoids silent data loss |
+| Worker uses createApplicationContext (no HTTP server) | Workers process jobs, not HTTP requests; lighter startup and cleaner separation | ✓ Good -- right abstraction |
+| CoreModule in WorkerModule | MongoConnectionService in CoreModule requires MONGO_URL; worker needs DB access | ✓ Good -- pragmatic |
+| deleteOutDir:false in worker-cli.json | Prevents worker build from deleting dist/main.js; both entry points must coexist | ✓ Good -- critical for dual-build |
+| Debug port 9230 for worker | Avoids port collision with API debugging on 9229 | ✓ Good -- clear convention |
+| No Redis volume in Docker Compose | BullMQ jobs are transient in dev; ephemeral Redis is simpler and sufficient | ✓ Good -- right trade-off |
 
 ## Evolution
 
@@ -204,4 +200,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-22 after Phase 23 (Developer Experience) completed*
+*Last updated: 2026-03-25 after v1.4 milestone (Monorepo & Worker Infrastructure) completed*
