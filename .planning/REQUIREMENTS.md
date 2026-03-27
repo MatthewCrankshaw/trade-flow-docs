@@ -75,33 +75,33 @@ Populated by roadmapper. Each requirement maps to exactly one phase.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | — | Pending |
-| FOUND-02 | — | Pending |
-| FOUND-03 | — | Pending |
-| FOUND-04 | — | Pending |
-| FOUND-05 | — | Pending |
-| AUTH-01 | — | Pending |
-| AUTH-02 | — | Pending |
-| AUTH-03 | — | Pending |
-| JOB-01 | — | Pending |
-| JOB-02 | — | Pending |
-| JOB-03 | — | Pending |
-| JOB-04 | — | Pending |
-| QTE-01 | — | Pending |
-| QTE-02 | — | Pending |
-| QTE-03 | — | Pending |
-| QTE-04 | — | Pending |
-| QTE-05 | — | Pending |
-| SET-01 | — | Pending |
-| SET-02 | — | Pending |
-| SET-03 | — | Pending |
-| SET-04 | — | Pending |
+| FOUND-01 | Phase 24 | Pending |
+| FOUND-02 | Phase 24 | Pending |
+| FOUND-03 | Phase 25 | Pending |
+| FOUND-04 | Phase 27 | Pending |
+| FOUND-05 | Phase 28 | Pending |
+| AUTH-01 | Phase 25 | Pending |
+| AUTH-02 | Phase 25 | Pending |
+| AUTH-03 | Phase 25 | Pending |
+| JOB-01 | Phase 26 | Pending |
+| JOB-02 | Phase 26 | Pending |
+| JOB-03 | Phase 26 | Pending |
+| JOB-04 | Phase 26 | Pending |
+| QTE-01 | Phase 27 | Pending |
+| QTE-02 | Phase 27 | Pending |
+| QTE-03 | Phase 27 | Pending |
+| QTE-04 | Phase 27 | Pending |
+| QTE-05 | Phase 27 | Pending |
+| SET-01 | Phase 28 | Pending |
+| SET-02 | Phase 28 | Pending |
+| SET-03 | Phase 28 | Pending |
+| SET-04 | Phase 28 | Pending |
 
 **Coverage:**
 - v1.5 requirements: 21 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 21 ⚠️
+- Mapped to phases: 21
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-27*
-*Last updated: 2026-03-27 after initial definition*
+*Last updated: 2026-03-27 — Phase assignments added by roadmapper*

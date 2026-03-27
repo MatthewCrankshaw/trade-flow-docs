@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Automated E2E Playwright Testing
-status: Defining requirements
-stopped_at: —
+status: Ready to plan
+stopped_at: Phase 24
 last_updated: "2026-03-27T00:00:00.000Z"
 ---
 
@@ -18,10 +18,15 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 24 — Playwright Bootstrap & Auth
 Plan: —
-Status: Defining requirements
-Last activity: 2026-03-27 — Milestone v1.5 started
+Status: Ready to plan
+Last activity: 2026-03-27 — Roadmap created for v1.5
+
+```
+Progress: Phase 24 of 28
+[░░░░░░░░░░░░░░░░░░░░░░░░░] 0% complete (0/5 phases)
+```
 
 ## Performance Metrics
 
@@ -64,6 +69,11 @@ Recent decisions affecting current work:
 - [Phase 22]: deleteOutDir:false in worker-cli.json prevents clobbering dist/main.js during worker build
 - [Phase 23]: Debug port 9230 for worker to avoid collision with API on 9229
 - [Phase 23-02]: Worker reuses development Dockerfile stage -- no separate worker-specific development stage needed
+- [v1.5 research]: Fixture pattern (test.extend) over Page Object Model -- composes better, Playwright-native lifecycle
+- [v1.5 research]: Global auth setup project + storageState reuse -- prevents Firebase rate limiting from per-test login
+- [v1.5 research]: API seeding via HTTP (not direct MongoDB) -- decouples tests from schema, auth via Firebase token
+- [v1.5 research]: E2E_TEST_MODE bypass on QuoteEmailSender -- allows SENT status transition without real Resend call
+- [v1.5 research]: Email delivery verification deferred -- test via seeded token URL on public quote page instead
 
 ### Pending Todos
 
@@ -71,7 +81,9 @@ None.
 
 ### Blockers/Concerns
 
-None.
+- Firebase v12 IndexedDB persistence in Playwright storageState needs validation in Phase 24 -- fallback is signInWithCustomToken() in page evaluate
+- Dedicated Firebase test user must be pre-created in Firebase Console before Phase 24 can run
+- Two-repo CI checkout strategy (trade-flow-ui + trade-flow-api) needs validation in Phase 28
 
 ### Quick Tasks Completed
 
@@ -90,6 +102,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-25T21:30:17Z
-Stopped at: Completed quick task 260325-tsb
+Last session: 2026-03-27T00:00:00Z
+Stopped at: Roadmap created -- ready to start Phase 24
 Resume file: None
