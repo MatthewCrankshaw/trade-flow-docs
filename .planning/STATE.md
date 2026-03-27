@@ -1,25 +1,27 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.4
-milestone_name: Monorepo & Worker Infrastructure
-status: v1.4 milestone complete
-stopped_at: Completed 23-02-PLAN.md
-last_updated: "2026-03-25T19:58:03.785Z"
+milestone: v1.5
+milestone_name: Automated E2E Playwright Testing
+status: Defining requirements
+stopped_at: —
+last_updated: "2026-03-27T00:00:00.000Z"
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-25)
+See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Planning next milestone (v1.5)
+**Current focus:** Milestone v1.5 — Automated E2E Playwright Testing
 
 ## Current Position
 
-Phase: 23
-Plan: Not started
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-27 — Milestone v1.5 started
 
 ## Performance Metrics
 

@@ -81,7 +81,15 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 
 ### Active
 
-<!-- Requirements for next milestone -- defined via /gsd:new-milestone -->
+<!-- Requirements for this milestone -- v1.5 Automated E2E Playwright Testing -->
+
+- E2E test suite bootstrapped with Playwright in trade-flow-ui targeting localhost dev stack
+- Auth & onboarding flows tested (signup, login, onboarding wizard, business creation)
+- Core job flow tested (create customer → create job → add schedule → create quote)
+- Quote send & respond flow tested (send email, customer views/accepts/declines)
+- Settings & inventory tested (tax rates, items, visit types, quote email template)
+- Test data seeded via API calls before each test (isolated per test, torn down after)
+- GitHub Actions CI integration running E2E tests on push/PR
 
 ### Out of Scope
 
@@ -182,6 +190,19 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 | Debug port 9230 for worker | Avoids port collision with API debugging on 9229 | ✓ Good -- clear convention |
 | No Redis volume in Docker Compose | BullMQ jobs are transient in dev; ephemeral Redis is simpler and sufficient | ✓ Good -- right trade-off |
 
+## Current Milestone: v1.5 Automated E2E Playwright Testing
+
+**Goal:** Build a reliable automated E2E test suite using Playwright that covers the full Trade Flow user journey from login to quote acceptance, running locally and in CI.
+
+**Target features:**
+- Playwright setup in trade-flow-ui with local dev stack as target
+- Auth & onboarding flow tests (signup, login, onboarding, business creation)
+- Core job flow tests (customer → job → schedule → quote)
+- Quote send & respond tests (send email, customer accept/decline)
+- Settings & inventory tests (tax rates, items, visit types, email template)
+- Test data seeded via API calls before each test (isolated, clean)
+- GitHub Actions CI integration (runs on push/PR)
+
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
@@ -200,4 +221,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-25 after v1.4 milestone (Monorepo & Worker Infrastructure) completed*
+*Last updated: 2026-03-27 — Milestone v1.5 Automated E2E Playwright Testing started*
