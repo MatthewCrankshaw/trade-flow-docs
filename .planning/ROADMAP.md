@@ -77,7 +77,7 @@ Full details: `.planning/milestones/v1.4-ROADMAP.md`
 <details open>
 <summary>v1.5 Automated E2E Playwright Testing (Phases 24-28) -- IN PROGRESS</summary>
 
-- [ ] **Phase 24: Playwright Bootstrap & Auth** - Install and configure Playwright with global auth storageState
+- [x] **Phase 24: Playwright Bootstrap & Auth** - Install and configure Playwright with global auth storageState (completed 2026-03-27)
 - [ ] **Phase 25: API Seeding Infrastructure + Onboarding Tests** - Typed API client for test data seeding and onboarding flow tests
 - [ ] **Phase 26: Core Job Flow Tests** - Customer, job, schedule, and quote creation tests
 - [ ] **Phase 27: Quote Lifecycle Tests** - Email bypass, send flow, and customer accept/decline tests
