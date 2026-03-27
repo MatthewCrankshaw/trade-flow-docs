@@ -98,7 +98,7 @@ Full details: `.planning/milestones/v1.4-ROADMAP.md`
   4. The `e2e/` directory structure (`fixtures/`, `helpers/`, `tests/`) exists and a first smoke test passes in Chromium
 **Plans**: 1 plan
 Plans:
-- [ ] 24-01-PLAN.md — Install Playwright, configure three-project layout, implement programmatic Firebase auth setup, and deliver smoke tests
+- [x] 24-01-PLAN.md — Install Playwright, configure three-project layout, implement programmatic Firebase auth setup, and deliver smoke tests
 
 ### Phase 25: API Seeding Infrastructure + Onboarding Tests
 **Goal**: Tests can create and clean up isolated test data via the API, and the onboarding flow is verified end-to-end
@@ -176,7 +176,7 @@ Plans:
 | 21. Queue Module | v1.4 | 1/1 | Complete | 2026-03-22 |
 | 22. Worker Service Scaffold | v1.4 | 2/2 | Complete | 2026-03-22 |
 | 23. Developer Experience | v1.4 | 2/2 | Complete | 2026-03-22 |
-| 24. Playwright Bootstrap & Auth | v1.5 | 0/1 | Not started | - |
+| 24. Playwright Bootstrap & Auth | v1.5 | 1/1 | Complete   | 2026-03-27 |
 | 25. API Seeding Infrastructure + Onboarding Tests | v1.5 | 0/? | Not started | - |
 | 26. Core Job Flow Tests | v1.5 | 0/? | Not started | - |
 | 27. Quote Lifecycle Tests | v1.5 | 0/? | Not started | - |

@@ -1,10 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.5
-milestone_name: Automated E2E Playwright Testing
-status: Ready to plan
-stopped_at: Phase 24
-last_updated: "2026-03-27T00:00:00.000Z"
+milestone: v1.0
+milestone_name: milestone
+status: verifying
+stopped_at: Completed 24-playwright-bootstrap-auth 24-01-PLAN.md
+last_updated: "2026-03-27T11:51:50.219Z"
+last_activity: 2026-03-27
+progress:
+  total_phases: 5
+  completed_phases: 1
+  total_plans: 1
+  completed_plans: 1
 ---
 
 # Project State
@@ -14,14 +20,14 @@ last_updated: "2026-03-27T00:00:00.000Z"
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Milestone v1.5 — Automated E2E Playwright Testing
+**Current focus:** Phase 24 — playwright-bootstrap-auth
 
 ## Current Position
 
-Phase: 24 — Playwright Bootstrap & Auth
-Plan: —
-Status: Ready to plan
-Last activity: 2026-03-27 — Roadmap created for v1.5
+Phase: 24 (playwright-bootstrap-auth) — EXECUTING
+Plan: 1 of 1
+Status: Phase complete — ready for verification
+Last activity: 2026-03-27
 
 ```
 Progress: Phase 24 of 28
@@ -50,6 +56,7 @@ Progress: Phase 24 of 28
 | Phase 22 P02 | 2min | 1 tasks | 3 files |
 | Phase 23 P01 | 1min | 1 tasks | 2 files |
 | Phase 23-developer-experience P02 | 1min | 2 tasks | 2 files |
+| Phase 24-playwright-bootstrap-auth P01 | 3 | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -74,6 +81,9 @@ Recent decisions affecting current work:
 - [v1.5 research]: API seeding via HTTP (not direct MongoDB) -- decouples tests from schema, auth via Firebase token
 - [v1.5 research]: E2E_TEST_MODE bypass on QuoteEmailSender -- allows SENT status transition without real Resend call
 - [v1.5 research]: Email delivery verification deferred -- test via seeded token URL on public quote page instead
+- [Phase 24-playwright-bootstrap-auth]: Three-project Playwright layout (setup/chromium/chromium-unauth) with testMatch isolation prevents storageState leaking to unauthenticated tests
+- [Phase 24-playwright-bootstrap-auth]: signInWithEmailAndPassword in page.evaluate chosen over signInWithCustomToken — custom tokens require Firebase Admin SDK and are a different token format
+- [Phase 24-playwright-bootstrap-auth]: fileURLToPath(import.meta.url) for __dirname shim in ESM context — trade-flow-ui is type=module
 
 ### Pending Todos
 
@@ -102,6 +112,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-27T00:00:00Z
-Stopped at: Roadmap created -- ready to start Phase 24
+Last session: 2026-03-27T11:51:50.217Z
+Stopped at: Completed 24-playwright-bootstrap-auth 24-01-PLAN.md
 Resume file: None
