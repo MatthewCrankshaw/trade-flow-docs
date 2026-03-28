@@ -2,7 +2,7 @@
 phase: 25
 slug: api-seeding-onboarding-tests
 status: draft
-nyquist_compliant: false
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-03-28
 ---
@@ -38,11 +38,10 @@ created: 2026-03-28
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 25-01-01 | 01 | 1 | FOUND-03 | integration | `npx playwright test e2e/tests/seed-smoke.spec.ts` | ❌ W0 | ⬜ pending |
-| 25-01-02 | 01 | 1 | FOUND-03 | integration | `npx playwright test e2e/tests/seed-smoke.spec.ts` | ❌ W0 | ⬜ pending |
-| 25-02-01 | 02 | 2 | AUTH-01 | e2e | `npx playwright test e2e/tests/auth.spec.ts` | ❌ W0 | ⬜ pending |
-| 25-02-02 | 02 | 2 | AUTH-02 | e2e | `npx playwright test e2e/tests/auth.spec.ts` | ❌ W0 | ⬜ pending |
-| 25-02-03 | 02 | 2 | AUTH-03 | e2e | `npx playwright test e2e/tests/onboarding.spec.ts` | ❌ W0 | ⬜ pending |
+| 25-01-01 | 01 | 1 | FOUND-03 | integration | `npx playwright test --list` (compilation check; infrastructure files, no dedicated spec) | ❌ W0 | ⬜ pending |
+| 25-01-02 | 01 | 1 | FOUND-03 | integration | `npx playwright test --list` (auth setup compilation check) | ❌ W0 | ⬜ pending |
+| 25-01-03 | 01 | 1 | AUTH-01, AUTH-02 | e2e | `npx playwright test e2e/tests/auth/login.spec.ts` and `npx playwright test e2e/tests/auth/redirect-unauth.spec.ts --project=chromium-unauth` | ❌ W0 | ⬜ pending |
+| 25-02-01 | 02 | 2 | AUTH-03 | e2e | `npx playwright test e2e/tests/onboarding/onboarding-wizard.spec.ts --project=chromium` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -50,9 +49,13 @@ created: 2026-03-28
 
 ## Wave 0 Requirements
 
-- [ ] `e2e/tests/seed-smoke.spec.ts` — stubs for FOUND-03 (seeding client creates + cleans up data)
-- [ ] `e2e/tests/auth.spec.ts` — stubs for AUTH-01, AUTH-02 (login + redirect tests)
-- [ ] `e2e/tests/onboarding.spec.ts` — stubs for AUTH-03 (onboarding wizard test)
+- [ ] `e2e/helpers/api-client.ts` — seeding client (FOUND-03)
+- [ ] `e2e/helpers/db-cleanup.ts` — MongoDB cleanup helper (FOUND-03)
+- [ ] `e2e/helpers/seed-factories.ts` — Faker factories (FOUND-03)
+- [ ] `e2e/fixtures/test-base.ts` — extended Playwright fixture (FOUND-03)
+- [ ] `e2e/tests/auth/login.spec.ts` — AUTH-01 (login test)
+- [ ] `e2e/tests/auth/redirect-unauth.spec.ts` — AUTH-02 (redirect test)
+- [ ] `e2e/tests/onboarding/onboarding-wizard.spec.ts` — AUTH-03 (onboarding wizard test)
 
 *Existing Playwright infrastructure from Phase 24 covers framework setup.*
 
