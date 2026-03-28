@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Completed 24-playwright-bootstrap-auth 24-01-PLAN.md
-last_updated: "2026-03-27T11:51:50.219Z"
-last_activity: 2026-03-27
+status: planning
+stopped_at: Phase 25 planned — 2 plans in 2 waves
+last_updated: "2026-03-28T09:06:12.278Z"
+last_activity: 2026-03-28
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 1
+  total_plans: 3
   completed_plans: 1
 ---
 
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 24 — playwright-bootstrap-auth
+**Current focus:** Phase 25 — API Seeding Infrastructure + Onboarding Tests
 
 ## Current Position
 
-Phase: 24 (playwright-bootstrap-auth) — EXECUTING
-Plan: 1 of 1
-Status: Phase complete — ready for verification
-Last activity: 2026-03-27
+Phase: 25 (api-seeding-onboarding-tests) — DISCUSSING
+Plan: TBD
+Status: Context gathered — ready for planning
+Last activity: 2026-03-28
 
 ```
 Progress: Phase 24 of 28
@@ -112,6 +112,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-27T11:51:50.217Z
-Stopped at: Completed 24-playwright-bootstrap-auth 24-01-PLAN.md
-Resume file: None
+Last session: 2026-03-28T09:06:12.275Z
+Stopped at: Phase 25 planned — 2 plans in 2 waves
+Resume file: .planning/phases/25-api-seeding-onboarding-tests/25-01-PLAN.md
