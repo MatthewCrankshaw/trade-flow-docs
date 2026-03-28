@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Phase 25 planned — 2 plans in 2 waves
-last_updated: "2026-03-28T09:06:12.278Z"
+status: executing
+stopped_at: Completed 25-api-seeding-onboarding-tests-01-PLAN.md
+last_updated: "2026-03-28T09:13:43.386Z"
 last_activity: 2026-03-28
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 3
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -20,13 +20,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 25 — API Seeding Infrastructure + Onboarding Tests
+**Current focus:** Phase 25 — api-seeding-onboarding-tests
 
 ## Current Position
 
-Phase: 25 (api-seeding-onboarding-tests) — DISCUSSING
-Plan: TBD
-Status: Context gathered — ready for planning
+Phase: 25 (api-seeding-onboarding-tests) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
 Last activity: 2026-03-28
 
 ```
@@ -57,6 +57,7 @@ Progress: Phase 24 of 28
 | Phase 23 P01 | 1min | 1 tasks | 2 files |
 | Phase 23-developer-experience P02 | 1min | 2 tasks | 2 files |
 | Phase 24-playwright-bootstrap-auth P01 | 3 | 3 tasks | 9 files |
+| Phase 25-api-seeding-onboarding-tests P01 | 5 | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,9 @@ Recent decisions affecting current work:
 - [Phase 24-playwright-bootstrap-auth]: Three-project Playwright layout (setup/chromium/chromium-unauth) with testMatch isolation prevents storageState leaking to unauthenticated tests
 - [Phase 24-playwright-bootstrap-auth]: signInWithEmailAndPassword in page.evaluate chosen over signInWithCustomToken — custom tokens require Firebase Admin SDK and are a different token format
 - [Phase 24-playwright-bootstrap-auth]: fileURLToPath(import.meta.url) for __dirname shim in ESM context — trade-flow-ui is type=module
+- [Phase 25-api-seeding-onboarding-tests]: Token extraction via page.evaluate(getIdToken()) not from storageState JSON — avoids Firebase token expiry after 1h
+- [Phase 25-api-seeding-onboarding-tests]: Dynamic businessId discovery via GET /v1/business in apiClient fixture — no hardcoded IDs
+- [Phase 25-api-seeding-onboarding-tests]: D-03 auto-chaining in createJob: auto-creates customer when customerId omitted — simplifies job-centric test setup
 
 ### Pending Todos
 
@@ -112,6 +116,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-28T09:06:12.275Z
-Stopped at: Phase 25 planned — 2 plans in 2 waves
-Resume file: .planning/phases/25-api-seeding-onboarding-tests/25-01-PLAN.md
+Last session: 2026-03-28T09:13:43.384Z
+Stopped at: Completed 25-api-seeding-onboarding-tests-01-PLAN.md
+Resume file: None

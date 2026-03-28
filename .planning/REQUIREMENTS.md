@@ -9,14 +9,14 @@
 
 - [x] **FOUND-01**: Playwright is installed and configured in trade-flow-ui with `playwright.config.ts`, `webServer` config targeting the Vite dev server, Chromium-only, and an `e2e/` directory structure (`fixtures/`, `helpers/`, `tests/`)
 - [x] **FOUND-02**: A global auth setup project authenticates via the real Firebase login UI once and saves `storageState` for reuse across all tests (no per-test login)
-- [ ] **FOUND-03**: A typed API seeding client (fetch-based helper) can create and delete test entities via the NestJS API, authenticated with a Firebase test user token
+- [x] **FOUND-03**: A typed API seeding client (fetch-based helper) can create and delete test entities via the NestJS API, authenticated with a Firebase test user token
 - [ ] **FOUND-04**: The NestJS API has a test-mode email bypass so `QuoteEmailSender` transitions a quote to SENT status without calling Resend when `E2E_TEST_MODE=true`
 - [ ] **FOUND-05**: A GitHub Actions workflow checks out both repos, starts the Docker Compose stack (MongoDB, Redis), runs Playwright tests, and uploads traces/reports on failure
 
 ### Auth & Onboarding
 
-- [ ] **AUTH-01**: Test verifies user can log in with valid credentials and land on the dashboard
-- [ ] **AUTH-02**: Test verifies unauthenticated users are redirected to login when accessing protected routes
+- [x] **AUTH-01**: Test verifies user can log in with valid credentials and land on the dashboard
+- [x] **AUTH-02**: Test verifies unauthenticated users are redirected to login when accessing protected routes
 - [ ] **AUTH-03**: Test verifies the full onboarding wizard creates a business with default job types, tax rates, items, and visit types
 
 ### Core Job Flow
@@ -77,11 +77,11 @@ Populated by roadmapper. Each requirement maps to exactly one phase.
 |-------------|-------|--------|
 | FOUND-01 | Phase 24 | Complete |
 | FOUND-02 | Phase 24 | Complete |
-| FOUND-03 | Phase 25 | Pending |
+| FOUND-03 | Phase 25 | Complete |
 | FOUND-04 | Phase 27 | Pending |
 | FOUND-05 | Phase 28 | Pending |
-| AUTH-01 | Phase 25 | Pending |
-| AUTH-02 | Phase 25 | Pending |
+| AUTH-01 | Phase 25 | Complete |
+| AUTH-02 | Phase 25 | Complete |
 | AUTH-03 | Phase 25 | Pending |
 | JOB-01 | Phase 26 | Pending |
 | JOB-02 | Phase 26 | Pending |
