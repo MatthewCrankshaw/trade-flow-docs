@@ -109,8 +109,10 @@ Plans:
   2. A test verifies that a user with valid credentials can log in and land on the dashboard
   3. A test verifies that accessing a protected route without authentication redirects to the login page
   4. A test verifies the full onboarding wizard: business name entered, trade selected, wizard completed, and default job types/tax rates/items/visit types appear in the new business
-**Plans**: TBD
-**UI hint**: yes
+**Plans**: 2 plans
+Plans:
+- [ ] 25-01-PLAN.md — Seeding infrastructure (api-client, db-cleanup, factories, fixtures), second user auth setup, auth redirect tests
+- [ ] 25-02-PLAN.md — Onboarding wizard E2E test with default entity verification and cleanup
 
 ### Phase 26: Core Job Flow Tests
 **Goal**: The primary business object pipeline (customer → job → schedule → quote) is tested end-to-end
@@ -177,7 +179,7 @@ Plans:
 | 22. Worker Service Scaffold | v1.4 | 2/2 | Complete | 2026-03-22 |
 | 23. Developer Experience | v1.4 | 2/2 | Complete | 2026-03-22 |
 | 24. Playwright Bootstrap & Auth | v1.5 | 1/1 | Complete   | 2026-03-27 |
-| 25. API Seeding Infrastructure + Onboarding Tests | v1.5 | 0/? | Not started | - |
+| 25. API Seeding Infrastructure + Onboarding Tests | v1.5 | 0/2 | Not started | - |
 | 26. Core Job Flow Tests | v1.5 | 0/? | Not started | - |
 | 27. Quote Lifecycle Tests | v1.5 | 0/? | Not started | - |
 | 28. Settings Tests + CI Integration | v1.5 | 0/? | Not started | - |
