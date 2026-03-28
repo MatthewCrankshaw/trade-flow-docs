@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: executing
-stopped_at: "Checkpoint: 25-02 Task 2 human-verify — awaiting full Playwright suite run"
-last_updated: "2026-03-28T09:18:54.203Z"
+milestone: v1.6
+milestone_name: Stripe Subscription Billing
+status: planning
+stopped_at: ""
+last_updated: "2026-03-28T00:00:00.000Z"
 last_activity: 2026-03-28
 progress:
-  total_phases: 5
-  completed_phases: 2
-  total_plans: 3
-  completed_plans: 3
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 
 ## Current Position
 
-Phase: 25 (api-seeding-onboarding-tests) — EXECUTING
-Plan: 2 of 2
-Status: Ready to execute
-Last activity: 2026-03-28
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-28 — Milestone v1.6 started
 
 ```
 Progress: Phase 24 of 28

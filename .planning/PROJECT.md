@@ -81,15 +81,20 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 
 ### Active
 
-<!-- Requirements for this milestone -- v1.5 Automated E2E Playwright Testing -->
+<!-- Requirements for this milestone -- v1.6 Stripe Subscription Billing -->
 
-- E2E test suite bootstrapped with Playwright in trade-flow-ui targeting localhost dev stack
-- Auth & onboarding flows tested (signup, login, onboarding wizard, business creation)
-- Core job flow tested (create customer → create job → add schedule → create quote)
-- Quote send & respond flow tested (send email, customer views/accepts/declines)
-- Settings & inventory tested (tax rates, items, visit types, quote email template)
-- Test data seeded via API calls before each test (isolated per test, torn down after)
-- GitHub Actions CI integration running E2E tests on push/PR
+- User is prompted to start a free trial (Stripe Checkout) after completing onboarding
+- User can start a 30-day free trial by entering a card via Stripe Checkout
+- User has full access to Trade Flow during the active trial period
+- Stripe webhook creates and syncs local subscription record after checkout completes
+- User is automatically charged £6/month after the 30-day trial ends
+- User receives read-only access when trial expires, payment fails, or subscription is canceled
+- User can subscribe (start trial) from a dedicated /subscribe page
+- User can view their current subscription status in Settings > Billing
+- User can cancel their subscription (cancels at period end, access continues until then)
+- User can manage billing details (update card, view invoices) via Stripe Billing Portal
+- Support role users bypass subscription gating entirely
+- Trial banner shows days remaining during trial period
 
 ### Out of Scope
 
@@ -190,18 +195,23 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 | Debug port 9230 for worker | Avoids port collision with API debugging on 9229 | ✓ Good -- clear convention |
 | No Redis volume in Docker Compose | BullMQ jobs are transient in dev; ephemeral Redis is simpler and sufficient | ✓ Good -- right trade-off |
 
-## Current Milestone: v1.5 Automated E2E Playwright Testing
+## Current Milestone: v1.6 Stripe Subscription Billing
 
-**Goal:** Build a reliable automated E2E test suite using Playwright that covers the full Trade Flow user journey from login to quote acceptance, running locally and in CI.
+**Goal:** Turn Trade Flow into a SaaS product — card-required 30-day free trial via Stripe Checkout (Stripe owns the trial), then £6/month recurring, with read-only enforcement when trial expires or payment fails, and a custom billing settings tab.
 
 **Target features:**
-- Playwright setup in trade-flow-ui with local dev stack as target
-- Auth & onboarding flow tests (signup, login, onboarding, business creation)
-- Core job flow tests (customer → job → schedule → quote)
-- Quote send & respond tests (send email, customer accept/decline)
-- Settings & inventory tests (tax rates, items, visit types, email template)
-- Test data seeded via API calls before each test (isolated, clean)
-- GitHub Actions CI integration (runs on push/PR)
+- SubscriptionModule in trade-flow-api (MongoDB collection, userId-keyed)
+- POST /v1/subscription/checkout → Stripe Checkout Session (trial_period_days: 30, card collected)
+- Stripe webhook endpoint with raw body + signature verification; webhook creates/syncs local record
+- Webhook event handling: subscription.created/updated/deleted, invoice.payment_failed/succeeded
+- GET /v1/subscription, POST /v1/subscription/portal, DELETE /v1/subscription endpoints
+- Unit tests for all services and repository
+- SubscriptionGate component in trade-flow-ui (wraps business routes, redirects to /subscribe)
+- Support role exemption bypasses SubscriptionGate
+- /subscribe, /subscribe/success, /subscribe/cancel pages
+- Persistent trial banner showing days remaining
+- Settings > Billing tab with SubscriptionStatusCard (status, dates, cancel, manage billing CTA)
+- Read-only mode when status is past_due, canceled, or trial expired
 
 ## Evolution
 
@@ -221,4 +231,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-27 — Milestone v1.5 Automated E2E Playwright Testing started*
+*Last updated: 2026-03-28 — Milestone v1.6 Stripe Subscription Billing started*
