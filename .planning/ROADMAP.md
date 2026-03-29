@@ -185,7 +185,7 @@ Plans:
 **Goal**: A user can complete Stripe Checkout and the webhook handler creates and keeps the local subscription record in sync across all five Stripe event types
 **Depends on**: Phase 29
 **Repo**: trade-flow-api
-**Requirements**: ACQ-01, ACQ-03, ACQ-04, ACQ-05, WBHK-02, WBHK-03, WBHK-04, WBHK-05, WBHK-06, WBHK-07
+**Requirements**: ACQ-01, ACQ-03, ACQ-05, WBHK-02, WBHK-03, WBHK-04, WBHK-05, WBHK-06, WBHK-07
 **Success Criteria** (what must be TRUE):
   1. After completing Stripe Checkout, the `checkout.session.completed` webhook creates a subscription record in MongoDB with status `trialing`
   2. Sending `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_succeeded`, and `invoice.payment_failed` webhook events each update the local record to the correct status
@@ -213,7 +213,7 @@ Plans:
 **Goal**: Unauthenticated-subscription users are redirected to /subscribe and cannot access business routes, while users completing checkout land on a confirming success page
 **Depends on**: Phase 31
 **Repo**: trade-flow-ui
-**Requirements**: GATE-01, GATE-02, GATE-03, GATE-04, GATE-05
+**Requirements**: GATE-01, GATE-02, GATE-03, GATE-04, GATE-05, ACQ-04
 **Success Criteria** (what must be TRUE):
   1. Navigating to `/customers` (or any business route) without an active subscription redirects to `/subscribe` — the subscribe page shows a pricing card with a "Start free trial" CTA
   2. Users with a support role can navigate to all business routes without being redirected, regardless of subscription status
