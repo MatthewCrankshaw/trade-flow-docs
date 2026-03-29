@@ -68,3 +68,61 @@
 **Resolved to:** Controller/guard spec covers signature rejection; SubscriptionUpdaterService spec covers only the 5 event types and their effects on the local record.
 
 ---
+
+## Area: SubscriptionGuard — API-Level Access Control (Update Session 2026-03-29)
+
+**Context:** User requested an update to add API-level subscription enforcement — not just UI-level gating.
+
+**Q1:** Which API operations should be blocked for unsubscribed users?
+
+| Option | Selected |
+|--------|----------|
+| All write endpoints (POST/PUT/PATCH/DELETE) | ✓ |
+| Write + some reads | |
+| Scoped to job/quote/customer only | |
+
+**Q2:** Implementation approach?
+
+| Option | Selected |
+|--------|----------|
+| New SubscriptionGuard (NestJS guard, 403 Forbidden) | ✓ |
+| Extend existing policies | |
+| Middleware | |
+
+**Q3:** Guard application scope?
+
+| Option | Selected |
+|--------|----------|
+| Global APP_GUARD with @SkipSubscriptionCheck() decorator | ✓ |
+| Per-controller @UseGuards() | |
+| Route-group level | |
+
+**Q4:** Which subscription statuses pass the guard?
+
+| Option | Selected |
+|--------|----------|
+| trialing + active only | ✓ |
+| trialing + active + past_due | |
+| Any non-canceled | |
+
+**Q5:** Support user bypass?
+
+| Option | Selected |
+|--------|----------|
+| Check request.user.supportRoles on IUserDto | ✓ |
+| Separate SupportGuard | |
+| Hardcoded email list | |
+
+**Notes:** `supportRoles` already exists on the user DTO — no schema changes needed.
+
+**Q6:** Route exemptions?
+
+| Option | Selected |
+|--------|----------|
+| Only @Public() routes and subscription routes | ✓ |
+| Also exempt business settings | |
+| Also exempt user/profile routes | |
+
+**Resolved:** SubscriptionGuard blocks write methods globally. Subscription routes (checkout, verify-session, GET/DELETE subscription, POST portal, POST webhooks/stripe) decorated with @SkipSubscriptionCheck(). Support users bypass via supportRoles check. Returns 403 ForbiddenError.
+
+---

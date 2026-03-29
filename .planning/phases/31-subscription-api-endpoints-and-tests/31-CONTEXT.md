@@ -6,7 +6,7 @@
 <domain>
 ## Phase Boundary
 
-Add three subscription management endpoints on top of the Phase 29/30 foundation: `GET /v1/subscription` (retrieve current subscription state), `DELETE /v1/subscription` (cancel at period end), and `POST /v1/subscription/portal` (create Stripe Billing Portal session). Add unit test coverage for all services and the repository. Phase is backend-only (`trade-flow-api`).
+Add three subscription management endpoints on top of the Phase 29/30 foundation: `GET /v1/subscription` (retrieve current subscription state), `DELETE /v1/subscription` (cancel at period end), and `POST /v1/subscription/portal` (create Stripe Billing Portal session). Add unit test coverage for all services and the repository. Add a global `SubscriptionGuard` that enforces subscription status on write endpoints at the API level — blocking unsubscribed users regardless of UI state. Phase is backend-only (`trade-flow-api`).
 
 </domain>
 
@@ -34,12 +34,20 @@ Add three subscription management endpoints on top of the Phase 29/30 foundation
   - TEST-04: `SubscriptionRepository` — upsert, findByUserId, findByStripeSubscriptionId operations
   - Additional: `SubscriptionController` (webhook route) spec — valid signature → 200; invalid signature → 400
 
+### SubscriptionGuard — API-Level Access Control
+- **D-09:** A new global `SubscriptionGuard` enforces subscription status on write operations. It blocks POST, PUT, PATCH, and DELETE requests for users whose subscription status is not `trialing` or `active`. GET and HEAD requests always bypass — reads are unrestricted. Returns 403 Forbidden (`ForbiddenError`) when blocked. This enforces the access model at the API layer, not just the UI layer.
+- **D-10:** `SubscriptionGuard` is registered as a global guard (`APP_GUARD`) in `AppModule`, running after `JwtAuthGuard` in the guard chain. Routes opt out using a `@SkipSubscriptionCheck()` custom decorator. Routes that bypass: all `@Public()` routes (auto-bypass — no JWT means no subscription check) and all subscription management routes (`POST /v1/subscription/checkout`, `GET /v1/subscription`, `DELETE /v1/subscription`, `POST /v1/subscription/portal`, `GET /v1/subscription/verify-session`, `POST /v1/webhooks/stripe`). All other authenticated write routes are enforced.
+- **D-11:** Support users bypass `SubscriptionGuard` by checking `request.user.supportRoles` on the `IUserDto`. If `supportRoles` is truthy/non-empty, the guard allows the request through without a subscription DB lookup. `supportRoles` already exists on the User DTO — no schema changes needed.
+- **D-12:** Statuses that pass the guard: `trialing` and `active` only. Users with `past_due`, `canceled`, `incomplete`, or no subscription record at all are blocked from write operations.
+- **D-13:** Guard performs a DB lookup via `SubscriptionRepository` to retrieve current status. After confirming the user is not a support user and the request is a write method, it calls `findByUserId` and checks the status field.
+
 ### Claude's Discretion
 - Stripe SDK mock structure for tests (exact shape of `jest.fn()` mocks for `stripe.subscriptions.*`, `stripe.billingPortal.sessions.create`, `stripe.webhooks.constructEvent`)
 - `SubscriptionMockGenerator` design (follow existing mock generator conventions)
 - Repository method naming for `findByUserId`, `findByStripeSubscriptionId`
 - Response DTO shape for subscription endpoints (extend existing ISubscriptionDto or create ISubscriptionResponse)
 - Controller method names and route handler structure
+- BullMQ job caching: guard may cache the subscription lookup per-request to avoid double DB call if other guards also check subscription
 
 </decisions>
 
@@ -71,21 +79,26 @@ Add three subscription management endpoints on top of the Phase 29/30 foundation
 ### Reusable Assets
 - `ResourceNotFoundError`: existing error class → used for GET /v1/subscription 404 case (D-01)
 - `InvalidRequestError`: existing error class → used for DELETE /v1/subscription 422 case (D-03)
-- `JwtAuthGuard` + `@Public()`: all three endpoints are protected by JwtAuthGuard (standard, not public)
+- `ForbiddenError`: existing error class → used for SubscriptionGuard 403 response (D-09)
+- `JwtAuthGuard` + `@Public()`: all three endpoints are protected by JwtAuthGuard (standard, not public); `@Public()` routes auto-bypass SubscriptionGuard
 - `AppLogger`: inject as `new AppLogger(ClassName.name)` per existing service convention
 - `ConfigService`: read `FRONTEND_URL` env var for portal return URL (D-05)
 - Mock generators: `BusinessMockGenerator`, `UserMockGenerator` in `src/*/test/mocks/` — `SubscriptionMockGenerator` follows same pattern
+- `IUserDto.supportRoles`: existing field on user DTO — no schema changes needed for support bypass (D-11)
 
 ### Established Patterns
 - Service splitting: Creator/Retriever/Updater per resource — `SubscriptionCreatorService`, `SubscriptionRetrieverService`, `SubscriptionUpdaterService` already named in REQUIREMENTS.md
 - Test structure: `src/subscription/test/services/*.spec.ts`, `src/subscription/test/repositories/*.spec.ts`, `src/subscription/test/controllers/*.spec.ts`
 - Response pattern: `ISubscriptionResponse` interface with camelCase fields matching the entity DTO
 - Provider injection: `{ provide: STRIPE_CLIENT, useValue: { ... jest.fn()s ... } }` in test module setup (same as factory provider pattern in production)
+- Global guard pattern: `APP_GUARD` registration in AppModule providers array — same mechanism as global `JwtAuthGuard` if applicable
 
 ### Integration Points
 - `src/subscription/` — Phase 31 adds new methods to existing services and new endpoint handlers to existing controller
 - GET and DELETE routes on `SubscriptionController` alongside the existing checkout and verify-session routes from Phases 29–30
 - `FRONTEND_URL` env var already in `.env.example` from Phase 29
+- `AppModule` providers — register `SubscriptionGuard` as `APP_GUARD` (D-10)
+- `src/subscription/guards/subscription.guard.ts` — new guard file, injects `SubscriptionRepository`
 
 </code_context>
 
@@ -95,6 +108,8 @@ Add three subscription management endpoints on top of the Phase 29/30 foundation
 - Portal return URL: `${FRONTEND_URL}/settings?tab=billing` — the `?tab=billing` query param is intentional; Phase 33 wires up tab routing in Settings and will read this param to pre-select Billing
 - Invalid signature test: test the controller/guard, not the updater service — "SubscriptionUpdaterService should not test authorization, only subscription update business logic" (user's words)
 - DELETE response: return full updated subscription (200), not 204 — lets frontend update immediately without a refetch
+- SubscriptionGuard: blocks writes at API level for unsubscribed users, mirroring what SubscriptionGate does at the UI level — the two work in tandem, not as alternatives
+- `@SkipSubscriptionCheck()` decorator: use `SetMetadata('skipSubscriptionCheck', true)` pattern — consistent with how `@Public()` is implemented
 
 </specifics>
 
