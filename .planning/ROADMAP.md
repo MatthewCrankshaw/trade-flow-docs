@@ -93,7 +93,7 @@ Full details: `.planning/milestones/v1.4-ROADMAP.md`
 - [ ] **Phase 30: Stripe Checkout and Webhooks** - POST /v1/subscription/checkout and POST /v1/webhooks/stripe with all 5 event handlers and upsert idempotency
 - [ ] **Phase 31: Subscription API Endpoints and Tests** - GET/DELETE /v1/subscription, POST /v1/subscription/portal, and unit tests for all services and repository
 - [ ] **Phase 32: Subscription Gate and Subscribe Pages** - SubscriptionGate component, /subscribe page, /subscribe/success, /subscribe/cancel, App.tsx route wiring, RTK Query subscriptionApi
-- [ ] **Phase 33: Trial Banner and Billing Settings Tab** - TrialBanner component, Settings > Billing tab with SubscriptionStatusCard
+- [ ] **Phase 33: Trial Banner and Billing Settings Tab** - TrialChip component, Settings > Billing tab with SubscriptionStatusCard
 
 </details>
 
@@ -127,14 +127,14 @@ Plans:
 - [ ] 25-02-PLAN.md — Onboarding wizard E2E test with default entity verification and cleanup
 
 ### Phase 26: Core Job Flow Tests
-**Goal**: The primary business object pipeline (customer → job → schedule → quote) is tested end-to-end
+**Goal**: The primary business object pipeline (customer -> job -> schedule -> quote) is tested end-to-end
 **Depends on**: Phase 25
 **Requirements**: JOB-01, JOB-02, JOB-03, JOB-04
 **Success Criteria** (what must be TRUE):
   1. A test verifies that creating a customer via the UI results in the customer appearing in the customer list
   2. A test verifies that creating a job linked to a customer results in the job appearing in the job list
   3. A test verifies that adding a schedule entry to a job with a date, start time, and visit type displays the entry in the job detail page
-  4. A connected end-to-end test runs the full sequence: create customer → create job → add schedule entry → create quote, and each step passes without relying on pre-seeded data
+  4. A connected end-to-end test runs the full sequence: create customer -> create job -> add schedule entry -> create quote, and each step passes without relying on pre-seeded data
 **Plans**: TBD
 **UI hint**: yes
 
@@ -250,7 +250,12 @@ Plans:
   2. Settings > Billing tab shows the current subscription status and next billing date (or trial end date)
   3. When `cancelAtPeriodEnd` is true, the Billing tab shows "Cancels on [date]" rather than "Active"
   4. "Manage Billing" button on the Billing tab redirects the user to the Stripe Billing Portal
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 33-01-PLAN.md — TrialChip component with days-remaining display and DashboardLayout header wiring
+- [ ] 33-02-PLAN.md — Billing tab on Settings page with SubscriptionStatusCard, portal redirect, and tab routing
+
 **UI hint**: yes
 
 ## Progress
@@ -289,4 +294,4 @@ Plans:
 | 30. Stripe Checkout and Webhooks | v1.6 | 3/3 | Complete   | 2026-03-29 |
 | 31. Subscription API Endpoints and Tests | v1.6 | 2/2 | Complete   | 2026-03-29 |
 | 32. Subscription Gate and Subscribe Pages | v1.6 | 3/3 | Complete    | 2026-03-29 |
-| 33. Trial Banner and Billing Settings Tab | v1.6 | 0/? | Not started | - |
+| 33. Trial Banner and Billing Settings Tab | v1.6 | 0/2 | Not started | - |
