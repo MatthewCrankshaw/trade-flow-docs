@@ -163,6 +163,16 @@ Plans:
   5. A GitHub Actions workflow runs on push and pull request: checks out both repos, starts the Docker Compose stack, executes the full Playwright suite, and uploads traces and reports as artifacts on failure
 **Plans**: TBD
 
+### Phase 34: Use luxon DateTime in DTOs, extend IBaseResourceDto, move createdAt/updatedAt to entity only
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 33
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 34 to break down)
+
 ---
 
 ## v1.6 Stripe Subscription Billing — Phase Details
@@ -193,7 +203,7 @@ Plans:
   4. `GET /v1/subscription/verify-session?sessionId=` returns the subscription status so the success page can confirm without waiting for the webhook
 **Plans**: 3 plans
 Plans:
-- [ ] 30-01-PLAN.md — Queue infrastructure, entity/repo extensions, webhook controller enqueue
+- [x] 30-01-PLAN.md — Queue infrastructure, entity/repo extensions, webhook controller enqueue
 - [ ] 30-02-PLAN.md — StripeWebhookProcessor with 5 event handlers in WorkerModule
 - [ ] 30-03-PLAN.md — Verify-session endpoint and duplicate checkout guard
 
@@ -269,7 +279,7 @@ Plans:
 | 27. Quote Lifecycle Tests | v1.5 | 0/? | Not started | - |
 | 28. Settings Tests + CI Integration | v1.5 | 0/? | Not started | - |
 | 29. Subscription Module Foundation | v1.6 | 2/2 | Complete    | 2026-03-29 |
-| 30. Stripe Checkout and Webhooks | v1.6 | 0/3 | Not started | - |
+| 30. Stripe Checkout and Webhooks | v1.6 | 1/3 | In Progress|  |
 | 31. Subscription API Endpoints and Tests | v1.6 | 0/? | Not started | - |
 | 32. Subscription Gate and Subscribe Pages | v1.6 | 0/? | Not started | - |
 | 33. Trial Banner and Billing Settings Tab | v1.6 | 0/? | Not started | - |

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Stripe Subscription Billing — Phase Details
-status: completed
-stopped_at: Completed 29-02-PLAN.md
-last_updated: "2026-03-29T14:28:15.093Z"
+status: executing
+stopped_at: Completed 30-01-PLAN.md
+last_updated: "2026-03-29T14:37:31.792Z"
 last_activity: 2026-03-29
 progress:
-  total_phases: 10
+  total_phases: 11
   completed_phases: 3
   total_plans: 8
-  completed_plans: 5
+  completed_plans: 6
 ---
 
 # Project State
@@ -20,13 +20,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 29 — Subscription Module Foundation
+**Current focus:** Phase 30 — stripe-checkout-and-webhooks
 
 ## Current Position
 
-Phase: 30
-Plan: Not started
-Status: Phase 29 complete, ready for Phase 30
+Phase: 30 (stripe-checkout-and-webhooks) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
 Last activity: 2026-03-29
 
 ```
@@ -60,6 +60,7 @@ Progress: Phase 29 of 33
 | Phase 25-api-seeding-onboarding-tests P01 | 5 | 3 tasks | 10 files |
 | Phase 29 P01 | 5min | 2 tasks | 12 files |
 | Phase 29 P02 | 5min | 2 tasks | 3 files |
+| Phase 30 P01 | 3min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -101,6 +102,12 @@ Recent decisions affecting current work:
 - [Phase 29-02]: BadRequestException (HTTP 400) for webhook signature failures -- InvalidRequestError maps to 422
 - [Phase 29-02]: WebhookController as separate class without JwtAuthGuard -- @Public() decorator does not exist in codebase
 - [Phase 29-02]: externalAuthUserId for Stripe metadata.userId -- Firebase UID is the user identity key
+- [Phase 30]: Enqueue failure returns 200 to Stripe -- prevents retries on transient Redis issues
+- [Phase 30]: jobId: event.id provides first-layer deduplication at BullMQ level
+
+### Roadmap Evolution
+
+- Phase 34 added: Use luxon DateTime in DTOs, extend IBaseResourceDto, move createdAt/updatedAt to entity only
 
 ### Pending Todos
 
@@ -130,6 +137,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-29T14:19:32Z
-Stopped at: Completed 29-02-PLAN.md
-Resume file: .planning/phases/30-stripe-checkout-and-webhooks/30-01-PLAN.md
+Last session: 2026-03-29T14:37:31.790Z
+Stopped at: Completed 30-01-PLAN.md
+Resume file: None

@@ -21,7 +21,7 @@
 - [ ] **WBHK-04**: `customer.subscription.deleted` event sets local record status to `canceled` and records `canceledAt`
 - [ ] **WBHK-05**: `invoice.payment_succeeded` event sets local record status to `active`
 - [ ] **WBHK-06**: `invoice.payment_failed` event sets local record status to `past_due`
-- [ ] **WBHK-07**: Webhook handler is idempotent — processing the same event twice produces no duplicate records (upsert by `stripeSubscriptionId`)
+- [x] **WBHK-07**: Webhook handler is idempotent — processing the same event twice produces no duplicate records (upsert by `stripeSubscriptionId`)
 
 ### Access Enforcement
 
