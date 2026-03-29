@@ -46,10 +46,10 @@
 
 ### Testing & Quality
 
-- [ ] **TEST-01**: `SubscriptionCreatorService` has unit tests covering Checkout Session creation (Stripe SDK mocked)
-- [ ] **TEST-02**: `SubscriptionUpdaterService` has unit tests covering each webhook event type, including invalid signature rejection
-- [ ] **TEST-03**: `SubscriptionRetrieverService` has unit tests covering found and not-found subscription scenarios
-- [ ] **TEST-04**: `SubscriptionRepository` has unit tests covering upsert, findByUserId, and findByStripeSubscriptionId operations
+- [x] **TEST-01**: `SubscriptionCreatorService` has unit tests covering Checkout Session creation (Stripe SDK mocked)
+- [x] **TEST-02**: `SubscriptionUpdaterService` has unit tests covering each webhook event type, including invalid signature rejection
+- [x] **TEST-03**: `SubscriptionRetrieverService` has unit tests covering found and not-found subscription scenarios
+- [x] **TEST-04**: `SubscriptionRepository` has unit tests covering upsert, findByUserId, and findByStripeSubscriptionId operations
 
 ---
 

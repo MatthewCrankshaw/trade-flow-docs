@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Stripe Subscription Billing — Phase Details
-status: executing
-stopped_at: Completed 31-01-PLAN.md
-last_updated: "2026-03-29T16:04:00.823Z"
+status: verifying
+stopped_at: Completed 31-02-PLAN.md
+last_updated: "2026-03-29T18:30:52.171Z"
 last_activity: 2026-03-29
 progress:
   total_phases: 11
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 10
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 
 Phase: 31 (subscription-api-endpoints-and-tests) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-03-29
 
 ```
@@ -64,6 +64,7 @@ Progress: Phase 29 of 33
 | Phase 30 P02 | 3min | 2 tasks | 2 files |
 | Phase 30 P03 | 3min | 2 tasks | 7 files |
 | Phase 31 P01 | 5min | 2 tasks | 11 files |
+| Phase 31 P02 | 6min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -111,6 +112,7 @@ Recent decisions affecting current work:
 - [Phase 30]: InvalidRequestError with SUBSCRIPTION_ALREADY_ACTIVE code for duplicate guard (consistent with existing error patterns)
 - [Phase 31]: Stripe v21 current_period_end at items.data[0] level, not subscription level
 - [Phase 31]: SubscriptionGuard uses supportRoles.length for support user bypass
+- [Phase 31]: DtoCollection.create() for non-empty collections in tests (private constructor)
 
 ### Roadmap Evolution
 
@@ -144,6 +146,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-29T16:04:00.821Z
-Stopped at: Completed 31-01-PLAN.md
+Last session: 2026-03-29T18:30:52.169Z
+Stopped at: Completed 31-02-PLAN.md
 Resume file: None
