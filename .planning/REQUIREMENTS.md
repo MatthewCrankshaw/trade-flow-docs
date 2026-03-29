@@ -84,4 +84,8 @@
 
 | Phase | REQ-IDs |
 |-------|---------|
-| TBD | TBD |
+| Phase 29: Subscription Module Foundation | ACQ-02, WBHK-01 |
+| Phase 30: Stripe Checkout and Webhooks | ACQ-01, ACQ-03, ACQ-04, ACQ-05, WBHK-02, WBHK-03, WBHK-04, WBHK-05, WBHK-06, WBHK-07 |
+| Phase 31: Subscription API Endpoints and Tests | BILL-01, BILL-02, BILL-03, TEST-01, TEST-02, TEST-03, TEST-04 |
+| Phase 32: Subscription Gate and Subscribe Pages | GATE-01, GATE-02, GATE-03, GATE-04, GATE-05 |
+| Phase 33: Trial Banner and Billing Settings Tab | TRIAL-01, TRIAL-02, BILL-04, BILL-05 |

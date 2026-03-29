@@ -7,7 +7,7 @@ stopped_at: ""
 last_updated: "2026-03-28T00:00:00.000Z"
 last_activity: 2026-03-28
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -20,17 +20,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 25 — api-seeding-onboarding-tests
+**Current focus:** Phase 29 — Subscription Module Foundation (v1.6 roadmap defined, awaiting execution)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Not started (roadmap defined)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-03-28 — Milestone v1.6 started
+Status: Ready to execute Phase 29
+Last activity: 2026-03-28 — Milestone v1.6 roadmap created (Phases 29-33)
 
 ```
-Progress: Phase 24 of 28
+Progress: Phase 29 of 33
 [░░░░░░░░░░░░░░░░░░░░░░░░░] 0% complete (0/5 phases)
 ```
 
@@ -88,6 +88,12 @@ Recent decisions affecting current work:
 - [Phase 25-api-seeding-onboarding-tests]: Token extraction via page.evaluate(getIdToken()) not from storageState JSON — avoids Firebase token expiry after 1h
 - [Phase 25-api-seeding-onboarding-tests]: Dynamic businessId discovery via GET /v1/business in apiClient fixture — no hardcoded IDs
 - [Phase 25-api-seeding-onboarding-tests]: D-03 auto-chaining in createJob: auto-creates customer when customerId omitted — simplifies job-centric test setup
+- [v1.6 research]: Stripe Checkout (hosted) over Stripe Elements — zero PCI scope, SCA/3DS handled automatically, no frontend packages
+- [v1.6 research]: Local MongoDB subscription record (not Stripe as source of truth) — avoids Stripe API call on every gated request
+- [v1.6 research]: rawBody: true globally in NestFactory.create — critical first task; without it all webhook signature verifications fail
+- [v1.6 research]: cancel_at_period_end on cancel (not stripe.subscriptions.cancel) — user retains access until period end
+- [v1.6 research]: Session verification endpoint as race condition safety net — webhook may arrive 1-30s after redirect
+- [v1.6 research]: Subscription keyed by userId — per-user billing aligned with Firebase auth identity
 
 ### Pending Todos
 
@@ -98,6 +104,7 @@ None.
 - Firebase v12 IndexedDB persistence in Playwright storageState needs validation in Phase 24 -- fallback is signInWithCustomToken() in page evaluate
 - Dedicated Firebase test user must be pre-created in Firebase Console before Phase 24 can run
 - Two-repo CI checkout strategy (trade-flow-ui + trade-flow-api) needs validation in Phase 28
+- Stripe Dashboard setup required before Phase 29 can run: create Product/Price (£6/month), configure webhook endpoint, enable Customer Portal
 
 ### Quick Tasks Completed
 
@@ -116,6 +123,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-28T09:18:54.200Z
-Stopped at: Checkpoint: 25-02 Task 2 human-verify — awaiting full Playwright suite run
+Last session: 2026-03-28T00:00:00.000Z
+Stopped at: Roadmap created for v1.6 Stripe Subscription Billing (Phases 29-33)
 Resume file: None

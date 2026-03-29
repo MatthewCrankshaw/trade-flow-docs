@@ -8,6 +8,7 @@
 - v1.3 Send Quotes -- Phases 15-19 (shipped 2026-03-21)
 - v1.4 Monorepo & Worker Infrastructure -- Phases 20-23 (shipped 2026-03-22)
 - v1.5 Automated E2E Playwright Testing -- Phases 24-28 (in progress)
+- v1.6 Stripe Subscription Billing -- Phases 29-33 (planned)
 
 ## Phases
 
@@ -85,6 +86,17 @@ Full details: `.planning/milestones/v1.4-ROADMAP.md`
 
 </details>
 
+<details>
+<summary>v1.6 Stripe Subscription Billing (Phases 29-33) -- PLANNED</summary>
+
+- [ ] **Phase 29: Subscription Module Foundation** - SubscriptionModule skeleton, MongoDB entity/repo, SubscriptionStatus enum, rawBody: true in main.ts, Stripe provider, env vars
+- [ ] **Phase 30: Stripe Checkout and Webhooks** - POST /v1/subscription/checkout and POST /v1/webhooks/stripe with all 5 event handlers and upsert idempotency
+- [ ] **Phase 31: Subscription API Endpoints and Tests** - GET/DELETE /v1/subscription, POST /v1/subscription/portal, and unit tests for all services and repository
+- [ ] **Phase 32: Subscription Gate and Subscribe Pages** - SubscriptionGate component, /subscribe page, /subscribe/success, /subscribe/cancel, App.tsx route wiring, RTK Query subscriptionApi
+- [ ] **Phase 33: Trial Banner and Billing Settings Tab** - TrialBanner component, Settings > Billing tab with SubscriptionStatusCard
+
+</details>
+
 ## Phase Details
 
 ### Phase 24: Playwright Bootstrap & Auth
@@ -151,6 +163,72 @@ Plans:
   5. A GitHub Actions workflow runs on push and pull request: checks out both repos, starts the Docker Compose stack, executes the full Playwright suite, and uploads traces and reports as artifacts on failure
 **Plans**: TBD
 
+---
+
+## v1.6 Stripe Subscription Billing — Phase Details
+
+### Phase 29: Subscription Module Foundation
+**Goal**: The API is structurally ready to handle Stripe — raw body preserved for webhook signature verification, Stripe SDK wired, and the subscription data model exists in MongoDB
+**Depends on**: Nothing (first phase of v1.6)
+**Repo**: trade-flow-api
+**Requirements**: ACQ-02, WBHK-01
+**Success Criteria** (what must be TRUE):
+  1. `POST /v1/subscription/checkout` returns a Stripe Checkout Session URL (Stripe SDK live, env vars loaded)
+  2. `POST /v1/webhooks/stripe` with an invalid or missing signature returns 400, confirming raw body is preserved and signature verification is active
+  3. `SubscriptionStatus` enum values (`trialing`, `active`, `past_due`, `canceled`, `incomplete`) are defined and the `subscriptions` MongoDB collection has unique indexes on `userId` and `stripeSubscriptionId`
+**Plans**: TBD
+
+### Phase 30: Stripe Checkout and Webhooks
+**Goal**: A user can complete Stripe Checkout and the webhook handler creates and keeps the local subscription record in sync across all five Stripe event types
+**Depends on**: Phase 29
+**Repo**: trade-flow-api
+**Requirements**: ACQ-01, ACQ-03, ACQ-04, ACQ-05, WBHK-02, WBHK-03, WBHK-04, WBHK-05, WBHK-06, WBHK-07
+**Success Criteria** (what must be TRUE):
+  1. After completing Stripe Checkout, the `checkout.session.completed` webhook creates a subscription record in MongoDB with status `trialing`
+  2. Sending `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_succeeded`, and `invoice.payment_failed` webhook events each update the local record to the correct status
+  3. Replaying the same webhook event twice produces one record, not two (upsert by `stripeSubscriptionId` is idempotent)
+  4. `GET /v1/subscription/verify-session?sessionId=` returns the subscription status so the success page can confirm without waiting for the webhook
+**Plans**: TBD
+
+### Phase 31: Subscription API Endpoints and Tests
+**Goal**: All subscription management endpoints are available and the service layer has unit test coverage
+**Depends on**: Phase 30
+**Repo**: trade-flow-api
+**Requirements**: BILL-01, BILL-02, BILL-03, TEST-01, TEST-02, TEST-03, TEST-04
+**Success Criteria** (what must be TRUE):
+  1. `GET /v1/subscription` returns status, `currentPeriodEnd`, `trialEnd`, and `cancelAtPeriodEnd` for the authenticated user
+  2. `DELETE /v1/subscription` sets `cancel_at_period_end: true` on Stripe and updates the local record — access is not immediately removed
+  3. `POST /v1/subscription/portal` returns a Stripe Billing Portal URL the frontend can redirect to
+  4. Unit tests for `SubscriptionCreatorService`, `SubscriptionUpdaterService`, `SubscriptionRetrieverService`, and `SubscriptionRepository` all pass with the Stripe SDK mocked
+**Plans**: TBD
+
+### Phase 32: Subscription Gate and Subscribe Pages
+**Goal**: Unauthenticated-subscription users are redirected to /subscribe and cannot access business routes, while users completing checkout land on a confirming success page
+**Depends on**: Phase 31
+**Repo**: trade-flow-ui
+**Requirements**: GATE-01, GATE-02, GATE-03, GATE-04, GATE-05
+**Success Criteria** (what must be TRUE):
+  1. Navigating to `/customers` (or any business route) without an active subscription redirects to `/subscribe` — the subscribe page shows a pricing card with a "Start free trial" CTA
+  2. Users with a support role can navigate to all business routes without being redirected, regardless of subscription status
+  3. `/subscribe/success` shows a loading state while polling, then confirms the subscription is active once the webhook has been processed
+  4. `/subscribe/cancel` offers a "Try again" option that returns the user to `/subscribe`
+  5. The Settings page is reachable without an active subscription, and no flash of the subscribe page occurs for users who already have an active subscription (loading skeleton shown during fetch)
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 33: Trial Banner and Billing Settings Tab
+**Goal**: Trialing users see how many days remain in their trial, and any user can view and manage their subscription from Settings > Billing
+**Depends on**: Phase 32
+**Repo**: trade-flow-ui
+**Requirements**: TRIAL-01, TRIAL-02, BILL-04, BILL-05
+**Success Criteria** (what must be TRUE):
+  1. A persistent banner appears for trialing users showing the number of days remaining and a "Subscribe" CTA — the banner is absent when subscription status is `active`
+  2. Settings > Billing tab shows the current subscription status and next billing date (or trial end date)
+  3. When `cancelAtPeriodEnd` is true, the Billing tab shows "Cancels on [date]" rather than "Active"
+  4. "Manage Billing" button on the Billing tab redirects the user to the Stripe Billing Portal
+**Plans**: TBD
+**UI hint**: yes
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -183,3 +261,8 @@ Plans:
 | 26. Core Job Flow Tests | v1.5 | 0/? | Not started | - |
 | 27. Quote Lifecycle Tests | v1.5 | 0/? | Not started | - |
 | 28. Settings Tests + CI Integration | v1.5 | 0/? | Not started | - |
+| 29. Subscription Module Foundation | v1.6 | 0/? | Not started | - |
+| 30. Stripe Checkout and Webhooks | v1.6 | 0/? | Not started | - |
+| 31. Subscription API Endpoints and Tests | v1.6 | 0/? | Not started | - |
+| 32. Subscription Gate and Subscribe Pages | v1.6 | 0/? | Not started | - |
+| 33. Trial Banner and Billing Settings Tab | v1.6 | 0/? | Not started | - |
