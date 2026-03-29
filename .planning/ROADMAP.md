@@ -236,8 +236,8 @@ Plans:
 **Plans**: 3 plans
 Plans:
 - [x] 32-01-PLAN.md — Subscription feature foundation: types, RTK Query subscriptionApi, paywallSlice, SubscriptionContext, hooks
-- [ ] 32-02-PLAN.md — UI components (PaywallModal, PersistentCta, DashboardBanner, PricingCard, SubscriptionGatedLayout), subscribe pages, App.tsx route wiring
-- [ ] 32-03-PLAN.md — Wire paywall triggers into all business page write-action handlers
+- [x] 32-02-PLAN.md — UI components (PaywallModal, PersistentCta, DashboardBanner, PricingCard, SubscriptionGatedLayout), subscribe pages, App.tsx route wiring
+- [x] 32-03-PLAN.md — Wire paywall triggers into all business page write-action handlers
 **UI hint**: yes
 
 ### Phase 33: Trial Banner and Billing Settings Tab
@@ -288,5 +288,5 @@ Plans:
 | 29. Subscription Module Foundation | v1.6 | 2/2 | Complete    | 2026-03-29 |
 | 30. Stripe Checkout and Webhooks | v1.6 | 3/3 | Complete   | 2026-03-29 |
 | 31. Subscription API Endpoints and Tests | v1.6 | 2/2 | Complete   | 2026-03-29 |
-| 32. Subscription Gate and Subscribe Pages | v1.6 | 1/3 | In Progress|  |
+| 32. Subscription Gate and Subscribe Pages | v1.6 | 3/3 | Complete   | 2026-03-29 |
 | 33. Trial Banner and Billing Settings Tab | v1.6 | 0/? | Not started | - |
