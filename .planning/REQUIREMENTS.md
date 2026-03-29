@@ -25,11 +25,11 @@
 
 ### Access Enforcement
 
-- [ ] **GATE-01**: All business routes (dashboard, customers, jobs, quotes, items, business) are wrapped by `SubscriptionGate` and redirect to `/subscribe` when subscription status is `past_due`, `canceled`, `incomplete`, or when no subscription record exists
+- [x] **GATE-01**: All business routes (dashboard, customers, jobs, quotes, items, business) are wrapped by `SubscriptionGate` and redirect to `/subscribe` when subscription status is `past_due`, `canceled`, `incomplete`, or when no subscription record exists
 - [ ] **GATE-02**: Settings page is always accessible regardless of subscription status (so users can resubscribe)
 - [ ] **GATE-03**: `/subscribe`, `/subscribe/success`, and `/subscribe/cancel` pages are accessible without an active subscription
-- [ ] **GATE-04**: Users with a support role bypass `SubscriptionGate` entirely and have full access without a subscription
-- [ ] **GATE-05**: `SubscriptionGate` shows a loading skeleton during the initial subscription status fetch (no flash of the subscribe page for active users)
+- [x] **GATE-04**: Users with a support role bypass `SubscriptionGate` entirely and have full access without a subscription
+- [x] **GATE-05**: `SubscriptionGate` shows a loading skeleton during the initial subscription status fetch (no flash of the subscribe page for active users)
 
 ### Trial Experience
 

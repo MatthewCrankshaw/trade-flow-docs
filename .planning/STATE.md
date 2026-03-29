@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Stripe Subscription Billing — Phase Details
-status: verifying
-stopped_at: Completed 31-02-PLAN.md
-last_updated: "2026-03-29T18:30:52.171Z"
+status: executing
+stopped_at: Completed 32-01-PLAN.md
+last_updated: "2026-03-29T18:53:50.420Z"
 last_activity: 2026-03-29
 progress:
   total_phases: 11
   completed_phases: 5
-  total_plans: 10
-  completed_plans: 10
+  total_plans: 13
+  completed_plans: 11
 ---
 
 # Project State
@@ -20,13 +20,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 31 — subscription-api-endpoints-and-tests
+**Current focus:** Phase 32 — subscription-gate-and-subscribe-pages
 
 ## Current Position
 
-Phase: 31 (subscription-api-endpoints-and-tests) — EXECUTING
-Plan: 2 of 2
-Status: Phase complete — ready for verification
+Phase: 32 (subscription-gate-and-subscribe-pages) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
 Last activity: 2026-03-29
 
 ```
@@ -65,6 +65,7 @@ Progress: Phase 29 of 33
 | Phase 30 P03 | 3min | 2 tasks | 7 files |
 | Phase 31 P01 | 5min | 2 tasks | 11 files |
 | Phase 31 P02 | 6min | 2 tasks | 2 files |
+| Phase 32 P01 | 3min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -113,6 +114,7 @@ Recent decisions affecting current work:
 - [Phase 31]: Stripe v21 current_period_end at items.data[0] level, not subscription level
 - [Phase 31]: SubscriptionGuard uses supportRoles.length for support user bypass
 - [Phase 31]: DtoCollection.create() for non-empty collections in tests (private constructor)
+- [Phase 32]: Separated SubscriptionContext (.ts) from SubscriptionProvider (.tsx) to satisfy react-refresh ESLint rule
 
 ### Roadmap Evolution
 
@@ -146,6 +148,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-29T18:30:52.169Z
-Stopped at: Completed 31-02-PLAN.md
+Last session: 2026-03-29T18:53:50.417Z
+Stopped at: Completed 32-01-PLAN.md
 Resume file: None
