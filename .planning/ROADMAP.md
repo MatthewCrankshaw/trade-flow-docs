@@ -191,7 +191,11 @@ Plans:
   2. Sending `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_succeeded`, and `invoice.payment_failed` webhook events each update the local record to the correct status
   3. Replaying the same webhook event twice produces one record, not two (upsert by `stripeSubscriptionId` is idempotent)
   4. `GET /v1/subscription/verify-session?sessionId=` returns the subscription status so the success page can confirm without waiting for the webhook
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 30-01-PLAN.md — Queue infrastructure, entity/repo extensions, webhook controller enqueue
+- [ ] 30-02-PLAN.md — StripeWebhookProcessor with 5 event handlers in WorkerModule
+- [ ] 30-03-PLAN.md — Verify-session endpoint and duplicate checkout guard
 
 ### Phase 31: Subscription API Endpoints and Tests
 **Goal**: All subscription management endpoints are available and the service layer has unit test coverage
@@ -265,7 +269,7 @@ Plans:
 | 27. Quote Lifecycle Tests | v1.5 | 0/? | Not started | - |
 | 28. Settings Tests + CI Integration | v1.5 | 0/? | Not started | - |
 | 29. Subscription Module Foundation | v1.6 | 0/2 | Not started | - |
-| 30. Stripe Checkout and Webhooks | v1.6 | 0/? | Not started | - |
+| 30. Stripe Checkout and Webhooks | v1.6 | 0/3 | Not started | - |
 | 31. Subscription API Endpoints and Tests | v1.6 | 0/? | Not started | - |
 | 32. Subscription Gate and Subscribe Pages | v1.6 | 0/? | Not started | - |
 | 33. Trial Banner and Billing Settings Tab | v1.6 | 0/? | Not started | - |
