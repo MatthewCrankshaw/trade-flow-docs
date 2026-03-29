@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Stripe Subscription Billing — Phase Details
 status: executing
-stopped_at: Completed 32-01-PLAN.md
-last_updated: "2026-03-29T18:53:50.420Z"
+stopped_at: Phase 33 UI-SPEC approved
+last_updated: "2026-03-29T18:58:34.679Z"
 last_activity: 2026-03-29
 progress:
   total_phases: 11
   completed_phases: 5
   total_plans: 13
-  completed_plans: 11
+  completed_plans: 12
 ---
 
 # Project State
@@ -148,6 +148,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-29T18:53:50.417Z
-Stopped at: Completed 32-01-PLAN.md
-Resume file: None
+Last session: 2026-03-29T18:58:34.676Z
+Stopped at: Phase 33 UI-SPEC approved
+Resume file: .planning/phases/33-trial-banner-and-billing-settings-tab/33-UI-SPEC.md
