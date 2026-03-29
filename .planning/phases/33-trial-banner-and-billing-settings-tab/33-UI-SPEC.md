@@ -34,8 +34,7 @@ Declared values follow the established Trade Flow spacing system (carried forwar
 | Token | Value | Tailwind | Usage in Phase 33 |
 |-------|-------|----------|-------------------|
 | 2xs | 4px | `1` | Gap between chip icon and text |
-| xs | 6px | `1.5` | Chip inline padding (`px-1.5`) |
-| sm | 8px | `2` | Chip vertical padding (`py-0.5`), button groups on billing tab (`gap-2`) |
+| sm | 8px | `2` | Chip inline padding (`px-2`), chip vertical padding (`py-0.5`), button groups on billing tab (`gap-2`) |
 | md | 12px | `3` | Status card internal section spacing |
 | base | 16px | `4` | Billing tab content padding, card padding (`p-4`) |
 | lg | 24px | `6` | Tab content section spacing (`space-y-6`) |
@@ -53,7 +52,6 @@ All values from the established Trade Flow type system (carried forward from Pha
 | Body | 14px | 500 (medium) | normal | `text-sm font-medium` | Billing tab status text, subscription details |
 | Label | 12px | 500 (medium) | normal | `text-xs font-medium` | TrialChip text, metadata labels on billing card |
 | Heading | 18px | 600 (semibold) | none | `text-lg font-semibold` | Billing tab section heading ("Billing") |
-| Page heading | 30px | 700 (bold) | none | `text-3xl font-bold tracking-tight` | Not used this phase (Settings page heading already exists) |
 
 Additional patterns used:
 - TrialChip text: `text-xs font-medium` (12px, 500) -- compact to fit header
@@ -75,7 +73,7 @@ All values from the established Trade Flow colour system (carried forward from P
 | Destructive | `destructive` | `oklch(0.64 0.21 25)` | Not used in Phase 33 (no destructive actions) |
 
 Accent (`primary`) reserved for:
-- "Subscribe" CTA button on billing tab when status is inactive (`bg-primary text-primary-foreground`)
+- "Start Subscription" CTA button on billing tab when status is inactive (`bg-primary text-primary-foreground`)
 - "Manage Billing" CTA button on billing tab (`bg-primary text-primary-foreground`)
 
 Additional semantic colors:
@@ -140,7 +138,7 @@ Additional semantic colors:
 | Trialing | `status === 'trialing'` | Badge "Trial", status line "Trial -- X days remaining", CTA "Manage Billing" |
 | Active | `status === 'active'` AND `cancelAtPeriodEnd === false` | Badge "Active", status line "Active -- renews [date]", CTA "Manage Billing" |
 | Cancelling | `status === 'active'` AND `cancelAtPeriodEnd === true` (D-13) | Badge "Cancels on [date]", status line "Cancels on [date]", CTA "Manage Billing" |
-| Inactive | `status` is `past_due` / `canceled` / no subscription | Badge "Inactive", status line "Inactive", CTA "Subscribe" |
+| Inactive | `status` is `past_due` / `canceled` / no subscription | Badge "Inactive", status line "Inactive", CTA "Start Subscription" |
 | CTA loading | Portal session being created | "Manage Billing" button shows `Loader2` spinner, disabled (D-15) |
 
 ### Settings Page Tab Routing
@@ -176,7 +174,7 @@ Additional semantic colors:
 | `trialing` | "Trial -- X days remaining" | "Manage Billing" | POST /v1/subscription/portal -> redirect | D-11 |
 | `active` (no cancel) | "Active -- renews [date]" | "Manage Billing" | POST /v1/subscription/portal -> redirect | D-11 |
 | `active` + `cancelAtPeriodEnd` | "Cancels on [date]" | "Manage Billing" | POST /v1/subscription/portal -> redirect | D-13 |
-| `past_due` / `canceled` / none | "Inactive" | "Subscribe" | Navigate to `/subscribe` | D-11 |
+| `past_due` / `canceled` / none | "Inactive" | "Start Subscription" | Navigate to `/subscribe` | D-11 |
 
 ### Date Formatting
 
@@ -195,7 +193,7 @@ All dates rendered using the format: `"15 Jan 2026"` (day-month-year, abbreviate
 |---------|------|
 | Status badge | "Inactive" |
 | Status description | "You don't have an active subscription." |
-| CTA | "Subscribe" (navigates to `/subscribe`) |
+| CTA | "Start Subscription" (navigates to `/subscribe`) |
 
 ### Destructive Actions
 
@@ -210,7 +208,7 @@ None in this phase. Cancellation is handled entirely through the Stripe Billing 
 ```
 DashboardLayout header (right side, near user avatar):
   TrialChip (clickable -> /settings?tab=billing)
-    div (bg-amber-100 text-amber-800 rounded-full px-2.5 py-0.5 flex items-center gap-1 cursor-pointer)
+    div (bg-amber-100 text-amber-800 rounded-full px-2 py-0.5 flex items-center gap-1 cursor-pointer)
       Clock icon (h-3 w-3 text-amber-600)
       span "X days left in trial" (text-xs font-medium)
     Hover: bg-amber-200 transition
@@ -221,7 +219,7 @@ DashboardLayout header (right side, near user avatar):
 
 ```
 SettingsPage (existing page)
-  Page header: "Settings" (existing, text-3xl font-bold tracking-tight)
+  Page header: "Settings" (existing, text-3xl font-semibold tracking-tight)
   Tabs (shadcn Tabs component or existing tab pattern)
     TabsList
       TabsTrigger "General" (default)
@@ -240,7 +238,7 @@ SettingsPage (existing page)
 Card
   CardHeader (flex flex-row items-center justify-between)
     CardTitle "Subscription" (text-lg font-semibold)
-    Status badge (rounded-full px-2.5 py-0.5 text-xs font-medium)
+    Status badge (rounded-full px-2 py-0.5 text-xs font-medium)
       trialing: bg-amber-100 text-amber-800 "Trial"
       active: bg-green-100 text-green-800 "Active"
       cancelling: bg-orange-100 text-orange-800 "Cancels on [date]"
@@ -253,7 +251,7 @@ Card
       inactive: "You don't have an active subscription."
     Button (full-width or right-aligned)
       trialing/active/cancelling: "Manage Billing" (variant="default") + ExternalLink icon
-      inactive: "Subscribe" (variant="default")
+      inactive: "Start Subscription" (variant="default")
 ```
 
 ### SubscriptionStatusCard Skeleton (Loading State)
