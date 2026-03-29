@@ -176,7 +176,10 @@ Plans:
   1. `POST /v1/subscription/checkout` returns a Stripe Checkout Session URL (Stripe SDK live, env vars loaded)
   2. `POST /v1/webhooks/stripe` with an invalid or missing signature returns 400, confirming raw body is preserved and signature verification is active
   3. `SubscriptionStatus` enum values (`trialing`, `active`, `past_due`, `canceled`, `incomplete`) are defined and the `subscriptions` MongoDB collection has unique indexes on `userId` and `stripeSubscriptionId`
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 29-01-PLAN.md — Infrastructure + module skeleton: rawBody, Stripe SDK, enum, entity, DTO, repo, provider, module registration
+- [ ] 29-02-PLAN.md — Endpoints: SubscriptionController (checkout) and WebhookController (signature verification)
 
 ### Phase 30: Stripe Checkout and Webhooks
 **Goal**: A user can complete Stripe Checkout and the webhook handler creates and keeps the local subscription record in sync across all five Stripe event types
@@ -261,7 +264,7 @@ Plans:
 | 26. Core Job Flow Tests | v1.5 | 0/? | Not started | - |
 | 27. Quote Lifecycle Tests | v1.5 | 0/? | Not started | - |
 | 28. Settings Tests + CI Integration | v1.5 | 0/? | Not started | - |
-| 29. Subscription Module Foundation | v1.6 | 0/? | Not started | - |
+| 29. Subscription Module Foundation | v1.6 | 0/2 | Not started | - |
 | 30. Stripe Checkout and Webhooks | v1.6 | 0/? | Not started | - |
 | 31. Subscription API Endpoints and Tests | v1.6 | 0/? | Not started | - |
 | 32. Subscription Gate and Subscribe Pages | v1.6 | 0/? | Not started | - |
