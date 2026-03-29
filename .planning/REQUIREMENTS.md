@@ -41,8 +41,8 @@
 - [x] **BILL-01**: `GET /v1/subscription` returns the current user's subscription status, `currentPeriodEnd`, `trialEnd`, and `cancelAtPeriodEnd`
 - [x] **BILL-02**: `DELETE /v1/subscription` cancels the subscription at period end (`cancel_at_period_end: true`) — access continues until `currentPeriodEnd`
 - [x] **BILL-03**: `POST /v1/subscription/portal` creates a Stripe Billing Portal session and returns the portal URL for redirect
-- [ ] **BILL-04**: Settings page has a Billing tab showing the user's current subscription status, next billing date (or trial end date), and appropriate CTAs (Subscribe / Manage Billing / Cancel)
-- [ ] **BILL-05**: When `cancelAtPeriodEnd` is true, the Billing tab shows "Cancels on [date]" rather than "Active" so the user knows when access ends
+- [x] **BILL-04**: Settings page has a Billing tab showing the user's current subscription status, next billing date (or trial end date), and appropriate CTAs (Subscribe / Manage Billing / Cancel)
+- [x] **BILL-05**: When `cancelAtPeriodEnd` is true, the Billing tab shows "Cancels on [date]" rather than "Active" so the user knows when access ends
 
 ### Testing & Quality
 
