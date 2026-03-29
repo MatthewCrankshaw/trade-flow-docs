@@ -165,6 +165,20 @@ See `user_setup` section in `25-01-PLAN.md` for detailed steps.
 - Two storageState files will be written by `npx playwright test --project=setup` before other tests run
 - Onboarding test (Plan 02) must use `test.use({ storageState: "e2e/.auth/onboarding-user.json" })` at file level
 
+## Self-Check: PASSED
+
+- FOUND: trade-flow-ui/e2e/helpers/api-client.ts
+- FOUND: trade-flow-ui/e2e/helpers/db-cleanup.ts
+- FOUND: trade-flow-ui/e2e/helpers/seed-factories.ts
+- FOUND: trade-flow-ui/e2e/fixtures/test-base.ts
+- FOUND: trade-flow-ui/e2e/tests/auth/login.spec.ts
+- FOUND: trade-flow-ui/e2e/tests/auth/redirect-unauth.spec.ts
+- CONFIRMED: e2e/fixtures/.gitkeep removed
+- FOUND: fc846f7 (Task 1 commit in trade-flow-ui)
+- FOUND: a642720 (Task 2 commit in trade-flow-ui)
+- FOUND: b570a36 (Task 3 commit in trade-flow-ui)
+- FOUND: 5c6f018 (docs commit in trade-flow-docs)
+
 ---
 *Phase: 25-api-seeding-onboarding-tests*
 *Completed: 2026-03-28*
