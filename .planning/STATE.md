@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Stripe Subscription Billing
 status: executing
-stopped_at: "Completed 29-01-PLAN.md"
-last_updated: "2026-03-29T14:10:20Z"
+stopped_at: "Completed 29-02-PLAN.md"
+last_updated: "2026-03-29T14:19:32Z"
 last_activity: 2026-03-29
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -20,20 +20,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-<<<<<<< Updated upstream
 **Current focus:** Phase 29 — Subscription Module Foundation
 
 ## Current Position
 
-Phase: 29 (subscription-module-foundation) — EXECUTING
-<<<<<<< Updated upstream
-Plan: 2 of 2
-Status: Plan 01 complete, ready for Plan 02
-Last activity: 2026-03-29 — Phase 29 Plan 01 executed (SubscriptionModule foundation)
+Phase: 29 (subscription-module-foundation) — COMPLETE
+Plan: 2 of 2 (all complete)
+Status: Phase 29 complete, ready for Phase 30
+Last activity: 2026-03-29 — Phase 29 Plan 02 executed (checkout and webhook endpoints)
 
 ```
 Progress: Phase 29 of 33
-[█████░░░░░░░░░░░░░░░░░░░░] 10% complete (1/10 plans)
+[██████░░░░░░░░░░░░░░░░░░░] 20% complete (2/10 plans)
 ```
 
 ## Performance Metrics
@@ -61,6 +59,7 @@ Progress: Phase 29 of 33
 | Phase 24-playwright-bootstrap-auth P01 | 3 | 3 tasks | 9 files |
 | Phase 25-api-seeding-onboarding-tests P01 | 5 | 3 tasks | 10 files |
 | Phase 29 P01 | 5min | 2 tasks | 12 files |
+| Phase 29 P02 | 5min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -99,6 +98,9 @@ Recent decisions affecting current work:
 - [v1.6 research]: Subscription keyed by userId — per-user billing aligned with Firebase auth identity
 - [Phase 29-01]: ISubscriptionEntity extends Record<string, unknown> for MongoDb generic compatibility
 - [Phase 29-01]: OnModuleInit for index creation instead of separate migration file
+- [Phase 29-02]: BadRequestException (HTTP 400) for webhook signature failures -- InvalidRequestError maps to 422
+- [Phase 29-02]: WebhookController as separate class without JwtAuthGuard -- @Public() decorator does not exist in codebase
+- [Phase 29-02]: externalAuthUserId for Stripe metadata.userId -- Firebase UID is the user identity key
 
 ### Pending Todos
 
@@ -128,6 +130,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-29T14:10:20Z
-Stopped at: Completed 29-01-PLAN.md
-Resume file: .planning/phases/29-subscription-module-foundation/29-02-PLAN.md
+Last session: 2026-03-29T14:19:32Z
+Stopped at: Completed 29-02-PLAN.md
+Resume file: .planning/phases/30-stripe-checkout-and-webhooks/30-01-PLAN.md

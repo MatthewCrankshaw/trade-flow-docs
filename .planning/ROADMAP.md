@@ -89,7 +89,7 @@ Full details: `.planning/milestones/v1.4-ROADMAP.md`
 <details>
 <summary>v1.6 Stripe Subscription Billing (Phases 29-33) -- PLANNED</summary>
 
-- [ ] **Phase 29: Subscription Module Foundation** - SubscriptionModule skeleton, MongoDB entity/repo, SubscriptionStatus enum, rawBody: true in main.ts, Stripe provider, env vars
+- [x] **Phase 29: Subscription Module Foundation** - SubscriptionModule skeleton, MongoDB entity/repo, SubscriptionStatus enum, rawBody: true in main.ts, Stripe provider, checkout + webhook endpoints
 - [ ] **Phase 30: Stripe Checkout and Webhooks** - POST /v1/subscription/checkout and POST /v1/webhooks/stripe with all 5 event handlers and upsert idempotency
 - [ ] **Phase 31: Subscription API Endpoints and Tests** - GET/DELETE /v1/subscription, POST /v1/subscription/portal, and unit tests for all services and repository
 - [ ] **Phase 32: Subscription Gate and Subscribe Pages** - SubscriptionGate component, /subscribe page, /subscribe/success, /subscribe/cancel, App.tsx route wiring, RTK Query subscriptionApi
@@ -178,8 +178,8 @@ Plans:
   3. `SubscriptionStatus` enum values (`trialing`, `active`, `past_due`, `canceled`, `incomplete`) are defined and the `subscriptions` MongoDB collection has unique indexes on `userId` and `stripeSubscriptionId`
 **Plans**: 2 plans
 Plans:
-- [ ] 29-01-PLAN.md — Infrastructure + module skeleton: rawBody, Stripe SDK, enum, entity, DTO, repo, provider, module registration
-- [ ] 29-02-PLAN.md — Endpoints: SubscriptionController (checkout) and WebhookController (signature verification)
+- [x] 29-01-PLAN.md — Infrastructure + module skeleton: rawBody, Stripe SDK, enum, entity, DTO, repo, provider, module registration
+- [x] 29-02-PLAN.md — Endpoints: SubscriptionController (checkout) and WebhookController (signature verification)
 
 ### Phase 30: Stripe Checkout and Webhooks
 **Goal**: A user can complete Stripe Checkout and the webhook handler creates and keeps the local subscription record in sync across all five Stripe event types
@@ -268,7 +268,7 @@ Plans:
 | 26. Core Job Flow Tests | v1.5 | 0/? | Not started | - |
 | 27. Quote Lifecycle Tests | v1.5 | 0/? | Not started | - |
 | 28. Settings Tests + CI Integration | v1.5 | 0/? | Not started | - |
-| 29. Subscription Module Foundation | v1.6 | 0/2 | Not started | - |
+| 29. Subscription Module Foundation | v1.6 | 2/2 | Complete | 2026-03-29 |
 | 30. Stripe Checkout and Webhooks | v1.6 | 0/3 | Not started | - |
 | 31. Subscription API Endpoints and Tests | v1.6 | 0/? | Not started | - |
 | 32. Subscription Gate and Subscribe Pages | v1.6 | 0/? | Not started | - |
