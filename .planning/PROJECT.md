@@ -78,6 +78,9 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - ✓ Dual entry-point build (dist/main.js + dist/worker.js) via worker-cli.json -- v1.4
 - ✓ worker:dev (nodemon hot reload), worker:prod, build:all npm scripts -- v1.4
 - ✓ Worker as fourth Docker Compose service with multi-stage production Dockerfile -- v1.4
+- ✓ Trial banner shows days remaining during trial period -- v1.6
+- ✓ User can view their current subscription status in Settings > Billing -- v1.6
+- ✓ User can manage billing details (update card, view invoices) via Stripe Billing Portal -- v1.6
 
 ### Active
 
@@ -90,11 +93,8 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - User is automatically charged £6/month after the 30-day trial ends
 - User receives read-only access when trial expires, payment fails, or subscription is canceled
 - User can subscribe (start trial) from a dedicated /subscribe page
-- User can view their current subscription status in Settings > Billing
 - User can cancel their subscription (cancels at period end, access continues until then)
-- User can manage billing details (update card, view invoices) via Stripe Billing Portal
 - Support role users bypass subscription gating entirely
-- Trial banner shows days remaining during trial period
 
 ### Out of Scope
 
@@ -231,4 +231,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-29 — Phase 32 complete: Subscription paywall gate, subscribe pages, and paywall triggers wired into all business page write-actions*
+*Last updated: 2026-03-29 — Phase 33 complete: Trial chip in header showing days remaining, Billing settings tab with subscription status and Stripe Portal redirect*
