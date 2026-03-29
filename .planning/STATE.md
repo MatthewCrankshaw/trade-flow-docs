@@ -20,11 +20,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
+<<<<<<< Updated upstream
 **Current focus:** Phase 29 — Subscription Module Foundation
 
 ## Current Position
 
 Phase: 29 (subscription-module-foundation) — EXECUTING
+<<<<<<< Updated upstream
 Plan: 2 of 2
 Status: Plan 01 complete, ready for Plan 02
 Last activity: 2026-03-29 — Phase 29 Plan 01 executed (SubscriptionModule foundation)
