@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Stripe Subscription Billing — Phase Details
-status: verifying
-stopped_at: Completed 30-03-PLAN.md
-last_updated: "2026-03-29T14:42:59.991Z"
+status: executing
+stopped_at: Completed 31-01-PLAN.md
+last_updated: "2026-03-29T16:04:00.823Z"
 last_activity: 2026-03-29
 progress:
   total_phases: 11
   completed_phases: 4
-  total_plans: 9
-  completed_plans: 8
+  total_plans: 10
+  completed_plans: 9
 ---
 
 # Project State
@@ -20,13 +20,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 30 — stripe-checkout-and-webhooks
+**Current focus:** Phase 31 — subscription-api-endpoints-and-tests
 
 ## Current Position
 
-Phase: 30 (stripe-checkout-and-webhooks) — EXECUTING
-Plan: 3 of 3
-Status: Phase complete — ready for verification
+Phase: 31 (subscription-api-endpoints-and-tests) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
 Last activity: 2026-03-29
 
 ```
@@ -63,6 +63,7 @@ Progress: Phase 29 of 33
 | Phase 30 P01 | 3min | 2 tasks | 9 files |
 | Phase 30 P02 | 3min | 2 tasks | 2 files |
 | Phase 30 P03 | 3min | 2 tasks | 7 files |
+| Phase 31 P01 | 5min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -108,6 +109,8 @@ Recent decisions affecting current work:
 - [Phase 30]: jobId: event.id provides first-layer deduplication at BullMQ level
 - [Phase 30]: Out-of-order webhook events throw errors for BullMQ retry -- no silent drops
 - [Phase 30]: InvalidRequestError with SUBSCRIPTION_ALREADY_ACTIVE code for duplicate guard (consistent with existing error patterns)
+- [Phase 31]: Stripe v21 current_period_end at items.data[0] level, not subscription level
+- [Phase 31]: SubscriptionGuard uses supportRoles.length for support user bypass
 
 ### Roadmap Evolution
 
@@ -141,6 +144,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-29T14:42:59.988Z
-Stopped at: Completed 30-03-PLAN.md
+Last session: 2026-03-29T16:04:00.821Z
+Stopped at: Completed 31-01-PLAN.md
 Resume file: None
