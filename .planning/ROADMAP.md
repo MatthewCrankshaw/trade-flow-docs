@@ -217,7 +217,10 @@ Plans:
   2. `DELETE /v1/subscription` sets `cancel_at_period_end: true` on Stripe and updates the local record — access is not immediately removed
   3. `POST /v1/subscription/portal` returns a Stripe Billing Portal URL the frontend can redirect to
   4. Unit tests for `SubscriptionCreatorService`, `SubscriptionUpdaterService`, `SubscriptionRetrieverService`, and `SubscriptionRepository` all pass with the Stripe SDK mocked
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 31-01-PLAN.md — Subscription management endpoints (GET, DELETE, POST portal), SubscriptionGuard, @SkipSubscriptionCheck decorator
+- [ ] 31-02-PLAN.md — Unit tests for all services, repository, controller webhook spec, and guard spec
 
 ### Phase 32: Subscription Gate and Subscribe Pages
 **Goal**: Unauthenticated-subscription users are redirected to /subscribe and cannot access business routes, while users completing checkout land on a confirming success page
@@ -280,6 +283,6 @@ Plans:
 | 28. Settings Tests + CI Integration | v1.5 | 0/? | Not started | - |
 | 29. Subscription Module Foundation | v1.6 | 2/2 | Complete    | 2026-03-29 |
 | 30. Stripe Checkout and Webhooks | v1.6 | 3/3 | Complete   | 2026-03-29 |
-| 31. Subscription API Endpoints and Tests | v1.6 | 0/? | Not started | - |
+| 31. Subscription API Endpoints and Tests | v1.6 | 0/2 | Not started | - |
 | 32. Subscription Gate and Subscribe Pages | v1.6 | 0/? | Not started | - |
 | 33. Trial Banner and Billing Settings Tab | v1.6 | 0/? | Not started | - |
