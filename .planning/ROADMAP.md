@@ -253,7 +253,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 33-01-PLAN.md — TrialChip component with days-remaining display and DashboardLayout header wiring
+- [x] 33-01-PLAN.md — TrialChip component with days-remaining display and DashboardLayout header wiring
 - [ ] 33-02-PLAN.md — Billing tab on Settings page with SubscriptionStatusCard, portal redirect, and tab routing
 
 **UI hint**: yes
@@ -294,4 +294,4 @@ Plans:
 | 30. Stripe Checkout and Webhooks | v1.6 | 3/3 | Complete   | 2026-03-29 |
 | 31. Subscription API Endpoints and Tests | v1.6 | 2/2 | Complete   | 2026-03-29 |
 | 32. Subscription Gate and Subscribe Pages | v1.6 | 3/3 | Complete    | 2026-03-29 |
-| 33. Trial Banner and Billing Settings Tab | v1.6 | 0/2 | Not started | - |
+| 33. Trial Banner and Billing Settings Tab | v1.6 | 1/2 | In Progress|  |

@@ -33,8 +33,8 @@
 
 ### Trial Experience
 
-- [ ] **TRIAL-01**: A persistent banner is shown to trialing users displaying the number of days remaining in their free trial and a "Subscribe" CTA
-- [ ] **TRIAL-02**: The trial banner is not shown when subscription status is `active`
+- [x] **TRIAL-01**: A persistent banner is shown to trialing users displaying the number of days remaining in their free trial and a "Subscribe" CTA
+- [x] **TRIAL-02**: The trial banner is not shown when subscription status is `active`
 
 ### Billing Management
 

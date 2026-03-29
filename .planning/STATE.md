@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Stripe Subscription Billing — Phase Details
 status: executing
-stopped_at: Completed 32-03-PLAN.md
-last_updated: "2026-03-29T19:11:46.035Z"
+stopped_at: Completed 33-01-PLAN.md
+last_updated: "2026-03-29T19:54:58.701Z"
 last_activity: 2026-03-29
 progress:
   total_phases: 11
   completed_phases: 6
-  total_plans: 13
-  completed_plans: 13
+  total_plans: 15
+  completed_plans: 14
 ---
 
 # Project State
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 32 — subscription-gate-and-subscribe-pages
+**Current focus:** Phase 33 — trial-banner-and-billing-settings-tab
 
 ## Current Position
 
-Phase: 33
-Plan: Not started
+Phase: 33 (trial-banner-and-billing-settings-tab) — EXECUTING
+Plan: 2 of 2
 Status: Ready to execute
 Last activity: 2026-03-29
 
@@ -67,6 +67,7 @@ Progress: Phase 29 of 33
 | Phase 31 P02 | 6min | 2 tasks | 2 files |
 | Phase 32 P01 | 3min | 2 tasks | 11 files |
 | Phase 32 P03 | 5min | 1 tasks | 9 files |
+| Phase 33 P01 | 4min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -117,6 +118,7 @@ Recent decisions affecting current work:
 - [Phase 31]: DtoCollection.create() for non-empty collections in tests (private constructor)
 - [Phase 32]: Separated SubscriptionContext (.ts) from SubscriptionProvider (.tsx) to satisfy react-refresh ESLint rule
 - [Phase 32]: Paywall guards placed directly in sub-components (QuoteActionStrip, QuoteLineItemsCard, BusinessDetails) where handlers live
+- [Phase 33]: TrialChip and PersistentCta mutually exclusive at runtime -- no conditional wrapper needed
 
 ### Roadmap Evolution
 
@@ -150,6 +152,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-29T19:06:01.124Z
-Stopped at: Completed 32-03-PLAN.md
+Last session: 2026-03-29T19:54:58.699Z
+Stopped at: Completed 33-01-PLAN.md
 Resume file: None
