@@ -7,11 +7,11 @@
 
 ### Subscription Acquisition
 
-- [ ] **ACQ-01**: User can initiate a 30-day free trial by completing Stripe Checkout (card required at trial start)
+- [x] **ACQ-01**: User can initiate a 30-day free trial by completing Stripe Checkout (card required at trial start)
 - [x] **ACQ-02**: API creates a Stripe Checkout Session with `trial_period_days: 30` and returns the hosted checkout URL
-- [ ] **ACQ-03**: User is redirected to `/subscribe/success` after completing Stripe Checkout
+- [x] **ACQ-03**: User is redirected to `/subscribe/success` after completing Stripe Checkout
 - [ ] **ACQ-04**: User is redirected to `/subscribe/cancel` if they abandon Stripe Checkout, with a "Try again" option
-- [ ] **ACQ-05**: `/subscribe/success` page polls for subscription status and verifies the Checkout Session server-side (race condition safety net)
+- [x] **ACQ-05**: `/subscribe/success` page polls for subscription status and verifies the Checkout Session server-side (race condition safety net)
 
 ### Webhook & Status Sync
 

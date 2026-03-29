@@ -205,7 +205,7 @@ Plans:
 Plans:
 - [x] 30-01-PLAN.md — Queue infrastructure, entity/repo extensions, webhook controller enqueue
 - [x] 30-02-PLAN.md — StripeWebhookProcessor with 5 event handlers in WorkerModule
-- [ ] 30-03-PLAN.md — Verify-session endpoint and duplicate checkout guard
+- [x] 30-03-PLAN.md — Verify-session endpoint and duplicate checkout guard
 
 ### Phase 31: Subscription API Endpoints and Tests
 **Goal**: All subscription management endpoints are available and the service layer has unit test coverage
@@ -279,7 +279,7 @@ Plans:
 | 27. Quote Lifecycle Tests | v1.5 | 0/? | Not started | - |
 | 28. Settings Tests + CI Integration | v1.5 | 0/? | Not started | - |
 | 29. Subscription Module Foundation | v1.6 | 2/2 | Complete    | 2026-03-29 |
-| 30. Stripe Checkout and Webhooks | v1.6 | 2/3 | In Progress|  |
+| 30. Stripe Checkout and Webhooks | v1.6 | 3/3 | Complete   | 2026-03-29 |
 | 31. Subscription API Endpoints and Tests | v1.6 | 0/? | Not started | - |
 | 32. Subscription Gate and Subscribe Pages | v1.6 | 0/? | Not started | - |
 | 33. Trial Banner and Billing Settings Tab | v1.6 | 0/? | Not started | - |

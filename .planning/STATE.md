@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Stripe Subscription Billing — Phase Details
-status: executing
-stopped_at: Completed 30-02-PLAN.md
-last_updated: "2026-03-29T14:42:08.113Z"
+status: verifying
+stopped_at: Completed 30-03-PLAN.md
+last_updated: "2026-03-29T14:42:59.991Z"
 last_activity: 2026-03-29
 progress:
   total_phases: 11
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 9
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 
 Phase: 30 (stripe-checkout-and-webhooks) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-03-29
 
 ```
@@ -62,6 +62,7 @@ Progress: Phase 29 of 33
 | Phase 29 P02 | 5min | 2 tasks | 3 files |
 | Phase 30 P01 | 3min | 2 tasks | 9 files |
 | Phase 30 P02 | 3min | 2 tasks | 2 files |
+| Phase 30 P03 | 3min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -106,6 +107,7 @@ Recent decisions affecting current work:
 - [Phase 30]: Enqueue failure returns 200 to Stripe -- prevents retries on transient Redis issues
 - [Phase 30]: jobId: event.id provides first-layer deduplication at BullMQ level
 - [Phase 30]: Out-of-order webhook events throw errors for BullMQ retry -- no silent drops
+- [Phase 30]: InvalidRequestError with SUBSCRIPTION_ALREADY_ACTIVE code for duplicate guard (consistent with existing error patterns)
 
 ### Roadmap Evolution
 
@@ -139,6 +141,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-29T14:42:08.110Z
-Stopped at: Completed 30-02-PLAN.md
+Last session: 2026-03-29T14:42:59.988Z
+Stopped at: Completed 30-03-PLAN.md
 Resume file: None
