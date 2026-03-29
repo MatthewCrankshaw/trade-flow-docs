@@ -268,7 +268,7 @@ Plans:
 | 26. Core Job Flow Tests | v1.5 | 0/? | Not started | - |
 | 27. Quote Lifecycle Tests | v1.5 | 0/? | Not started | - |
 | 28. Settings Tests + CI Integration | v1.5 | 0/? | Not started | - |
-| 29. Subscription Module Foundation | v1.6 | 2/2 | Complete | 2026-03-29 |
+| 29. Subscription Module Foundation | v1.6 | 2/2 | Complete    | 2026-03-29 |
 | 30. Stripe Checkout and Webhooks | v1.6 | 0/3 | Not started | - |
 | 31. Subscription API Endpoints and Tests | v1.6 | 0/? | Not started | - |
 | 32. Subscription Gate and Subscribe Pages | v1.6 | 0/? | Not started | - |
