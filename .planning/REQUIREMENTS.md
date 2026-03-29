@@ -8,14 +8,14 @@
 ### Subscription Acquisition
 
 - [ ] **ACQ-01**: User can initiate a 30-day free trial by completing Stripe Checkout (card required at trial start)
-- [ ] **ACQ-02**: API creates a Stripe Checkout Session with `trial_period_days: 30` and returns the hosted checkout URL
+- [x] **ACQ-02**: API creates a Stripe Checkout Session with `trial_period_days: 30` and returns the hosted checkout URL
 - [ ] **ACQ-03**: User is redirected to `/subscribe/success` after completing Stripe Checkout
 - [ ] **ACQ-04**: User is redirected to `/subscribe/cancel` if they abandon Stripe Checkout, with a "Try again" option
 - [ ] **ACQ-05**: `/subscribe/success` page polls for subscription status and verifies the Checkout Session server-side (race condition safety net)
 
 ### Webhook & Status Sync
 
-- [ ] **WBHK-01**: Stripe webhook endpoint (`POST /v1/webhooks/stripe`) verifies request signature using raw body before processing any event
+- [x] **WBHK-01**: Stripe webhook endpoint (`POST /v1/webhooks/stripe`) verifies request signature using raw body before processing any event
 - [ ] **WBHK-02**: `checkout.session.completed` event creates the local subscription record in MongoDB with status `trialing`
 - [ ] **WBHK-03**: `customer.subscription.updated` event syncs status, `currentPeriodEnd`, `trialEnd`, and `cancelAtPeriodEnd` to the local record
 - [ ] **WBHK-04**: `customer.subscription.deleted` event sets local record status to `canceled` and records `canceledAt`

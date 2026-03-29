@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Stripe Subscription Billing
-status: planning
-stopped_at: ""
-last_updated: "2026-03-28T00:00:00.000Z"
-last_activity: 2026-03-28
+status: executing
+stopped_at: "Completed 29-01-PLAN.md"
+last_updated: "2026-03-29T14:10:20Z"
+last_activity: 2026-03-29
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 2
+  completed_plans: 1
 ---
 
 # Project State
@@ -20,18 +20,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 29 — Subscription Module Foundation (v1.6 roadmap defined, awaiting execution)
+**Current focus:** Phase 29 — Subscription Module Foundation
 
 ## Current Position
 
-Phase: Not started (roadmap defined)
-Plan: —
-Status: Ready to execute Phase 29
-Last activity: 2026-03-28 — Milestone v1.6 roadmap created (Phases 29-33)
+Phase: 29 (subscription-module-foundation) — EXECUTING
+Plan: 2 of 2
+Status: Plan 01 complete, ready for Plan 02
+Last activity: 2026-03-29 — Phase 29 Plan 01 executed (SubscriptionModule foundation)
 
 ```
 Progress: Phase 29 of 33
-[░░░░░░░░░░░░░░░░░░░░░░░░░] 0% complete (0/5 phases)
+[█████░░░░░░░░░░░░░░░░░░░░] 10% complete (1/10 plans)
 ```
 
 ## Performance Metrics
@@ -58,6 +58,7 @@ Progress: Phase 29 of 33
 | Phase 23-developer-experience P02 | 1min | 2 tasks | 2 files |
 | Phase 24-playwright-bootstrap-auth P01 | 3 | 3 tasks | 9 files |
 | Phase 25-api-seeding-onboarding-tests P01 | 5 | 3 tasks | 10 files |
+| Phase 29 P01 | 5min | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -94,6 +95,8 @@ Recent decisions affecting current work:
 - [v1.6 research]: cancel_at_period_end on cancel (not stripe.subscriptions.cancel) — user retains access until period end
 - [v1.6 research]: Session verification endpoint as race condition safety net — webhook may arrive 1-30s after redirect
 - [v1.6 research]: Subscription keyed by userId — per-user billing aligned with Firebase auth identity
+- [Phase 29-01]: ISubscriptionEntity extends Record<string, unknown> for MongoDb generic compatibility
+- [Phase 29-01]: OnModuleInit for index creation instead of separate migration file
 
 ### Pending Todos
 
@@ -123,6 +126,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-28T00:00:00.000Z
-Stopped at: Roadmap created for v1.6 Stripe Subscription Billing (Phases 29-33)
-Resume file: None
+Last session: 2026-03-29T14:10:20Z
+Stopped at: Completed 29-01-PLAN.md
+Resume file: .planning/phases/29-subscription-module-foundation/29-02-PLAN.md
