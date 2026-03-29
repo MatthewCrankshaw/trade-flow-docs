@@ -294,4 +294,4 @@ Plans:
 | 30. Stripe Checkout and Webhooks | v1.6 | 3/3 | Complete   | 2026-03-29 |
 | 31. Subscription API Endpoints and Tests | v1.6 | 2/2 | Complete   | 2026-03-29 |
 | 32. Subscription Gate and Subscribe Pages | v1.6 | 3/3 | Complete    | 2026-03-29 |
-| 33. Trial Banner and Billing Settings Tab | v1.6 | 2/2 | Complete   | 2026-03-29 |
+| 33. Trial Banner and Billing Settings Tab | v1.6 | 2/2 | Complete    | 2026-03-29 |
