@@ -4,7 +4,7 @@ milestone: v1.6
 milestone_name: Stripe Subscription Billing — Phase Details
 status: verifying
 stopped_at: Completed 34-02-PLAN.md
-last_updated: "2026-03-30T18:53:52.992Z"
+last_updated: "2026-03-30T18:59:30.006Z"
 last_activity: 2026-03-30
 progress:
   total_phases: 11
@@ -24,8 +24,8 @@ See: .planning/PROJECT.md (updated 2026-03-27)
 
 ## Current Position
 
-Phase: 34 (use-luxon-datetime-in-dtos-extend-ibaseresourcedto-move-createdat-updatedat-to-entity-only) — EXECUTING
-Plan: 2 of 2
+Phase: 34
+Plan: Not started
 Status: Phase complete — ready for verification
 Last activity: 2026-03-30
 
