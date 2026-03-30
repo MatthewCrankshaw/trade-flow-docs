@@ -171,8 +171,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 34-PLAN-1.md — API: Shared toDateTime utility, ISubscriptionDto alignment (extend IBaseResourceDto, strip timestamps, Luxon dates), DTO audit, API CLAUDE.md
-- [ ] 34-PLAN-2.md — UI: Install Luxon, create date-helpers module, replace raw Date handling, UI CLAUDE.md
+- [x] 34-01-PLAN.md — API: Shared toDateTime utility, ISubscriptionDto alignment (extend IBaseResourceDto, strip timestamps, Luxon dates), DTO audit, API CLAUDE.md
+- [ ] 34-02-PLAN.md — UI: Install Luxon, create date-helpers module, replace raw Date handling, UI CLAUDE.md
 
 ---
 

@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Stripe Subscription Billing — Phase Details
-status: verifying
-stopped_at: Phase 34 context gathered
-last_updated: "2026-03-30T06:24:51.536Z"
-last_activity: 2026-03-29
+status: executing
+stopped_at: Completed 34-01-PLAN.md
+last_updated: "2026-03-30T18:34:52.568Z"
+last_activity: 2026-03-30 -- Completed 34-01-PLAN.md
 progress:
   total_phases: 11
   completed_phases: 7
-  total_plans: 15
+  total_plans: 17
   completed_plans: 15
 ---
 
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 33 — trial-banner-and-billing-settings-tab
+**Current focus:** Phase 34 — use-luxon-datetime-in-dtos-extend-ibaseresourcedto-move-createdat-updatedat-to-entity-only
 
 ## Current Position
 
-Phase: 34
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-03-29
+Phase: 34 (use-luxon-datetime-in-dtos-extend-ibaseresourcedto-move-createdat-updatedat-to-entity-only) — EXECUTING
+Plan: 2 of 2
+Status: Executing Phase 34
+Last activity: 2026-03-30 -- Completed 34-01-PLAN.md
 
 ```
 Progress: Phase 29 of 33
@@ -69,6 +69,7 @@ Progress: Phase 29 of 33
 | Phase 32 P03 | 5min | 1 tasks | 9 files |
 | Phase 33 P01 | 4min | 2 tasks | 4 files |
 | Phase 33-trial-banner-and-billing-settings-tab P02 | 3min | 2 tasks | 6 files |
+| Phase 34 P01 | 6min | 4 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -121,6 +122,8 @@ Recent decisions affecting current work:
 - [Phase 32]: Paywall guards placed directly in sub-components (QuoteActionStrip, QuoteLineItemsCard, BusinessDetails) where handlers live
 - [Phase 33]: TrialChip and PersistentCta mutually exclusive at runtime -- no conditional wrapper needed
 - [Phase 33-trial-banner-and-billing-settings-tab]: URL query param (?tab=billing) for Settings tab routing preserves Stripe Portal return_url context
+- [Phase 34-01]: Repository toEntityFields helper converts DateTime back to Date for MongoDB upsert operations
+- [Phase 34-01]: updatedAt removed from service layer -- repository handles it in upsert methods
 
 ### Roadmap Evolution
 
@@ -154,6 +157,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-30T06:24:51.533Z
-Stopped at: Phase 34 context gathered
-Resume file: .planning/phases/34-use-luxon-datetime-in-dtos-extend-ibaseresourcedto-move-createdat-updatedat-to-entity-only/34-CONTEXT.md
+Last session: 2026-03-30T18:41:34Z
+Stopped at: Completed 34-01-PLAN.md
+Resume file: .planning/phases/34-use-luxon-datetime-in-dtos-extend-ibaseresourcedto-move-createdat-updatedat-to-entity-only/34-01-SUMMARY.md
