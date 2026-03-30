@@ -1,0 +1,147 @@
+# Phase 34 — Plan 2: Frontend Luxon Adoption and Date Standardization
+
+**Goal:** Install Luxon in trade-flow-ui, create a centralized date-helpers utility module, replace all raw Date/string-based date handling with Luxon, and document frontend date standards in UI CLAUDE.md.
+**Repo:** trade-flow-ui
+**Depends on:** Plan 1 (API date format must be locked down before frontend consumes it — though wire format does not actually change, API standards must be documented first)
+
+## Pre-conditions
+- Plan 1 is complete — API DTOs use Luxon DateTime and serialize to ISO 8601 automatically
+- `trade-flow-ui` repo is available and builds cleanly
+- The API wire format (ISO 8601 strings in JSON responses) has NOT changed — this is purely a frontend improvement
+
+## Tasks
+
+### Task 1: Install Luxon and create date-helpers utility module
+**File(s):**
+- `package.json` (modify — add luxon + @types/luxon)
+- `src/lib/date-helpers.ts` (create)
+
+**Action:** create + modify
+**Details:**
+
+**Per D-11:** Install Luxon and its type definitions:
+```bash
+npm install luxon
+npm install --save-dev @types/luxon
+```
+
+**Create `src/lib/date-helpers.ts`** — a centralized utility module for all date parsing and formatting. Components import from this module instead of using `DateTime.fromISO()` directly. This provides a single place to adjust formatting conventions.
+
+```typescript
+// src/lib/date-helpers.ts
+import { DateTime } from "luxon";
+
+/** Parse an ISO 8601 string from the API into a Luxon DateTime (UTC) */
+export function parseApiDate(isoString: string): DateTime {
+  return DateTime.fromISO(isoString, { zone: "utc" });
+}
+
+/** Format a date for display (e.g., "30 Mar 2026") */
+export function formatDate(isoString: string): string {
+  return DateTime.fromISO(isoString).toLocaleString(DateTime.DATE_MED);
+}
+
+/** Format a date with time (e.g., "30 Mar 2026, 10:00") */
+export function formatDateTime(isoString: string): string {
+  return DateTime.fromISO(isoString).toLocaleString(DateTime.DATETIME_MED);
+}
+
+/** Format relative time (e.g., "in 5 days", "3 hours ago") */
+export function formatRelative(isoString: string): string | null {
+  return DateTime.fromISO(isoString).toRelative();
+}
+
+/** Calculate days remaining from now until a future date */
+export function daysUntil(isoString: string): number {
+  const target = DateTime.fromISO(isoString);
+  const diff = target.diff(DateTime.now(), "days").days;
+  return Math.max(0, Math.ceil(diff));
+}
+```
+
+**Verification:**
+- [ ] `npm install` succeeds — luxon and @types/luxon in package.json
+- [ ] `npx tsc --noEmit` compiles the new file without errors
+- [ ] `npm run build` succeeds
+- [ ] `import { formatDate } from "@/lib/date-helpers"` resolves correctly
+
+### Task 2: Replace all raw Date handling in components with Luxon date-helpers
+**File(s):**
+- All components that display dates from API responses (search comprehensively)
+- `src/features/subscription/` components (trial banner, billing tab — most date-heavy)
+- `src/features/schedule/` components (if any display schedule dates)
+- `src/features/quotes/` components (if any display quote dates)
+- Any other component using `new Date()`, `toLocaleDateString()`, or string-based date parsing
+
+**Action:** modify
+**Details:**
+
+**Per D-12:** Standardize all frontend date parsing and display to use Luxon. Replace any raw `new Date()` or string-based date handling.
+
+**Step 1 — Find all date handling in the UI codebase:**
+```bash
+grep -rn "new Date\|toLocaleDateString\|toLocaleString\|toISOString\|Date.parse\|Date.now" src/
+```
+
+**Step 2 — For each match, replace with the appropriate date-helpers function:**
+
+| Old pattern | New pattern |
+|-------------|-------------|
+| `new Date(isoString).toLocaleDateString(...)` | `formatDate(isoString)` |
+| `new Date(isoString).toLocaleString(...)` | `formatDateTime(isoString)` |
+| `new Date(isoString)` for comparison/math | `parseApiDate(isoString)` then use Luxon methods |
+| Days-remaining calculations with raw Date | `daysUntil(isoString)` |
+
+**Subscription components priority (most impactful):**
+- Trial banner days-remaining calculation — use `daysUntil(subscription.trialEnd)`
+- Billing tab next billing date — use `formatDate(subscription.currentPeriodEnd)`
+- Billing tab cancellation date — use `formatDate(subscription.currentPeriodEnd)` when cancelAtPeriodEnd is true
+- Trial end date display — use `formatDate(subscription.trialEnd)`
+
+**Important:** The API wire format has NOT changed. The API always returned ISO 8601 strings in JSON responses (both `JSON.stringify(new Date())` and `JSON.stringify(DateTime)` produce ISO strings). So this is purely a frontend code quality improvement — no API integration changes needed.
+
+**Import pattern (per frontend conventions):**
+```typescript
+import { formatDate, daysUntil } from "@/lib/date-helpers";
+```
+
+Use `import type` only for type imports — `formatDate` etc. are value imports.
+
+**Verification:**
+- [ ] `grep -rn "new Date" src/` returns zero matches in component files (excluding config/build files)
+- [ ] `npx tsc --noEmit` compiles cleanly
+- [ ] `npm run build` succeeds with no errors
+- [ ] Visually verify date displays are unchanged (same formatting, same values) — this is a refactor, not a behavior change
+
+### Task 3: Update frontend CLAUDE.md with date standards
+**File(s):**
+- `CLAUDE.md` (modify)
+
+**Action:** modify
+**Details:**
+
+**Per D-14:** Update `trade-flow-ui/CLAUDE.md` to document:
+
+Add a `## Date/Time Standards` section:
+- Luxon `DateTime` is the standard for all date parsing and display
+- API responses provide ISO 8601 UTC strings — parse with `DateTime.fromISO()` or the `parseApiDate()` helper
+- Never use `new Date()` for parsing API date strings — always use Luxon
+- Import date helpers from `@/lib/date-helpers` for common operations (formatDate, formatDateTime, formatRelative, daysUntil)
+- For custom formatting, use `DateTime.fromISO(isoString).toFormat("pattern")` or `.toLocaleString()`
+- All dates from the API are in UTC — convert to local time for display using `.toLocal()` if needed
+
+Place this section near the existing frontend conventions (after the Validation section or similar).
+
+**Verification:**
+- [ ] CLAUDE.md contains the new Date/Time Standards section
+- [ ] Section references `@/lib/date-helpers` utility module
+- [ ] Section states "never use new Date()" for API date parsing
+
+## Success Criteria
+- [ ] Luxon is installed in trade-flow-ui (D-11)
+- [ ] `src/lib/date-helpers.ts` exists with parseApiDate, formatDate, formatDateTime, formatRelative, daysUntil exports
+- [ ] All frontend date handling uses Luxon — no raw `new Date()` for API date parsing (D-12)
+- [ ] Date displays are visually unchanged (refactor, not behavior change)
+- [ ] `npm run build` succeeds
+- [ ] `npx tsc --noEmit` compiles cleanly
+- [ ] UI CLAUDE.md documents Luxon date standards (D-14)

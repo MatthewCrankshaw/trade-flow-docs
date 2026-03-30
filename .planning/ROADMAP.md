@@ -165,13 +165,14 @@ Plans:
 
 ### Phase 34: Use luxon DateTime in DTOs, extend IBaseResourceDto, move createdAt/updatedAt to entity only
 
-**Goal:** [To be planned]
-**Requirements**: TBD
+**Goal:** Standardize date/time handling across the full stack -- Luxon DateTime in all DTOs, ISubscriptionDto aligned to IBaseResourceDto, shared toDateTime utility, Luxon adopted on the frontend, and conventions documented in both CLAUDE.md files
+**Requirements**: D-01, D-02, D-03, D-04, D-05, D-06, D-07, D-08, D-09, D-10, D-11, D-12, D-13, D-14
 **Depends on:** Phase 33
-**Plans:** 0 plans
+**Plans:** 2 plans
 
 Plans:
-- [ ] TBD (run /gsd:plan-phase 34 to break down)
+- [ ] 34-PLAN-1.md — API: Shared toDateTime utility, ISubscriptionDto alignment (extend IBaseResourceDto, strip timestamps, Luxon dates), DTO audit, API CLAUDE.md
+- [ ] 34-PLAN-2.md — UI: Install Luxon, create date-helpers module, replace raw Date handling, UI CLAUDE.md
 
 ---
 
@@ -295,3 +296,4 @@ Plans:
 | 31. Subscription API Endpoints and Tests | v1.6 | 2/2 | Complete   | 2026-03-29 |
 | 32. Subscription Gate and Subscribe Pages | v1.6 | 3/3 | Complete    | 2026-03-29 |
 | 33. Trial Banner and Billing Settings Tab | v1.6 | 2/2 | Complete    | 2026-03-29 |
+| 34. Luxon DateTime Standardization | - | 0/2 | Not started | - |
