@@ -231,4 +231,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-29 — Phase 33 complete: Trial chip in header showing days remaining, Billing settings tab with subscription status and Stripe Portal redirect*
+*Last updated: 2026-03-30 — Phase 34 complete: Luxon DateTime standardized across full stack — all DTOs use DateTime (no native Date), shared toDateTime utility, ISubscriptionDto aligned to IBaseResourceDto, Luxon adopted in frontend with date-helpers module, standards documented in both CLAUDE.md files*
