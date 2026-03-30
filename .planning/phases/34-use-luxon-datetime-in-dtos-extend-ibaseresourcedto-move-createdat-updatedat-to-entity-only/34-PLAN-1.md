@@ -14,7 +14,7 @@
 ### Task 1: Create shared toDateTime utility
 **File(s):**
 - `src/core/utilities/to-date-time.utility.ts` (create)
-- `src/core/utilities/to-date-time.utility.spec.ts` (create — in `src/core/test/utilities/` per project conventions)
+- `src/core/test/utilities/to-date-time.utility.spec.ts` (create)
 
 **Action:** create
 **Details:**
