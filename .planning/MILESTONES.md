@@ -1,5 +1,29 @@
 # Milestones
 
+## v1.6 Stripe Subscription Billing (Shipped: 2026-03-31)
+
+**Phases completed:** 5 phases (29-33), 12 plans + Phase 34 (Luxon standardization, 2 plans)
+**Timeline:** 3 days (2026-03-28 → 2026-03-30)
+
+**Key accomplishments:**
+
+- SubscriptionModule with Stripe SDK v21, MongoDB subscription entity, rawBody for webhook signature verification, Stripe Checkout with 30-day trial
+- BullMQ STRIPE_WEBHOOKS queue processing 5 event types (checkout.session.completed, subscription.updated/deleted, invoice.payment_succeeded/failed) with upsert idempotency
+- Verify-session endpoint (race condition safety net) and duplicate checkout guard
+- Subscription management API: GET status, DELETE cancel-at-period-end, POST portal URL, plus SubscriptionGuard with support role bypass
+- Unit tests for all subscription services, repository, webhook controller, and guard
+- Frontend paywall system: SubscriptionGatedLayout, PaywallModal for write actions, PricingCard, subscribe/success/cancel pages
+- Trial chip in app header with days remaining, Settings > Billing tab with status card and Stripe Portal redirect
+- Luxon DateTime standardized across full stack — shared toDateTime utility, all DTOs use DateTime, date-helpers module in UI
+
+### Known Gaps
+
+- **ACQ-04**: `/subscribe/cancel` redirect on Checkout abandonment — page exists but requirement not formally verified
+- **GATE-02**: Settings page accessibility without subscription — implemented but not formally verified
+- **GATE-03**: Subscribe pages accessible without subscription — implemented but not formally verified
+
+---
+
 ## v1.4 Monorepo & Worker Infrastructure (Shipped: 2026-03-22)
 
 **Phases completed:** 4 phases, 7 plans

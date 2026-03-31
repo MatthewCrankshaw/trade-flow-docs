@@ -231,6 +231,58 @@
 
 ---
 
+## Milestone: v1.6 -- Stripe Subscription Billing
+
+**Shipped:** 2026-03-31
+**Phases:** 6 (29-34) | **Plans:** 14 | **Execution time:** ~55 min
+
+### What Was Built
+- SubscriptionModule with Stripe SDK v21 factory provider, MongoDB entity with userId-keyed unique indexes, rawBody enabled globally for webhook signature verification
+- BullMQ STRIPE_WEBHOOKS queue with webhook controller enqueuing validated events, processor handling 5 Stripe event types with upsert idempotency
+- Verify-session endpoint (local DB fast path + Stripe API fallback) and duplicate checkout guard
+- Three subscription management endpoints (GET status, DELETE cancel-at-period-end, POST portal) with global SubscriptionGuard and support role bypass
+- Unit tests for all subscription services, repository, webhook controller, and guard
+- Frontend paywall: SubscriptionGatedLayout, PaywallModal for write actions, PricingCard, subscribe/success/cancel pages, RTK Query subscriptionApi with SubscriptionProvider
+- TrialChip in app header with days-remaining display, Settings > Billing tab with SubscriptionStatusCard and Stripe Portal redirect
+- Luxon DateTime standardized across full stack: shared toDateTime utility, ISubscriptionDto aligned to IBaseResourceDto, date-helpers module in UI replacing date-fns
+
+### What Worked
+- Stripe Checkout (hosted) was the right choice -- zero PCI scope, SCA/3DS handled automatically, no frontend Stripe packages needed
+- BullMQ for webhook processing provided deduplication (jobId: event.id) and retry semantics out of the box -- v1.4 infrastructure investment paid off
+- Soft paywall modal (not hard gate) for write actions was a balanced UX -- users can browse data but can't create/edit
+- Verify-session endpoint as race condition safety net was essential -- webhook can arrive 1-30s after Checkout redirect
+- SubscriptionGuard on API (server-side enforcement) prevents bypass via direct API calls
+- Phase 34 (Luxon standardization) was a clean cross-cutting cleanup that benefited from fresh subscription module code
+
+### What Was Inefficient
+- v1.5 E2E Playwright testing was paused to start v1.6 -- interleaving milestones adds context switching overhead
+- 3 requirements left unchecked (ACQ-04, GATE-02, GATE-03) that are likely implemented but not formally verified -- should have been checked during phase verification
+- No milestone audit run before completion
+
+### Patterns Established
+- Stripe webhook processing: enqueue in controller (return 200 to Stripe immediately) -> BullMQ processor handles event types -> upsert by stripeSubscriptionId
+- Subscription guard pattern: global NestJS guard with @SkipSubscriptionCheck decorator for exempt routes
+- Soft paywall: useSubscription() hook + PaywallModal that opens on write-action handlers, blocks action without navigation
+- SubscriptionContext/Provider separation (.ts/.tsx) to satisfy react-refresh ESLint rule
+- URL query param tab routing (?tab=billing) for Settings page tabs -- preserves Stripe Portal return_url context
+- toEntityFields helper for DateTime -> Date conversion at repository boundary
+
+### Key Lessons
+1. Stripe Checkout (hosted) is the fastest path to billing -- don't build Stripe Elements unless you need custom UI
+2. Webhook processing should be async (BullMQ) not inline -- return 200 to Stripe immediately, process later
+3. Verify-session endpoint is essential for any redirect-after-payment flow -- webhooks are not instant
+4. Soft paywall (modal on write actions) is better UX than hard redirect for SaaS billing
+5. Server-side subscription guard is mandatory even with frontend gate -- never trust client-only enforcement
+6. Luxon standardization across full stack eliminates an entire class of date parsing bugs
+
+### Cost Observations
+- Model mix: opus for planning and execution
+- Total execution: ~55 min across 14 plans (avg 4min/plan)
+- Notable: zero gap closure plans for the billing phases (29-33) -- clear Stripe patterns and thorough research phase paid off
+- Phase 34 (Luxon) was a cross-cutting cleanup that touched 30+ files but completed in 2 plans
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -242,6 +294,7 @@
 | v1.2 | ~30 min | 4 | Reusable picker component, quote system, parallel execution, gap closure for UX polish |
 | v1.3 | ~1 hour | 5 | Email delivery + customer response, token-based public access, email provider migration, gap closure for architecture |
 | v1.4 | ~15 min | 4 | Infrastructure-only milestone, dual entry-point pattern, zero gap closure, lowest plan count per outcome |
+| v1.6 | ~55 min | 6 | Full SaaS billing, webhook processing via BullMQ, soft paywall, Luxon standardization, zero gap closure |
 
 ### Top Lessons (Verified Across Milestones)
 

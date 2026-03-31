@@ -78,23 +78,23 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - ✓ Dual entry-point build (dist/main.js + dist/worker.js) via worker-cli.json -- v1.4
 - ✓ worker:dev (nodemon hot reload), worker:prod, build:all npm scripts -- v1.4
 - ✓ Worker as fourth Docker Compose service with multi-stage production Dockerfile -- v1.4
+- ✓ User can start a 30-day free trial via Stripe Checkout (card required) -- v1.6
+- ✓ Stripe webhook creates and syncs local subscription record (5 event types) -- v1.6
+- ✓ User is charged £6/month after trial ends -- v1.6
+- ✓ Paywall enforces read-only when trial expires, payment fails, or subscription canceled -- v1.6
+- ✓ User can subscribe from /subscribe page with pricing card -- v1.6
+- ✓ User can cancel subscription (cancels at period end, access continues) -- v1.6
+- ✓ Support role users bypass subscription gating entirely -- v1.6
 - ✓ Trial banner shows days remaining during trial period -- v1.6
-- ✓ User can view their current subscription status in Settings > Billing -- v1.6
-- ✓ User can manage billing details (update card, view invoices) via Stripe Billing Portal -- v1.6
+- ✓ User can view subscription status in Settings > Billing -- v1.6
+- ✓ User can manage billing via Stripe Billing Portal -- v1.6
+- ✓ Luxon DateTime standardized across full stack (API + UI) -- v1.6
 
 ### Active
 
-<!-- Requirements for this milestone -- v1.6 Stripe Subscription Billing -->
+<!-- Requirements for next milestone -- to be defined -->
 
-- User is prompted to start a free trial (Stripe Checkout) after completing onboarding
-- User can start a 30-day free trial by entering a card via Stripe Checkout
-- User has full access to Trade Flow during the active trial period
-- Stripe webhook creates and syncs local subscription record after checkout completes
-- User is automatically charged £6/month after the 30-day trial ends
-- User receives read-only access when trial expires, payment fails, or subscription is canceled
-- User can subscribe (start trial) from a dedicated /subscribe page
-- User can cancel their subscription (cancels at period end, access continues until then)
-- Support role users bypass subscription gating entirely
+(None yet -- define with `/gsd:new-milestone`)
 
 ### Out of Scope
 
@@ -126,6 +126,9 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - Automated follow-up reminder emails -- adds scheduling infrastructure; premature
 - Rich HTML quote template builder -- template builders are entire products
 - Deposit collection on acceptance -- requires invoicing system (not yet built)
+- Custom card input form (Stripe Elements) -- hosted Checkout handles PCI/SCA/3DS
+- Custom dunning emails -- Stripe built-in dunning handles retries
+- Multiple pricing tiers / annual billing -- single £6/month plan for now
 
 ## Context
 
@@ -140,9 +143,11 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - **Item tax rate linkage shipped (v1.1):** Items reference tax rates by ID; API validates references; UI shows tax rate dropdown on item forms; quote factories resolve rates
 - **Bundles & Quotes shipped (v1.2):** Bundle creation/editing with SearchableItemPicker, quote system with creation dialog, list, detail view, line item management (add/edit/delete), expandable bundle rows, tax-inclusive totals, mobile-responsive card layout, status transitions (Draft/Sent/Accepted/Rejected)
 - **Send Quotes shipped (v1.3):** Quote deletion, token infrastructure, customer-facing quote page with view tracking, email sending with configurable templates and Tiptap rich text editor, customer accept/decline with notification emails
-- **Codebase size:** ~21.9k LOC API (TypeScript) + ~23.9k LOC UI (TypeScript/TSX)
-- **Worker infrastructure shipped (v1.4):** Dual entry-point NestJS monorepo with API + background worker connected via BullMQ/Redis. `npm run worker:dev` (hot reload) and `docker compose up` start all four services. Echo processor proves end-to-end queue flow; real processors (email, PDF) ship in future milestones
-- **Monetization roadmap:** Future milestones will add Stripe subscription billing, async payment processing via BullMQ queues, and scheduled reminder emails -- v1.4 lays the infrastructure foundation
+- **Worker infrastructure shipped (v1.4):** Dual entry-point NestJS monorepo with API + background worker connected via BullMQ/Redis
+- **E2E testing in progress (v1.5):** Playwright bootstrapped with global auth setup, API seeding infrastructure, partial test coverage
+- **Stripe billing shipped (v1.6):** Full SaaS billing — Stripe Checkout with 30-day trial, webhook processing via BullMQ (5 event types), subscription management API (GET/DELETE/portal), frontend paywall with soft modal for write actions, trial chip, Settings > Billing tab
+- **Luxon standardized (v1.6):** All DTOs use Luxon DateTime (no native Date), shared toDateTime utility, date-helpers module in UI
+- **Codebase size:** ~22k LOC API (TypeScript) + ~24k LOC UI (TypeScript/TSX)
 
 ## Constraints
 
@@ -194,24 +199,24 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 | deleteOutDir:false in worker-cli.json | Prevents worker build from deleting dist/main.js; both entry points must coexist | ✓ Good -- critical for dual-build |
 | Debug port 9230 for worker | Avoids port collision with API debugging on 9229 | ✓ Good -- clear convention |
 | No Redis volume in Docker Compose | BullMQ jobs are transient in dev; ephemeral Redis is simpler and sufficient | ✓ Good -- right trade-off |
+| Stripe Checkout (hosted) over Elements | Zero PCI scope, SCA/3DS handled automatically, no frontend Stripe packages | ✓ Good -- fastest path |
+| Local MongoDB subscription record | Avoids Stripe API call on every gated request; webhook keeps in sync | ✓ Good -- fast reads |
+| rawBody: true globally | Required for Stripe webhook signature verification; must be first task | ✓ Good -- critical |
+| cancel_at_period_end (not immediate cancel) | User retains access until billing period end | ✓ Good -- fair UX |
+| BullMQ for webhook processing | Async processing with deduplication (jobId: event.id) and retry semantics | ✓ Good -- resilient |
+| Verify-session endpoint | Race condition safety net when webhook arrives after redirect (1-30s) | ✓ Good -- smooth UX |
+| Soft paywall modal (not hard gate) for write actions | Non-disruptive; user can still browse data but can't create/edit | ✓ Good -- balanced |
+| SubscriptionGuard on API (not just frontend) | Server-side enforcement prevents bypass via direct API calls | ✓ Good -- secure |
+| Luxon DateTime in all DTOs (no native Date) | Consistent date handling across full stack; eliminated date parsing bugs | ✓ Good -- clean |
 
-## Current Milestone: v1.6 Stripe Subscription Billing
+## Current State
 
-**Goal:** Turn Trade Flow into a SaaS product — card-required 30-day free trial via Stripe Checkout (Stripe owns the trial), then £6/month recurring, with read-only enforcement when trial expires or payment fails, and a custom billing settings tab.
+**Shipped:** v1.6 Stripe Subscription Billing (2026-03-31)
+**In progress:** v1.5 Automated E2E Playwright Testing (Phases 25-28 remaining)
 
-**Target features:**
-- SubscriptionModule in trade-flow-api (MongoDB collection, userId-keyed)
-- POST /v1/subscription/checkout → Stripe Checkout Session (trial_period_days: 30, card collected)
-- Stripe webhook endpoint with raw body + signature verification; webhook creates/syncs local record
-- Webhook event handling: subscription.created/updated/deleted, invoice.payment_failed/succeeded
-- GET /v1/subscription, POST /v1/subscription/portal, DELETE /v1/subscription endpoints
-- Unit tests for all services and repository
-- SubscriptionGate component in trade-flow-ui (wraps business routes, redirects to /subscribe)
-- Support role exemption bypasses SubscriptionGate
-- /subscribe, /subscribe/success, /subscribe/cancel pages
-- Persistent trial banner showing days remaining
-- Settings > Billing tab with SubscriptionStatusCard (status, dates, cancel, manage billing CTA)
-- Read-only mode when status is past_due, canceled, or trial expired
+Trade Flow is now a monetized SaaS product with full billing infrastructure. The core product flow — from customer management through job tracking, quoting, and payment — is complete. Subscription billing via Stripe handles trial, payment, and access enforcement.
+
+**Next milestone:** To be defined via `/gsd:new-milestone`
 
 ## Evolution
 
@@ -231,4 +236,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-30 — Phase 34 complete: Luxon DateTime standardized across full stack — all DTOs use DateTime (no native Date), shared toDateTime utility, ISubscriptionDto aligned to IBaseResourceDto, Luxon adopted in frontend with date-helpers module, standards documented in both CLAUDE.md files*
+*Last updated: 2026-03-31 after v1.6 milestone — Stripe subscription billing shipped, Luxon standardized, Trade Flow is now a monetized SaaS product*
