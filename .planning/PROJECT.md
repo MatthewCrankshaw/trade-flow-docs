@@ -92,9 +92,21 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 
 ### Active
 
-<!-- Requirements for next milestone -- to be defined -->
+<!-- Current scope. Building toward these. -->
 
-(None yet -- define with `/gsd:new-milestone`)
+## Current Milestone: v1.7 Onboarding & Landing Page
+
+**Goal:** Replace the dismissible onboarding flow with a mandatory, streamlined setup process — from public landing page through profile, business, and no-card trial activation — and enforce a hard paywall for invalid subscriptions.
+
+**Target features:**
+- Public landing page (single-page marketing at root path, no auth required)
+- Mandatory profile setup (name required)
+- Mandatory business setup (business name + primary trade, UK/GBP defaults, auto-creates all defaults)
+- No-card-upfront free trial via Stripe (30-day trial, add card via Billing Portal later)
+- Welcome dashboard with greeting and first-steps guidance
+- Getting-started widget (create job, create quote) using existing onboarding widget pattern
+- Hard paywall replacing soft write-action modal (blocking screen when subscription invalid)
+- Remove existing dismissible onboarding flow
 
 ### Out of Scope
 
@@ -212,11 +224,9 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 ## Current State
 
 **Shipped:** v1.6 Stripe Subscription Billing (2026-03-31)
-**In progress:** v1.5 Automated E2E Playwright Testing (Phases 25-28 remaining)
+**In progress:** v1.7 Onboarding & Landing Page
 
-Trade Flow is now a monetized SaaS product with full billing infrastructure. The core product flow — from customer management through job tracking, quoting, and payment — is complete. Subscription billing via Stripe handles trial, payment, and access enforcement.
-
-**Next milestone:** To be defined via `/gsd:new-milestone`
+Trade Flow is now a monetized SaaS product with full billing infrastructure. The core product flow — from customer management through job tracking, quoting, and payment — is complete. Subscription billing via Stripe handles trial, payment, and access enforcement. Now rebuilding the onboarding experience and adding a public landing page.
 
 ## Evolution
 
@@ -236,4 +246,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-31 after v1.6 milestone — Stripe subscription billing shipped, Luxon standardized, Trade Flow is now a monetized SaaS product*
+*Last updated: 2026-03-31 after v1.7 milestone start — Onboarding & Landing Page milestone defined*

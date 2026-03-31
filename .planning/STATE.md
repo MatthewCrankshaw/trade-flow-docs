@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.6
-milestone_name: Stripe Subscription Billing
-status: complete
-stopped_at: Milestone v1.6 archived
-last_updated: "2026-03-31T20:00:00.000Z"
+milestone: v1.7
+milestone_name: Onboarding & Landing Page
+status: active
+stopped_at: null
+last_updated: "2026-03-31T21:00:00.000Z"
 last_activity: 2026-03-31
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 14
-  completed_plans: 14
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-31)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Milestone v1.6 complete -- planning next milestone
+**Current focus:** v1.7 Onboarding & Landing Page
 
 ## Current Position
 
-Phase: N/A (milestone complete)
-Plan: N/A
-Status: v1.6 shipped -- ready for next milestone
-Last activity: 2026-03-31
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-31 — Milestone v1.7 started
 
 ## Performance Metrics
 
