@@ -9,6 +9,7 @@
 - v1.4 Monorepo & Worker Infrastructure -- Phases 20-23 (shipped 2026-03-22)
 - v1.5 Automated E2E Playwright Testing -- Phases 24-28 (in progress)
 - v1.6 Stripe Subscription Billing -- Phases 29-34 (shipped 2026-03-31)
+- v1.7 Onboarding & Landing Page -- Phases 35-39 (in progress)
 
 ## Phases
 
@@ -75,7 +76,7 @@ Full details: `.planning/milestones/v1.4-ROADMAP.md`
 
 </details>
 
-<details open>
+<details>
 <summary>v1.5 Automated E2E Playwright Testing (Phases 24-28) -- IN PROGRESS</summary>
 
 - [x] **Phase 24: Playwright Bootstrap & Auth** - Install and configure Playwright with global auth storageState (completed 2026-03-27)
@@ -99,6 +100,16 @@ Full details: `.planning/milestones/v1.4-ROADMAP.md`
 Full details: `.planning/milestones/v1.6-ROADMAP.md`
 
 </details>
+
+### v1.7 Onboarding & Landing Page (In Progress)
+
+**Milestone Goal:** Replace the dismissible onboarding flow with a mandatory, streamlined setup process -- from public landing page through profile, business, and no-card trial activation -- and enforce a hard paywall for invalid subscriptions.
+
+- [ ] **Phase 35: No-Card Trial API Endpoint** - Backend endpoint for no-card Stripe trial creation with webhook compatibility
+- [ ] **Phase 36: Public Landing Page and Route Restructure** - Marketing landing page at root URL with three-tier route guard architecture
+- [ ] **Phase 37: Onboarding Wizard Pages** - Mandatory profile and business setup with trial activation and old onboarding removal
+- [ ] **Phase 38: Hard Paywall and Soft Paywall Removal** - Full-screen blocking paywall replacing soft write-action modal
+- [ ] **Phase 39: Welcome Dashboard and Final Cleanup** - Personalised welcome experience with getting-started checklist
 
 ## Phase Details
 
@@ -166,7 +177,70 @@ Plans:
   5. A GitHub Actions workflow runs on push and pull request: checks out both repos, starts the Docker Compose stack, executes the full Playwright suite, and uploads traces and reports as artifacts on failure
 **Plans**: TBD
 
+### Phase 35: No-Card Trial API Endpoint
+**Goal**: New users get a 30-day free trial without entering payment details, and the local subscription record is created reliably regardless of whether the subscription originated from Checkout or the direct Stripe API
+**Depends on**: Nothing (first phase of v1.7, API-only work)
+**Requirements**: TRIAL-01, TRIAL-04
+**Success Criteria** (what must be TRUE):
+  1. Calling POST /v1/subscription/trial creates a Stripe subscription with a 30-day trial period and no payment method required
+  2. The local MongoDB subscription record is written synchronously in the endpoint response (belt-and-suspenders with webhook)
+  3. When a trial ends without a payment method on file, the subscription auto-cancels via Stripe's `trial_settings.end_behavior.missing_payment_method: cancel`
+  4. The `customer.subscription.created` webhook handler can create a fresh local record (not just update), ensuring compatibility with both Checkout-created and API-created subscriptions
+**Plans**: TBD
+
+### Phase 36: Public Landing Page and Route Restructure
+**Goal**: Visitors can discover Trade Flow's value proposition and start a free trial from a public marketing page, and the app's route architecture supports three tiers of access (public, onboarding, authenticated+subscribed)
+**Depends on**: Nothing (first phase of v1.7, UI-only work -- can run in parallel with Phase 35)
+**Requirements**: LAND-01, LAND-02, LAND-03, LAND-04, LAND-05, LAND-06
+**Success Criteria** (what must be TRUE):
+  1. An unauthenticated visitor can view the landing page at the root URL with hero section, feature highlights, pricing card, and sign-up/login navigation
+  2. The landing page loads without importing the app's Redux store, feature modules, or auth hooks (verified by bundle analysis)
+  3. An authenticated user visiting the root URL is redirected to the dashboard without seeing the landing page
+  4. The App.tsx route tree has three nested guard layers (ProtectedRoute, OnboardingGuard shell, HardPaywallGuard shell) ready for Phase 37 and 38 to implement
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 37: Onboarding Wizard Pages
+**Goal**: Every new user completes a mandatory two-step setup (profile name, then business name + trade) before accessing the app, and existing users with completed profiles and businesses pass through automatically
+**Depends on**: Phase 35 (trial endpoint), Phase 36 (route guard architecture)
+**Requirements**: ONBD-01, ONBD-02, ONBD-03, ONBD-04, ONBD-05, ONBD-06, ONBD-07, TRIAL-02, TRIAL-03
+**Success Criteria** (what must be TRUE):
+  1. A new user who signs up is redirected to the profile setup page and cannot access any app page until they enter a display name
+  2. After profile setup, the user is redirected to business setup where they enter a business name and select a trade; country defaults to UK and currency defaults to GBP without user input
+  3. Completing business setup auto-creates default tax rates, job types, visit types, items, and quote email template, then starts the 30-day no-card trial
+  4. The user can see trial days remaining in the app header and can add a payment method via Stripe Billing Portal at any time
+  5. Existing users who already have a display name, business, and subscription bypass onboarding entirely; refreshing mid-wizard resumes at the correct step
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 38: Hard Paywall and Soft Paywall Removal
+**Goal**: Users with invalid subscriptions see a full-screen blocking page with contextual messaging and a path to resubscribe, replacing the soft modal that only blocked write actions
+**Depends on**: Phase 36 (route guard architecture -- can run in parallel with Phase 37)
+**Requirements**: PAYWALL-01, PAYWALL-02, PAYWALL-03, PAYWALL-04, PAYWALL-05, PAYWALL-06
+**Success Criteria** (what must be TRUE):
+  1. A user with an expired trial, failed payment, or canceled subscription sees a full-screen paywall page instead of the app
+  2. The paywall displays differentiated messaging based on subscription state (trial expired vs payment failed vs canceled) and includes "your data is safe" reassurance
+  3. The user can access the Stripe Billing Portal directly from the paywall screen to add a payment method or resubscribe
+  4. Support role users bypass the hard paywall entirely and see the normal app
+  5. The soft paywall modal, PersistentCta, DashboardBanner, SubscriptionGatedLayout, and all per-page `openPaywall()` dispatch calls are removed
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 39: Welcome Dashboard and Final Cleanup
+**Goal**: New users land on a personalised welcome experience that guides them toward their first job and quote, and all remnants of the old onboarding system are removed
+**Depends on**: Phase 37 (display name for greeting, business existence for welcome variant)
+**Requirements**: DASH-01, DASH-02, DASH-03
+**Success Criteria** (what must be TRUE):
+  1. A new user who just completed onboarding sees a personalised welcome message using their display name on the dashboard
+  2. The dashboard shows a getting-started widget with "Create your first job" and "Send your first quote" checklist items that link to the relevant pages
+  3. Checklist items show completion state (checked when the user has created a job or sent a quote) and the widget hides once all items are complete
+**Plans**: TBD
+**UI hint**: yes
+
 ## Progress
+
+**Execution Order:**
+Phases execute in numeric order. Note: Phases 35+36 can run in parallel (different repos). Phases 37+38 can run in parallel (different concerns). Phase 39 depends on 37.
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -204,3 +278,8 @@ Plans:
 | 32. Subscription Gate and Subscribe Pages | v1.6 | 3/3 | Complete | 2026-03-29 |
 | 33. Trial Banner and Billing Settings Tab | v1.6 | 2/2 | Complete | 2026-03-29 |
 | 34. Luxon DateTime Standardization | v1.6 | 2/2 | Complete | 2026-03-30 |
+| 35. No-Card Trial API Endpoint | v1.7 | 0/? | Not started | - |
+| 36. Public Landing Page and Route Restructure | v1.7 | 0/? | Not started | - |
+| 37. Onboarding Wizard Pages | v1.7 | 0/? | Not started | - |
+| 38. Hard Paywall and Soft Paywall Removal | v1.7 | 0/? | Not started | - |
+| 39. Welcome Dashboard and Final Cleanup | v1.7 | 0/? | Not started | - |

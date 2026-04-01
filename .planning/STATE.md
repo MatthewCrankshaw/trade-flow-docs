@@ -4,10 +4,10 @@ milestone: v1.7
 milestone_name: Onboarding & Landing Page
 status: active
 stopped_at: null
-last_updated: "2026-03-31T21:00:00.000Z"
+last_updated: "2026-03-31T22:00:00.000Z"
 last_activity: 2026-03-31
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -20,14 +20,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-31)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** v1.7 Onboarding & Landing Page
+**Current focus:** v1.7 Onboarding & Landing Page -- Phase 35 ready to plan
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-31 — Milestone v1.7 started
+Phase: 35 of 39 (No-Card Trial API Endpoint)
+Plan: 0 of ? in current phase
+Status: Ready to plan
+Last activity: 2026-03-31 -- Roadmap created for v1.7 (Phases 35-39)
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -55,7 +57,9 @@ Key decisions archived in PROJECT.md Key Decisions table.
 
 ### Roadmap Evolution
 
-None pending.
+- Phases 35+36 can run in parallel (API vs UI repos)
+- Phases 37+38 can run in parallel (onboarding vs paywall concerns)
+- Phase 39 depends on Phase 37 (displayName feeds welcome greeting)
 
 ### Pending Todos
 
@@ -64,8 +68,9 @@ None.
 ### Blockers/Concerns
 
 - v1.5 Playwright testing (Phases 25-28) still in progress -- paused during v1.6 work
-- Firebase v12 IndexedDB persistence in Playwright storageState needs validation
-- Two-repo CI checkout strategy needs validation in Phase 28
+- Existing user migration: mandatory onboarding guard must pass users who already have profile + business + subscription
+- Stripe webhook compatibility: `customer.subscription.created` must handle both Checkout-created and API-created subscriptions
+- `past_due` grace period duration is a product decision needed during Phase 38 planning
 
 ### Quick Tasks Completed
 
@@ -85,5 +90,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-31
-Stopped at: Milestone v1.6 archived
+Stopped at: Roadmap created for v1.7 Onboarding & Landing Page
 Resume file: None

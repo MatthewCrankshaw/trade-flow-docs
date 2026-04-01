@@ -85,13 +85,38 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (populated by roadmapper) | | |
+| LAND-01 | Phase 36 | Pending |
+| LAND-02 | Phase 36 | Pending |
+| LAND-03 | Phase 36 | Pending |
+| LAND-04 | Phase 36 | Pending |
+| LAND-05 | Phase 36 | Pending |
+| LAND-06 | Phase 36 | Pending |
+| ONBD-01 | Phase 37 | Pending |
+| ONBD-02 | Phase 37 | Pending |
+| ONBD-03 | Phase 37 | Pending |
+| ONBD-04 | Phase 37 | Pending |
+| ONBD-05 | Phase 37 | Pending |
+| ONBD-06 | Phase 37 | Pending |
+| ONBD-07 | Phase 37 | Pending |
+| TRIAL-01 | Phase 35 | Pending |
+| TRIAL-02 | Phase 37 | Pending |
+| TRIAL-03 | Phase 37 | Pending |
+| TRIAL-04 | Phase 35 | Pending |
+| PAYWALL-01 | Phase 38 | Pending |
+| PAYWALL-02 | Phase 38 | Pending |
+| PAYWALL-03 | Phase 38 | Pending |
+| PAYWALL-04 | Phase 38 | Pending |
+| PAYWALL-05 | Phase 38 | Pending |
+| PAYWALL-06 | Phase 38 | Pending |
+| DASH-01 | Phase 39 | Pending |
+| DASH-02 | Phase 39 | Pending |
+| DASH-03 | Phase 39 | Pending |
 
 **Coverage:**
-- v1.7 requirements: 20 total
-- Mapped to phases: 0
-- Unmapped: 20 ⚠️
+- v1.7 requirements: 26 total
+- Mapped to phases: 26
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-01*
-*Last updated: 2026-04-01 after initial definition*
+*Last updated: 2026-03-31 after roadmap creation*
