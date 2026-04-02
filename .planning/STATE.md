@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Stripe Subscription Billing — Phase Details
 status: verifying
-stopped_at: Completed 34-02-PLAN.md
-last_updated: "2026-03-30T18:59:30.006Z"
+stopped_at: Completed 35-02-PLAN.md
+last_updated: "2026-04-02T11:08:28.442Z"
 last_activity: 2026-03-30
 progress:
   total_phases: 11
-  completed_phases: 8
-  total_plans: 17
+  completed_phases: 7
+  total_plans: 15
   completed_plans: 17
 ---
 
@@ -71,6 +71,7 @@ Progress: Phase 29 of 33
 | Phase 33-trial-banner-and-billing-settings-tab P02 | 3min | 2 tasks | 6 files |
 | Phase 34 P01 | 6min | 4 tasks | 11 files |
 | Phase 34 P02 | 6min | 3 tasks | 17 files |
+| Phase 35 P02 | 2min | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -127,6 +128,7 @@ Recent decisions affecting current work:
 - [Phase 34-01]: updatedAt removed from service layer -- repository handles it in upsert methods
 - [Phase 34]: Replaced date-fns entirely with Luxon in trade-flow-ui -- single date library across both repos
 - [Phase 34]: new Date() kept only for Calendar UI component boundaries requiring native Date objects
+- [Phase 35]: customer.subscription.created handler reuses extractSubscriptionDates for consistent date mapping across all webhook handlers
 
 ### Roadmap Evolution
 
@@ -160,6 +162,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-30T18:53:52.987Z
-Stopped at: Completed 34-02-PLAN.md
+Last session: 2026-04-02T11:08:28.439Z
+Stopped at: Completed 35-02-PLAN.md
 Resume file: None
