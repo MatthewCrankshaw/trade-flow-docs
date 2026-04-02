@@ -294,7 +294,7 @@ Phases execute in numeric order. Note: Phases 35+36 can run in parallel (differe
 | 32. Subscription Gate and Subscribe Pages | v1.6 | 3/3 | Complete | 2026-03-29 |
 | 33. Trial Banner and Billing Settings Tab | v1.6 | 2/2 | Complete | 2026-03-29 |
 | 34. Luxon DateTime Standardization | v1.6 | 2/2 | Complete | 2026-03-30 |
-| 35. No-Card Trial API Endpoint | v1.7 | 2/2 | Complete   | 2026-04-02 |
+| 35. No-Card Trial API Endpoint | v1.7 | 2/2 | Complete    | 2026-04-02 |
 | 36. Public Landing Page and Route Restructure | v1.7 | 0/2 | Not started | - |
 | 37. Onboarding Wizard Pages | v1.7 | 0/3 | Not started | - |
 | 38. Hard Paywall and Soft Paywall Removal | v1.7 | 0/2 | Not started | - |

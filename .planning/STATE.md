@@ -4,12 +4,12 @@ milestone: v1.7
 milestone_name: Onboarding & Landing Page
 status: verifying
 stopped_at: Completed 35-02-PLAN.md
-last_updated: "2026-04-02T11:09:29.611Z"
+last_updated: "2026-04-02T11:14:01.739Z"
 last_activity: 2026-04-02
 progress:
   total_phases: 10
   completed_phases: 3
-  total_plans: 12
+  total_plans: 14
   completed_plans: 5
   percent: 0
 ---
@@ -25,8 +25,8 @@ See: .planning/PROJECT.md (updated 2026-03-31)
 
 ## Current Position
 
-Phase: 35 (no-card-trial-api-endpoint) — EXECUTING
-Plan: 2 of 2
+Phase: 36
+Plan: Not started
 Status: Phase complete — ready for verification
 Last activity: 2026-04-02
 
