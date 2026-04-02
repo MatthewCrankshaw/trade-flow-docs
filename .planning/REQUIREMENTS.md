@@ -40,7 +40,7 @@ Requirements for Onboarding & Landing Page milestone. Each maps to roadmap phase
 - [x] **PAYWALL-03**: User can access Stripe Billing Portal from the paywall screen to manage subscription
 - [x] **PAYWALL-04**: User sees "your data is safe" messaging on the paywall screen
 - [x] **PAYWALL-05**: Support role users bypass the hard paywall entirely
-- [ ] **PAYWALL-06**: Existing soft paywall modal and write-action gating are removed
+- [x] **PAYWALL-06**: Existing soft paywall modal and write-action gating are removed
 
 ### Welcome Dashboard
 
@@ -107,7 +107,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PAYWALL-03 | Phase 38 | Complete |
 | PAYWALL-04 | Phase 38 | Complete |
 | PAYWALL-05 | Phase 38 | Complete |
-| PAYWALL-06 | Phase 38 | Pending |
+| PAYWALL-06 | Phase 38 | Complete |
 | DASH-01 | Phase 39 | Pending |
 | DASH-02 | Phase 39 | Pending |
 | DASH-03 | Phase 39 | Pending |
