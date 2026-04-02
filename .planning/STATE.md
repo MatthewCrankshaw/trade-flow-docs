@@ -51,6 +51,7 @@ Progress: [░░░░░░░░░░] 0%
 | v1.6 Stripe Billing | 6 | 14 | ~55min | 4min |
 | Phase 35 P01 | 4min | 2 tasks | 4 files |
 | Phase 35 P02 | 2min | 1 tasks | 2 files |
+| Phase 37 P01 | 4min | 2 tasks | 13 files |
 | Phase 37 P03 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
@@ -61,6 +62,7 @@ Key decisions archived in PROJECT.md Key Decisions table.
 
 - [Phase 35]: Used SUBSCRIPTION_ALREADY_ACTIVE error code for trial duplicate guard; Stripe v21+ item-level current_period_end pattern; Luxon DateTime.fromSeconds for Stripe timestamps
 - [Phase 35]: customer.subscription.created handler reuses extractSubscriptionDates for consistent date mapping across all webhook handlers
+- [Phase 37 P01]: Used API User.name (not Firebase displayName) for guard check; added updateUser RTK Query mutation; dual OnboardingGuard wrapping in App.tsx
 - [Phase 37]: Replaced TrialChip with TrialBadge in DashboardLayout header; portal opens in new tab via window.open
 
 ### Roadmap Evolution
