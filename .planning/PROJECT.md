@@ -228,6 +228,8 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 
 Trade Flow is now a monetized SaaS product with full billing infrastructure. The core product flow — from customer management through job tracking, quoting, and payment — is complete. Subscription billing via Stripe handles trial, payment, and access enforcement. Now rebuilding the onboarding experience and adding a public landing page.
 
+Phase 35 complete (2026-04-02) — No-card trial API endpoint. POST /v1/subscription/trial creates a 30-day Stripe trial without payment details. Webhook handler for customer.subscription.created ensures belt-and-suspenders reliability.
+
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
@@ -246,4 +248,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-31 after v1.7 milestone start — Onboarding & Landing Page milestone defined*
+*Last updated: 2026-04-02 after Phase 35 completion — no-card trial API endpoint*
