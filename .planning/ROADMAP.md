@@ -216,8 +216,12 @@ Plans:
   3. Completing business setup auto-creates default tax rates, job types, visit types, items, and quote email template, then starts the 30-day no-card trial
   4. The user can see trial days remaining in the app header and can add a payment method via Stripe Billing Portal at any time
   5. Existing users who already have a display name, business, and subscription bypass onboarding entirely; refreshing mid-wizard resumes at the correct step
-**Plans**: TBD
+**Plans**: 3 plans
 **UI hint**: yes
+Plans:
+- [ ] 37-01-PLAN.md -- OnboardingGuard redirect logic, wizard container, ProfileStep form, progress bar, trade constants
+- [ ] 37-02-PLAN.md -- BusinessStep with trade card grid, SetupLoadingScreen with sequential API calls, RTK Query mutations
+- [ ] 37-03-PLAN.md -- TrialBadge component with urgency variants and DashboardLayout header integration
 
 ### Phase 38: Hard Paywall and Soft Paywall Removal
 **Goal**: Users with invalid subscriptions see a full-screen blocking page with contextual messaging and a path to resubscribe, replacing the soft modal that only blocked write actions
@@ -289,6 +293,6 @@ Phases execute in numeric order. Note: Phases 35+36 can run in parallel (differe
 | 34. Luxon DateTime Standardization | v1.6 | 2/2 | Complete | 2026-03-30 |
 | 35. No-Card Trial API Endpoint | v1.7 | 0/2 | Not started | - |
 | 36. Public Landing Page and Route Restructure | v1.7 | 0/2 | Not started | - |
-| 37. Onboarding Wizard Pages | v1.7 | 0/? | Not started | - |
+| 37. Onboarding Wizard Pages | v1.7 | 0/3 | Not started | - |
 | 38. Hard Paywall and Soft Paywall Removal | v1.7 | 0/2 | Not started | - |
 | 39. Welcome Dashboard and Final Cleanup | v1.7 | 0/? | Not started | - |
