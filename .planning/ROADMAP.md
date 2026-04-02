@@ -235,7 +235,7 @@ Plans:
   5. The soft paywall modal, PersistentCta, DashboardBanner, SubscriptionGatedLayout, and all per-page `openPaywall()` dispatch calls are removed
 **Plans**: 2 plans
 Plans:
-- [ ] 38-01-PLAN.md -- PaywallPage component (3 variants), PaywallGuard blocking logic, useSubscription simplification, route tree adjustments
+- [x] 38-01-PLAN.md -- PaywallPage component (3 variants), PaywallGuard blocking logic, useSubscription simplification, route tree adjustments
 - [ ] 38-02-PLAN.md -- Delete soft paywall components (7 files), clean Redux store, remove all openPaywall dispatch calls from feature pages
 **UI hint**: yes
 
@@ -297,5 +297,5 @@ Phases execute in numeric order. Note: Phases 35+36 can run in parallel (differe
 | 35. No-Card Trial API Endpoint | v1.7 | 2/2 | Complete    | 2026-04-02 |
 | 36. Public Landing Page and Route Restructure | v1.7 | 0/2 | Not started | - |
 | 37. Onboarding Wizard Pages | v1.7 | 2/3 | In Progress|  |
-| 38. Hard Paywall and Soft Paywall Removal | v1.7 | 0/2 | Not started | - |
+| 38. Hard Paywall and Soft Paywall Removal | v1.7 | 1/2 | In Progress|  |
 | 39. Welcome Dashboard and Final Cleanup | v1.7 | 0/2 | Not started | - |

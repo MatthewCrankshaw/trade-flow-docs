@@ -35,11 +35,11 @@ Requirements for Onboarding & Landing Page milestone. Each maps to roadmap phase
 
 ### Hard Paywall
 
-- [ ] **PAYWALL-01**: User with invalid subscription sees a full-screen blocking page instead of the app
-- [ ] **PAYWALL-02**: User sees differentiated messaging based on subscription state (trial expired, payment failed, canceled)
-- [ ] **PAYWALL-03**: User can access Stripe Billing Portal from the paywall screen to manage subscription
-- [ ] **PAYWALL-04**: User sees "your data is safe" messaging on the paywall screen
-- [ ] **PAYWALL-05**: Support role users bypass the hard paywall entirely
+- [x] **PAYWALL-01**: User with invalid subscription sees a full-screen blocking page instead of the app
+- [x] **PAYWALL-02**: User sees differentiated messaging based on subscription state (trial expired, payment failed, canceled)
+- [x] **PAYWALL-03**: User can access Stripe Billing Portal from the paywall screen to manage subscription
+- [x] **PAYWALL-04**: User sees "your data is safe" messaging on the paywall screen
+- [x] **PAYWALL-05**: Support role users bypass the hard paywall entirely
 - [ ] **PAYWALL-06**: Existing soft paywall modal and write-action gating are removed
 
 ### Welcome Dashboard
@@ -102,11 +102,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TRIAL-02 | Phase 37 | Complete |
 | TRIAL-03 | Phase 37 | Complete |
 | TRIAL-04 | Phase 35 | Complete |
-| PAYWALL-01 | Phase 38 | Pending |
-| PAYWALL-02 | Phase 38 | Pending |
-| PAYWALL-03 | Phase 38 | Pending |
-| PAYWALL-04 | Phase 38 | Pending |
-| PAYWALL-05 | Phase 38 | Pending |
+| PAYWALL-01 | Phase 38 | Complete |
+| PAYWALL-02 | Phase 38 | Complete |
+| PAYWALL-03 | Phase 38 | Complete |
+| PAYWALL-04 | Phase 38 | Complete |
+| PAYWALL-05 | Phase 38 | Complete |
 | PAYWALL-06 | Phase 38 | Pending |
 | DASH-01 | Phase 39 | Pending |
 | DASH-02 | Phase 39 | Pending |

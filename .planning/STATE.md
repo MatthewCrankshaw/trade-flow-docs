@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Onboarding & Landing Page
-status: verifying
-stopped_at: Completed 37-03-PLAN.md
-last_updated: "2026-04-02T11:23:34.863Z"
+status: executing
+stopped_at: Completed 38-01-PLAN.md
+last_updated: "2026-04-02T11:39:43.296Z"
 last_activity: 2026-04-02
 progress:
   total_phases: 10
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 14
-  completed_plans: 7
+  completed_plans: 10
   percent: 0
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-31)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 35 — no-card-trial-api-endpoint
+**Current focus:** Phase 38 — hard-paywall-and-soft-paywall-removal
 
 ## Current Position
 
-Phase: 36
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: 38 (hard-paywall-and-soft-paywall-removal) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
 Last activity: 2026-04-02
 
 Progress: [░░░░░░░░░░] 0%
@@ -53,6 +53,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 35 P02 | 2min | 1 tasks | 2 files |
 | Phase 37 P01 | 4min | 2 tasks | 13 files |
 | Phase 37 P03 | 2min | 2 tasks | 4 files |
+| Phase 38 P01 | 3min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -64,6 +65,7 @@ Key decisions archived in PROJECT.md Key Decisions table.
 - [Phase 35]: customer.subscription.created handler reuses extractSubscriptionDates for consistent date mapping across all webhook handlers
 - [Phase 37 P01]: Used API User.name (not Firebase displayName) for guard check; added updateUser RTK Query mutation; dual OnboardingGuard wrapping in App.tsx
 - [Phase 37]: Replaced TrialChip with TrialBadge in DashboardLayout header; portal opens in new tab via window.open
+- [Phase 38]: openPaywall made no-op (not deleted) to maintain backward compat; Plan 02 removes all consumers
 
 ### Roadmap Evolution
 
@@ -99,6 +101,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-02T11:23:34.860Z
-Stopped at: Completed 37-03-PLAN.md
+Last session: 2026-04-02T11:39:43.293Z
+Stopped at: Completed 38-01-PLAN.md
 Resume file: None
