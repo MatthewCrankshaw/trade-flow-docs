@@ -1,33 +1,33 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.6
-milestone_name: Stripe Subscription Billing — Phase Details
-status: verifying
-stopped_at: Completed 34-02-PLAN.md
-last_updated: "2026-03-30T18:59:30.006Z"
-last_activity: 2026-03-30
+milestone: v1.7
+milestone_name: Onboarding & Landing Page
+status: executing
+stopped_at: Completed 38-02-PLAN.md
+last_updated: "2026-04-02T11:46:24Z"
+last_activity: 2026-04-02
 progress:
-  total_phases: 11
-  completed_phases: 8
-  total_plans: 17
-  completed_plans: 17
+  total_phases: 10
+  completed_phases: 4
+  total_plans: 14
+  completed_plans: 12
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-27)
+See: .planning/PROJECT.md (updated 2026-04-02)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 34 — use-luxon-datetime-in-dtos-extend-ibaseresourcedto-move-createdat-updatedat-to-entity-only
+**Current focus:** Phase 38 — hard-paywall-and-soft-paywall-removal (COMPLETE)
 
 ## Current Position
 
-Phase: 34
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-03-30
+Phase: 38 (hard-paywall-and-soft-paywall-removal) — COMPLETE
+Plan: 2 of 2
+Status: Phase complete
+Last activity: 2026-04-02
 
 ```
 Progress: Phase 29 of 33
