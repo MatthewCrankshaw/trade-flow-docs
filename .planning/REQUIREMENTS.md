@@ -29,8 +29,8 @@ Requirements for Onboarding & Landing Page milestone. Each maps to roadmap phase
 ### No-Card Trial
 
 - [x] **TRIAL-01**: User's 30-day free trial starts automatically after business setup without entering payment details
-- [ ] **TRIAL-02**: User can see trial days remaining in the app header
-- [ ] **TRIAL-03**: User can add payment method via Stripe Billing Portal at any time during trial
+- [x] **TRIAL-02**: User can see trial days remaining in the app header
+- [x] **TRIAL-03**: User can add payment method via Stripe Billing Portal at any time during trial
 - [x] **TRIAL-04**: Subscription auto-cancels when trial ends without a payment method on file
 
 ### Hard Paywall
@@ -99,8 +99,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ONBD-06 | Phase 37 | Pending |
 | ONBD-07 | Phase 37 | Pending |
 | TRIAL-01 | Phase 35 | Complete |
-| TRIAL-02 | Phase 37 | Pending |
-| TRIAL-03 | Phase 37 | Pending |
+| TRIAL-02 | Phase 37 | Complete |
+| TRIAL-03 | Phase 37 | Complete |
 | TRIAL-04 | Phase 35 | Complete |
 | PAYWALL-01 | Phase 38 | Pending |
 | PAYWALL-02 | Phase 38 | Pending |

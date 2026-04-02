@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Onboarding & Landing Page
 status: verifying
-stopped_at: Completed 36-01-PLAN.md
-last_updated: "2026-04-02T11:19:06Z"
-last_activity: 2026-04-02 -- Phase 36-01 landing page components complete
+stopped_at: Completed 37-03-PLAN.md
+last_updated: "2026-04-02T11:23:34.863Z"
+last_activity: 2026-04-02
 progress:
   total_phases: 10
   completed_phases: 3
   total_plans: 14
-  completed_plans: 5
+  completed_plans: 7
   percent: 0
 ---
 
@@ -51,6 +51,7 @@ Progress: [░░░░░░░░░░] 0%
 | v1.6 Stripe Billing | 6 | 14 | ~55min | 4min |
 | Phase 35 P01 | 4min | 2 tasks | 4 files |
 | Phase 35 P02 | 2min | 1 tasks | 2 files |
+| Phase 37 P03 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -60,6 +61,7 @@ Key decisions archived in PROJECT.md Key Decisions table.
 
 - [Phase 35]: Used SUBSCRIPTION_ALREADY_ACTIVE error code for trial duplicate guard; Stripe v21+ item-level current_period_end pattern; Luxon DateTime.fromSeconds for Stripe timestamps
 - [Phase 35]: customer.subscription.created handler reuses extractSubscriptionDates for consistent date mapping across all webhook handlers
+- [Phase 37]: Replaced TrialChip with TrialBadge in DashboardLayout header; portal opens in new tab via window.open
 
 ### Roadmap Evolution
 
@@ -95,6 +97,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-02T11:19:06Z
-Stopped at: Completed 36-01-PLAN.md
+Last session: 2026-04-02T11:23:34.860Z
+Stopped at: Completed 37-03-PLAN.md
 Resume file: None

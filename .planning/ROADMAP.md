@@ -221,7 +221,7 @@ Plans:
 Plans:
 - [ ] 37-01-PLAN.md -- OnboardingGuard redirect logic, wizard container, ProfileStep form, progress bar, trade constants
 - [ ] 37-02-PLAN.md -- BusinessStep with trade card grid, SetupLoadingScreen with sequential API calls, RTK Query mutations
-- [ ] 37-03-PLAN.md -- TrialBadge component with urgency variants and DashboardLayout header integration
+- [x] 37-03-PLAN.md -- TrialBadge component with urgency variants and DashboardLayout header integration
 
 ### Phase 38: Hard Paywall and Soft Paywall Removal
 **Goal**: Users with invalid subscriptions see a full-screen blocking page with contextual messaging and a path to resubscribe, replacing the soft modal that only blocked write actions
@@ -296,6 +296,6 @@ Phases execute in numeric order. Note: Phases 35+36 can run in parallel (differe
 | 34. Luxon DateTime Standardization | v1.6 | 2/2 | Complete | 2026-03-30 |
 | 35. No-Card Trial API Endpoint | v1.7 | 2/2 | Complete    | 2026-04-02 |
 | 36. Public Landing Page and Route Restructure | v1.7 | 0/2 | Not started | - |
-| 37. Onboarding Wizard Pages | v1.7 | 0/3 | Not started | - |
+| 37. Onboarding Wizard Pages | v1.7 | 1/3 | In Progress|  |
 | 38. Hard Paywall and Soft Paywall Removal | v1.7 | 0/2 | Not started | - |
 | 39. Welcome Dashboard and Final Cleanup | v1.7 | 0/2 | Not started | - |
