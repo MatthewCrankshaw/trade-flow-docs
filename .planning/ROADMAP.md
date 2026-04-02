@@ -297,3 +297,5 @@ Plans:
 | 32. Subscription Gate and Subscribe Pages | v1.6 | 3/3 | Complete    | 2026-03-29 |
 | 33. Trial Banner and Billing Settings Tab | v1.6 | 2/2 | Complete    | 2026-03-29 |
 | 34. Luxon DateTime Standardization | - | 2/2 | Complete    | 2026-03-30 |
+| 35. No-Card Trial API Endpoint | v1.7 | 2/2 | Complete | 2026-04-02 |
+| 36. Public Landing Page and Route Restructure | v1.7 | 2/2 | Complete | 2026-04-02 |

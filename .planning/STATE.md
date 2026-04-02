@@ -1,16 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.6
-milestone_name: Stripe Subscription Billing — Phase Details
-status: verifying
-stopped_at: Completed 34-02-PLAN.md
-last_updated: "2026-03-30T18:59:30.006Z"
-last_activity: 2026-03-30
+milestone: v1.7
+milestone_name: Onboarding & Landing Page
+status: executing
+stopped_at: Completed 36-02-PLAN.md
+last_updated: "2026-04-02T12:02:30Z"
+last_activity: 2026-04-02 -- Phase 36 Plan 02 completed
 progress:
-  total_phases: 11
-  completed_phases: 8
-  total_plans: 17
-  completed_plans: 17
+  total_phases: 10
+  completed_phases: 4
+  total_plans: 15
+  completed_plans: 12
+  percent: 80
 ---
 
 # Project State
@@ -20,18 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-27)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 34 — use-luxon-datetime-in-dtos-extend-ibaseresourcedto-move-createdat-updatedat-to-entity-only
+**Current focus:** Phase 36 — public-landing-page-and-route-restructure (complete)
 
 ## Current Position
 
-Phase: 34
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-03-30
+Phase: 36 (public-landing-page-and-route-restructure) — COMPLETE
+Plan: 2 of 2 (complete)
+Status: Phase 36 complete -- all plans executed
+Last activity: 2026-04-02 -- Phase 36 Plan 02 completed (pre-completed by parallel phases)
 
 ```
-Progress: Phase 29 of 33
-[██████░░░░░░░░░░░░░░░░░░░] 20% complete (2/10 plans)
+Progress: [████████░░] 80% complete (12/15 plans)
 ```
 
 ## Performance Metrics
@@ -160,6 +160,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-30T18:53:52.987Z
-Stopped at: Completed 34-02-PLAN.md
+Last session: 2026-04-02T12:02:30Z
+Stopped at: Completed 36-02-PLAN.md
 Resume file: None
