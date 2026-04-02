@@ -32,8 +32,7 @@ Declared values follow the established Trade Flow spacing system (consistent wit
 | Token | Value | Tailwind | Usage in Phase 36 |
 |-------|-------|----------|-------------------|
 | 2xs | 4px | `1` | Icon-text gaps in feature cards, inline spacing |
-| xs | 6px | `1.5` | Icon-label pairing in feature highlight items |
-| sm | 8px | `2` | Button groups (`gap-2`), nav item spacing |
+| sm | 8px | `2` | Button groups (`gap-2`), nav item spacing, pricing card feature list icon-label pairing |
 | md | 12px | `3` | Feature card internal padding, list stacking |
 | base | 16px | `4` | Section content padding, grid gaps between feature cards |
 | lg | 24px | `6` | Section vertical spacing (`space-y-6`), landing page header padding |
@@ -50,14 +49,14 @@ All values from the established Trade Flow type system (consistent with Phase 32
 
 | Role | Size | Weight | Line Height | Tailwind | Phase 36 Usage |
 |------|------|--------|-------------|----------|----------------|
-| Body | 14px | 500 (medium) | normal | `text-sm font-medium` | Feature card descriptions, pricing card features, footer text |
-| Label | 12px | 500 (medium) | normal | `text-xs font-medium` | Price period label, fine print ("no card required") |
-| Heading | 18px | 600 (semibold) | none | `text-lg font-semibold` | Feature card titles, pricing card title |
-| Display | 36px | 700 (bold) | 1.2 | `text-4xl font-bold tracking-tight` | Hero headline |
+| Body | 14px | 400 (regular) | normal | `text-sm` | Feature card descriptions, pricing card features, footer text |
+| Label | 12px | 400 (regular) | normal | `text-xs` | Price period label, fine print ("no card required") |
+| Heading | 18px | 600 (semibold) | none | `text-lg font-semibold` | Feature card titles, pricing card title, price display ("GBP 6") |
+| Display | 36px | 600 (semibold) | 1.2 | `text-4xl font-semibold tracking-tight` | Hero headline |
 
 Additional patterns used:
-- Hero subheadline: `text-lg text-muted-foreground` (18px, 400) -- secondary copy below headline
-- Price display: `text-2xl font-bold` (24px, 700) -- the plan price "GBP 6"
+- Hero subheadline: `text-lg text-muted-foreground` (18px, 400) -- secondary copy below headline, uses Body weight at Heading size
+- Price display: `text-lg font-semibold` (18px, 600) -- the plan price "GBP 6", uses Heading role
 - Muted descriptions: `text-sm text-muted-foreground` -- secondary copy throughout landing page
 - Fine print: `text-xs text-muted-foreground` -- "No card required", "Cancel any time"
 
@@ -232,7 +231,7 @@ LandingHeader (sticky top, bg-background/80 backdrop-blur border-b)
 
 HeroSection (py-16 md:py-24)
   Container (max-w-3xl mx-auto px-4 text-center)
-    h1 "Run your trade business in one place" (text-4xl font-bold tracking-tight md:text-5xl)
+    h1 "Run your trade business in one place" (text-4xl font-semibold tracking-tight md:text-5xl)
     p subheadline (text-lg text-muted-foreground mt-4 max-w-2xl mx-auto)
     Button "Start Free Trial" (mt-8, size="lg") with ArrowRight icon
 
@@ -249,12 +248,12 @@ PricingSection (py-12)
     Card
       CardHeader
         CardTitle: "Trade Flow Pro" (text-lg font-semibold)
-        Price: "GBP 6" (text-2xl font-bold) "/ month" (text-xs text-muted-foreground)
+        Price: "GBP 6" (text-lg font-semibold) "/ month" (text-xs text-muted-foreground)
       CardContent
         Feature list with Check icons (space-y-3)
-          Each: flex items-center gap-1.5
+          Each: flex items-center gap-2
             Check (h-4 w-4 text-primary)
-            text-sm font-medium
+            text-sm
       CardFooter
         Button full-width: "Start Free Trial" (w-full)
 
