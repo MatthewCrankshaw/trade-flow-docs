@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Onboarding & Landing Page
-status: planning
-stopped_at: Phase 39 context gathered
-last_updated: "2026-04-02T08:39:12.575Z"
-last_activity: 2026-03-31 -- Roadmap created for v1.7 (Phases 35-39)
+status: verifying
+stopped_at: Completed 35-01-PLAN.md
+last_updated: "2026-04-02T11:09:29.611Z"
+last_activity: 2026-04-02
 progress:
   total_phases: 10
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 12
-  completed_plans: 3
+  completed_plans: 5
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-31)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** v1.7 Onboarding & Landing Page -- Phase 35 ready to plan
+**Current focus:** Phase 35 — no-card-trial-api-endpoint
 
 ## Current Position
 
-Phase: 35 of 39 (No-Card Trial API Endpoint)
-Plan: 0 of ? in current phase
-Status: Ready to plan
-Last activity: 2026-03-31 -- Roadmap created for v1.7 (Phases 35-39)
+Phase: 35 (no-card-trial-api-endpoint) — EXECUTING
+Plan: 2 of 2
+Status: Phase complete — ready for verification
+Last activity: 2026-04-02
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -49,12 +49,15 @@ Progress: [░░░░░░░░░░] 0%
 | v1.3 Send Quotes | 5 | 18 | ~1 hour | 3min |
 | v1.4 Worker Infrastructure | 4 | 7 | ~13min | 2min |
 | v1.6 Stripe Billing | 6 | 14 | ~55min | 4min |
+| Phase 35 P01 | 4min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
 ### Decisions
 
 Key decisions archived in PROJECT.md Key Decisions table.
+
+- [Phase 35]: Used SUBSCRIPTION_ALREADY_ACTIVE error code for trial duplicate guard; Stripe v21+ item-level current_period_end pattern; Luxon DateTime.fromSeconds for Stripe timestamps
 
 ### Roadmap Evolution
 
@@ -90,6 +93,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-02T08:39:12.572Z
-Stopped at: Phase 39 context gathered
-Resume file: .planning/phases/39-welcome-dashboard-and-final-cleanup/39-CONTEXT.md
+Last session: 2026-04-02T11:09:29.608Z
+Stopped at: Completed 35-01-PLAN.md
+Resume file: None

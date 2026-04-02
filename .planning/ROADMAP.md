@@ -105,7 +105,7 @@ Full details: `.planning/milestones/v1.6-ROADMAP.md`
 
 **Milestone Goal:** Replace the dismissible onboarding flow with a mandatory, streamlined setup process -- from public landing page through profile, business, and no-card trial activation -- and enforce a hard paywall for invalid subscriptions.
 
-- [ ] **Phase 35: No-Card Trial API Endpoint** - Backend endpoint for no-card Stripe trial creation with webhook compatibility
+- [x] **Phase 35: No-Card Trial API Endpoint** - Backend endpoint for no-card Stripe trial creation with webhook compatibility (completed 2026-04-02)
 - [ ] **Phase 36: Public Landing Page and Route Restructure** - Marketing landing page at root URL with three-tier route guard architecture
 - [ ] **Phase 37: Onboarding Wizard Pages** - Mandatory profile and business setup with trial activation and old onboarding removal
 - [ ] **Phase 38: Hard Paywall and Soft Paywall Removal** - Full-screen blocking paywall replacing soft write-action modal
@@ -188,8 +188,8 @@ Plans:
   4. The `customer.subscription.created` webhook handler can create a fresh local record (not just update), ensuring compatibility with both Checkout-created and API-created subscriptions
 **Plans**: 2 plans
 Plans:
-- [ ] 35-01-PLAN.md -- SubscriptionTrialCreator service, findByUserId repo method, controller route, and unit tests
-- [ ] 35-02-PLAN.md -- customer.subscription.created webhook handler and checkout.session.completed upsert migration
+- [x] 35-01-PLAN.md -- SubscriptionTrialCreator service, findByUserId repo method, controller route, and unit tests
+- [x] 35-02-PLAN.md -- customer.subscription.created webhook handler and checkout.session.completed upsert migration
 
 ### Phase 36: Public Landing Page and Route Restructure
 **Goal**: Visitors can discover Trade Flow's value proposition and start a free trial from a public marketing page, and the app's route architecture supports three tiers of access (public, onboarding, authenticated+subscribed)
@@ -291,7 +291,7 @@ Phases execute in numeric order. Note: Phases 35+36 can run in parallel (differe
 | 32. Subscription Gate and Subscribe Pages | v1.6 | 3/3 | Complete | 2026-03-29 |
 | 33. Trial Banner and Billing Settings Tab | v1.6 | 2/2 | Complete | 2026-03-29 |
 | 34. Luxon DateTime Standardization | v1.6 | 2/2 | Complete | 2026-03-30 |
-| 35. No-Card Trial API Endpoint | v1.7 | 0/2 | Not started | - |
+| 35. No-Card Trial API Endpoint | v1.7 | 2/2 | Complete   | 2026-04-02 |
 | 36. Public Landing Page and Route Restructure | v1.7 | 0/2 | Not started | - |
 | 37. Onboarding Wizard Pages | v1.7 | 0/3 | Not started | - |
 | 38. Hard Paywall and Soft Paywall Removal | v1.7 | 0/2 | Not started | - |
