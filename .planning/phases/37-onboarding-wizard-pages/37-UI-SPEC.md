@@ -32,8 +32,7 @@ Declared values follow the established Trade Flow spacing system (consistent wit
 | Token | Value | Tailwind | Usage in Phase 37 |
 |-------|-------|----------|-------------------|
 | 2xs | 4px | `1` | Icon-text gaps in trade cards, progress bar text spacing |
-| sm | 8px | `2` | Form field gaps, trade card internal icon-label spacing |
-| md | 12px | `3` | Trade card internal padding, progress bar container padding |
+| sm | 8px | `2` | Form field gaps, trade card internal padding, trade section internal spacing, "Other" trade input margin |
 | base | 16px | `4` | Wizard card body padding (mobile), form field vertical stacking |
 | lg | 24px | `6` | Wizard card body padding (desktop), section spacing within card |
 | xl | 48px | `12` | Wizard card vertical margin from viewport center offset |
@@ -68,7 +67,7 @@ All values from the established Trade Flow colour system (consistent with Phase 
 | Destructive | `destructive` | `oklch(0.64 0.21 25)` | Trial badge at <=3 days remaining |
 
 Accent (`primary`) reserved for:
-- "Continue" CTA button on Step 1 (`bg-primary text-primary-foreground`)
+- "Continue Setup" CTA button on Step 1 (`bg-primary text-primary-foreground`)
 - "Set up my business" CTA button on Step 2 (`bg-primary text-primary-foreground`)
 - Progress bar filled segment (`bg-primary`)
 - Selected trade card border highlight (`border-primary`)
@@ -129,9 +128,9 @@ Additional semantic colors used:
 
 | State | Condition | Visual |
 |-------|-----------|--------|
-| Default | User lands on /onboarding, no display name | Card with "What's your name?" heading, empty display name input, disabled "Continue" button |
-| Input valid | Display name field has 1+ non-whitespace characters | "Continue" button becomes enabled (`bg-primary`) |
-| Submitting | User clicks "Continue" | Button shows `Loader2` spinner, input disabled, text changes to "Saving..." |
+| Default | User lands on /onboarding, no display name | Card with "What's your name?" heading, empty display name input, disabled "Continue Setup" button |
+| Input valid | Display name field has 1+ non-whitespace characters | "Continue Setup" button becomes enabled (`bg-primary`) |
+| Submitting | User clicks "Continue Setup" | Button shows `Loader2` spinner, input disabled, text changes to "Saving..." |
 | Success | PATCH /v1/user returns 200 | Instant swap to Step 2 content (no animation per D-06) |
 | Error | API call fails | Sonner error toast: "Something went wrong. Please try again." Button re-enables. |
 
@@ -188,7 +187,7 @@ Additional semantic colors used:
 | Step subtitle | "We just need a couple of things to get you started." |
 | Input label | "Display name" |
 | Input placeholder | "e.g. Dave" |
-| CTA button | "Continue" |
+| CTA button | "Continue Setup" |
 | CTA button (submitting) | "Saving..." |
 
 ### Step 2: Business Setup
@@ -316,12 +315,12 @@ CardContent
           placeholder "e.g. Dave's Plumbing"
           autoFocus
 
-    div (space-y-3)
+    div (space-y-2)
       Label "What's your trade?" (text-xs font-medium)
       TradeCardGrid
         div (grid grid-cols-2 sm:grid-cols-3 gap-2)
           TradeCard x10
-            button (flex flex-col items-center justify-center p-3 rounded-lg border
+            button (flex flex-col items-center justify-center p-2 rounded-lg border
                     transition-colors cursor-pointer
                     [unselected]: border-border bg-card hover:bg-muted/50
                     [selected]: border-primary ring-2 ring-primary/20 bg-primary/5)
@@ -329,7 +328,7 @@ CardContent
               span (text-xs [unselected]: text-muted-foreground [selected]: text-foreground font-medium)
 
       [If "Other" selected]
-      div (mt-3)
+      div (mt-2)
         Input
           placeholder "e.g. Roofer, Glazier"
 ```
