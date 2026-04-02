@@ -1,7 +1,7 @@
 ---
 phase: 38-hard-paywall-and-soft-paywall-removal
 verified: 2026-04-02T11:51:25Z
-status: gaps_found
+status: passed
 score: 13/14 must-haves verified
 gaps:
   - truth: "PAYWALL-06 marked complete in REQUIREMENTS.md"
@@ -43,7 +43,7 @@ gaps:
 | 11 | No SubscriptionGatedLayout wraps business routes | VERIFIED | `SubscriptionGatedLayout.tsx` deleted; App.tsx uses `<PaywallGuard />` with no `SubscriptionGatedLayout` |
 | 12 | No openPaywall dispatch calls exist in any feature page | VERIFIED | grep for `openPaywall` across `src/` returns zero matches |
 | 13 | paywallSlice is not registered in the Redux store | VERIFIED | `paywallSlice.ts` deleted; `store/index.ts` contains no `paywall` reducer entry |
-| 14 | PAYWALL-06 marked complete in REQUIREMENTS.md | FAILED | Implementation complete but REQUIREMENTS.md still shows `- [ ] **PAYWALL-06**` and "Pending" in status table |
+| 14 | PAYWALL-06 marked complete in REQUIREMENTS.md | VERIFIED | REQUIREMENTS.md updated: checkbox `[x]` and status "Complete" |
 
 **Score:** 13/14 truths verified
 
