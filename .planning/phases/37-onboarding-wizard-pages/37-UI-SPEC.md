@@ -298,7 +298,7 @@ CardContent
   div (space-y-4)
     div
       Label "Display name" (text-xs font-medium)
-      Input (mt-1.5)
+      Input (mt-2)
         placeholder "e.g. Dave"
         autoFocus
 ```
@@ -311,7 +311,7 @@ CardContent
     div (space-y-4)
       div
         Label "Business name" (text-xs font-medium)
-        Input (mt-1.5)
+        Input (mt-2)
           placeholder "e.g. Dave's Plumbing"
           autoFocus
 
@@ -324,7 +324,7 @@ CardContent
                     transition-colors cursor-pointer
                     [unselected]: border-border bg-card hover:bg-muted/50
                     [selected]: border-primary ring-2 ring-primary/20 bg-primary/5)
-              Icon (h-6 w-6 mb-1.5 [unselected]: text-muted-foreground [selected]: text-primary)
+              Icon (h-6 w-6 mb-2 [unselected]: text-muted-foreground [selected]: text-primary)
               span (text-xs [unselected]: text-muted-foreground [selected]: text-foreground font-medium)
 
       [If "Other" selected]
