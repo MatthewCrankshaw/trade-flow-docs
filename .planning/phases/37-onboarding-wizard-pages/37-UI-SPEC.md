@@ -35,6 +35,7 @@ Declared values follow the established Trade Flow spacing system (consistent wit
 | sm | 8px | `2` | Form field gaps, trade card internal padding, trade section internal spacing, "Other" trade input margin |
 | base | 16px | `4` | Wizard card body padding (mobile), form field vertical stacking |
 | lg | 24px | `6` | Wizard card body padding (desktop), section spacing within card |
+| lg+ | 32px | `8` | Logo bottom margin (mb-8) |
 | xl | 48px | `12` | Wizard card vertical margin from viewport center offset |
 | 2xl | 64px | `16` | Not used in Phase 37 |
 
@@ -355,7 +356,7 @@ div (flex flex-col items-center justify-center min-h-screen bg-gradient-to-br fr
 Desktop (hidden md:flex):
   Badge (variant="secondary" | urgency variant, cursor-pointer)
     onClick -> open Stripe Billing Portal
-    Clock (h-3.5 w-3.5 mr-1.5)
+    Clock (h-3.5 w-3.5 mr-1)
     span: "28 days left"
 
 Mobile (md:hidden):
