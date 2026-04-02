@@ -229,7 +229,10 @@ Plans:
   3. The user can access the Stripe Billing Portal directly from the paywall screen to add a payment method or resubscribe
   4. Support role users bypass the hard paywall entirely and see the normal app
   5. The soft paywall modal, PersistentCta, DashboardBanner, SubscriptionGatedLayout, and all per-page `openPaywall()` dispatch calls are removed
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 38-01-PLAN.md -- PaywallPage component (3 variants), PaywallGuard blocking logic, useSubscription simplification, route tree adjustments
+- [ ] 38-02-PLAN.md -- Delete soft paywall components (7 files), clean Redux store, remove all openPaywall dispatch calls from feature pages
 **UI hint**: yes
 
 ### Phase 39: Welcome Dashboard and Final Cleanup
@@ -287,5 +290,5 @@ Phases execute in numeric order. Note: Phases 35+36 can run in parallel (differe
 | 35. No-Card Trial API Endpoint | v1.7 | 0/2 | Not started | - |
 | 36. Public Landing Page and Route Restructure | v1.7 | 0/2 | Not started | - |
 | 37. Onboarding Wizard Pages | v1.7 | 0/? | Not started | - |
-| 38. Hard Paywall and Soft Paywall Removal | v1.7 | 0/? | Not started | - |
+| 38. Hard Paywall and Soft Paywall Removal | v1.7 | 0/2 | Not started | - |
 | 39. Welcome Dashboard and Final Cleanup | v1.7 | 0/? | Not started | - |
