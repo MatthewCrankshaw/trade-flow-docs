@@ -200,7 +200,10 @@ Plans:
   2. The landing page loads without importing the app's Redux store, feature modules, or auth hooks (verified by bundle analysis)
   3. An authenticated user visiting the root URL is redirected to the dashboard without seeing the landing page
   4. The App.tsx route tree has three nested guard layers (ProtectedRoute, OnboardingGuard shell, HardPaywallGuard shell) ready for Phase 37 and 38 to implement
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 36-01-PLAN.md -- Landing page components (header, hero, features, pricing, footer) with Firebase auth redirect
+- [ ] 36-02-PLAN.md -- Route guard shells (OnboardingGuard, PaywallGuard), App.tsx route restructure, LoginPage mode param
 **UI hint**: yes
 
 ### Phase 37: Onboarding Wizard Pages
@@ -282,7 +285,7 @@ Phases execute in numeric order. Note: Phases 35+36 can run in parallel (differe
 | 33. Trial Banner and Billing Settings Tab | v1.6 | 2/2 | Complete | 2026-03-29 |
 | 34. Luxon DateTime Standardization | v1.6 | 2/2 | Complete | 2026-03-30 |
 | 35. No-Card Trial API Endpoint | v1.7 | 0/2 | Not started | - |
-| 36. Public Landing Page and Route Restructure | v1.7 | 0/? | Not started | - |
+| 36. Public Landing Page and Route Restructure | v1.7 | 0/2 | Not started | - |
 | 37. Onboarding Wizard Pages | v1.7 | 0/? | Not started | - |
 | 38. Hard Paywall and Soft Paywall Removal | v1.7 | 0/? | Not started | - |
 | 39. Welcome Dashboard and Final Cleanup | v1.7 | 0/? | Not started | - |
