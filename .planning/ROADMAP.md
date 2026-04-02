@@ -247,7 +247,10 @@ Plans:
   1. A new user who just completed onboarding sees a personalised welcome message using their display name on the dashboard
   2. The dashboard shows a getting-started widget with "Create your first job" and "Send your first quote" checklist items that link to the relevant pages
   3. Checklist items show completion state (checked when the user has created a job or sent a quote) and the widget hides once all items are complete
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 39-01-PLAN.md -- Welcome widget components (WelcomeSection, GettingStartedChecklist, ChecklistItem), useGettingStarted hook, DashboardPage integration
+- [ ] 39-02-PLAN.md -- Old onboarding system removal (delete files, clean imports from App.tsx and store)
 **UI hint**: yes
 
 ## Progress
@@ -295,4 +298,4 @@ Phases execute in numeric order. Note: Phases 35+36 can run in parallel (differe
 | 36. Public Landing Page and Route Restructure | v1.7 | 0/2 | Not started | - |
 | 37. Onboarding Wizard Pages | v1.7 | 0/3 | Not started | - |
 | 38. Hard Paywall and Soft Paywall Removal | v1.7 | 0/2 | Not started | - |
-| 39. Welcome Dashboard and Final Cleanup | v1.7 | 0/? | Not started | - |
+| 39. Welcome Dashboard and Final Cleanup | v1.7 | 0/2 | Not started | - |
