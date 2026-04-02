@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Onboarding & Landing Page
 status: verifying
-stopped_at: Completed 35-01-PLAN.md
+stopped_at: Completed 35-02-PLAN.md
 last_updated: "2026-04-02T11:09:29.611Z"
 last_activity: 2026-04-02
 progress:
@@ -50,6 +50,7 @@ Progress: [░░░░░░░░░░] 0%
 | v1.4 Worker Infrastructure | 4 | 7 | ~13min | 2min |
 | v1.6 Stripe Billing | 6 | 14 | ~55min | 4min |
 | Phase 35 P01 | 4min | 2 tasks | 4 files |
+| Phase 35 P02 | 2min | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -58,6 +59,7 @@ Progress: [░░░░░░░░░░] 0%
 Key decisions archived in PROJECT.md Key Decisions table.
 
 - [Phase 35]: Used SUBSCRIPTION_ALREADY_ACTIVE error code for trial duplicate guard; Stripe v21+ item-level current_period_end pattern; Luxon DateTime.fromSeconds for Stripe timestamps
+- [Phase 35]: customer.subscription.created handler reuses extractSubscriptionDates for consistent date mapping across all webhook handlers
 
 ### Roadmap Evolution
 
@@ -94,5 +96,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-04-02T11:09:29.608Z
-Stopped at: Completed 35-01-PLAN.md
+Stopped at: Completed 35-02-PLAN.md
 Resume file: None
