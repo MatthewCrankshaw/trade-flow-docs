@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Stripe Subscription Billing — Phase Details
 status: verifying
-stopped_at: Completed 34-02-PLAN.md
-last_updated: "2026-03-30T18:59:30.006Z"
-last_activity: 2026-03-30
+stopped_at: Completed 36-01-PLAN.md
+last_updated: "2026-04-02T11:19:06Z"
+last_activity: 2026-04-02 -- Phase 36-01 landing page components complete
 progress:
   total_phases: 11
   completed_phases: 8
@@ -160,6 +160,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-30T18:53:52.987Z
-Stopped at: Completed 34-02-PLAN.md
+Last session: 2026-04-02T11:19:06Z
+Stopped at: Completed 36-01-PLAN.md
 Resume file: None
