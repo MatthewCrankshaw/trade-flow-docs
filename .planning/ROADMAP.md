@@ -186,7 +186,10 @@ Plans:
   2. The local MongoDB subscription record is written synchronously in the endpoint response (belt-and-suspenders with webhook)
   3. When a trial ends without a payment method on file, the subscription auto-cancels via Stripe's `trial_settings.end_behavior.missing_payment_method: cancel`
   4. The `customer.subscription.created` webhook handler can create a fresh local record (not just update), ensuring compatibility with both Checkout-created and API-created subscriptions
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 35-01-PLAN.md -- SubscriptionTrialCreator service, findByUserId repo method, controller route, and unit tests
+- [ ] 35-02-PLAN.md -- customer.subscription.created webhook handler and checkout.session.completed upsert migration
 
 ### Phase 36: Public Landing Page and Route Restructure
 **Goal**: Visitors can discover Trade Flow's value proposition and start a free trial from a public marketing page, and the app's route architecture supports three tiers of access (public, onboarding, authenticated+subscribed)
@@ -278,7 +281,7 @@ Phases execute in numeric order. Note: Phases 35+36 can run in parallel (differe
 | 32. Subscription Gate and Subscribe Pages | v1.6 | 3/3 | Complete | 2026-03-29 |
 | 33. Trial Banner and Billing Settings Tab | v1.6 | 2/2 | Complete | 2026-03-29 |
 | 34. Luxon DateTime Standardization | v1.6 | 2/2 | Complete | 2026-03-30 |
-| 35. No-Card Trial API Endpoint | v1.7 | 0/? | Not started | - |
+| 35. No-Card Trial API Endpoint | v1.7 | 0/2 | Not started | - |
 | 36. Public Landing Page and Route Restructure | v1.7 | 0/? | Not started | - |
 | 37. Onboarding Wizard Pages | v1.7 | 0/? | Not started | - |
 | 38. Hard Paywall and Soft Paywall Removal | v1.7 | 0/? | Not started | - |
