@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Onboarding & Landing Page
 status: executing
-stopped_at: Completed 36-02-PLAN.md
-last_updated: "2026-04-07T13:58:48.471Z"
+stopped_at: Completed 37-04-PLAN.md
+last_updated: "2026-04-07T14:06:34.021Z"
 last_activity: 2026-04-07
 progress:
   total_phases: 10
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 15
-  completed_plans: 12
+  completed_plans: 13
   percent: 80
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-02)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 36 — public-landing-page-and-route-restructure (executing)
+**Current focus:** Phase 37 — onboarding-wizard-pages
 
 ## Current Position
 
-Phase: 37
-Plan: Not started
-Status: Executing phase 36, pending verification
+Phase: 37 (onboarding-wizard-pages) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
 Last activity: 2026-04-07
 
 Progress: [████████░░] 80% complete (12/15 plans)
@@ -55,6 +55,7 @@ Progress: [████████░░] 80% complete (12/15 plans)
 | Phase 37 P03 | 2min | 2 tasks | 4 files |
 | Phase 38 P01 | 3min | 2 tasks | 5 files |
 | Phase 38 P02 | 5min | 2 tasks | 19 files |
+| Phase 37 P04 | 3min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,7 @@ Key decisions archived in PROJECT.md Key Decisions table.
 - [Phase 37 P01]: Used API User.name (not Firebase displayName) for guard check; added updateUser RTK Query mutation; dual OnboardingGuard wrapping in App.tsx
 - [Phase 37]: Replaced TrialChip with TrialBadge in DashboardLayout header; portal opens in new tab via window.open
 - [Phase 38]: openPaywall made no-op (not deleted) to maintain backward compat; Plan 02 removes all consumers
+- [Phase 37]: DefaultQuoteSettingsCreatorService in quote-settings module with forwardRef circular dependency resolution; completes all 5 default resource types
 
 ### Roadmap Evolution
 
@@ -102,6 +104,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-02T12:02:30Z
-Stopped at: Completed 36-02-PLAN.md
+Last session: 2026-04-07T14:06:34.019Z
+Stopped at: Completed 37-04-PLAN.md
 Resume file: None
