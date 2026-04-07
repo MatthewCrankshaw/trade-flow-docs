@@ -19,9 +19,9 @@ Requirements for Onboarding & Landing Page milestone. Each maps to roadmap phase
 ### Onboarding Wizard
 
 - [x] **ONBD-01**: New user is required to enter their display name before accessing the app
-- [ ] **ONBD-02**: New user is required to enter business name and select primary trade before accessing the app
-- [ ] **ONBD-03**: Country defaults to UK and currency defaults to GBP during business setup (no user input required)
-- [ ] **ONBD-04**: Tax rates, job types, visit types, items, and quote email template are auto-created when business setup completes
+- [x] **ONBD-02**: New user is required to enter business name and select primary trade before accessing the app
+- [x] **ONBD-03**: Country defaults to UK and currency defaults to GBP during business setup (no user input required)
+- [x] **ONBD-04**: Tax rates, job types, visit types, items, and quote email template are auto-created when business setup completes
 - [x] **ONBD-05**: User can see progress indication during onboarding steps
 - [x] **ONBD-06**: Onboarding wizard resumes at the correct step if user refreshes or returns
 - [x] **ONBD-07**: Existing users with completed profile and business bypass onboarding automatically
@@ -92,9 +92,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LAND-05 | Phase 36 | Pending |
 | LAND-06 | Phase 36 | Pending |
 | ONBD-01 | Phase 37 | Complete |
-| ONBD-02 | Phase 37 | Pending |
-| ONBD-03 | Phase 37 | Pending |
-| ONBD-04 | Phase 37 | Pending |
+| ONBD-02 | Phase 37 | Complete |
+| ONBD-03 | Phase 37 | Complete |
+| ONBD-04 | Phase 37 | Complete |
 | ONBD-05 | Phase 37 | Complete |
 | ONBD-06 | Phase 37 | Complete |
 | ONBD-07 | Phase 37 | Complete |
@@ -119,4 +119,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-04-01*
-*Last updated: 2026-03-31 after roadmap creation*
+*Last updated: 2026-04-02 after Phase 37 gap closure*
