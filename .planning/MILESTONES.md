@@ -1,5 +1,22 @@
 # Milestones
 
+## v1.7 Onboarding & Landing Page (Shipped: 2026-04-07)
+
+**Phases completed:** 6 phases (35-40), 13 plans
+**Timeline:** 7 days (2026-04-01 -> 2026-04-07)
+
+**Key accomplishments:**
+
+- No-card 30-day free trial via Stripe API with belt-and-suspenders webhook reconciliation (auto-cancel on missing payment method)
+- Bundle-isolated marketing landing page with hero section, feature highlights, GBP 6/month pricing card, and Firebase auth redirect for authenticated users
+- Three-tier route guard architecture (ProtectedRoute > OnboardingGuard > PaywallGuard) with lazy-loaded landing page
+- Mandatory two-step onboarding wizard (profile name + business/trade setup) with auto-created defaults (tax rates, items, job types, visit types, quote settings)
+- Full-screen hard paywall with three variant modes (trial-expired, payment-failed, canceled) replacing soft modal -- 7 old files deleted, 10 pages cleaned
+- Personalised welcome dashboard with getting-started checklist (create first job, send first quote) and old onboarding system removal (15 files deleted)
+- @SkipSubscriptionCheck decorator for onboarding endpoints, closing INT-01 integration gap
+
+---
+
 ## v1.6 Stripe Subscription Billing (Shipped: 2026-03-31)
 
 **Phases completed:** 5 phases (29-33), 12 plans + Phase 34 (Luxon standardization, 2 plans)

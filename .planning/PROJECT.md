@@ -2,7 +2,7 @@
 
 ## What This Is
 
-A business management application for sole tradespeople -- plumbers, electricians, builders, and other independent contractors -- that replaces scattered tools (paper notes, spreadsheets, generic invoicing apps, WhatsApp, calendar apps) with one streamlined system built around how trades actually work. Everything connects to the job: quotes, schedules, materials, labour, invoices, payments, and customer history. Tradespeople can now send quotes to customers via email, and customers can accept or reject quotes directly from a secure online link.
+A business management SaaS for sole tradespeople -- plumbers, electricians, builders, and other independent contractors -- that replaces scattered tools (paper notes, spreadsheets, generic invoicing apps, WhatsApp, calendar apps) with one streamlined system built around how trades actually work. Everything connects to the job: quotes, schedules, materials, labour, invoices, payments, and customer history. New users discover the product on a public landing page, sign up, complete a mandatory onboarding wizard (profile + business setup), and start a 30-day free trial without entering payment details. Customers receive quotes via email and can accept or reject directly from a secure online link.
 
 Two independent codebases: `trade-flow-api` (NestJS/MongoDB) and `trade-flow-ui` (React/Vite), each with their own git repo, managed and deployed independently. Feature branches are created in both repos for coordinated feature work.
 
@@ -89,24 +89,24 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - ✓ User can view subscription status in Settings > Billing -- v1.6
 - ✓ User can manage billing via Stripe Billing Portal -- v1.6
 - ✓ Luxon DateTime standardized across full stack (API + UI) -- v1.6
+- ✓ Public landing page at root URL with hero, features, pricing, and sign-up/login CTAs -- v1.7
+- ✓ Authenticated users redirected from landing page to dashboard -- v1.7
+- ✓ Mandatory profile setup (display name required before app access) -- v1.7
+- ✓ Mandatory business setup (business name + trade, UK/GBP defaults, auto-creates all defaults) -- v1.7
+- ✓ No-card 30-day free trial starts automatically after business setup -- v1.7
+- ✓ Trial days remaining shown in app header with urgency colors -- v1.7
+- ✓ Hard paywall blocks app access when subscription invalid (trial expired, payment failed, canceled) -- v1.7
+- ✓ Soft paywall modal and write-action gating fully removed -- v1.7
+- ✓ Personalised welcome dashboard with getting-started checklist -- v1.7
+- ✓ Onboarding wizard resumes at correct step on refresh/return -- v1.7
+- ✓ Existing users with profile + business + subscription bypass onboarding -- v1.7
+- ✓ @SkipSubscriptionCheck on onboarding endpoints (user patch, business create) -- v1.7
 
 ### Active
 
 <!-- Current scope. Building toward these. -->
 
-## Current Milestone: v1.7 Onboarding & Landing Page
-
-**Goal:** Replace the dismissible onboarding flow with a mandatory, streamlined setup process — from public landing page through profile, business, and no-card trial activation — and enforce a hard paywall for invalid subscriptions.
-
-**Target features:**
-- Public landing page (single-page marketing at root path, no auth required)
-- Mandatory profile setup (name required)
-- Mandatory business setup (business name + primary trade, UK/GBP defaults, auto-creates all defaults)
-- No-card-upfront free trial via Stripe (30-day trial, add card via Billing Portal later)
-- Welcome dashboard with greeting and first-steps guidance
-- Getting-started widget (create job, create quote) using existing onboarding widget pattern
-- Hard paywall replacing soft write-action modal (blocking screen when subscription invalid)
-- Remove existing dismissible onboarding flow
+(No active milestone -- run `/gsd-new-milestone` to start next)
 
 ### Out of Scope
 
@@ -156,8 +156,9 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - **Bundles & Quotes shipped (v1.2):** Bundle creation/editing with SearchableItemPicker, quote system with creation dialog, list, detail view, line item management (add/edit/delete), expandable bundle rows, tax-inclusive totals, mobile-responsive card layout, status transitions (Draft/Sent/Accepted/Rejected)
 - **Send Quotes shipped (v1.3):** Quote deletion, token infrastructure, customer-facing quote page with view tracking, email sending with configurable templates and Tiptap rich text editor, customer accept/decline with notification emails
 - **Worker infrastructure shipped (v1.4):** Dual entry-point NestJS monorepo with API + background worker connected via BullMQ/Redis
-- **E2E testing in progress (v1.5):** Playwright bootstrapped with global auth setup, API seeding infrastructure, partial test coverage
-- **Stripe billing shipped (v1.6):** Full SaaS billing — Stripe Checkout with 30-day trial, webhook processing via BullMQ (5 event types), subscription management API (GET/DELETE/portal), frontend paywall with soft modal for write actions, trial chip, Settings > Billing tab
+- **E2E testing in progress (v1.5):** Playwright bootstrapped with global auth setup, API seeding infrastructure, partial test coverage (paused during v1.6/v1.7)
+- **Stripe billing shipped (v1.6):** Full SaaS billing — Stripe API-based trial (no card required), webhook processing via BullMQ (5 event types), subscription management API (GET/DELETE/portal), hard paywall for invalid subscriptions, trial badge, Settings > Billing tab
+- **Onboarding & landing page shipped (v1.7):** Public marketing page at root URL, mandatory two-step onboarding wizard, no-card 30-day trial, hard paywall (replaced soft modal), welcome dashboard with getting-started checklist, old onboarding system removed
 - **Luxon standardized (v1.6):** All DTOs use Luxon DateTime (no native Date), shared toDateTime utility, date-helpers module in UI
 - **Codebase size:** ~22k LOC API (TypeScript) + ~24k LOC UI (TypeScript/TSX)
 
@@ -217,28 +218,23 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 | cancel_at_period_end (not immediate cancel) | User retains access until billing period end | ✓ Good -- fair UX |
 | BullMQ for webhook processing | Async processing with deduplication (jobId: event.id) and retry semantics | ✓ Good -- resilient |
 | Verify-session endpoint | Race condition safety net when webhook arrives after redirect (1-30s) | ✓ Good -- smooth UX |
-| Soft paywall modal (not hard gate) for write actions | Non-disruptive; user can still browse data but can't create/edit | ✓ Good -- balanced |
+| Soft paywall modal (not hard gate) for write actions | Non-disruptive; user can still browse data but can't create/edit | ⚠️ Revisit -- replaced by hard paywall in v1.7 |
 | SubscriptionGuard on API (not just frontend) | Server-side enforcement prevents bypass via direct API calls | ✓ Good -- secure |
 | Luxon DateTime in all DTOs (no native Date) | Consistent date handling across full stack; eliminated date parsing bugs | ✓ Good -- clean |
+| No-card trial via Stripe API (not Checkout) | Removes friction at signup; card collected later via Billing Portal | ✓ Good -- higher conversion expected |
+| Mandatory onboarding (not dismissible) | Ensures every user has profile + business before app access; cleaner data | ✓ Good -- eliminates incomplete accounts |
+| Three-tier route guards (auth > onboarding > paywall) | Each guard handles one concern; composable and testable | ✓ Good -- clean architecture |
+| Hard paywall replacing soft modal | Full-screen block is clearer than per-action modal; simpler code (7 files deleted) | ✓ Good -- simpler and clearer |
+| @SkipSubscriptionCheck decorator for onboarding | Method-level bypass avoids weakening global guard; explicit and auditable | ✓ Good -- surgical |
+| Landing page bundle-isolated from app | Lazy-loaded route doesn't import Redux/auth/features; fast public page load | ✓ Good -- performance |
+| DefaultQuoteSettingsCreatorService with forwardRef | Circular dependency between business and quote-settings modules resolved cleanly | ✓ Good -- pragmatic |
 
 ## Current State
 
-**Shipped:** v1.6 Stripe Subscription Billing (2026-03-31)
-**In progress:** v1.7 Onboarding & Landing Page
+**Shipped:** v1.7 Onboarding & Landing Page (2026-04-07)
+**Next milestone:** Not yet planned -- run `/gsd-new-milestone`
 
-Trade Flow is now a monetized SaaS product with full billing infrastructure. The core product flow — from customer management through job tracking, quoting, and payment — is complete. Subscription billing via Stripe handles trial, payment, and access enforcement. Now rebuilding the onboarding experience and adding a public landing page.
-
-Phase 35 complete (2026-04-02) — No-card trial API endpoint. POST /v1/subscription/trial creates a 30-day Stripe trial without payment details. Webhook handler for customer.subscription.created ensures belt-and-suspenders reliability.
-
-Phase 36 complete (2026-04-07) — Public landing page at root URL with hero, features, pricing, and footer. Three-tier route guard architecture (ProtectedRoute > OnboardingGuard > PaywallGuard). Landing page lazy-loaded and bundle-isolated from app. LoginPage accepts ?mode=signup for CTA flow.
-
-Phase 37 complete (2026-04-07) — Mandatory two-step onboarding wizard (display name + business/trade). OnboardingGuard redirects new users. TrialBadge in header shows days remaining with urgency colors. Auto-creates all 5 default resource types (tax rates, items, job types, visit types, quote settings) on business creation.
-
-Phase 38 complete (2026-04-02) — Hard paywall replaces soft paywall. Full-screen blocking page with three variant modes (trial-expired, payment-failed, canceled). All soft paywall infrastructure removed — 7 files deleted, Redux slice cleaned, openPaywall dispatch calls stripped from all feature pages.
-
-Phase 39 complete (2026-04-07) — Welcome dashboard with personalised greeting and getting-started checklist (create first job, send first quote). Old pre-Phase 37 onboarding system fully removed — 15 files deleted, 10 consuming files cleaned. FIRST_QUOTE_SENT onboarding step added to API.
-
-Phase 40 complete (2026-04-07) — SubscriptionGuard onboarding bypass. @SkipSubscriptionCheck decorator applied to PATCH /v1/user/me and POST /v1/business so new users without a subscription can complete the mandatory onboarding wizard. Closes INT-01 gap from v1.7 milestone audit.
+Trade Flow is a monetized SaaS product with a complete user acquisition funnel: public landing page, mandatory onboarding wizard, no-card free trial, and hard paywall. The core product flow -- from customer management through job tracking, quoting, and payment -- is fully functional. New users discover the product at the root URL, sign up, set up their profile and business in a two-step wizard, and start a 30-day trial automatically. The getting-started checklist guides them to create their first job and send their first quote.
 
 ## Evolution
 
@@ -258,4 +254,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-07 after Phase 40 completion — SubscriptionGuard onboarding bypass*
+*Last updated: 2026-04-07 after v1.7 milestone*

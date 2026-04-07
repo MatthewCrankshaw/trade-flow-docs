@@ -4,7 +4,7 @@ milestone: v1.7
 milestone_name: Onboarding & Landing Page
 status: executing
 stopped_at: Completed quick task 260407-pwg
-last_updated: "2026-04-07T18:48:59.823Z"
+last_updated: "2026-04-07T19:08:25.260Z"
 last_activity: 2026-04-07
 progress:
   total_phases: 11
@@ -18,19 +18,18 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-02)
+See: .planning/PROJECT.md (updated 2026-04-07)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 37 — onboarding-wizard-pages
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 40
-Plan: Not started
-Status: Ready to execute
+Milestone: v1.7 complete (shipped 2026-04-07)
+Next milestone: Not yet planned
 Last activity: 2026-04-07
 
-Progress: [██████████] 100% complete (15/15 plans)
+Progress: v1.7 shipped -- 6 phases, 13 plans
 
 ## Performance Metrics
 
@@ -62,19 +61,11 @@ Progress: [██████████] 100% complete (15/15 plans)
 ### Decisions
 
 Key decisions archived in PROJECT.md Key Decisions table.
-
-- [Phase 35]: Used SUBSCRIPTION_ALREADY_ACTIVE error code for trial duplicate guard; Stripe v21+ item-level current_period_end pattern; Luxon DateTime.fromSeconds for Stripe timestamps
-- [Phase 35]: customer.subscription.created handler reuses extractSubscriptionDates for consistent date mapping across all webhook handlers
-- [Phase 37 P01]: Used API User.name (not Firebase displayName) for guard check; added updateUser RTK Query mutation; dual OnboardingGuard wrapping in App.tsx
-- [Phase 37]: Replaced TrialChip with TrialBadge in DashboardLayout header; portal opens in new tab via window.open
-- [Phase 38]: openPaywall made no-op (not deleted) to maintain backward compat; Plan 02 removes all consumers
-- [Phase 37]: DefaultQuoteSettingsCreatorService in quote-settings module with forwardRef circular dependency resolution; completes all 5 default resource types
+v1.7 decisions archived with milestone completion.
 
 ### Roadmap Evolution
 
-- Phases 35+36 can run in parallel (API vs UI repos)
-- Phases 37+38 can run in parallel (onboarding vs paywall concerns)
-- Phase 39 depends on Phase 37 (displayName feeds welcome greeting)
+v1.7 complete. No active milestone.
 
 ### Pending Todos
 
@@ -82,10 +73,7 @@ None.
 
 ### Blockers/Concerns
 
-- v1.5 Playwright testing (Phases 25-28) still in progress -- paused during v1.6 work
-- Existing user migration: mandatory onboarding guard must pass users who already have profile + business + subscription
-- Stripe webhook compatibility: `customer.subscription.created` must handle both Checkout-created and API-created subscriptions
-- `past_due` grace period duration is a product decision needed during Phase 38 planning
+- v1.5 Playwright testing (Phases 25-28) still in progress -- paused during v1.6/v1.7 work
 
 ### Quick Tasks Completed
 
