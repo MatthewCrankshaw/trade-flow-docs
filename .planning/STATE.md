@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Onboarding & Landing Page
-status: verifying
-stopped_at: Completed 38-02-PLAN.md
-last_updated: "2026-04-02T11:53:28.199Z"
+status: executing
+stopped_at: Completed 36-02-PLAN.md
+last_updated: "2026-04-02T12:02:30Z"
 last_activity: 2026-04-02
 progress:
   total_phases: 10
   completed_phases: 4
   total_plans: 15
-  completed_plans: 11
-  percent: 0
+  completed_plans: 12
+  percent: 80
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-02)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 38 — hard-paywall-and-soft-paywall-removal
+**Current focus:** Phase 36 — public-landing-page-and-route-restructure (executing)
 
 ## Current Position
 
-Phase: 39
-Plan: Not started
-Status: All plans complete, pending verification
+Phase: 36
+Plan: 2 of 2 (complete)
+Status: Executing phase 36, pending verification
 Last activity: 2026-04-02
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [████████░░] 80% complete (12/15 plans)
 
 ## Performance Metrics
 
@@ -102,6 +102,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-02T11:46:24Z
-Stopped at: Completed 38-02-PLAN.md
+Last session: 2026-04-02T12:02:30Z
+Stopped at: Completed 36-02-PLAN.md
 Resume file: None
