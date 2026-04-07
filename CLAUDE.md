@@ -65,6 +65,11 @@ Two independent codebases: `trade-flow-api` (NestJS/MongoDB) and `trade-flow-ui`
 - **@dinero.js/currencies 2.0.0-alpha.14** - Currency data for dinero.js
 #### Authentication
 - **firebase 12.8.0** - Firebase SDK (auth, Firestore, real-time features)
+#### Testing
+- **vitest 4.1.3** - Fast unit test runner (Vite-native)
+- **@testing-library/react 16.3.2** - React component testing utilities
+- **@testing-library/jest-dom 6.9.1** - Custom DOM matchers for assertions
+- **@testing-library/user-event 14.6.1** - Simulates realistic user interactions
 #### Development Tools
 - **TypeScript 5.9.3** - TypeScript compiler and language
 - **ESLint 9.39.1** - JavaScript/TypeScript linter
@@ -174,7 +179,7 @@ Two independent codebases: `trade-flow-api` (NestJS/MongoDB) and `trade-flow-ui`
 - Prettier code formatting (125 char line width)
 - Husky pre-commit hooks with lint-staged for backend
 - Backend: Jest unit tests with supertest for HTTP assertions
-- Frontend: Static analysis only (ESLint, TypeScript)
+- Frontend: Vitest unit tests with Testing Library for component testing
 - Tailwind CSS v4 (utility-first approach)
 - Radix UI primitives (unstyled, accessible components)
 - Custom theme with semantic color tokens
@@ -182,6 +187,39 @@ Two independent codebases: `trade-flow-api` (NestJS/MongoDB) and `trade-flow-ui`
 - JSON request/response bodies
 - Standard HTTP status codes
 - CORS enabled with configurable origins
+## Testing
+### Backend (trade-flow-api) -- Jest
+- **Runner:** Jest 30.2.0 with ts-jest transformer
+- **Environment:** Node
+- **Libraries:** @nestjs/testing (test module), supertest (HTTP assertions)
+- **File pattern:** `*.spec.ts`
+- **Location:** `src/{feature}/test/` subdirectories mirroring source structure
+  - `test/controllers/` -- controller specs
+  - `test/services/` -- service specs (creator, retriever, updater, deleter)
+  - `test/repositories/` -- repository specs
+  - `test/policies/` -- policy specs
+  - `test/mocks/` -- shared mock factories
+- **Path aliases:** Configured in jest moduleNameMapper (matches tsconfig paths)
+- **Commands:**
+  - `npm run test` -- run all tests with coverage
+  - `npm run test:watch` -- watch mode
+  - `npm run test:debug` -- debug mode
+- **Coverage output:** `../coverage/`
+
+### Frontend (trade-flow-ui) -- Vitest
+- **Runner:** Vitest 4.1.3 (Vite-native, extends vite.config via mergeConfig)
+- **Environment:** jsdom
+- **Libraries:** @testing-library/react, @testing-library/jest-dom, @testing-library/user-event
+- **Setup file:** `vitest.setup.ts` imports `@testing-library/jest-dom/vitest` for matchers
+- **Globals:** Enabled (describe, it, expect available without imports)
+- **File pattern:** `src/**/*.{test,spec}.{ts,tsx}`
+- **Location:** `__tests__/` directories alongside source files
+- **CSS:** Disabled in tests
+- **Path aliases:** `@` alias inherited from vite config
+- **Commands:**
+  - `npm run test` -- run all tests (vitest run)
+  - `npm run test:watch` -- watch mode
+  - `npm run test:coverage` -- run with coverage
 <!-- GSD:stack-end -->
 
 <!-- GSD:conventions-start source:CONVENTIONS.md -->
