@@ -9,7 +9,7 @@
 - v1.4 Monorepo & Worker Infrastructure -- Phases 20-23 (shipped 2026-03-22)
 - v1.5 Automated E2E Playwright Testing -- Phases 24-28 (in progress)
 - v1.6 Stripe Subscription Billing -- Phases 29-34 (shipped 2026-03-31)
-- v1.7 Onboarding & Landing Page -- Phases 35-39 (in progress)
+- v1.7 Onboarding & Landing Page -- Phases 35-40 (in progress)
 
 ## Phases
 
@@ -110,6 +110,8 @@ Full details: `.planning/milestones/v1.6-ROADMAP.md`
 - [x] **Phase 37: Onboarding Wizard Pages** - Mandatory profile and business setup with trial activation and old onboarding removal (completed 2026-04-07)
 - [x] **Phase 38: Hard Paywall and Soft Paywall Removal** - Full-screen blocking paywall replacing soft write-action modal (completed 2026-04-02)
 - [x] **Phase 39: Welcome Dashboard and Final Cleanup** - Personalised welcome experience with getting-started checklist (completed 2026-04-07)
+- [ ] **Phase 40: SubscriptionGuard Onboarding Bypass** - Add @SkipSubscriptionCheck to user and business endpoints used during onboarding
+
 
 ## Phase Details
 
@@ -254,6 +256,17 @@ Plans:
 - [x] 39-02-PLAN.md -- Old onboarding system removal (delete files, clean imports from App.tsx and store)
 **UI hint**: yes
 
+### Phase 40: SubscriptionGuard Onboarding Bypass
+**Goal**: New users can complete onboarding without being blocked by the global SubscriptionGuard, which rejects non-GET requests for users without a subscription
+**Depends on**: Phase 35 (SubscriptionGuard), Phase 37 (Onboarding wizard endpoints)
+**Requirements**: TRIAL-01, ONBD-01, ONBD-02, ONBD-03, ONBD-04
+**Gap Closure:** Closes INT-01 and "New user onboarding" flow gap from v1.7 audit
+**Success Criteria** (what must be TRUE):
+  1. A new user without a subscription can PATCH /v1/user/me to save their display name during onboarding
+  2. A new user without a subscription can POST /v1/user/me/business to create their business during onboarding
+  3. Existing subscription enforcement remains intact for all other write endpoints
+**Plans**: TBD
+
 ## Progress
 
 **Execution Order:**
@@ -300,3 +313,4 @@ Phases execute in numeric order. Note: Phases 35+36 can run in parallel (differe
 | 37. Onboarding Wizard Pages | v1.7 | 4/4 | Complete    | 2026-04-07 |
 | 38. Hard Paywall and Soft Paywall Removal | v1.7 | 1/2 | Complete    | 2026-04-02 |
 | 39. Welcome Dashboard and Final Cleanup | v1.7 | 2/2 | Complete    | 2026-04-07 |
+| 40. SubscriptionGuard Onboarding Bypass | v1.7 | 0/? | Not started | - |

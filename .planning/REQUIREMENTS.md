@@ -9,12 +9,12 @@ Requirements for Onboarding & Landing Page milestone. Each maps to roadmap phase
 
 ### Landing Page
 
-- [ ] **LAND-01**: User can view a public landing page at the root URL without authentication
-- [ ] **LAND-02**: User can see a hero section with trade-specific value proposition and "Start Free Trial" CTA
-- [ ] **LAND-03**: User can see feature highlights showing core capabilities (jobs, quotes, scheduling)
-- [ ] **LAND-04**: User can see a pricing section displaying £6/month with no-card trial messaging
-- [ ] **LAND-05**: User can navigate to sign up or log in from the landing page
-- [ ] **LAND-06**: Authenticated user visiting the root URL is redirected to the dashboard
+- [x] **LAND-01**: User can view a public landing page at the root URL without authentication
+- [x] **LAND-02**: User can see a hero section with trade-specific value proposition and "Start Free Trial" CTA
+- [x] **LAND-03**: User can see feature highlights showing core capabilities (jobs, quotes, scheduling)
+- [x] **LAND-04**: User can see a pricing section displaying £6/month with no-card trial messaging
+- [x] **LAND-05**: User can navigate to sign up or log in from the landing page
+- [x] **LAND-06**: Authenticated user visiting the root URL is redirected to the dashboard
 
 ### Onboarding Wizard
 
@@ -44,9 +44,9 @@ Requirements for Onboarding & Landing Page milestone. Each maps to roadmap phase
 
 ### Welcome Dashboard
 
-- [ ] **DASH-01**: New user sees a personalised welcome message on first dashboard visit
-- [ ] **DASH-02**: Dashboard shows getting-started widget with "Create your first job" and "Send your first quote" checklist items
-- [ ] **DASH-03**: Getting-started checklist items link to relevant pages and show completion state
+- [x] **DASH-01**: New user sees a personalised welcome message on first dashboard visit
+- [x] **DASH-02**: Dashboard shows getting-started widget with "Create your first job" and "Send your first quote" checklist items
+- [x] **DASH-03**: Getting-started checklist items link to relevant pages and show completion state
 
 ## Future Requirements
 
@@ -85,12 +85,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| LAND-01 | Phase 36 | Pending |
-| LAND-02 | Phase 36 | Pending |
-| LAND-03 | Phase 36 | Pending |
-| LAND-04 | Phase 36 | Pending |
-| LAND-05 | Phase 36 | Pending |
-| LAND-06 | Phase 36 | Pending |
+| LAND-01 | Phase 36 | Complete |
+| LAND-02 | Phase 36 | Complete |
+| LAND-03 | Phase 36 | Complete |
+| LAND-04 | Phase 36 | Complete |
+| LAND-05 | Phase 36 | Complete |
+| LAND-06 | Phase 36 | Complete |
 | ONBD-01 | Phase 37 | Complete |
 | ONBD-02 | Phase 37 | Complete |
 | ONBD-03 | Phase 37 | Complete |
@@ -108,9 +108,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PAYWALL-04 | Phase 38 | Complete |
 | PAYWALL-05 | Phase 38 | Complete |
 | PAYWALL-06 | Phase 38 | Complete |
-| DASH-01 | Phase 39 | Pending |
-| DASH-02 | Phase 39 | Pending |
-| DASH-03 | Phase 39 | Pending |
+| DASH-01 | Phase 39 | Complete |
+| DASH-02 | Phase 39 | Complete |
+| DASH-03 | Phase 39 | Complete |
 
 **Coverage:**
 - v1.7 requirements: 26 total
