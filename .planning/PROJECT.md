@@ -238,8 +238,6 @@ Phase 38 complete (2026-04-02) — Hard paywall replaces soft paywall. Full-scre
 
 Phase 39 complete (2026-04-07) — Welcome dashboard with personalised greeting and getting-started checklist (create first job, send first quote). Old pre-Phase 37 onboarding system fully removed — 15 files deleted, 10 consuming files cleaned. FIRST_QUOTE_SENT onboarding step added to API.
 
-Phase 40 complete (2026-04-07) — SubscriptionGuard onboarding bypass. @SkipSubscriptionCheck decorator applied to PATCH /v1/user/me and POST /v1/business so new users without a subscription can complete the mandatory onboarding wizard. Closes INT-01 gap from v1.7 milestone audit.
-
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
@@ -258,4 +256,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-07 after Phase 40 completion — SubscriptionGuard onboarding bypass*
+*Last updated: 2026-04-07 after Phase 39 completion — welcome dashboard and old onboarding removal*

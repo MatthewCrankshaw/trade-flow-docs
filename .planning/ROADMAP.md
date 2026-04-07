@@ -110,7 +110,7 @@ Full details: `.planning/milestones/v1.6-ROADMAP.md`
 - [x] **Phase 37: Onboarding Wizard Pages** - Mandatory profile and business setup with trial activation and old onboarding removal (completed 2026-04-07)
 - [x] **Phase 38: Hard Paywall and Soft Paywall Removal** - Full-screen blocking paywall replacing soft write-action modal (completed 2026-04-02)
 - [x] **Phase 39: Welcome Dashboard and Final Cleanup** - Personalised welcome experience with getting-started checklist (completed 2026-04-07)
-- [x] **Phase 40: SubscriptionGuard Onboarding Bypass** - Add @SkipSubscriptionCheck to user and business endpoints used during onboarding (completed 2026-04-07)
+- [ ] **Phase 40: SubscriptionGuard Onboarding Bypass** - Add @SkipSubscriptionCheck to user and business endpoints used during onboarding
 
 
 ## Phase Details
@@ -265,9 +265,7 @@ Plans:
   1. A new user without a subscription can PATCH /v1/user/me to save their display name during onboarding
   2. A new user without a subscription can POST /v1/user/me/business to create their business during onboarding
   3. Existing subscription enforcement remains intact for all other write endpoints
-**Plans**: 1 plan
-Plans:
-- [x] 40-01-PLAN.md -- Add @SkipSubscriptionCheck to UserController.patch() and BusinessController.create(), guard spec tests
+**Plans**: TBD
 
 ## Progress
 
@@ -315,4 +313,4 @@ Phases execute in numeric order. Note: Phases 35+36 can run in parallel (differe
 | 37. Onboarding Wizard Pages | v1.7 | 4/4 | Complete    | 2026-04-07 |
 | 38. Hard Paywall and Soft Paywall Removal | v1.7 | 1/2 | Complete    | 2026-04-02 |
 | 39. Welcome Dashboard and Final Cleanup | v1.7 | 2/2 | Complete    | 2026-04-07 |
-| 40. SubscriptionGuard Onboarding Bypass | v1.7 | 1/1 | Complete    | 2026-04-07 |
+| 40. SubscriptionGuard Onboarding Bypass | v1.7 | 0/? | Not started | - |
