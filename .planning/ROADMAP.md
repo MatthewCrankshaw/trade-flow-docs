@@ -106,7 +106,7 @@ Full details: `.planning/milestones/v1.6-ROADMAP.md`
 **Milestone Goal:** Replace the dismissible onboarding flow with a mandatory, streamlined setup process -- from public landing page through profile, business, and no-card trial activation -- and enforce a hard paywall for invalid subscriptions.
 
 - [x] **Phase 35: No-Card Trial API Endpoint** - Backend endpoint for no-card Stripe trial creation with webhook compatibility (completed 2026-04-02)
-- [ ] **Phase 36: Public Landing Page and Route Restructure** - Marketing landing page at root URL with three-tier route guard architecture
+- [x] **Phase 36: Public Landing Page and Route Restructure** - Marketing landing page at root URL with three-tier route guard architecture (completed 2026-04-07)
 - [ ] **Phase 37: Onboarding Wizard Pages** - Mandatory profile and business setup with trial activation and old onboarding removal
 - [x] **Phase 38: Hard Paywall and Soft Paywall Removal** - Full-screen blocking paywall replacing soft write-action modal (completed 2026-04-02)
 - [ ] **Phase 39: Welcome Dashboard and Final Cleanup** - Personalised welcome experience with getting-started checklist
@@ -296,7 +296,7 @@ Phases execute in numeric order. Note: Phases 35+36 can run in parallel (differe
 | 33. Trial Banner and Billing Settings Tab | v1.6 | 2/2 | Complete | 2026-03-29 |
 | 34. Luxon DateTime Standardization | v1.6 | 2/2 | Complete | 2026-03-30 |
 | 35. No-Card Trial API Endpoint | v1.7 | 2/2 | Complete    | 2026-04-02 |
-| 36. Public Landing Page and Route Restructure | v1.7 | 2/2 | Complete | 2026-04-02 |
+| 36. Public Landing Page and Route Restructure | v1.7 | 2/2 | Complete    | 2026-04-07 |
 | 37. Onboarding Wizard Pages | v1.7 | 3/4 | In Progress|  |
 | 38. Hard Paywall and Soft Paywall Removal | v1.7 | 1/2 | Complete    | 2026-04-02 |
 | 39. Welcome Dashboard and Final Cleanup | v1.7 | 0/2 | Not started | - |
