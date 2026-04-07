@@ -109,7 +109,7 @@ Full details: `.planning/milestones/v1.6-ROADMAP.md`
 - [x] **Phase 36: Public Landing Page and Route Restructure** - Marketing landing page at root URL with three-tier route guard architecture (completed 2026-04-07)
 - [x] **Phase 37: Onboarding Wizard Pages** - Mandatory profile and business setup with trial activation and old onboarding removal (completed 2026-04-07)
 - [x] **Phase 38: Hard Paywall and Soft Paywall Removal** - Full-screen blocking paywall replacing soft write-action modal (completed 2026-04-02)
-- [ ] **Phase 39: Welcome Dashboard and Final Cleanup** - Personalised welcome experience with getting-started checklist
+- [x] **Phase 39: Welcome Dashboard and Final Cleanup** - Personalised welcome experience with getting-started checklist (completed 2026-04-07)
 
 ## Phase Details
 
@@ -250,8 +250,8 @@ Plans:
   3. Checklist items show completion state (checked when the user has created a job or sent a quote) and the widget hides once all items are complete
 **Plans**: 2 plans
 Plans:
-- [ ] 39-01-PLAN.md -- Welcome widget components (WelcomeSection, GettingStartedChecklist, ChecklistItem), useGettingStarted hook, DashboardPage integration
-- [ ] 39-02-PLAN.md -- Old onboarding system removal (delete files, clean imports from App.tsx and store)
+- [x] 39-01-PLAN.md -- Welcome widget components (WelcomeSection, GettingStartedChecklist, ChecklistItem), useGettingStarted hook, DashboardPage integration
+- [x] 39-02-PLAN.md -- Old onboarding system removal (delete files, clean imports from App.tsx and store)
 **UI hint**: yes
 
 ## Progress
@@ -299,4 +299,4 @@ Phases execute in numeric order. Note: Phases 35+36 can run in parallel (differe
 | 36. Public Landing Page and Route Restructure | v1.7 | 2/2 | Complete    | 2026-04-07 |
 | 37. Onboarding Wizard Pages | v1.7 | 4/4 | Complete    | 2026-04-07 |
 | 38. Hard Paywall and Soft Paywall Removal | v1.7 | 1/2 | Complete    | 2026-04-02 |
-| 39. Welcome Dashboard and Final Cleanup | v1.7 | 0/2 | Not started | - |
+| 39. Welcome Dashboard and Final Cleanup | v1.7 | 2/2 | Complete    | 2026-04-07 |
