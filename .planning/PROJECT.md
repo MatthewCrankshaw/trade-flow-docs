@@ -236,6 +236,8 @@ Phase 37 complete (2026-04-07) — Mandatory two-step onboarding wizard (display
 
 Phase 38 complete (2026-04-02) — Hard paywall replaces soft paywall. Full-screen blocking page with three variant modes (trial-expired, payment-failed, canceled). All soft paywall infrastructure removed — 7 files deleted, Redux slice cleaned, openPaywall dispatch calls stripped from all feature pages.
 
+Phase 39 complete (2026-04-07) — Welcome dashboard with personalised greeting and getting-started checklist (create first job, send first quote). Old pre-Phase 37 onboarding system fully removed — 15 files deleted, 10 consuming files cleaned. FIRST_QUOTE_SENT onboarding step added to API.
+
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
@@ -254,4 +256,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-07 after Phase 37 completion — onboarding wizard pages with trial badge*
+*Last updated: 2026-04-07 after Phase 39 completion — welcome dashboard and old onboarding removal*
