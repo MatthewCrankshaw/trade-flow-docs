@@ -283,6 +283,55 @@
 
 ---
 
+## Milestone: v1.7 -- Onboarding & Landing Page
+
+**Shipped:** 2026-04-07
+**Phases:** 6 (35-40) | **Plans:** 13 | **Timeline:** 7 days (2026-04-01 -> 2026-04-07)
+
+### What Was Built
+- No-card 30-day free trial via Stripe API with belt-and-suspenders webhook reconciliation
+- Public marketing landing page at root URL (hero, features, pricing, footer) with bundle isolation from app
+- Three-tier route guard architecture (ProtectedRoute > OnboardingGuard > PaywallGuard)
+- Mandatory two-step onboarding wizard (profile name + business/trade) with auto-created defaults (5 resource types)
+- Hard paywall with three variant modes replacing soft paywall modal (7 files deleted, 10 pages cleaned)
+- Personalised welcome dashboard with getting-started checklist and old onboarding system removal (15 files deleted)
+- @SkipSubscriptionCheck decorator for onboarding endpoints (INT-01 gap closure)
+
+### What Worked
+- Milestone audit before completion caught the critical INT-01 gap (SubscriptionGuard blocking onboarding) -- Phase 40 fixed it surgically with a decorator
+- Parallel phase execution (35+36 in different repos, 37+38 on different concerns) shortened the critical path
+- Landing page bundle isolation was the right call -- lazy-loaded route doesn't import Redux/auth, keeping public page fast
+- Three-tier guard architecture cleanly separates auth/onboarding/paywall concerns -- each guard has one responsibility
+- Hard paywall was a significant simplification over soft paywall -- deleted 7 files and removed dispatch calls from 10 pages
+- DefaultQuoteSettingsCreatorService completed the "5 default resource types on business creation" goal -- no gap left
+
+### What Was Inefficient
+- Phase 38 shows 1/2 plans complete in roadmap despite being marked complete -- plan tracking inconsistency persists
+- Some phases completed out of order (38 before 37) due to parallel execution -- roadmap tracking doesn't handle non-linear well
+- Audit was run late (after all phases except 40) -- running it earlier would have caught INT-01 sooner and avoided the emergency Phase 40
+
+### Patterns Established
+- @SkipSubscriptionCheck method-level decorator pattern for guard bypass (surgical, auditable)
+- Three-tier route guard nesting (auth > onboarding > paywall) with each guard as a shell layout
+- Landing page bundle isolation via lazy-loaded route avoiding app state imports
+- Trade card grid selection pattern for onboarding with TRADE_OPTIONS constant
+- SetupLoadingScreen pattern for sequential API calls with partial-completion retry
+- TrialBadge with urgency color thresholds (yellow at <=10 days, red at <=3)
+
+### Key Lessons
+1. Run milestone audit early (after ~75% of phases) not at the end -- INT-01 was a critical integration gap that could have been caught earlier
+2. Hard paywall is simpler than soft paywall -- one blocking route vs per-page gating logic in every feature
+3. Mandatory onboarding eliminates the "incomplete account" problem entirely -- worth the upfront friction
+4. Bundle-isolating public pages from the authenticated app pays off immediately in load performance
+5. Decorator-based guard bypass (@SkipSubscriptionCheck) is cleaner than conditional logic inside the guard
+
+### Cost Observations
+- Model mix: opus for planning and execution
+- Timeline: 7 days for 13 plans across 6 phases
+- Notable: Phase 40 (gap closure) was 1 plan, ~3 min -- surgical fixes with decorators are fast when the pattern is established
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -295,6 +344,7 @@
 | v1.3 | ~1 hour | 5 | Email delivery + customer response, token-based public access, email provider migration, gap closure for architecture |
 | v1.4 | ~15 min | 4 | Infrastructure-only milestone, dual entry-point pattern, zero gap closure, lowest plan count per outcome |
 | v1.6 | ~55 min | 6 | Full SaaS billing, webhook processing via BullMQ, soft paywall, Luxon standardization, zero gap closure |
+| v1.7 | ~7 days | 6 | User acquisition funnel, hard paywall replacing soft, milestone audit caught critical integration gap |
 
 ### Top Lessons (Verified Across Milestones)
 
@@ -308,3 +358,5 @@
 8. Separate config/settings from core entities from the start -- embedding then extracting causes a full rework cycle (confirmed: v1.3 QuoteSettings)
 9. Gap closure plans should decrease over milestones -- 40% gap closure rate (v1.3) → 0% (v1.4): infrastructure phases with clear acceptance criteria execute cleanly
 10. Infrastructure milestones (v1.4) unlock future product milestones -- tight scope + no gap closure = fastest shipping rate yet
+11. Run milestone audit at ~75% completion, not after final phase -- catches integration gaps while there's still time to fix cheaply (confirmed: v1.7 INT-01)
+12. Hard paywall is simpler than soft paywall for subscription enforcement -- one blocking route vs per-page gating in every feature (confirmed: v1.7 deleted 7 files + cleaned 10 pages)
