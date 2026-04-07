@@ -576,7 +576,33 @@ Use these entry points:
 Do not make direct repo edits outside a GSD workflow unless the user explicitly asks to bypass it.
 <!-- GSD:workflow-end -->
 
+## CI Gate Policy
 
+All phases of development and milestones MUST have all quality checks passing before they can be deployed. This is enforced via the `npm run ci` script in both repositories.
+
+### Quality Gates (both repos)
+
+Every deployment must pass these checks in order:
+
+1. **Unit tests** -- all tests must pass with zero failures
+2. **Linting** -- ESLint must report zero errors
+3. **Formatting** -- Prettier must report zero formatting issues
+4. **Type checking** -- TypeScript compiler must report zero errors
+
+### Commands
+
+| Repository | CI Gate Command | Description |
+|------------|----------------|-------------|
+| trade-flow-api | `npm run ci` | Runs tests, lint:check, format:check, typecheck |
+| trade-flow-ui | `npm run ci` | Runs tests, lint, format:check, typecheck |
+
+### Enforcement Rules
+
+- **Before merging any feature branch:** `npm run ci` must pass in both affected repos
+- **Before deploying to Railway:** The build process should run `npm run ci` before `npm run build`
+- **During phase execution:** Each plan's verification step must confirm `npm run ci` passes
+- **Quick tasks:** Must not leave any repo with failing CI checks
+- **No suppression:** Do not use `eslint-disable`, `@ts-ignore`, `@ts-expect-error`, or `@ts-nocheck` to bypass checks -- fix the root cause
 
 <!-- GSD:profile-start -->
 ## Developer Profile
