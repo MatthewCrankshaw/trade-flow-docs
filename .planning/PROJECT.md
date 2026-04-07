@@ -230,6 +230,8 @@ Trade Flow is now a monetized SaaS product with full billing infrastructure. The
 
 Phase 35 complete (2026-04-02) — No-card trial API endpoint. POST /v1/subscription/trial creates a 30-day Stripe trial without payment details. Webhook handler for customer.subscription.created ensures belt-and-suspenders reliability.
 
+Phase 36 complete (2026-04-07) — Public landing page at root URL with hero, features, pricing, and footer. Three-tier route guard architecture (ProtectedRoute > OnboardingGuard > PaywallGuard). Landing page lazy-loaded and bundle-isolated from app. LoginPage accepts ?mode=signup for CTA flow.
+
 Phase 38 complete (2026-04-02) — Hard paywall replaces soft paywall. Full-screen blocking page with three variant modes (trial-expired, payment-failed, canceled). All soft paywall infrastructure removed — 7 files deleted, Redux slice cleaned, openPaywall dispatch calls stripped from all feature pages.
 
 ## Evolution
@@ -250,4 +252,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-02 after Phase 38 completion — hard paywall and soft paywall removal*
+*Last updated: 2026-04-07 after Phase 36 completion — public landing page and route restructure*
