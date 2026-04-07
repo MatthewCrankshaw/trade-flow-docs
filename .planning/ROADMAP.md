@@ -297,6 +297,6 @@ Phases execute in numeric order. Note: Phases 35+36 can run in parallel (differe
 | 34. Luxon DateTime Standardization | v1.6 | 2/2 | Complete | 2026-03-30 |
 | 35. No-Card Trial API Endpoint | v1.7 | 2/2 | Complete    | 2026-04-02 |
 | 36. Public Landing Page and Route Restructure | v1.7 | 2/2 | Complete    | 2026-04-07 |
-| 37. Onboarding Wizard Pages | v1.7 | 4/4 | Complete   | 2026-04-07 |
+| 37. Onboarding Wizard Pages | v1.7 | 4/4 | Complete    | 2026-04-07 |
 | 38. Hard Paywall and Soft Paywall Removal | v1.7 | 1/2 | Complete    | 2026-04-02 |
 | 39. Welcome Dashboard and Final Cleanup | v1.7 | 0/2 | Not started | - |
