@@ -232,6 +232,8 @@ Phase 35 complete (2026-04-02) — No-card trial API endpoint. POST /v1/subscrip
 
 Phase 36 complete (2026-04-07) — Public landing page at root URL with hero, features, pricing, and footer. Three-tier route guard architecture (ProtectedRoute > OnboardingGuard > PaywallGuard). Landing page lazy-loaded and bundle-isolated from app. LoginPage accepts ?mode=signup for CTA flow.
 
+Phase 37 complete (2026-04-07) — Mandatory two-step onboarding wizard (display name + business/trade). OnboardingGuard redirects new users. TrialBadge in header shows days remaining with urgency colors. Auto-creates all 5 default resource types (tax rates, items, job types, visit types, quote settings) on business creation.
+
 Phase 38 complete (2026-04-02) — Hard paywall replaces soft paywall. Full-screen blocking page with three variant modes (trial-expired, payment-failed, canceled). All soft paywall infrastructure removed — 7 files deleted, Redux slice cleaned, openPaywall dispatch calls stripped from all feature pages.
 
 ## Evolution
@@ -252,4 +254,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-07 after Phase 36 completion — public landing page and route restructure*
+*Last updated: 2026-04-07 after Phase 37 completion — onboarding wizard pages with trial badge*
