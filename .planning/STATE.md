@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-07)
 Phase: Not started (defining requirements)
 Plan: —
 Status: Defining requirements
-Last activity: 2026-04-10 — Milestone v1.8 Estimates started
+Last activity: 2026-04-10 — Completed quick task 260410-tkt: Review onboarding defect fixes and refactor for better holistic solution
 
 ## Performance Metrics
 
@@ -93,6 +93,7 @@ None.
 | 260407-pwg | Document testing standards and tools in CLAUDE.md | 2026-04-07 | 586631e, 0447cbd | [260407-pwg-document-the-testing-standards-and-testi](./quick/260407-pwg-document-the-testing-standards-and-testi/) |
 | 260407-rp3 | Ensure API and UI have passing unit tests, prettier, linting checks and Railway pre-build CI gate | 2026-04-07 | 3e7de43 | [260407-rp3-ensure-api-and-ui-have-passing-unit-test](./quick/260407-rp3-ensure-api-and-ui-have-passing-unit-test/) |
 | 260407-s9g | Fix Railway build to run npm run ci instead of npm ci before deployment | 2026-04-07 | 9642daa, d3a8f6f | [260407-s9g-fix-railway-build-to-run-npm-run-ci-inst](./quick/260407-s9g-fix-railway-build-to-run-npm-run-ci-inst/) |
+| 260410-tkt | Review onboarding defect fixes and refactor for better holistic solution | 2026-04-10 | 8715966 (api), 380345b (ui) | [260410-tkt-review-onboarding-defect-fixes-and-refac](./quick/260410-tkt-review-onboarding-defect-fixes-and-refac/) |
 
 ## Session Continuity
 
