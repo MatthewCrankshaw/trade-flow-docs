@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.7
-milestone_name: Onboarding & Landing Page
-status: executing
-stopped_at: Completed quick task 260407-pwg
-last_updated: "2026-04-07T19:08:25.260Z"
-last_activity: 2026-04-07
+milestone: v1.8
+milestone_name: Estimates
+status: defining_requirements
+stopped_at: Milestone v1.8 started
+last_updated: "2026-04-10T00:00:00.000Z"
+last_activity: 2026-04-10
 progress:
-  total_phases: 11
-  completed_phases: 8
-  total_plans: 16
-  completed_plans: 16
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,15 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-07)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Planning next milestone
+**Current focus:** v1.8 Estimates -- defining requirements
 
 ## Current Position
 
-Milestone: v1.7 complete (shipped 2026-04-07)
-Next milestone: Not yet planned
-Last activity: 2026-04-07 - Completed quick task 260407-s9g: Fix Railway build CI gate
-
-Progress: v1.7 shipped -- 6 phases, 13 plans
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-10 — Milestone v1.8 Estimates started
 
 ## Performance Metrics
 
