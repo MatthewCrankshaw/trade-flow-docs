@@ -1,255 +1,404 @@
-# Feature Research
+# Feature Research: v1.8 Estimates
 
-**Domain:** SaaS onboarding overhaul, public landing page, no-card Stripe trial, hard paywall for trade management software
-**Researched:** 2026-03-31
-**Confidence:** HIGH (competitor patterns well-documented, Stripe APIs verified against official docs)
+**Domain:** UK sole-trader SaaS — estimates (pre-site-visit "rough cost" documents) as a parallel document type to quotes, with price ranges, soft customer responses, automated follow-ups, and conversion to quotes.
+**Researched:** 2026-04-10
+**Confidence:** MEDIUM-HIGH (competitor product behaviour and UK legal framing HIGH; follow-up cadence and contingency percentages MEDIUM — drawn from sales industry and US plumbing sources, adapted for UK trade context)
+
+## Executive Summary
+
+The single most important finding: **every major competitor treats "estimate" as a cosmetic relabel of "quote"**. Tradify's own docs confirm it — switching to Estimate mode just swaps the word "Quote" for "Estimate" in customer-facing output; internally everything is still a quote, with the same fields, same structure, same customer response flow (accept/decline). Jobber, ServiceM8, YourTradebase and Powered Now all follow the same nomenclature-only pattern.
+
+This is a major differentiation opportunity. UK tradespeople genuinely need a separate pre-site-visit document that (a) communicates price uncertainty honestly via ranges or "from £X", (b) legally signals non-binding status, (c) routes customers into a soft response flow ("book a site visit" rather than "accept £X"), and (d) nudges the trader with automated follow-ups because estimates are a lead-generation tool, not a signed agreement. None of the incumbents model estimates this way.
+
+UK legal context reinforces the design: quotes are binding contracts under the Consumer Rights Act 2015; estimates are explicitly non-binding guide prices. Citizens Advice, the Dispute Resolution Ombudsman and Ralli Solicitors all draw the same line. If Trade Flow ships an "estimate" document that behaves like a quote (single price, accept/decline buttons), it exposes users to the same contract risk — defeating the purpose.
+
+The existing v1.3 quote infrastructure (token-based public pages, Resend + Maizzle, view tracking) and v1.4 BullMQ worker (already used for Stripe webhooks) cover ~70% of the plumbing. What's genuinely new is the price-range data model, the soft-response taxonomy, the follow-up scheduler, and the convert-to-quote flow.
 
 ## Feature Landscape
 
 ### Table Stakes (Users Expect These)
 
-Features users assume exist. Missing these = product feels incomplete or untrustworthy.
-
-#### Landing Page
+Features a UK sole trader would consider broken if absent. These set the baseline of a credible estimates feature.
 
 | Feature | Why Expected | Complexity | Notes |
 |---------|--------------|------------|-------|
-| Hero with clear value proposition | Every competitor (ServiceM8, Fergus, Jobber, Tradify) leads with "what it does + who it's for" headline. Tradies scanning the page need to know in 5 seconds. | LOW | Headline + subheadline + single CTA. Fergus: "Job management software built for tradies". Jobber: "Run a stronger service business". Keep it trades-specific. |
-| Primary CTA to start free trial | All four competitors have prominent "Start Free Trial" / "Try Free" button above the fold. No-card messaging displayed inline. | LOW | Single CTA, not two competing buttons. "Start Free Trial - No card required" is the standard phrasing. |
-| Feature highlights section | ServiceM8 shows bulleted features, Fergus uses interactive tabs (Enquiries, Quotes, Scheduling, Payments, Reporting), Jobber uses 4 benefit sections. Users need to see what they get. | LOW | 3-5 feature cards showing core capabilities (Jobs, Quotes, Scheduling, Invoicing). Screenshots or illustrations increase trust. |
-| Social proof / trust signals | Fergus shows Xero/Google/G2 logos. Jobber shows "29M+ jobs completed, 50+ industries". ServiceM8 shows "$35B in jobs managed" and Xero award badge. Without social proof, trades don't trust you. | LOW | For early-stage: use specific metrics ("Built for plumbers, electricians, and builders"), ratings if available, or a single testimonial. Logos come later. |
-| Mobile-responsive design | Tradies browse on phones between jobs. Fergus and Tradify emphasise mobile-first. A landing page that breaks on mobile loses the primary audience. | LOW | Already using Tailwind with mobile-first approach. Standard responsive implementation. |
-| Login link in nav | Every competitor has "Log In" visible in the header. Returning users need quick access without hunting. | LOW | Existing auth system. Just needs a nav link. |
-
-#### Onboarding Wizard
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Profile name collection | Every SaaS asks for name at signup or immediately after. Needed for personalised greetings ("Welcome, Matt") and quote/invoice sender identity. | LOW | Single form step: first name + last name. Firebase auth only captures email -- name must be stored in Trade Flow user record. |
-| Business name + trade selection | ServiceM8, Tradify, Fergus, and Jobber all collect business type during setup. Trade Flow already generates defaults per trade -- this step feeds that system. | LOW | Single form step. Existing business creation endpoint handles the rest (defaults for job types, visit types, items, tax rates). |
-| Auto-provisioned defaults | Trade Flow already does this (v1.0+). Trade-specific job types, visit types, items, and tax rates created on business creation. Table stakes because competitors all provide starter templates. | ALREADY DONE | No new work. Existing business creation service handles this. |
-| Progress indication | SaaS onboarding best practice: users need to know how many steps remain. Reduces abandonment. Airtable's wizard approach showed 20% lift in activation. | LOW | Step indicator (1/3, 2/3, 3/3) or simple progress bar. |
-| Mandatory completion before app access | This is the shift from current dismissible flow. If onboarding is skippable, users enter the app with no business configured, hitting errors everywhere. Fergus and Tradify both require setup before app use. | MEDIUM | Requires route guards and state checks. New users without completed profile+business must be redirected to onboarding. Depends on: new `onboardingComplete` flag or checking user+business existence. |
-
-#### No-Card Free Trial
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Trial starts without payment method | ALL four competitors (ServiceM8, Fergus, Tradify, Jobber) offer 14-day no-card trials. Industry standard. Card-required trials have ~49% conversion but filter out most prospects. No-card gets 18-25% conversion but 3-5x more signups. For early-stage product, volume matters more. | MEDIUM | Stripe supports this natively. Create subscription via API with `trial_period_days=30`, no payment method attached. Key param: `trial_settings.end_behavior.missing_payment_method`. Replaces current Stripe Checkout flow for trial start. |
-| Trial period visibility | Current trial chip exists (v1.6). Users need to know how many days remain. | ALREADY DONE | Existing trial chip component. May need copy tweak ("14 days left -- add payment method to continue"). |
-| Add payment method later via Billing Portal | Stripe Billing Portal already integrated (v1.6). Users add card when ready, not at signup. | ALREADY DONE | Existing Settings > Billing tab with portal link. Needs prominence during trial nearing end. |
-| End-of-trial handling | When trial ends with no card: subscription must cancel or pause. User must be blocked from write actions (hard paywall kicks in). | MEDIUM | Stripe `trial_settings.end_behavior.missing_payment_method=cancel` is simplest. Webhook `customer.subscription.deleted` already handled (v1.6). Existing subscription sync should handle this. |
-
-#### Hard Paywall
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Full-screen blocking when subscription invalid | Current soft paywall only blocks write actions with a modal. A hard paywall replaces the app content entirely when subscription is expired/canceled/missing. This is standard for paid SaaS -- Jobber, Tradify, Fergus all lock you out fully when subscription lapses. | MEDIUM | Full-screen overlay or redirect to a "reactivate" page. Must show: what happened (trial ended / payment failed / canceled), what to do (add card / update payment / resubscribe), and a way to access billing portal. Depends on: existing subscription state from Redux store. |
-| Billing Portal access from paywall | User locked behind paywall must be able to fix their subscription without support tickets. | LOW | Button linking to Stripe Billing Portal. Existing portal session creation endpoint works. |
-| Support bypass preserved | Current support role bypass (v1.6) must continue working. | LOW | Existing `SubscriptionGuard` already handles this. Just extend to new paywall component. |
-| Data preservation messaging | Users with expired trials need assurance their data isn't deleted. Reduces panic and support requests. | LOW | Copy: "Your data is safe. Add a payment method to continue where you left off." |
+| Separate document type with distinct numbering | Legal and psychological separation from quotes; users need to tell them apart in lists | LOW | E-YYYY-NNN via new `estimate_counters` collection mirroring `quote_counters` pattern from v1.2 |
+| Non-binding language on customer-facing page and email | UK legal distinction — estimates are guide prices, quotes are contracts. Mislabelling exposes the user to unintended binding contracts under CRA 2015 | LOW | One paragraph of disclaimer copy in Maizzle template; include "This is a guide price only and does not form a contract" |
+| Line items shared with quotes (same data model) | Users already know how to add items/bundles; would be jarring to have two different editors | LOW | Reuse existing line item schema; `documentType: 'quote' \| 'estimate'` discriminator on parent doc |
+| Customer-facing page via token | Direct parity with quotes — customers expect to click a link, see the estimate, respond | LOW | Reuse v1.3 `QuoteSessionAuthGuard` generalised to `DocumentSessionAuthGuard` (or dedicated estimate variant) |
+| Email delivery with configurable template | Mirrors the quote send flow users already learned in v1.3 | LOW | Clone QuoteSettings module into EstimateSettings; reuse Resend + Maizzle infra |
+| View tracking (firstViewedAt) | Shipped in v1.3 for quotes; users expect the "has customer seen this?" signal everywhere | LOW | Reuse existing tracking logic |
+| Status lifecycle | Need to know which estimates are still live vs dead | MEDIUM | Draft → Sent → Viewed → Responded → (Site Visit Requested / Converted / Declined / Expired). Expired = auto-transition after N days with no response |
+| Edit and resend | Customers ask questions, traders revise. Without this, every change is a new document | MEDIUM | Versioned revisions (parent_estimate_id + revision_number) under the hood; UI reads as "edit and resend" with a collapsed History section |
+| Convert to Quote action | The whole point of an estimate is it becomes a quote after the site visit. Competitors missing this force manual re-keying | MEDIUM | Pulls from latest revision, drops contingency, sets `convertedFromEstimateId`, back-links both ways |
+| Decline with reason capture | Quotes already do this; estimate parity expected | LOW | Reuse existing decline-reason text field, extended with the structured taxonomy below |
+| Price range OR "From £X" display | Without this, estimates are just quotes with a different word on them (Tradify's mistake) | MEDIUM | Base price + contingency percent → display as "£900 – £1,100" (range) or "From £900" (floor only, for diagnostic/repair jobs) |
 
 ### Differentiators (Competitive Advantage)
 
-Features that set Trade Flow apart. Not required, but valuable.
+Features that no UK competitor does well, that genuinely help traders win more work.
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| Welcome dashboard with personalised greeting | "Good morning, Matt" with first-steps guidance creates warmth competitors lack. Jobber and ServiceM8 dump you into a feature-heavy dashboard. A simple welcome state for new users reduces overwhelm. | LOW | Conditional rendering on dashboard: if new user with no jobs, show welcome card with greeting + getting-started checklist instead of empty charts. |
-| Getting-started checklist widget | Notion-style checklists (create job, create quote) raised onboarding completion to 60% with 40% retention bump at 30 days. Existing onboarding widget pattern can be repurposed. | LOW | Reuse existing widget pattern from current dashboard. Two items: "Create your first job", "Send your first quote". Checkmarks persist via existing mechanisms. |
-| Trade-specific landing page copy | Fergus has industry-specific cards (Plumbers, Electricians, HVAC, Builders). Jobber serves 50+ industries. Trade Flow can speak directly to specific trades rather than generic "field service" language. | LOW | Copy variation, not code. Hero section mentions "plumbers, electricians, builders" specifically. Resonates with target audience who distrust generic software. |
-| Single pricing displayed on landing page | Fergus shows 2 plans, Jobber shows 3. Trade Flow has one plan at GBP 6/month -- radically simple. No decision paralysis. This simplicity is a selling point vs competitors charging GBP 30-75/month. | LOW | Single pricing card on landing page. "GBP 6/month after your free trial. That's it." Undercuts every competitor by 5-12x. |
-| Instant time-to-value (under 2 minutes to app) | Best practice: under 2 minutes to first perceived value. With only 2-3 mandatory onboarding steps (profile + business + trial activation), user lands in the app in under 60 seconds. Competitors require more setup. | LOW | Minimal mandatory steps. No email verification gate, no feature tour, no tutorial before access. Get them into the app fast. |
-| Contextual trial-ending nudges | Instead of just a chip, show contextual prompts when trial is nearing end (7 days, 3 days, 1 day). "Add a payment method to keep your data" messaging in-context drives conversion better than email alone. | LOW | Enhanced trial chip with urgency states. Could link directly to billing portal. Low effort, high conversion impact. |
+| True separate document type (not nomenclature relabel) | Tradify, Jobber, ServiceM8, YourTradebase all treat estimate as a relabel. Trade Flow's estimate has different semantics: price range, soft responses, follow-ups, no binding | MEDIUM | This is the core strategic move. Everything else flows from it |
+| Contingency slider with transparent range display | Tradespeople already add 10-25% mental buffers informally. Exposing it as a slider lets them explain uncertainty to the customer without writing prose | LOW | 0-30% in 5% steps, default 10%. Matches the 10-25% construction industry norm from US sources, conservatively adjusted |
+| Soft customer response flow (4 buttons, not accept/decline) | The hardest bit of the sales conversation is "£X, yes or no" when the trader hasn't seen the job. Replacing binary accept/decline with "Book a site visit / Send me a quote / I have a question / Not right now" matches real-world dynamics | MEDIUM | Custom button routes on public estimate page; each captures structured data + triggers appropriate tradesperson notification |
+| Structured decline reasons | Competitors use free-text. Structured reasons (Too expensive / Going with someone else / Not the right time / Decided against the work / Other) unlock future pipeline analytics milestone | LOW | Enum on `estimate.declineReason`; see Reason Taxonomy section below |
+| Quick-tap uncertainty notes | One-tap reasons for contingency ("Pipework behind walls", "Access unclear", "Material spec TBD") tell the customer *why* the range exists — more persuasive than a blank range | LOW | Chip selector in create dialog, persisted as string array; rendered as bullet list on customer page |
+| Automated follow-up sequence | Yesware/Apollo data shows 50% of responses come from the first follow-up; 80% of sales need 5+ touches. Competitors leave this to the trader's willpower, which means it never happens | MEDIUM | Three BullMQ delayed jobs at 3/10/21 days (see Cadence Evidence below). Cancel on response/revision/convert. Reset on revision |
+| Invisible versioning with visible history | "Edit and resend" UX with a collapsed audit trail. Users don't want to manage "v2" explicitly — they want the document to stay correct. But they occasionally need to prove what they sent last Tuesday | MEDIUM | parent_estimate_id + revision_number on the entity, but list view only shows latest; collapsed History section in detail view |
+| "Book a site visit" with pre-populated availability prompt | Not a full calendar integration. A lightweight "Here are the next 5 working days, what suits?" prompt the customer replies to, captured as a site visit request the trader manually schedules | LOW-MEDIUM | Customer sends 1-3 preferred windows as free text or date-picker. Creates a SiteVisitRequest row; trader confirms via existing v1.0 schedule entries. **Avoids a full calendar-sync build** |
+| Back-link on converted quote | When a quote was born from an estimate, the quote detail page shows "Converted from E-2026-0042". Context preserved for the trader months later | LOW | One extra field on Quote entity + a link in the UI |
 
 ### Anti-Features (Commonly Requested, Often Problematic)
 
-Features that seem good but create problems for this specific milestone.
+Things that sound reasonable but would bloat scope, confuse the data model, or clone the worst patterns from competitors.
 
 | Feature | Why Requested | Why Problematic | Alternative |
 |---------|---------------|-----------------|-------------|
-| Interactive product tour / guided walkthrough | SaaS onboarding guides recommend it. Airtable, Notion do it. | Requires tooltip/spotlight library, per-feature tour scripts, maintenance as UI changes. Overkill when the product has 3 core screens. Trades people learn by doing, not by watching. | Getting-started checklist that links to relevant pages. Let users explore naturally. |
-| Email verification gate before app access | "Best practice" for reducing fake signups. | Adds friction at the exact moment user is most engaged. Firebase handles email verification asynchronously. Trade Flow is B2B SaaS, not a social network -- fake signups are not a pressing problem at this stage. | Let Firebase send verification email in background. Do not gate access on it. |
-| Multi-page marketing site | Competitors have 20+ pages (features, industries, resources, blog). Looks more "professional". | Massive content effort. Single-page landing with clear sections converts just as well for early-stage products. Trade Flow does not need SEO-driven content marketing yet. | Single-page landing with hero, features, pricing, CTA sections. Add pages later when content exists. |
-| Animated demos / product videos on landing page | ServiceM8 and Jobber use video. Looks polished. | Requires video production, hosting, and slows page load. Screenshots or static illustrations are sufficient and faster to produce. Can add video later. | Static screenshots or device mockups showing the actual product UI. |
-| Freemium tier / feature-limited free plan | "Let users try forever for free." Sounds generous. | Complicates subscription logic. Creates support burden from non-paying users. Trade Flow's GBP 6/month is already extremely low -- freemium adds complexity for minimal conversion benefit. | 30-day full-access free trial with hard paywall. Clean, simple, industry standard. |
-| Custom Stripe Elements payment form | More "integrated" feel than redirecting to Stripe. | PCI compliance scope increases. SCA/3DS handling becomes your problem. Current Stripe Checkout/Portal already handles all of this. No benefit for the complexity cost. | Continue using Stripe Billing Portal for payment method collection. Already integrated (v1.6). |
-| Onboarding step for adding first customer/job | "Guide them through the whole workflow." | Makes mandatory onboarding too long. Best practice says under 2 minutes. Customer/job creation is what the getting-started checklist handles -- optional, in-app, at user's pace. | Getting-started widget on dashboard (create job, send quote). |
-| Grace period after trial expiry | "Give them a few extra days to decide." | Complicates subscription state machine. Users who have not converted in 30 days rarely convert in 33. Stripe's cancel-at-trial-end is clean. | Hard paywall immediately at trial end. User can resubscribe at any time -- data preserved. |
+| Just call the existing Quote feature "Estimate" when user chooses | Simplest possible implementation; matches what Tradify/Jobber do | Defeats the purpose — same semantics, same contract risk, same accept/decline flow. Users will say "why is this different?" and churn | Ship estimates as a true parallel type with the soft-response flow |
+| Calendar integration for site visit booking (Google/Outlook sync) | "Customer should pick a slot directly from my calendar" | Two-way calendar sync is a multi-milestone feature with OAuth, timezone, edge cases, stale-slot problems. BUILT Booking, Nabooki and Tradease are *entire products* doing just this | Capture the customer's preferred windows as a message; trader creates the schedule entry manually via the existing v1.0 job-page schedule UI |
+| Visible version numbers (E-2026-0042 v2, v3) | Audit trail feels professional | Cognitive overhead for the trader; customers get confused seeing "v2" on a document and ask "what was v1?". Creates version-management UX that nobody wants | Invisible `revision_number` + collapsed History section; latest revision is always the live document |
+| Deposit collection on estimate acceptance | Pattern copied from quote feature discussions | Estimates are explicitly non-binding. Taking a deposit on a non-binding document is legally incoherent and operationally risky (refunds, disputes) | Deposits belong on quotes or invoices, not estimates |
+| Electronic signature on estimate | "Makes it feel real" | Doubles down on binding semantics, contradicting the whole point of an estimate. Also legal complexity (eIDAS in UK) | Keep signatures for the future quote feature, not estimates |
+| Estimate → Invoice direct conversion | "Skip the quote step for simple jobs" | Invoicing isn't built yet (out of scope per PROJECT.md). Also collapses the quote-as-contract step that legally protects the trader | Convert to Quote, then (future milestone) Quote to Invoice |
+| AI-generated contingency suggestions | ServiceM8's AI angle; "pick the right buffer automatically" | Hallucination risk on money. Trader needs to own the number. Training data for UK sole trader jobs doesn't exist at useful granularity | Sensible default (10%) + clear slider; trust the user |
+| Email tracking pixel as the primary view signal | Matches the v1.3 quote pattern — already built | UK PECR/GDPR implications if used without disclosure. DMA guidance says pixels need clear notice; ICO has issued warnings. Low risk for B2C transactional but not zero | Continue using the link-click / page-load approach from v1.3 (customer visits the token URL = view event). Document the mechanism in privacy policy. Avoid hidden pixel. **Confirm with PITFALLS.md review** |
+| Customer login for estimate responses | "Secure customer portal" | Adds signup friction on the customer side. v1.3 decision was token-based for exactly this reason | Reuse token-based public access |
+| Auto-convert estimate to quote when trader marks "site visit done" | "One less click" | The whole point of the site visit is the trader revises the numbers. Auto-conversion with old numbers creates binding contracts the trader doesn't intend | Explicit Convert to Quote action; pre-fill from latest revision but require trader review |
+| Rich-text uncertainty notes with formatting toolbar | v1.3 used Tiptap for the email template editor | Overkill for 3-word chips. Slows the create flow. Traders don't want to format on their phone between jobs | Quick-tap chip selector with maybe 6-8 presets + custom text field |
 
 ## Feature Dependencies
 
 ```
-[Public Landing Page]
-    (independent -- no auth, no app state)
+Estimate entity + data model (document type toggle)
+    ├──requires──> Quote module (reuse line item schema, bundle handling)
+    └──requires──> MongoDB atomic counter pattern (v1.2 quote_counters)
 
-[Profile Setup Step]
-    └──requires──> [User record in MongoDB (existing)]
+Customer-facing estimate page
+    ├──requires──> Token infra (v1.3)
+    └──requires──> Public RTK Query slice (v1.3 publicQuoteApi → publicDocumentApi)
 
-[Business Setup Step]
-    └──requires──> [Profile Setup Step]
-    └──triggers──> [Auto-create defaults (existing)]
+Email send with Maizzle template
+    ├──requires──> Resend SDK (v1.3)
+    ├──requires──> Maizzle pipeline (v1.3)
+    └──requires──> EstimateSettings module (clone QuoteSettings pattern)
 
-[No-Card Trial Activation]
-    └──requires──> [Business Setup Step (Stripe customer needs business context)]
-    └──requires──> [Stripe Customer creation (existing)]
-    └──modifies──> [Subscription creation flow (replaces Checkout)]
+Automated follow-up sequence
+    ├──requires──> BullMQ worker (v1.4)
+    ├──requires──> Delayed job pattern (already used in v1.6 Stripe webhooks)
+    └──requires──> Estimate status tracking (for cancellation on response)
 
-[Mandatory Onboarding Guards]
-    └──requires──> [Profile Setup Step]
-    └──requires──> [Business Setup Step]
-    └──requires──> [Onboarding completion state tracking]
+Soft response flow (4 buttons)
+    ├──requires──> Customer-facing estimate page
+    └──enhances──> Structured decline reasons (persists for future BI milestone)
 
-[Hard Paywall]
-    └──requires──> [Subscription state in Redux store (existing)]
-    └──replaces──> [Soft paywall modal (existing)]
-    └──requires──> [Billing Portal access (existing)]
+Convert to Quote action
+    ├──requires──> Estimate entity
+    ├──requires──> Quote module (v1.2)
+    └──requires──> Versioned revisions (pull from latest)
 
-[Welcome Dashboard]
-    └──requires──> [Profile name (from Profile Setup)]
-    └──requires──> [Business exists (from Business Setup)]
-    └──enhances──> [Existing dashboard page]
+Versioned revisions (invisible)
+    └──requires──> Estimate entity with parent_estimate_id self-reference
 
-[Getting-Started Widget]
-    └──requires──> [Welcome Dashboard]
-    └──reuses──> [Existing onboarding widget pattern]
+Site visit request (no calendar sync)
+    ├──requires──> Customer-facing estimate page
+    ├──enhances──> v1.0 Schedule entries (trader creates manually from request)
+    └──conflicts──> Full calendar integration (anti-feature)
 ```
 
 ### Dependency Notes
 
-- **Business Setup requires Profile Setup:** Business must be associated with a named user. Profile name feeds into quote sender identity and dashboard greeting.
-- **No-Card Trial requires Business:** Stripe subscription needs a customer ID. Current flow creates Stripe customer during business creation. Trial activation should happen automatically after business setup completes.
-- **Hard Paywall replaces Soft Paywall:** Not additive -- the soft paywall modal (v1.6) should be removed and replaced with full-screen blocking. Both cannot coexist without confusion.
-- **Landing Page is independent:** No dependencies on auth or app state. Can be built and deployed independently of other features.
-- **Welcome Dashboard enhances existing:** Conditional rendering on the existing dashboard, not a new page. Shows welcome state for users with no jobs.
+- **Estimate entity leverages 70% of quote infrastructure:** Line items, bundles, tax rates, token public access, email rendering, BullMQ — all already built. Genuinely new work is the range/contingency fields, soft-response buttons, follow-up scheduler, convert flow, and decline taxonomy.
+- **Follow-up sequence depends on BullMQ delayed jobs:** Same pattern as Stripe webhook processing from v1.6, so the team has done this before. Cancellation on customer response requires storing jobIds on the estimate.
+- **Site visit request deliberately avoids calendar sync:** The dependency graph is much smaller if we capture a message-style preference rather than syncing two calendars. Existing v1.0 schedule entries absorb the output.
+- **Versioned revisions enable convert-to-quote correctness:** Pull from latest revision, not the original. Without versioning, converting a revised estimate silently uses stale numbers.
 
 ## MVP Definition
 
-### Launch With (v1.7)
+### Launch With (v1.8)
 
-Minimum viable set -- what is needed to replace current onboarding and enforce hard paywall.
+The minimum coherent estimates feature. Ship less than this and it's just quotes with a new label.
 
-- [ ] Public landing page (hero, features, pricing, CTA) -- first touchpoint for new users
-- [ ] Profile setup step (first name, last name) -- mandatory, feeds greeting and identity
-- [ ] Business setup step (business name, primary trade) -- mandatory, triggers default creation
-- [ ] No-card Stripe trial activation -- automatic after business setup, 30-day trial, no payment method
-- [ ] Mandatory onboarding route guards -- redirect incomplete users to onboarding flow
-- [ ] Hard paywall screen -- full-screen block when subscription invalid, with billing portal access
-- [ ] Welcome dashboard with greeting -- personalised greeting with getting-started checklist
-- [ ] Getting-started widget -- create job + send quote checklist items
-- [ ] Remove existing dismissible onboarding flow -- clean up old code
+- [x] Document type toggle (Quote / Estimate) on create dialog with shared line-item data model — core differentiation
+- [x] Base price + contingency slider (0-30%, default 10%, 5% steps) — data model for the range
+- [x] Range / "From £X" display modes on customer page — the honest-uncertainty signal
+- [x] Optional uncertainty notes with quick-tap chips (site inspection, pipework, materials, access) — adds persuasion to the range
+- [x] Separate E-YYYY-NNN numbering via `estimate_counters` — legal and psychological separation
+- [x] Versioned revisions (parent + revision_number) invisible to users with collapsed History section — enables edit-and-resend without "v2" UX baggage
+- [x] Customer-facing page via token (reuses v1.3 infra) — table stakes
+- [x] Four soft response buttons (Book site visit / Send quote / I have a question / Not right now) with structured decline reasons — the differentiator
+- [x] View tracking (firstViewedAt) parity with quotes — table stakes
+- [x] Status lifecycle (Draft → Sent → Viewed → Responded → Site Visit Requested / Converted / Declined / Expired) — state machine
+- [x] Convert to Quote action (pulls latest revision, drops contingency, back-links both ways) — the pay-off
+- [x] Revise Estimate action (resets follow-up sequence) — lifecycle completeness
+- [x] Mark as Lost action with structured reason — captures future BI signal
+- [x] Automated follow-up sequence at 3 / 10 / 21 days via BullMQ delayed jobs — cadence-backed differentiator
+- [x] Estimate email template in Business settings with Maizzle HTML rendering — table stakes
+- [x] Non-binding legal language in template and customer page — UK legal safety
 
-### Add After Validation (v1.x)
+All of the above are already listed as v1.8 target features in PROJECT.md. Research confirms the scope is correct.
 
-Features to add once core onboarding and paywall are working.
+### Add After Validation (v1.8.x / v1.9)
 
-- [ ] Trial-ending email nudges (7 day, 3 day, 1 day) -- trigger when `customer.subscription.trial_will_end` webhook fires
-- [ ] Enhanced trial chip with urgency states -- visual escalation as trial nears end
-- [ ] Landing page testimonials / social proof -- add once real user quotes are available
-- [ ] Trade-specific landing page variations -- separate sections or routes per trade
+Features to add once v1.8 is in user hands and validated.
+
+- [ ] Trader-initiated follow-up cadence override (pause, resume, custom intervals) — ship defaults only in v1.8; customize later if users ask
+- [ ] Estimate templates / presets ("Bathroom refit starting estimate", "Boiler install starting estimate") — wait for usage to reveal the right presets
+- [ ] Customer counter-offer on estimate ("I'm thinking more like £800") — interesting signal but complicates the soft-response flow; validate need first
+- [ ] Estimate PDF export — deferred from v1.3 for quotes too; solve once for both documents in a later milestone
 
 ### Future Consideration (v2+)
 
-Features to defer until product-market fit is established.
+Defer until product-market fit is clear.
 
-- [ ] Multi-page marketing site -- only when SEO/content strategy exists
-- [ ] Product demo video -- only when product is stable enough to record
-- [ ] Interactive product tour -- only if checklist approach shows low activation
-- [ ] A/B testing on landing page -- only when traffic volume justifies it
+- [ ] Reporting on decline reasons (which uncertainty categories are lost most often, which jobs convert best) — feeds off structured data v1.8 captures, but dashboard is its own milestone
+- [ ] Calendar sync for "Book a site visit" — only if users demand it and the message-based flow proves insufficient
+- [ ] Electronic signatures — only if an enterprise customer asks, and only on quotes
+- [ ] Multi-currency estimates — already have GBP infra; revisit for non-UK expansion
 
-## Feature Prioritisation Matrix
+## Feature Prioritization Matrix
 
-| Feature | User Value | Implementation Cost | Priority | Depends On Existing |
-|---------|------------|---------------------|----------|---------------------|
-| Public landing page | HIGH | LOW | P1 | None (new route, no auth) |
-| Mandatory profile setup | HIGH | LOW | P1 | User MongoDB record |
-| Mandatory business setup | HIGH | LOW | P1 | Profile setup, existing business creation |
-| No-card trial activation | HIGH | MEDIUM | P1 | Business setup, Stripe customer, new API flow |
-| Mandatory onboarding guards | HIGH | MEDIUM | P1 | Profile + business completion state |
-| Hard paywall screen | HIGH | MEDIUM | P1 | Subscription state (existing Redux store) |
-| Welcome dashboard greeting | MEDIUM | LOW | P1 | Profile name, business exists |
-| Getting-started widget | MEDIUM | LOW | P1 | Existing widget pattern |
-| Remove old onboarding flow | MEDIUM | LOW | P1 | New onboarding complete |
-| Contextual trial-ending nudges | MEDIUM | LOW | P2 | Trial chip (existing) |
-| Trial-ending emails | MEDIUM | MEDIUM | P2 | Email infrastructure (existing), webhook event |
-| Landing page social proof | LOW | LOW | P3 | Real user testimonials |
-
-**Priority key:**
-- P1: Must have for v1.7 launch
-- P2: Should have, add in subsequent iteration
-- P3: Nice to have, future consideration
+| Feature | User Value | Implementation Cost | Priority |
+|---------|------------|---------------------|----------|
+| Document type toggle + E-YYYY-NNN numbering | HIGH | LOW | P1 |
+| Contingency slider + range / "From £X" display | HIGH | MEDIUM | P1 |
+| Non-binding legal language on template + page | HIGH | LOW | P1 |
+| Customer page via token (reuse v1.3) | HIGH | LOW | P1 |
+| Four-button soft response flow | HIGH | MEDIUM | P1 |
+| Structured decline reason taxonomy | MEDIUM | LOW | P1 |
+| Automated follow-up sequence (3/10/21d) | HIGH | MEDIUM | P1 |
+| Convert to Quote action | HIGH | MEDIUM | P1 |
+| Versioned revisions (invisible) + History section | MEDIUM | MEDIUM | P1 |
+| Uncertainty notes quick-tap chips | MEDIUM | LOW | P1 |
+| View tracking parity | MEDIUM | LOW | P1 |
+| Revise Estimate + Mark as Lost actions | MEDIUM | LOW | P1 |
+| Estimate email template with Maizzle | MEDIUM | LOW | P1 |
+| Estimate PDF export | MEDIUM | MEDIUM | P3 (defer with quotes) |
+| Trader follow-up cadence customization | LOW | MEDIUM | P2 |
+| Estimate templates/presets | LOW | LOW | P2 (wait for usage data) |
+| Calendar sync for site visits | LOW | HIGH | P3 (anti-feature for now) |
+| AI contingency suggestions | LOW | HIGH | P3 (anti-feature) |
 
 ## Competitor Feature Analysis
 
-### Landing Pages
+| Feature | Tradify | Jobber | ServiceM8 | YourTradebase | Powered Now | Fergus | Trade Flow v1.8 |
+|---------|---------|--------|-----------|---------------|-------------|--------|-----------------|
+| Estimate as distinct document type | **Nomenclature only** — Document Theme swap replaces "Quote" with "Estimate" in outgoing communications; internally still a quote | Nomenclature — "estimates" and "quotes" are interchangeable in docs | Nomenclature — quoting flow is the same | Listed as "quotes, estimates, and invoices" — separate UI, shared data | Not clearly separated | Not clearly separated ("quotes and estimates" grouped) | **True parallel type** with different semantics |
+| Price range / contingency | No | No | No | No | No | No | **Yes (slider)** |
+| "From £X" display | No | No | No | No | No | No | **Yes** |
+| Soft customer response (not binary accept/decline) | No — customer accepts/declines | No — accept/decline | No — accept/decline | No | No | No — accept/decline | **Yes (4 buttons)** |
+| Structured decline reasons | Free text | Free text | Free text | Free text | Unknown | Free text | **Enum taxonomy** |
+| Automated follow-up sequence | Manual reminders | Manual reminders | Manual reminders, some automation | Manual | Unknown | Manual | **Automated 3/10/21d** |
+| Convert estimate → quote | N/A (same object) | Request → Quote → Job conversion built-in | N/A (same object) | N/A (same object) | N/A | N/A | **Yes (explicit action)** |
+| Customer-facing online view | Yes (Tradify online quotes) | Yes | Yes | Yes | Yes | Yes | Yes (reuse v1.3) |
+| View tracking | Yes | Yes | Yes | Yes | Unknown | Unknown | Yes (reuse v1.3) |
+| Non-binding legal language | User's responsibility | User's responsibility | User's responsibility | User's responsibility | User's responsibility | User's responsibility | **Built into template** |
+| Versioned revisions | Limited — recreate or edit | Limited | Limited | Limited | Unknown | Limited | **Invisible revisions + History** |
+| Calendar integration for site visits | Yes (schedule) | Yes (calendar) | Yes (online booking) | Basic | Yes | Yes | **No — message-based** |
 
-| Feature | ServiceM8 | Tradify | Fergus | Jobber | Trade Flow Approach |
-|---------|-----------|---------|--------|--------|---------------------|
-| Hero headline | "Smart software for contractors & services" | "Job Management Software for Trades" | "Job management software built for tradies" | "Run a stronger service business" | Trade-specific: "Run your trade business from first call to final payment" |
-| Primary CTA | "Free Trial" button | "Try Free" | Multi-step trial form | "Start Free Trial" | "Start Free Trial - No card required" |
-| Social proof | "$35B in jobs managed", Xero award | Customer logos | Xero/Google/G2 logos, testimonials | "29M+ jobs", app store ratings, testimonials | Metrics when available, trade-specific trust signals |
-| Pricing display | 5 tiers (Free to Premium Plus) | Single page link | 2 plans (GBP 53-75/month) | 3 plans ($39-599/month) | Single plan: GBP 6/month. Radical simplicity. |
-| Feature sections | Bulleted list | Feature pages | Interactive tabs (5 categories) | 4 benefit sections with testimonials | 3-5 feature cards with screenshots |
-| Industry targeting | Generic "contractors & services" | Trade-specific pages per industry | Industry cards (Plumbers, Electricians, etc.) | 50+ industry pages | Mention 3-4 core trades in hero copy. Industry pages deferred. |
+**Takeaway:** Across every axis that matters to a UK sole trader doing pre-site-visit estimates, competitors either do not differentiate at all (document type, price range, soft responses, follow-ups, legal language) or over-engineer features the solo operator doesn't need (full calendar sync, online booking widgets). Trade Flow has a clear wedge: treat the pre-site-visit stage as a genuinely different workflow, not a word-swap.
 
-### Onboarding
+## UK Legal Context
 
-| Feature | ServiceM8 | Tradify | Fergus | Jobber | Trade Flow Approach |
-|---------|-----------|---------|--------|--------|---------------------|
-| Trial length | 14 days, no card | 14 days, no card | 14 days, no card | 14 days, no card | 30 days, no card. Longer trial = more time to build habit. |
-| Signup friction | Email only | Email only | Email + reCAPTCHA | Email + business type | Email (Firebase) then profile + business in-app |
-| Setup guidance | Videos, articles, partner support | Free 1-on-1 onboarding session | Guided Job Card Tour with example data | Onboarding specialists, intuitive setup | Mandatory 2-step wizard + getting-started checklist |
-| Time to app access | Minutes (self-serve) | Minutes (self-serve) | Minutes (self-serve) | Minutes (self-serve) | Under 60 seconds (2 form steps only) |
-| Post-setup guidance | Help centre, videos | Phone support, training | Product walkthroughs | Support team | Getting-started checklist on dashboard |
+UK sources consistently draw the quote/estimate line the same way:
 
-### Paywall / Subscription
+- **Quote = legally binding contract.** Under the Consumer Rights Act 2015 and English common law, a written quote that is accepted by the customer forms a binding agreement. The tradesperson cannot then raise the price unless both parties agree in writing.
+- **Estimate = non-binding guide price.** The Dispute Resolution Ombudsman explicitly frames it this way: "an estimate is a rough guide to how much the work will cost. It is not a fixed price and can change."
+- **Language matters in disputes.** Ralli Solicitors note that courts look at how the document was worded and presented when deciding if a binding contract formed. Labelling a document "estimate" while listing a single fixed price and an accept button arguably creates a quote regardless of the label.
+- **Consumer Rights Act 2015 clarity requirement.** Requires pricing and terms to be clear and fair; both quotes and estimates must not mislead. A "from £X" or range display must not hide material costs the trader already knows about.
 
-| Feature | ServiceM8 | Tradify | Fergus | Jobber | Trade Flow Approach |
-|---------|-----------|---------|--------|--------|---------------------|
-| Post-trial behaviour | Locks out | Locks out | Locks out | Locks out | Hard paywall (full-screen block) |
-| Price point | Free tier + paid from ~$9/month | ~GBP 29/user/month | GBP 53-75/month | $39-599/month | GBP 6/month. Significant undercut. |
-| Payment method collection | During/after trial | After trial | After trial | After trial | Stripe Billing Portal (add when ready) |
-| Data on expiry | Preserved | Preserved | Preserved | Preserved | Preserved. Messaging: "Your data is safe." |
+### Required legal language (suggested defaults for Trade Flow templates)
 
-## Key Implementation Notes
+On the customer-facing estimate page and in the email body, include at minimum:
 
-### Stripe No-Card Trial API (verified against official docs)
+> This is an estimate — a guide price for the work described. It is not a fixed quote and does not form a binding contract. The final cost may be higher or lower once we have inspected the work. We will confirm the final price in a formal quote before starting.
 
-The existing Stripe Checkout flow (v1.6) creates trials with card required. The new flow replaces this:
+This pattern aligns with Citizens Advice and Ombudsman guidance. Trade Flow defaults this copy in the Maizzle template; the trader can edit it but at their own risk. Consider a small inline note in settings warning against removing the legal disclaimer.
 
-1. **Create subscription directly via API** (not Checkout) with `trial_period_days: 30` and no payment method
-2. Set `trial_settings.end_behavior.missing_payment_method: 'cancel'` -- subscription auto-cancels if no card added by trial end
-3. Set `payment_settings.save_default_payment_method: 'on_subscription'` -- when user adds card via Billing Portal, it attaches to subscription
-4. Webhook `customer.subscription.trial_will_end` fires 3 days before trial ends -- use for nudge notifications
-5. Webhook `customer.subscription.deleted` fires when trial ends without card -- triggers hard paywall
+## Contingency Percentage Evidence
 
-**Existing webhook handlers (v1.6) already process `customer.subscription.created`, `customer.subscription.updated`, and `customer.subscription.deleted`** -- the no-card flow generates the same events. Main change is subscription creation moves from Checkout redirect to server-side API call during onboarding.
+Research sources (US-dominant but broadly applicable):
 
-### Landing Page Routing
+- **Construction general:** 10-25% contingency is the recommended industry range, adjusted to the age and condition of the property (Ultimate Calculators plumbing guide).
+- **Plumbing specifically:** 10-15% is typical, reaching 25% for older properties or renovations with unknowns (Simpro, Housecall Pro, Bookipi templates).
+- **Residential repair:** 5-10% for simpler repair jobs where the scope is mostly visible (FreshBooks).
+- **Diagnostic jobs:** A different pricing model entirely — fixed diagnostic fee (e.g., £75-£150 plus first hour) rather than a range, because the uncertainty is "we don't know what's wrong yet" not "we don't know how long it'll take."
 
-The landing page must be the root route (`/`) for unauthenticated users. Authenticated users hitting `/` should redirect to `/dashboard`. This is a routing concern, not a new app -- the landing page lives in the same React app but renders outside the authenticated layout.
+**Trade Flow implementation:**
 
-### Onboarding State Machine
+- Slider range: **0-30% in 5% steps** (0% allows the trader to send a plain estimate with no buffer; 30% handles worst-case renovations; 5% steps keep it fast to adjust on mobile).
+- Default: **10%** (middle of the plumbing range, safe starting point for most jobs).
+- Display modes:
+  - **Range** ("£900 – £1,100"): use when base price and upper bound are both meaningful.
+  - **"From £X"**: use when the trader genuinely doesn't know the ceiling — diagnostic, fault-finding, investigative work. The lower bound is the minimum; the upper bound is undefined until inspection.
+- The trader chooses the display mode per estimate; don't try to infer it.
 
-The onboarding flow is a linear progression: Profile -> Business -> Trial -> Dashboard. State can be derived from data existence (has user name? has business? has subscription?) rather than a separate flag. This avoids a new onboarding state field and leverages existing data.
+**Confidence:** MEDIUM. US sources dominate the numbers, and UK sole traders are a tighter market segment than the commercial/residential new-build industry the sources describe. The 10-25% band is likely correct; exact trade-by-trade defaults are not worth pre-setting in v1.8.
+
+## Follow-up Cadence Evidence
+
+Sales cadence research (not trade-specific, but the psychology transfers):
+
+- **31.5% of replies come from the first follow-up** (Yesware, Belkins 2025 study).
+- **~50% of sales require 5+ follow-ups**, but ~44% of reps give up after one (multiple sources).
+- **Optimal spacing:** 2-3 business days for the first follow-up, then extending to 4-7 days for subsequent touches. Fibonacci-style spacing (Day 1, 3, 10, 17, 31) is a common recommendation.
+- **Three-week total window** is the most effective range for B2B sales cadences.
+
+**Trade Flow implementation: 3 / 10 / 21 days** from the Sent date.
+
+- **Day 3** — gentle nudge ("Just checking you saw the estimate"). Matches the 2-3 business day first-follow-up recommendation.
+- **Day 10** — value reframe ("Happy to answer questions or book a site visit"). Matches the 7-10 day second touch in Fibonacci-style cadences.
+- **Day 21** — final check-in ("If the timing isn't right, no worries — just let me know so I can free up the slot"). Matches the ~3 week window for B2B cadence effectiveness.
+
+After Day 21, auto-transition to **Expired** (configurable default, user can extend). Cancellation of remaining jobs must happen on: customer response (any of the 4 buttons), tradesperson marks as Lost, tradesperson revises (reset cadence from new Sent date), tradesperson converts to Quote.
+
+**Confidence:** MEDIUM. The data is from B2B SaaS sales cadence research, not UK trade-to-homeowner communications. Three-week total and three-touch structure are defensible defaults; adjust based on user feedback post-launch. Avoid over-promising "research-backed" — the research backs the *structure*, not the *exact days*.
+
+## Decline Reason Taxonomy
+
+Based on CRM lost-deal taxonomy research (HubSpot, Zendesk, Petavue) adapted to the trade context:
+
+**Proposed enum for Trade Flow:**
+
+1. **Too expensive** — customer cites price as the reason. Captures price-sensitivity signal.
+2. **Going with another trader** — lost to competitor. Captures competitive pressure.
+3. **Not the right time** — timing mismatch (moving house, wrong season, budget cycle). Deal is alive later.
+4. **Decided not to do the work** — customer abandoned the project itself, not just the trader.
+5. **Work out of scope** — trader or customer realised it's not the right fit (specialist work, access issues, out of area).
+6. **Other** — free text, for everything else.
+
+Why this taxonomy:
+
+- **Five structured + one "other"** matches the "four or five specific categories" guideline from sales CRM research.
+- **Each category maps to a different business action:** "Too expensive" → pricing review; "Going with another trader" → differentiation work; "Not the right time" → re-engagement cadence later; "Decided not to do the work" → no action; "Work out of scope" → process improvement.
+- **Avoids overlap** (HubSpot research warns about ambiguous categories making filtering unreliable).
+- **Feeds the future reporting milestone** — structured data from day one means the dashboard can be built later without data migration.
+
+Customers see these as four or five short radio-button labels on the "Not right now" flow. Traders see structured reasons in the estimate detail and (future) in the pipeline dashboard.
+
+## Site Visit Booking Approach (Message-Based, Not Calendar Sync)
+
+Research shows every serious online-booking product for trades (BUILT Booking, Nabooki, Tradease, SimplyBook, Acuity) is itself a full product, priced £15-£200/month. Two-way calendar sync with Google/Outlook involves OAuth, timezone handling, stale-slot invalidation, and notification loops. **This is a multi-milestone effort if built properly, and a footgun if built partially.**
+
+**Trade Flow v1.8 approach — capture the request, not the booking:**
+
+- Customer clicks "Book a site visit" on the estimate page.
+- Form asks: "When's good for you?" with either free text ("weekday afternoons next week") or a simple multi-select of the next 10 working days.
+- Submits a **SiteVisitRequest** row attached to the estimate.
+- Trader is notified by email (reuse Resend transactional path).
+- Trader manually creates a v1.0 schedule entry on the related job (or creates a new job if the estimate isn't linked yet).
+- Estimate status transitions to **Site Visit Requested**.
+- Follow-up sequence cancels.
+
+This gives the trader full control (which is what sole operators want — see Powered Now user research in other sources), avoids the calendar-sync rabbit hole, and leverages the already-shipped v1.0 schedule feature. **Users who demand real calendar sync in the future can get it in a dedicated calendar-integration milestone.**
+
+## View Tracking and UK PECR/GDPR Considerations
+
+Existing v1.3 quote feature tracks `firstViewedAt` via the customer visiting the token URL (server-side page-load event). **This is the right approach for v1.8 as well.**
+
+**Why not an email tracking pixel?**
+
+- PECR (the UK Privacy and Electronic Communications Regulations) and UK GDPR together require notice and, in many cases, consent for tracking pixels in emails.
+- ICO guidance and DMA Email Council guidance both flag tracking pixels as requiring recipient awareness.
+- EU EDPB guidelines go further, treating pixels as requiring informed consent.
+- Risk for a sole trader SaaS is low but non-zero; the user's customers are UK consumers, so UK GDPR applies.
+- The link-click approach Trade Flow already uses is on stronger legal footing because the customer actively clicks a link — no hidden tracking.
+
+**Recommendation:** Keep the v1.3 pattern unchanged. `firstViewedAt` = timestamp when customer first loads the token URL. Document the mechanism in the privacy policy. **Do not add a hidden email tracking pixel in v1.8.** This is called out in PITFALLS.md as well.
+
+**Confidence:** MEDIUM-HIGH on the regulatory interpretation; HIGH on the recommendation (avoid the risk when the existing approach already works).
+
+## Dependencies on Existing Trade Flow Infrastructure
+
+| Existing Capability | Used For | Source |
+|---------------------|----------|--------|
+| Line item schema and bundles | Estimate line items (shared data model) | v1.2 |
+| Atomic counter collection pattern | `estimate_counters` for E-YYYY-NNN | v1.2 (quote_counters) |
+| Token-based public access | Customer-facing estimate page | v1.3 |
+| `QuoteSessionAuthGuard` | Generalise to `EstimateSessionAuthGuard` | v1.3 |
+| Resend SDK + Maizzle | Estimate email delivery | v1.3 |
+| First-view tracking | Estimate view tracking | v1.3 |
+| Rich text editor for templates | Estimate email template settings | v1.3 (Tiptap) |
+| BullMQ delayed jobs | Follow-up cadence scheduler | v1.4 + v1.6 (Stripe webhooks) |
+| Schedule entries on jobs | Output target for site visit requests | v1.0 |
+| Trade-specific defaults on business creation | Default estimate email template | v1.0/v1.7 pattern |
+| `@SkipSubscriptionCheck` decorator | Public estimate endpoints | v1.7 |
+
+**Net new infrastructure:**
+
+- `estimate` entity with document-type discriminator + contingency fields
+- `estimate_counters` atomic counter collection
+- `EstimateSettings` module (cloned from QuoteSettings)
+- Follow-up cadence BullMQ processor
+- `SiteVisitRequest` entity + controller
+- Structured decline reason enum
+- Maizzle estimate template with non-binding legal copy
+- Convert-to-quote service + back-link fields on Quote entity
+
+Approximate split: **70% reuse of existing v1.2-v1.7 infrastructure, 30% net new code.** This is a mid-sized milestone — smaller than v1.7 onboarding, comparable to v1.3 quote sending.
 
 ## Sources
 
-- [ServiceM8 Landing Page](https://www.servicem8.com) -- live site analysis, 2026-03-31
-- [ServiceM8 Free Trial](https://www.servicem8.com/register) -- registration page
-- [Tradify Pricing](https://www.tradifyhq.com/pricing) -- 14-day no-card trial
-- [Tradify Signup](https://go.tradifyhq.com/signup/) -- registration flow
-- [Fergus Landing Page](https://fergus.com/) -- live site analysis, 2026-03-31
-- [Fergus Signup](https://fergus.com/signup/) -- registration page
-- [Jobber Landing Page](https://www.getjobber.com) -- live site analysis, 2026-03-31
-- [Jobber Pricing](https://www.getjobber.com/pricing/) -- plan comparison
-- [Stripe Free Trials Documentation](https://docs.stripe.com/billing/subscriptions/trials/free-trials) -- official API docs for no-card trials (HIGH confidence)
-- [Stripe Trial Configuration](https://docs.stripe.com/billing/subscriptions/trials) -- trial_settings.end_behavior parameter
-- [SaaS Free Trial Conversion Statistics 2025](https://www.amraandelma.com/free-trial-conversion-statistics/) -- 18-25% opt-in vs ~49% opt-out conversion rates
-- [SaaS Onboarding Best Practices 2025](https://productled.com/blog/5-best-practices-for-better-saas-user-onboarding) -- checklist patterns, time-to-value benchmarks
-- [Hard Paywall vs Soft Paywall](https://www.revenuecat.com/blog/growth/hard-paywall-vs-soft-paywall/) -- RevenueCat analysis, conversion trade-offs
-- [Airtable Onboarding Wizard](https://www.candu.ai/blog/airtables-best-wizard-onboarding-flow) -- 20% activation lift from wizard approach
+### Competitor Analysis
+- [Sending an Estimate instead of a Quote — Tradify Help Centre](https://help.tradifyhq.com/hc/en-us/articles/22034309269785-Sending-an-Estimate-instead-of-a-Quote) — confirms Tradify treats estimates as nomenclature-only relabel via Document Themes
+- [Create an Estimate — Tradify Help Centre](https://help.tradifyhq.com/hc/en-us/articles/15070931267609-Create-an-Estimate)
+- [Converting a Request to a Quote or Job — Jobber Help Center](https://help.getjobber.com/hc/en-us/articles/360056871013-Converting-a-Request-to-a-Quote-or-Job)
+- [Quoting for Work — ServiceM8](https://www.servicem8.com/us/articles/quoting-for-work-write-winning-job-estimates)
+- [YourTradebase Features — Capterra UK](https://www.capterra.co.uk/software/140632/yourtradebase)
+- [Fergus Job Management Software](https://fergus.com/)
+- [ServiceM8 vs Tradify vs Jobber comparison — tpsTech](https://tpstech.au/blog/service-scheduling-software-showdown-servicem8-vs-tradify-vs-jobber/)
+
+### UK Legal Context
+- [Difference Between a Quote and Estimate: UK Legal Guide — Go Legal AI](https://go-legal.ai/difference-between-a-quote-and-estimate-uk-legal-guide/)
+- [Estimates and Quotations — Ralli Solicitors LLP](https://ralli.co.uk/estimates-and-quotations/)
+- [What's the Difference Between a Quote and Estimate — MyJobQuote](https://www.myjobquote.co.uk/tradesadvice/difference-between-quote-and-estimate)
+- [Dispute Resolution Ombudsman — Estimate vs Quotation](https://www.disputeresolutionombudsman.org/blogs/q-what-is-the-difference-between-and-estimate-and-a-quotation-and-why-is-it-important)
+- [Quotes and estimated prices in UK — Admintech](https://admintech.uk/services-and-works/fixed-price-estimated-price-and-fee-quote/)
+- [Zoopla — Quotes from tradespeople guide](https://www.zoopla.co.uk/discover/improving-a-home/quotes-from-tradespeople-everything-you-need-to-know/)
+
+### Contingency Percentages
+- [Plumbing Cost Calculator — Ultimate Calculators](https://ultimatecalculators.com/calculator/plumbing-cost-calculator/)
+- [Plumbing Estimate Template — Simpro](https://www.simprogroup.com/blog/plumbing-estimate-template)
+- [2026 Plumbing Price Guide — Housecall Pro](https://www.housecallpro.com/resources/marketing/how-to/how-to-price-plumbing-jobs/)
+- [Plumbing Cost Estimator — FreshBooks](https://www.freshbooks.com/hub/estimates/plumbing-estimate)
+- [How to Price Plumbing Jobs — Jobber Academy](https://www.getjobber.com/academy/plumbing/how-to-price-a-plumbing-job/)
+
+### Diagnostic Fee Model (for "From £X" use case)
+- [Free Estimate vs Diagnostic Fee — ABQ Plumbing](https://www.abqplumb.com/free-estimate-vs-diagnostic-fee/)
+- [Perfect Diagnostic Dispatch Fee — ServiceTitan](https://www.servicetitan.com/field-service-management/perfect-diagnostic-fee)
+- [London Heating Expert pricing](https://www.londonheating.expert/pricing) — UK example of diagnostic-fee-plus-hourly model
+
+### Follow-up Cadence Research
+- [Sales Follow-Up Statistics 2025 — Belkins](https://belkins.io/blog/sales-follow-up-statistics)
+- [Sales Follow-Up Statistics — Yesware](https://www.yesware.com/blog/sales-follow-up-statistics/)
+- [Email Cadence Best Practices — Outreach](https://www.outreach.ai/resources/blog/email-cadence)
+- [Sales Cadence Playbook — Instantly](https://instantly.ai/blog/sales-follow-up-cadence-playbook/)
+- [What Is a Sales Follow-Up Email — Apollo](https://www.apollo.io/insights/sales-follow-up-email)
+
+### CRM Lost-Deal Taxonomy
+- [What is Closed Lost — DealHub](https://dealhub.io/glossary/closed-lost/)
+- [Uncovering 9 Closed Lost Reasons — The Sales Blog](https://www.thesalesblog.com/blog/uncovering-9-closed-lost-reasons-winning-sales-strategies)
+- [Creating deal loss reasons — Zendesk](https://support.zendesk.com/hc/en-us/articles/4408828162330-Creating-and-using-deal-loss-reasons)
+- [Closed-Lost stage in sales pipeline — HubSpot Community](https://community.hubspot.com/t5/Tips-Tricks-Best-Practices/Closed-lost-stage-in-sales-pipeline/m-p/949918)
+
+### PECR / UK GDPR / Tracking Pixels
+- [ICO — Direct marketing guidance](https://ico.org.uk/for-organisations/direct-marketing-and-privacy-and-electronic-communications/guidance-on-direct-marketing-using-electronic-mail/what-else-do-we-need-to-consider/)
+- [DMA Email Council on Tracking Pixels](https://dma.org.uk/article/dma-email-council-understanding-email-tracking-pixels)
+- [PECR overview — Sprintlaw UK](https://sprintlaw.co.uk/articles/pecr-privacy-and-electronic-communications-in-the-uk/)
+- [GDPR Email Marketing UK — Data Protection Network](https://dpnetwork.org.uk/electronic-communications/)
+
+### Calendar / Site Visit Booking (anti-feature research)
+- [BUILT Booking](https://www.builtfortrades.co.uk/services/built-booking)
+- [Tradease](https://www.tradease.uk)
+- [Nabooki trade booking](https://www.nabooki.com/booking-system/commercial-trade-services/)
+- [Online Booking System Cost Comparison — Sitethreesixty](https://sitethreesixty.com/us/booking-system-comparison)
+
+### Document Versioning Patterns
+- [Document Version Control — Accruent](https://www.accruent.com/resources/blog-posts/document-version-control-101-everything-you-need-know)
+- [Construction document versioning — PMWeb](https://pmweb.com/understanding-the-difference-between-versions-and-revisions-in-issued-for-construction-ifc-drawings/)
 
 ---
-*Feature research for: SaaS onboarding, landing page, no-card trial, hard paywall (trade management domain)*
-*Researched: 2026-03-31*
+*Feature research for: Trade Flow v1.8 Estimates*
+*Researched: 2026-04-10*
+*Confidence: MEDIUM-HIGH — Competitor behaviour and UK legal framing HIGH; cadence and contingency percentages MEDIUM (adapted from US/sales sources)*

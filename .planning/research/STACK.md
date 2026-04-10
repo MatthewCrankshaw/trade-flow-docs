@@ -1,318 +1,373 @@
-# Stack Research
+# Technology Stack — v1.8 Estimates
 
-**Domain:** Onboarding overhaul, public landing page, no-card Stripe trial, hard paywall
-**Researched:** 2026-03-31
-**Confidence:** HIGH
+**Project:** Trade Flow
+**Milestone:** v1.8 Estimates (subsequent milestone — brownfield)
+**Researched:** 2026-04-10
+**Overall confidence:** HIGH
 
----
+## Summary
 
-## Recommended Stack Additions
+**Zero net-new runtime dependencies are required for v1.8 Estimates.** Every capability the milestone needs — delayed BullMQ jobs, a slider UI primitive, self-referential Mongoose documents, and range-formatted money display — is already satisfied by libraries installed in v1.4 (worker infrastructure) or the existing Radix UI meta package. The work is pattern-level, not dependency-level.
 
-### Frontend -- New Libraries
+This document's job is therefore to (1) confirm existing versions cover the new use cases, (2) surface the specific BullMQ APIs that must be used for the new delayed-follow-up feature, and (3) explicitly recommend **against** three tempting additions (a cron library, a fresh slider package, a money formatting helper library).
 
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| motion | 12.x | Landing page scroll animations, section reveals, hero transitions | Successor to Framer Motion (rebranded 2025). Declarative React API (`<motion.div>`), built-in scroll-linked animations on native ScrollTimeline for hardware acceleration. 30M+ monthly npm downloads. Import from `motion/react`. |
-| react-intersection-observer | 10.x | Trigger animations when landing page sections scroll into view | Lightweight (2KB) React hook wrapping native IntersectionObserver API. Pairs with Motion's `whileInView` or standalone `useInView` hook for lazy reveal triggers. |
+## Recommended Stack — Changes for v1.8
 
-### Frontend -- No New Libraries Needed
+**Summary: no additions.** The tables below enumerate existing libraries that the new estimates feature will lean on, with confirmation that their currently-installed versions are sufficient.
 
-| Capability | Existing Solution | Why No Addition |
-|------------|-------------------|-----------------|
-| Routing (public vs auth vs onboarding) | react-router-dom 7.13.0 | Already supports layout routes, loaders, and route-level guards. Add new route groups -- no new package. |
-| Wizard/stepper UI | Radix UI primitives + custom state | Two-step onboarding (profile + business) is trivial with React state. A stepper library adds more weight than value for 2 steps. |
-| Form validation | react-hook-form 7.71.1 + valibot 1.2.0 | Existing form stack handles profile and business setup forms. |
-| Toast notifications | sonner 2.0.7 | Existing toast system for success/error feedback during onboarding. |
-| Icons | lucide-react 0.563.0 | Landing page icons (features section, CTAs) covered by existing icon set. |
-| Styling/layout | Tailwind CSS 4.1.18 | Landing page layout, responsive design, dark/light all handled by existing utility classes. |
+### Backend (trade-flow-api) — Reused Libraries
 
-### Backend -- No New Libraries Needed
+| Library | Installed Version | v1.8 Use | Why Sufficient |
+|---------|-------------------|----------|----------------|
+| `bullmq` | 5.71.0 (from v1.4) | Delayed follow-up jobs (3/10/21 days) | `Queue.add()` accepts a `delay` option (milliseconds) in `JobsOptions` — this is the native primitive for scheduled-in-the-future jobs. No cron/scheduler library needed. |
+| `@nestjs/bullmq` | 11.0.4 (from v1.4) | Register new `estimate-follow-up` queue; inject into `QueueProducer` | Same `BullModule.registerQueue()` + `@InjectQueue()` pattern already proven for the echo queue (v1.4) and Stripe webhook queue (v1.6). |
+| `ioredis` | 5.10.1 (from v1.4) | Underlying Redis driver for the delayed set | Already configured with `maxRetriesPerRequest: null` (BullMQ requirement). No changes needed. |
+| `mongoose` | 9.1.5 | Self-referential `parentEstimateId` + `revisionNumber` on Estimate entity | Mongoose supports self-referential `ObjectId` refs natively. Compound index `{ rootEstimateId: 1, revisionNumber: -1 }` will make "latest revision" queries O(log n). |
+| `mongodb` (driver) | 7.0.0 | `estimate_counters` atomic counter collection | Same atomic `findOneAndUpdate({ $inc })` pattern already used by `quote_counters` in v1.2. |
+| `dinero.js` | 1.9.1 | Computing `low = base` and `high = base * (1 + contingency)` for range display (API side) | v1 API has `multiply()` and `percentage()` — sufficient for the contingency math. |
+| `luxon` | 3.5.1 | Computing the three delay offsets (`DateTime.now().plus({ days: 3 })`) and storing scheduled-at timestamps | Luxon `plus({ days })` is the idiomatic way. Already standardized across all DTOs (v1.6). |
+| `class-validator` | 0.14.1 | Validating contingency range (0–30, integer) in Estimate DTOs | `@IsInt()`, `@Min(0)`, `@Max(30)` — existing decorators. Step-of-5 enforced at UI; API accepts any 0–30 integer defensively. |
+| Resend SDK (via `EmailModule`) | v1.3 | Sending follow-up emails via existing EmailModule | `EmailService.sendEmail()` already wraps Resend; the follow-up processor will call it the same way the quote-sent and quote-accepted emails do. |
 
-| Capability | Existing Solution | Why No Addition |
-|------------|-------------------|-----------------|
-| Stripe no-card trial | stripe SDK 21.x (already installed) | Direct Subscription API with `trial_period_days` + `trial_settings.end_behavior.missing_payment_method`. No new Stripe packages. |
-| Webhook handling | BullMQ + existing StripeWebhookProcessor | Same webhook pipeline from v1.6 handles `customer.subscription.created` event for API-created trials. |
-| User profile updates | Existing UserModule services | Profile name field update is a standard PATCH operation. |
-| Business creation | Existing BusinessCreator service | Mandatory business setup reuses existing creation flow with simplified inputs. |
+### Frontend (trade-flow-ui) — Reused Libraries
 
----
+| Library | Installed Version | v1.8 Use | Why Sufficient |
+|---------|-------------------|----------|----------------|
+| `radix-ui` (meta) | 1.4.3 | Contingency slider (0–30% in 5% steps) | The meta `radix-ui` package re-exports **all** Radix primitives including `Slider`. **No separate `@radix-ui/react-slider` install is needed.** Import path: `import { Slider } from "radix-ui"`. The primitive accepts `min`, `max`, `step`, and `value`/`onValueChange` — exactly what the contingency UX needs. Tick-mark labels are rendered by the consumer (absolutely positioned divs over the track), not by Radix. |
+| `dinero.js` | 2.0.0-alpha.14 | "From £X" and "£X – £Y" range display | Existing `formatCurrency` helper in `src/lib/` already uses v2 Dinero; the new `formatRange(low, high)` helper composes two calls. No new formatting library. |
+| `react-hook-form` + `valibot` | 7.71.1 / 1.2.0 | Estimate creation form (document type toggle, base price, contingency, display mode) | Existing form stack handles conditional fields fine. New `estimateSchema.ts` alongside `quoteSchema.ts` in `src/lib/forms/schemas/`. |
+| `@reduxjs/toolkit` (RTK Query) | 2.11.2 | New `estimatesApi` slice + `publicEstimateApi` (mirror of `publicQuoteApi`) | Same slice pattern already used for quotes. |
+| `sonner` | 2.0.7 | Follow-up scheduling confirmation toasts | Existing toast system. |
+| `luxon` | (standardized v1.6) | UI-side "scheduled for" display, countdown helpers | Already standardized across UI. |
 
-## Core Technologies (Detail)
+## Explicit Non-Additions (What NOT To Install)
 
-### 1. Motion (animation library) -- Frontend
+This section is as important as the inclusions — it prevents scope creep and accidental duplication.
 
-**Package:** `motion` (NOT `framer-motion` -- legacy name, no longer maintained)
-**Import:** `from "motion/react"`
-**Version:** 12.x (latest 12.38.0 as of 2026-03-31)
+| Tempting Addition | Why NOT | Use Instead |
+|-------------------|---------|-------------|
+| `node-cron`, `agenda`, `@nestjs/schedule` | BullMQ **already handles** time-deferred execution via the `delay` option. A cron library would add a second scheduling system competing with BullMQ for the same "fire at time T" responsibility. Pitfall: duplicated, harder-to-reason-about scheduling. | `await queue.add(jobName, payload, { delay: millisUntilFire, jobId: stableKey })` |
+| `@radix-ui/react-slider` (standalone) | The project already imports Radix primitives from the unified `radix-ui@1.4.3` meta package (shadcn/ui's February 2026 recommendation). Adding the standalone package would create a second source of the same component. | `import { Slider } from "radix-ui"` |
+| `numeral.js`, `accounting.js`, `currency.js` | `dinero.js` + its currency data are already in the UI; the existing `formatCurrency` utility covers all UK/GBP needs. A range formatter is two lines, not a new library. | Extend `src/lib/format-currency.ts` with `formatRange(low: Dinero, high: Dinero)` |
+| `mongoose-sequence`, `@typegoose/auto-increment` | v1.2 already solved atomic per-business counters with the hand-rolled `quote_counters` collection and `findOneAndUpdate({ $inc })`. Copy that exact pattern for `estimate_counters`. | Mirror `QuoteCounterRepository` as `EstimateCounterRepository` |
+| `rrule`, `later.js` | Follow-ups are fixed offsets (3, 10, 21 days), not recurring rules. No recurrence library needed. | Hard-code the offsets as a constant array. |
+| `ts-pattern`, `xstate` for status lifecycle | The existing quote-status transition pattern (enum + guard function) is enough. Introducing a state-machine library just for estimate statuses is over-engineering for eight states. | Mirror `quote-status-transition.utility.ts` as `estimate-status-transition.utility.ts` |
+| `mongoose-version`, `mongoose-history` | Plugin buries versioning logic. Hand-rolled `rootEstimateId` + `parentEstimateId` + `revisionNumber` (three fields) is ~20 lines and perfectly legible, and aligns with existing repo conventions. | See Pattern 2 below. |
 
-**Use cases in this milestone:**
-- Hero section fade-in and slide-up on page load
-- Feature cards stagger animation as they scroll into view
-- Pricing card hover/focus micro-interactions
-- Section reveal animations on scroll (paired with IntersectionObserver)
-- Smooth page transitions between landing and auth routes (optional, low priority)
+## Key Patterns for v1.8
 
-**Key APIs needed:**
-```typescript
-// Basic reveal animation
-import { motion } from "motion/react";
+### Pattern 1: BullMQ Delayed Follow-Up with Idempotency Key
 
-<motion.div
-  initial={{ opacity: 0, y: 20 }}
-  whileInView={{ opacity: 1, y: 0 }}
-  viewport={{ once: true, margin: "-100px" }}
-  transition={{ duration: 0.5 }}
->
-  <FeatureCard />
-</motion.div>
+**What:** Schedule the 3-day, 10-day, and 21-day follow-up emails at the moment an estimate is sent. Use stable `jobId`s so re-sending (or a revision reset) is idempotent and cancellable.
 
-// Stagger children
-<motion.div variants={containerVariants} initial="hidden" whileInView="visible">
-  {features.map((f) => (
-    <motion.div key={f.id} variants={itemVariants}>...</motion.div>
-  ))}
-</motion.div>
-```
+**Why:** BullMQ's `delay` option is the primitive for "run this job at a future time." Using `jobId` makes duplicates impossible (second `add()` with the same `jobId` is silently dropped by BullMQ), which is exactly the idempotency semantics we want. `removeOnComplete`/`removeOnFail` keeps the Redis delayed set from growing unboundedly.
 
-**Why Motion over alternatives:**
-- GSAP: Overkill for section reveals; imperative API clashes with React declarative patterns; commercial license for SaaS
-- CSS animations only: No scroll-linked timing, no stagger orchestration, verbose for coordinated sequences
-- react-spring: Less ecosystem momentum, weaker scroll animation support
-- No animation library: Landing pages without scroll animations feel static and unpolished; this is marketing surface
-
-**Bundle impact:** ~15KB gzipped for core React module. Tree-shakeable -- only imported APIs ship.
-
-### 2. react-intersection-observer -- Frontend
-
-**Package:** `react-intersection-observer`
-**Version:** 10.x (latest 10.0.3 as of 2026-03-31)
-
-**Why include when Motion has `whileInView`:**
-Motion's `whileInView` is sufficient for most cases. This package is a lightweight fallback for non-animated visibility triggers (lazy loading images, analytics section tracking, "currently visible" nav highlighting). Include only if landing page needs visibility-driven logic beyond animation triggers. **Optional -- evaluate during implementation.**
-
-### 3. Stripe Subscription API (no-card trial) -- Backend
-
-**Approach: Direct Subscription API, NOT Stripe Checkout**
-
-The v1.6 implementation uses Stripe Checkout (hosted page) with card collection for trial start. For no-card trials, there are two options:
-
-**Option A -- Stripe Checkout with `payment_method_collection: "if_required"` (REJECTED):**
-- Still redirects user to Stripe-hosted page
-- Page shows "Start trial" button with no card fields -- confusing empty page
-- Extra redirect away from the app and back
-- Poor UX for a trial that collects nothing
-
-**Option B -- Direct Subscription API (RECOMMENDED):**
-- Create subscription server-side via `stripe.subscriptions.create()`
-- No redirect, no Checkout page, instant trial activation
-- User stays in the app throughout onboarding
-- Stripe Customer created during onboarding, subscription created immediately after
-
-**API call pattern:**
-```typescript
-// Backend: SubscriptionCreator service
-const subscription = await this.stripe.subscriptions.create({
-  customer: stripeCustomerId,
-  items: [{ price: priceId }],
-  trial_period_days: 30,
-  payment_settings: {
-    save_default_payment_method: "on_subscription",
-  },
-  trial_settings: {
-    end_behavior: {
-      missing_payment_method: "cancel",
-    },
-  },
-});
-```
-
-**Key parameters:**
-| Parameter | Value | Purpose |
-|-----------|-------|---------|
-| `trial_period_days` | `30` | 30-day free trial |
-| `payment_settings.save_default_payment_method` | `"on_subscription"` | When user adds card later via Billing Portal, auto-attach to subscription |
-| `trial_settings.end_behavior.missing_payment_method` | `"cancel"` | Auto-cancel if no card added by trial end (user must re-subscribe) |
-
-**Webhook events to handle (same pipeline as v1.6):**
-- `customer.subscription.created` -- new event for API-created subscriptions (Checkout fires `checkout.session.completed` instead)
-- `customer.subscription.updated` -- trial ending, card added, status changes
-- `customer.subscription.deleted` -- trial expired with no card (auto-cancel)
-
-**Basil API note:** Same v2025-03-31.basil field paths apply. `current_period_end` at `items.data[0].current_period_end`.
-
-**Migration from v1.6 Checkout approach:**
-- Keep Checkout flow for re-subscription (user who canceled and wants to restart)
-- Add direct API flow for initial no-card trial during onboarding
-- Both flows feed into the same webhook processor and local subscription record
-- Existing `SubscriptionGuard` and paywall logic unchanged
-
-### 4. Routing Architecture -- Frontend
-
-**No new packages. React Router 7.x layout routes handle all three zones.**
-
-```
-Route Structure:
-/                          -- Public (no auth required)
-/login                     -- Public (no auth required)
-/signup                    -- Public (no auth required)
-
-/onboarding/profile        -- Auth required, no business required
-/onboarding/business       -- Auth required, no business required
-/onboarding/trial          -- Auth required, business required, no subscription
-
-/dashboard                 -- Auth + business + valid subscription required
-/customers                 -- Auth + business + valid subscription required
-/jobs                      -- Auth + business + valid subscription required
-/quotes                    -- Auth + business + valid subscription required
-/settings                  -- Auth + business + valid subscription required
-```
-
-**Guard layers (nested layout routes):**
+**Example (QueueProducer extension):**
 
 ```typescript
-// Route tree structure
-<Route element={<PublicLayout />}>        {/* No auth check */}
-  <Route path="/" element={<LandingPage />} />
-  <Route path="/login" element={<LoginPage />} />
-  <Route path="/signup" element={<SignupPage />} />
-</Route>
+// src/queue/services/queue-producer.service.ts -- new methods added for v1.8
+import { Injectable } from "@nestjs/common";
+import { InjectQueue } from "@nestjs/bullmq";
+import { Queue } from "bullmq";
+import { QUEUE_NAMES } from "@queue/queue.constant";
+import { AppLogger } from "@core/services/app-logger.service";
 
-<Route element={<AuthGuard />}>           {/* Requires Firebase auth */}
-  <Route element={<OnboardingGuard />}>   {/* Redirects if profile/business incomplete */}
-    <Route element={<SubscriptionGuard />}> {/* Hard paywall if no valid subscription */}
-      <Route element={<AppLayout />}>
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/customers" element={<CustomersPage />} />
-        {/* ... */}
-      </Route>
-    </Route>
-  </Route>
-  <Route path="/onboarding/*" element={<OnboardingWizard />} />
-</Route>
-```
+const FOLLOW_UP_OFFSETS_DAYS = [3, 10, 21] as const;
+const DAY_IN_MS = 24 * 60 * 60 * 1000;
 
-**Guard logic:**
-| Guard | Check | Redirect To |
-|-------|-------|-------------|
-| `AuthGuard` | Firebase user exists | `/login` |
-| `OnboardingGuard` | User has profile name AND business | `/onboarding/profile` or `/onboarding/business` |
-| `SubscriptionGuard` | Subscription status in `[trialing, active]` | Full-screen paywall (not a redirect -- renders blocking overlay) |
+@Injectable()
+export class QueueProducer {
+  private readonly logger = new AppLogger(QueueProducer.name);
 
-**Hard paywall pattern:**
-The v1.6 soft paywall intercepts write actions with a modal. The v1.7 hard paywall replaces the entire app shell with a blocking screen when subscription is invalid. This is a layout-level guard, not a per-action check.
+  constructor(
+    @InjectQueue(QUEUE_NAMES.ESTIMATE_FOLLOW_UP)
+    private readonly estimateFollowUpQueue: Queue,
+    // ...other queue injections
+  ) {}
 
-```typescript
-// SubscriptionGuard component (replaces soft modal approach)
-function SubscriptionGuard({ children }) {
-  const subscription = useAppSelector(selectSubscription);
-  const isValid = subscription?.status === "trialing" || subscription?.status === "active";
+  public async scheduleEstimateFollowUps(params: {
+    estimateId: string;
+    revisionNumber: number;
+  }): Promise<void> {
+    const { estimateId, revisionNumber } = params;
 
-  if (!isValid) {
-    return <PaywallScreen />;  // Full-screen block, not a modal
+    await Promise.all(
+      FOLLOW_UP_OFFSETS_DAYS.map((days) =>
+        this.estimateFollowUpQueue.add(
+          "follow-up",
+          { estimateId, revisionNumber, offsetDays: days },
+          {
+            // Stable, deterministic jobId: second call for the same
+            // (estimate, revision, offset) triple is a silent no-op.
+            jobId: `estimate-follow-up:${estimateId}:r${revisionNumber}:d${days}`,
+            delay: days * DAY_IN_MS,
+            removeOnComplete: { age: 60 * 60 * 24 * 7 }, // keep 7 days for audit
+            removeOnFail: { age: 60 * 60 * 24 * 30 },    // keep 30 days for triage
+            attempts: 3,
+            backoff: { type: "exponential", delay: 60_000 },
+          },
+        ),
+      ),
+    );
+
+    this.logger.log("Estimate follow-ups scheduled", { estimateId, revisionNumber });
   }
 
-  return <Outlet />;
+  public async cancelEstimateFollowUps(params: {
+    estimateId: string;
+    revisionNumber: number;
+  }): Promise<void> {
+    const { estimateId, revisionNumber } = params;
+    await Promise.all(
+      FOLLOW_UP_OFFSETS_DAYS.map(async (days) => {
+        const jobId = `estimate-follow-up:${estimateId}:r${revisionNumber}:d${days}`;
+        const job = await this.estimateFollowUpQueue.getJob(jobId);
+        if (job) await job.remove();
+      }),
+    );
+  }
 }
 ```
 
----
+**Reset-on-revision flow:**
+1. Revising an estimate bumps `revisionNumber` → new `jobId` namespace → new scheduled jobs.
+2. Before scheduling the new revision's jobs, call `cancelEstimateFollowUps()` for the previous `revisionNumber` to keep Redis clean.
+3. "Responded" / "Converted" / "Declined" / "Expired" transitions all call `cancelEstimateFollowUps()` for the active revision.
 
-## Installation
+**Worker-side defensive check (belt and braces):** The `EstimateFollowUpProcessor` should re-query the estimate and confirm (a) the estimate is still in a follow-up-worthy status and (b) `estimate.revisionNumber === job.data.revisionNumber` before sending. This handles races where cancellation and job execution overlap, and the case where `cancel` silently missed the job because BullMQ had already moved it from `delayed` to `active`.
 
-```bash
-# Frontend (trade-flow-ui)
-npm install motion
+**Sources:** [BullMQ — Delayed jobs](https://docs.bullmq.io/guide/jobs/delayed), [BullMQ — Auto-removal of jobs](https://docs.bullmq.io/guide/queues/auto-removal-of-jobs), existing v1.4 QueueProducer pattern.
 
-# Optional -- only if non-animation visibility triggers needed
-npm install react-intersection-observer
+### Pattern 2: Self-Referential Mongoose Versioning (Invisible to Users)
+
+**What:** An `Estimate` document has optional `parentEstimateId` (self-ref to immediate predecessor) and mandatory `revisionNumber` (integer, starts at 1). A "revision" is a new document whose `parentEstimateId` points to the previous revision and whose `rootEstimateId` points to the original root (denormalized for fast lookup).
+
+**Why invisible:** The UI shows a single logical estimate and calls "resend with changes" an edit. Internally we keep the old revision immutable for audit. The History collapsed section in the UI reads `findMany({ rootEstimateId }).sort({ revisionNumber: 1 })`.
+
+**Entity sketch:**
+
+```typescript
+// src/estimate/entities/estimate.entity.ts
+@Schema({ collection: "estimates", timestamps: true })
+export class EstimateEntity {
+  @Prop({ type: Types.ObjectId, ref: "EstimateEntity", default: null, index: true })
+  parentEstimateId: Types.ObjectId | null;
+
+  @Prop({ type: Types.ObjectId, ref: "EstimateEntity", required: true, index: true })
+  rootEstimateId: Types.ObjectId; // set to self._id on root creation, copied to all revisions
+
+  @Prop({ type: Number, required: true, default: 1, min: 1 })
+  revisionNumber: number;
+
+  // ... other fields (businessId, jobId, number, status, lineItems, basePriceAmount,
+  //                   contingencyPercent, displayMode, ...)
+}
+
+// Compound indexes:
+EstimateSchema.index({ rootEstimateId: 1, revisionNumber: -1 }); // "latest revision" query
+EstimateSchema.index({ parentEstimateId: 1 }); // optional chain walk for audit
+EstimateSchema.index({ businessId: 1, status: 1, updatedAt: -1 }); // list views
 ```
 
-```bash
-# Backend (trade-flow-api)
-# No new packages. Stripe SDK 21.x already installed.
+**Design decision — store BOTH `parentEstimateId` and `rootEstimateId`:**
+
+| Field | Purpose |
+|-------|---------|
+| `parentEstimateId` | Immediate predecessor for audit trail (History section shows chain) |
+| `rootEstimateId` | Fast "give me the latest revision of this logical estimate" query without chain walking |
+
+The cost is one extra indexed ObjectId per document. The benefit is that every list / detail / public-token fetch runs a single indexed query instead of a recursive lookup or `$graphLookup`.
+
+**Root creation:** When a root estimate is created, run a second write to set `rootEstimateId = self._id`. Cleaner alternative: use a Mongoose `pre('save')` hook to set `rootEstimateId` to `_id` if it's unset.
+
+**"Latest revision" repository method:**
+
+```typescript
+// EstimateRepository
+public async findLatestRevision(rootEstimateId: string): Promise<IEstimateDto | null> {
+  const doc = await this.model
+    .findOne({ rootEstimateId: new Types.ObjectId(rootEstimateId) })
+    .sort({ revisionNumber: -1 })
+    .exec();
+  return doc ? this.toDto(doc) : null;
+}
+
+public async findRevisionHistory(rootEstimateId: string): Promise<IEstimateDto[]> {
+  const docs = await this.model
+    .find({ rootEstimateId: new Types.ObjectId(rootEstimateId) })
+    .sort({ revisionNumber: 1 })
+    .exec();
+  return docs.map((d) => this.toDto(d));
+}
 ```
 
----
+**Public-token resolution note:** The public-facing URL should encode the `rootEstimateId` (or a token bound to it), not a specific revision ID. Customer always sees the latest revision. This mirrors v1.3's quote token pattern.
 
-## Alternatives Considered
+**Sources:** Mongoose self-reference uses a vanilla `ref` — see [Mongoose — Populate](https://mongoosejs.com/docs/populate.html). Existing v1.2 quote pattern for the repository and counter structure.
 
-| Recommended | Alternative | Why Not Alternative |
-|-------------|-------------|---------------------|
-| motion 12.x | GSAP + ScrollTrigger | Commercial license required for SaaS; imperative API; heavier bundle; overkill for section reveals |
-| motion 12.x | CSS @keyframes + IntersectionObserver | No orchestration (stagger, spring physics); verbose for coordinated sequences; no scroll-linked timing |
-| motion 12.x | react-spring | Smaller ecosystem; weaker scroll animation primitives; less community adoption |
-| motion 12.x | No animations | Landing page is marketing surface -- animations are expected table stakes for credibility |
-| Direct Stripe API | Stripe Checkout (if_required) | Unnecessary redirect to empty Checkout page; poor UX; user leaves app flow |
-| Direct Stripe API | Stripe Elements | Custom card form not needed -- no card collected at trial start |
-| Layout route guards | Per-page HOC wrappers | Layout routes are idiomatic React Router 7; centralized guard logic; less boilerplate |
-| Hard paywall (blocking screen) | Soft modal (v1.6 pattern) | Modal is dismissible; users can still navigate app without paying; hard gate enforces conversion |
+### Pattern 3: Radix Slider from the Unified `radix-ui` Package
 
-## What NOT to Use
+**What:** The contingency slider is a single-thumb Radix Slider with `min=0`, `max=30`, `step=5`, plus consumer-rendered tick labels.
 
-| Avoid | Why | Use Instead |
-|-------|-----|-------------|
-| framer-motion (package) | Legacy name; no longer maintained; redirects to motion | `motion` package, import from `motion/react` |
-| @stripe/stripe-js (frontend) | No frontend Stripe needed for no-card trial; Billing Portal handles card collection later | Server-side Stripe SDK only |
-| @stripe/react-stripe-js | Same reason -- no card elements in the UI for this milestone | Billing Portal link for adding payment method |
-| react-step-wizard / similar | Over-engineering for a 2-step onboarding flow | Local React state + conditional rendering |
-| Lottie / rive-react | Heavy animation runtimes for what are simple CSS-style transitions | Motion declarative animations |
-| AOS (animate-on-scroll) | jQuery-era library; no React integration; global side effects | Motion `whileInView` |
+**Why from the meta package:** The project's v1.7 STACK.md lists `radix-ui@1.4.3` (the unified meta package) alongside individual primitives. shadcn/ui's February 2026 changelog marks the unified package as the forward-compatible import path. Slider is available from this package today — **no new dependency install is needed.**
 
----
+**Example:**
 
-## Version Compatibility
+```tsx
+// src/features/estimates/components/ContingencySlider.tsx
+import { Slider } from "radix-ui"; // unified package, no new install
+import { cn } from "@/lib/utils";
 
-| Package | Compatible With | Notes |
-|---------|-----------------|-------|
-| motion@12.x | React 19.x | Full React 19 support confirmed; uses React concurrent features |
-| motion@12.x | Vite 7.x | ESM-native; no special Vite config needed |
-| motion@12.x | Tailwind CSS 4.x | Motion handles transforms/opacity; Tailwind handles layout/colors; no conflicts |
-| react-intersection-observer@10.x | React 19.x | Hook-based; no class component dependencies |
-| stripe@21.x | API 2025-03-31.basil | Already pinned in v1.6; same SDK handles direct subscription creation |
+interface ContingencySliderProps {
+  value: number;             // 0..30 (percent)
+  onChange: (value: number) => void;
+}
 
----
+const TICKS = [0, 5, 10, 15, 20, 25, 30] as const;
 
-## Integration Points
+export function ContingencySlider({ value, onChange }: ContingencySliderProps) {
+  return (
+    <div className="w-full">
+      <Slider.Root
+        className="relative flex h-5 w-full touch-none select-none items-center"
+        min={0}
+        max={30}
+        step={5}
+        value={[value]}
+        onValueChange={([next]) => onChange(next)}
+      >
+        <Slider.Track className="relative h-1.5 w-full grow rounded-full bg-muted">
+          <Slider.Range className="absolute h-full rounded-full bg-primary" />
+        </Slider.Track>
+        <Slider.Thumb
+          aria-label="Contingency percent"
+          className="block h-5 w-5 rounded-full border-2 border-primary bg-background shadow focus:outline-none focus:ring-2 focus:ring-ring"
+        />
+      </Slider.Root>
+      <div className="mt-2 flex justify-between text-xs text-muted-foreground">
+        {TICKS.map((tick) => (
+          <span key={tick} className={cn(tick === value && "font-semibold text-foreground")}>
+            {tick}%
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+```
 
-### Stripe -- Existing Infrastructure Reuse
+**Accessibility:** Radix's Slider primitive handles arrow-key navigation, `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, and RTL direction automatically. The `aria-label` on `Slider.Thumb` above is the only thing the consumer needs to add.
 
-| v1.6 Component | v1.7 Usage | Changes Needed |
-|----------------|------------|----------------|
-| StripeWebhookProcessor | Handles `customer.subscription.created` event | Add handler for new event type alongside existing 5 |
-| SubscriptionRepository | Stores trial record from API-created subscription | Add `upsertByStripeSubscriptionId` if not already present |
-| SubscriptionGuard (API) | Enforces subscription requirement on protected routes | No changes -- already checks `trialing`/`active` status |
-| Billing Portal link | User adds card after trial starts | No changes -- existing Settings > Billing flow |
-| verify-session endpoint | Not needed for direct API trial | Skip for API-created trials (subscription record created synchronously) |
+**Step-of-5 enforcement:** The `step={5}` prop makes the thumb snap to 0/5/10/…/30 regardless of where the user drags. Keyboard arrow keys respect the step too. No manual `Math.round()` needed in the `onValueChange` handler.
 
-### Onboarding -- Replaces Existing Flow
+**Sources:** [Radix Primitives — Slider](https://www.radix-ui.com/primitives/docs/components/slider), [shadcn/ui — February 2026 Unified Radix UI Package changelog](https://ui.shadcn.com/docs/changelog/2026-02-radix-ui).
 
-| Current (v1.6) | New (v1.7) | Impact |
-|-----------------|------------|--------|
-| Dismissible onboarding checklist | Mandatory wizard with redirect guards | Remove existing onboarding widget; add route guards |
-| Checkout page at `/subscribe` | Inline trial activation during onboarding | `/subscribe` kept for re-subscription only |
-| Soft paywall modal | Hard paywall full-screen block | Remove `useSubscriptionGate` hook (soft modal); replace with layout guard |
+### Pattern 4: Range vs "From £X" Display with Dinero
 
-### Landing Page -- New Public Surface
+**What:** Two display modes for the same pair of money values. Both endpoints are always computable from `(basePriceAmount, contingencyPercent)`; the display mode is a per-estimate flag (`"range" | "from"`).
 
-| Component | Integration | Notes |
-|-----------|-------------|-------|
-| Root path `/` | Public route (no auth) | Currently redirects to `/dashboard`; change to render LandingPage |
-| Navigation | Conditional: public nav (Login/Sign Up) vs app nav | Based on auth state from AuthProvider |
-| Pricing section | Links to `/signup` (not direct Stripe Checkout) | User signs up first, trial created during onboarding |
+**Computation (UI side, consistent with v1.2 quote totals pattern):**
 
----
+```typescript
+// src/features/estimates/lib/estimate-range.ts
+import { dinero, multiply, type Dinero } from "dinero.js";
+
+export function computeEstimateRange(
+  base: Dinero<number>,
+  contingencyPercent: number, // 0..30
+): { low: Dinero<number>; high: Dinero<number> } {
+  // Low = base. High = base * (100 + contingencyPercent) / 100.
+  // Use scale=2 so multiply by 110 becomes multiply by 1.10.
+  const high = multiply(base, { amount: 100 + contingencyPercent, scale: 2 });
+  return { low: base, high };
+}
+```
+
+```typescript
+// src/lib/format-currency.ts -- extension
+import type { Dinero } from "dinero.js";
+import { formatCurrency } from "./format-currency";
+
+export function formatRange(
+  low: Dinero<number>,
+  high: Dinero<number>,
+  mode: "range" | "from",
+  locale = "en-GB",
+): string {
+  if (mode === "from") {
+    return `From ${formatCurrency(low, locale)}`;
+  }
+  return `${formatCurrency(low, locale)} – ${formatCurrency(high, locale)}`;
+}
+```
+
+**Why this is enough:** `dinero.js` v2's `multiply({ amount, scale })` does integer-safe scaling without float rounding errors. The only "new" utility is the two-line `formatRange` helper. No currency-formatting library needed — `formatCurrency` already wraps `Intl.NumberFormat` via dinero's `toDecimal()`.
+
+**API-side note:** Persist `basePriceAmount` (Dinero-v1 shape) and `contingencyPercent` (integer) on the entity; compute `low`/`high` for responses the same way quote totals are recomputed on read (v1.2 decision: "Quote totals recalculated on every read"). **Do not denormalize** `lowAmount`/`highAmount` — they're derivable and would drift.
+
+## Alternatives Considered (and Rejected)
+
+| Area | Chose | Rejected | Why Not |
+|------|-------|----------|---------|
+| Scheduled jobs | BullMQ `delay` | `@nestjs/schedule` (cron) | Adds a second scheduler; cron has no per-job cancellation, no retry/backoff, no idempotency via jobId. BullMQ already owns this domain in Trade Flow. |
+| Scheduled jobs | BullMQ `delay` | BullMQ Repeatable Jobs | Repeatable = recurring pattern (every N minutes). We need one-shot at specific future offsets. `delay` is correct. |
+| Slider | `radix-ui` meta (already installed) | `@radix-ui/react-slider` standalone | Duplicate source of the same component; goes against the February 2026 shadcn/ui unified-package recommendation. |
+| Slider | Radix Slider | `react-range`, `rc-slider`, native `<input type="range">` | Native lacks proper styling + multi-mark labels without wrappers; third-party adds dependency; Radix is already in the project and has a11y built in. |
+| Versioning | Flat `rootEstimateId` + `parentEstimateId` | Event-sourcing / CQRS | Massive over-engineering for a document with ~5 edit events per lifetime. |
+| Versioning | Hand-rolled three-field approach | `mongoose-version` / `mongoose-history` plugin | External plugin buries the versioning logic and is untyped; three indexed fields are perfectly legible and align with existing repo conventions. |
+| Range money | Computed from base + percent on read | Store `lowAmount` + `highAmount` directly | Violates v1.2 single-source-of-truth decision ("recalculated on every read"). Denormalized totals drift when contingency changes. |
+| Counter | `estimate_counters` collection (mirror of v1.2) | `mongoose-sequence` | v1.2 already proved the atomic-`$inc` pattern works; adding a plugin duplicates that. |
+| Status transitions | Enum + transition table utility | `xstate` / `ts-pattern` | Eight states with linear transitions — state-machine library is overkill. |
+| Idempotency | Stable `jobId` strings | Lua scripts / application-level lock collection | BullMQ's `jobId` dedup is the cheapest and most reliable option, and it's built in. |
+
+## Version Currency Check
+
+| Library | Installed | Latest (verified April 2026) | Action |
+|---------|-----------|------------------------------|--------|
+| `bullmq` | 5.71.0 | 5.7x current | No upgrade needed for v1.8; `delay` API is stable since BullMQ 4.x. |
+| `@nestjs/bullmq` | 11.0.4 | 11.x | No upgrade needed. |
+| `ioredis` | 5.10.1 | 5.x | No upgrade needed. |
+| `mongoose` | 9.1.5 | 9.x | No upgrade needed; self-refs are classic Mongoose. |
+| `radix-ui` (meta) | 1.4.3 | 1.4.x | Sufficient; Slider primitive is included. |
+| `@radix-ui/react-slider` (standalone) | **not installed — do not add** | 1.3.6 on npm | Do not install; use `Slider` from the `radix-ui` meta package instead. |
+| `dinero.js` (UI) | 2.0.0-alpha.14 | Still alpha as of April 2026 | **Flag only:** same alpha pin as v1.2 quotes. Not upgrading for v1.8 — stay on same version as quote code for consistency. |
+| `dinero.js` (API) | 1.9.1 | v1 is LTS / frozen | No change. Continues to handle server-side money. |
+| `luxon` | 3.5.1 | 3.x | No upgrade needed. |
+
+**Confidence:** HIGH for BullMQ, Radix, Mongoose (verified via official docs and v1.4 phase research that inspected `node_modules`). MEDIUM for "latest" dinero.js UI since it remains on an alpha — however this is consistent with v1.2's choice and changing it is out of scope for v1.8.
+
+## Installation (None Required)
+
+```bash
+# Zero new packages. v1.8 is entirely pattern work on top of v1.4 + v1.3 infrastructure.
+```
+
+If a developer is tempted to run `npm install` for this milestone: stop and re-check this document. The only commits that should touch `package.json` in v1.8 are accidental lockfile churn — and those should be reverted.
+
+## Integration Notes
+
+- **New queue constant:** Add `ESTIMATE_FOLLOW_UP: "estimate-follow-up"` to `src/queue/queue.constant.ts`. Register in `QueueModule` via `BullModule.registerQueue({ name: QUEUE_NAMES.ESTIMATE_FOLLOW_UP })`.
+- **New worker processor:** Add `EstimateFollowUpProcessor` to `WorkerModule` (mirror `StripeWebhookProcessor` from v1.6). Inject `EstimateRetriever`, `EmailService`, and the `QueueProducer` (for chained scheduling if ever needed).
+- **New module:** `src/estimate/` mirroring `src/quote/` structure (controllers, services, repositories, DTOs, responses, entities, policies). Add `@estimate/*` path alias to both `tsconfig.json`, `jest.config.js`, and worker `tsconfig`.
+- **Shared document-type enum:** Neither quote nor estimate should own it. Put `DocumentType` enum in `src/core/enums/` and reference from both features.
+- **Email templates:** Add new Maizzle templates (`estimate-sent.njk`, `estimate-follow-up-3d.njk`, `estimate-follow-up-10d.njk`, `estimate-follow-up-21d.njk`, `estimate-site-visit-requested.njk`, etc.) under the existing templates directory. Same Maizzle pipeline as v1.3 quote emails.
+- **Public token infrastructure:** Reuse v1.3 `PublicTokenService` pattern. Create a parallel `EstimateSessionAuthGuard` (mirror of `QuoteSessionAuthGuard`). Prefer parallel for now; generalize in a future refactor if both guards stay identical.
+- **UI routing:** Add public customer-facing route `/estimates/view/:token` paired with a dedicated `publicEstimateApi` RTK Query slice that (like `publicQuoteApi`) does not inject Firebase auth headers.
 
 ## Sources
 
-- [Stripe: Configure free trials (Checkout)](https://docs.stripe.com/payments/checkout/free-trials) -- `payment_method_collection: "if_required"` for Checkout approach (MEDIUM confidence)
-- [Stripe: Use free trial periods on subscriptions](https://docs.stripe.com/billing/subscriptions/trials/free-trials) -- Direct API with `trial_period_days`, `trial_settings.end_behavior.missing_payment_method` (HIGH confidence)
-- [Stripe: Configure trial offers](https://docs.stripe.com/billing/subscriptions/trials) -- Flexible billing mode trial offers (MEDIUM confidence -- newer API, may not apply to classic mode)
-- [Motion official site](https://motion.dev/) -- Rebrand from Framer Motion, React integration docs (HIGH confidence)
-- [Motion npm](https://www.npmjs.com/package/motion) -- v12.38.0 current (HIGH confidence)
-- [react-intersection-observer npm](https://www.npmjs.com/package/react-intersection-observer) -- v10.0.3 current (HIGH confidence)
-- Phase 30 Research (trade-flow-api) -- Stripe basil API field paths, webhook processor pattern (HIGH confidence)
-- [Motion React scroll animations](https://motion.dev/docs/react-scroll-animations) -- Native ScrollTimeline support (HIGH confidence)
+- [BullMQ — Delayed jobs guide](https://docs.bullmq.io/guide/jobs/delayed) — verified `delay`, `jobId`, `removeOnComplete` semantics
+- [BullMQ — Auto-removal of jobs](https://docs.bullmq.io/guide/queues/auto-removal-of-jobs) — `KeepJobs` `{ age, count }` options
+- [BullMQ — JobsOptions API reference](https://api.docs.bullmq.io/interfaces/v1.JobsOptions.html) — full options shape
+- [Radix Primitives — Slider](https://www.radix-ui.com/primitives/docs/components/slider) — confirmed `min`, `max`, `step`, `value`, `onValueChange` props and a11y behaviour
+- [@radix-ui/react-slider on npm](https://www.npmjs.com/package/@radix-ui/react-slider) — version cross-check (1.3.6 latest; NOT to be installed)
+- [shadcn/ui — February 2026 Unified Radix UI Package changelog](https://ui.shadcn.com/docs/changelog/2026-02-radix-ui) — confirms `radix-ui` meta package is the current idiomatic import surface
+- [Mongoose — Populate (self-refs)](https://mongoosejs.com/docs/populate.html)
+- Trade Flow v1.4 Phase 21 RESEARCH.md — confirms installed BullMQ versions (`bullmq@5.71.0`, `@nestjs/bullmq@11.0.4`, `ioredis@5.10.1`) and existing `QueueProducer` pattern
+- Trade Flow `.planning/codebase/STACK.md` (v1.7 snapshot) — confirms `radix-ui@1.4.3` meta package and all other installed versions referenced in this document
+- Trade Flow v1.2 Quote implementation — pattern source for `estimate_counters`, totals recomputation, module structure
+- Trade Flow v1.3 Send Quotes implementation — pattern source for Maizzle templates, public token infrastructure, Resend email integration
 
 ---
-*Stack research for: v1.7 Onboarding & Landing Page*
-*Researched: 2026-03-31*
+
+*Stack research for v1.8 Estimates — 2026-04-10*

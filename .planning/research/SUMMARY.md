@@ -1,226 +1,330 @@
-# Project Research Summary
+# Research Summary — v1.8 Estimates
 
-**Project:** Trade Flow v1.7 — Onboarding & Landing Page
-**Domain:** SaaS onboarding overhaul, public landing page, no-card Stripe trial, hard paywall
-**Researched:** 2026-03-31
-**Confidence:** HIGH
+**Project:** Trade Flow
+**Milestone:** v1.8 Estimates (brownfield, subsequent milestone on shipped v1.7 SaaS)
+**Domain:** UK sole-trader SaaS — estimates as a parallel document type to quotes
+**Researched:** 2026-04-10
+**Confidence:** HIGH overall (HIGH for stack/architecture, HIGH for pitfalls/UK legal, MEDIUM-HIGH for features)
 
 ## Executive Summary
 
-Trade Flow v1.7 is a conversion and activation overhaul for an existing SaaS product. The milestone replaces a dismissible, optional onboarding experience with a mandatory wizard, introduces a public landing page as the primary acquisition surface, switches Stripe subscription creation from a card-required Checkout flow to a no-card trial via the direct Subscriptions API, and replaces the v1.6 soft paywall modal with a hard full-screen block. All four changes follow well-documented patterns from the trades software competitors (ServiceM8, Fergus, Tradify, Jobber) and from Stripe's official trial documentation. The research is high-confidence across all four dimensions.
+v1.8 Estimates is a **pattern-level milestone, not an infrastructure milestone**: zero new runtime dependencies, ~70% reuse of existing v1.2–v1.7 code (quote module shape, token infrastructure, Maizzle/Resend email pipeline, BullMQ worker, atomic counters, Radix UI primitives), and ~30% genuinely new code for contingency ranges, soft-response flow, follow-up scheduler, revisions, and convert-to-quote. Every capability the milestone needs — delayed jobs via `Queue.add({ delay })`, a single-thumb slider via `radix-ui@1.4.3`, self-referential Mongoose documents, range-formatted money via the existing `dinero.js` wrapper — is already satisfied by libraries installed in earlier milestones.
 
-The recommended approach is to build in five discrete workstreams with two parallel tracks available: the backend no-card trial endpoint can be built independently of the frontend route restructure, and the two can converge when the onboarding wizard pages wire up to the new API. The key architectural insight is to derive onboarding state from the existence of domain entities (user profile name, business record, subscription record) rather than storing separate progress state — this eliminates an entire Redux slice, middleware, context, and localStorage layer while also correctly handling existing users who already have businesses and subscriptions.
+The **strategic wedge** is that every major competitor (Tradify, Jobber, ServiceM8, YourTradebase, Powered Now, Fergus) treats "estimate" as cosmetic nomenclature — a relabel of the quote feature with identical semantics and the same binary accept/decline flow. Trade Flow's v1.8 does something none of them do: ships estimates as a **true parallel document type** with price ranges, a four-button soft-response flow (Book site visit / Send quote / I have a question / Not right now), automated follow-ups at 3/10/21 days, invisible-to-user versioned revisions, and non-binding legal language baked into the default template. UK law reinforces this design — the Consumer Rights Act 2015 and Dispute Resolution Ombudsman treat estimates as non-binding guide prices, but case law is clear that a badly worded estimate (single "Total: £X", an "Accept" button, no disclaimer) can become a binding offer on unconditional acceptance, exposing Trade Flow users to contract risk if we ship estimates that behave like quotes.
 
-The primary risk is the transition for existing users: deploying a mandatory onboarding gate without verifying that existing users with businesses and subscriptions pass the guard cleanly will lock out paying customers. A secondary risk is the Stripe webhook flow change — the no-card trial fires `customer.subscription.created` (not `checkout.session.completed`), and if the existing webhook processor only creates local subscription records from the Checkout event, new trial users get no local record and hit the hard paywall immediately. Both risks are known and preventable with targeted testing before deploying the mandatory flow.
+The **highest-consequence risks** are UK legal copy (binding-offer exposure via customer-facing wording), BullMQ delayed-job hygiene (orphaned follow-ups after revise/convert/decline → brand-damaging emails, silent data loss if Redis has no AOF persistence), public token semantics (must resolve to the latest revision, not the one the customer was emailed), estimate→quote conversion correctness (snapshot, don't reference; idempotent on double-click), and rounding artifacts between the v1-API and v2-alpha-UI dinero.js versions on contingency math. Each of these must be addressed as a **requirements-level constraint** in the roadmap, not left as a phase-level implementation detail.
 
 ## Key Findings
 
 ### Recommended Stack
 
-The stack changes for this milestone are minimal. Only one new frontend package is needed: `motion` (12.x, the rebranded Framer Motion) for landing page scroll animations. `react-intersection-observer` (10.x) is optional and should be evaluated during implementation. The backend requires no new packages — the Stripe SDK (v21.x) already installed in v1.6 handles direct subscription creation natively.
+See **[STACK.md](./STACK.md)** for full detail. **No new npm packages.** The work is entirely pattern-level on top of infrastructure shipped in v1.2–v1.7.
 
-**Core technologies:**
-- `motion` 12.x: Landing page scroll animations (stagger reveals, hero transitions) — successor to Framer Motion, React 19 compatible, 15KB gzipped, import from `motion/react`
-- Stripe Subscriptions API (existing SDK): No-card trial creation via `stripe.subscriptions.create()` with `trial_period_days: 30` and `payment_behavior: "default_incomplete"` — bypasses Checkout entirely
-- React Router 7.x layout routes (existing): Three-tier nested guards (ProtectedRoute > OnboardingGuard > HardPaywallGuard) — no new routing packages
-- RTK Query (existing): Onboarding state derived from `useGetUserQuery()` + `useGetBusinessesQuery()` — replaces Redux slice approach
+**Core technologies (all already installed):**
+- **BullMQ 5.71.0 + @nestjs/bullmq 11.0.4 + ioredis 5.10.1** — delayed follow-up jobs via native `Queue.add(jobName, data, { delay, jobId })`; no cron library needed
+- **Mongoose 9.1.5** — self-referential `parentEstimateId` + `rootEstimateId` + `revisionNumber` for invisible versioning
+- **radix-ui 1.4.3 (meta package)** — contingency slider via `import { Slider } from "radix-ui"`; standalone `@radix-ui/react-slider` must NOT be added (the v1.7 shadcn/ui unified-package migration is the current idiom)
+- **dinero.js** — v1.9.1 on API for server-side money, v2.0.0-alpha.14 on UI for display; range math computed on the API only, UI just renders what the API returns
+- **luxon 3.5.1** — already standardized in v1.6; `DateTime.plus({ days: 3 })` for follow-up offsets
+- **Resend + Maizzle** — existing v1.3 email pipeline; add estimate Maizzle templates alongside existing quote templates
+- **react-hook-form + valibot** — existing form stack handles the create dialog's document-type toggle and conditional fields
 
-**What NOT to use:**
-- `framer-motion` package (legacy name, no longer maintained — use `motion`)
-- Stripe Checkout for no-card trial (unnecessary redirect to empty hosted page)
-- Any stepper library (2-step wizard is trivial with React state)
-- `@stripe/react-stripe-js` (no card elements needed — Billing Portal handles card collection later)
+**Explicit non-additions:** `@nestjs/schedule`/cron (BullMQ already handles delay), `@radix-ui/react-slider` standalone, currency-formatting libraries, `mongoose-sequence` / `mongoose-version` plugins, `xstate`/`ts-pattern` for the eight-state lifecycle. Each is called out in STACK.md with the rationale.
 
 ### Expected Features
 
-**Must have (v1.7 table stakes):**
-- Public landing page with hero, features section, pricing card, and single CTA — every competitor has this as primary acquisition surface
-- Mandatory profile setup (display name) — feeds greeting, invoice identity, and personalisation
-- Mandatory business setup (name + trade selection) — triggers auto-provisioned defaults that already exist
-- No-card 30-day Stripe trial — industry standard; all four competitors offer no-card trials; Trade Flow's 30-day period undercuts the standard 14-day competitor offering
-- Mandatory onboarding route guards — redirect incomplete users, make setup non-skippable
-- Hard paywall full-screen block — replaces soft modal; industry standard for post-trial lockout
-- Welcome dashboard with personalised greeting and getting-started widget — reduces blank-slate anxiety on first login
+See **[FEATURES.md](./FEATURES.md)** for full competitor analysis and legal framing. All of the v1.8 target features in PROJECT.md are validated by research — **the scope is correct, not speculative.**
 
-**Should have (competitive differentiators):**
-- Trade-specific landing page copy mentioning plumbers, electricians, and builders by name — avoids generic "field service" positioning
-- Single pricing card (GBP 6/month) prominently displayed — radically undercuts competitors charging GBP 29-75/month; simplicity is a selling point
-- Contextual trial-ending nudges at 7, 3, and 1 day before trial end — converts better than email alone
-- Differentiated paywall states (trial expired vs payment failed vs canceled) — reduces confusion and support tickets
+**Must have (table stakes — users expect these):**
+- Separate document type with distinct E-YYYY-NNN numbering
+- Non-binding legal language on customer-facing page and email body
+- Line items shared with quotes (same data model)
+- Customer-facing page via token (reuse v1.3 infra)
+- Email delivery with configurable template
+- View tracking (firstViewedAt) parity with quotes
+- Status lifecycle: Draft → Sent → Viewed → Responded → (SiteVisitRequested / Converted / Declined / Expired)
+- Edit and resend (versioned revisions under the hood)
+- Convert to Quote action with back-link
+- Decline with structured reason
 
-**Defer to v1.x after validation:**
-- Trial-ending email nudges (webhook infrastructure exists, just needs `customer.subscription.trial_will_end` handler)
-- Enhanced trial chip with urgency visual states
-- Landing page testimonials and social proof (needs real user quotes)
+**Should have (the differentiators — Trade Flow's wedge):**
+- True parallel document type with different semantics (not a nomenclature relabel — the single biggest competitive gap)
+- Contingency slider 0–30% in 5% steps, default 10%, with range / "From £X" display modes
+- Four-button soft customer response flow: Book a site visit / Send me a quote / I have a question / Not right now
+- Structured decline reason enum (Too expensive / Going with another trader / Not the right time / Decided not to do the work / Work out of scope / Other) — feeds future BI milestone
+- Quick-tap uncertainty notes (chips for site inspection, pipework, materials, access)
+- Automated follow-up sequence at 3 / 10 / 21 days via BullMQ delayed jobs, defaults only, resets on revision
+- Invisible versioning + collapsed History section (not visible "v2" UX)
+- Message-based "Book a site visit" (capture preferred windows as a request, not a full calendar sync)
+- Back-link on converted quote ("Converted from E-2026-0042")
 
-**Defer to v2+:**
-- Multi-page marketing site (no SEO/content strategy yet)
-- Product demo video
-- Interactive product tour (validate checklist approach first)
-- A/B testing on landing page (needs traffic volume)
+**Defer (v1.8.x / v1.9 / v2+ — explicitly out of scope for v1.8):**
+- Trader-initiated follow-up cadence override (ship defaults only first)
+- Estimate templates/presets (wait for usage data)
+- Customer counter-offer on estimate
+- Estimate PDF export (deferred with quote PDF)
+- Calendar sync for site visits (message-based flow may prove sufficient)
+- Electronic signatures on estimates (doubles down on binding semantics)
+- Deposit collection on estimates (legally incoherent on non-binding doc)
+- AI-generated contingency suggestions
+- Email tracking pixel (PECR/GDPR risk; link-click tracking is fine)
+- Customer login for estimate responses
 
 ### Architecture Approach
 
-The architectural shift is primarily a routing and state management simplification. The v1.7 route tree introduces three nested layout guards replacing the single SubscriptionGatedLayout approach. Onboarding state moves from a Redux slice with middleware and localStorage persistence to a `useOnboardingStatus` hook that derives step from RTK Query cache — this eliminates six files of state management infrastructure while becoming more correct by using actual data as truth. The hard paywall replaces fourteen files worth of per-page `openPaywall()` dispatch calls with a single layout route component.
+See **[ARCHITECTURE.md](./ARCHITECTURE.md)** for full detail grounded in the `trade-flow-api` source. The research is HIGH confidence because the researcher read the existing module files directly.
+
+**Headline decision: a separate `EstimateModule` that mirrors `QuoteModule`, not a polymorphic discriminator on the existing quote module.** Quote status lifecycles, field surfaces, and transition graphs are genuinely different from estimates; unifying them would force nullable-field bloat, `documentType` branching across every service, and silent correctness bugs. Separate modules keep strict Controller → Service → Repository layering intact and match the existing precedent (`quote-token` and `quote-settings` are already sibling feature modules, not embedded in `quote`).
 
 **Major components:**
-
-1. **LandingPage** — public marketing page at `/`; redirects authenticated users to `/dashboard`; zero imports from app modules (store, features, auth hooks)
-2. **OnboardingGuard** — layout route that checks `displayName` existence and business existence; redirects to appropriate onboarding step; derived entirely from RTK Query cache
-3. **ProfileSetupPage + BusinessSetupPage** — mandatory wizard pages at `/onboarding/profile` and `/onboarding/business`; BusinessSetupPage calls `POST /v1/business` then `POST /v1/subscription/trial` sequentially
-4. **HardPaywallGuard** — layout route replacing SubscriptionGatedLayout; renders `PaywallPage` full-screen for any subscription status outside `trialing` or `active`; settings route always passes
-5. **SubscriptionCreator (API)** — new `createTrialWithoutCard` method calling `stripe.subscriptions.create()` with `trial_period_days: 30`, `payment_behavior: "default_incomplete"`, `trial_settings.end_behavior.missing_payment_method: "cancel"`; new `POST /v1/subscription/trial` endpoint decorated with `@SkipSubscriptionCheck()`
-6. **useOnboardingStatus hook** — derives `profileComplete`, `businessComplete`, `currentStep` from existing RTK Query user and business queries; no stored state; replaces Redux slice, middleware, context, localStorage
-7. **WelcomeDashboard variant** — conditional rendering on existing DashboardPage for users with no jobs; personalised greeting using `displayName` + GettingStartedWidget
-
-**Files removed (cleanup):** 15 UI files across onboarding components, context, Redux slice, middleware, paywall modal, persistent CTA, dashboard banner, and SubscriptionGatedLayout.
+1. **New `src/estimate/` module** — full mirror of `src/quote/` (controllers, creator/retriever/updater/deleter services, repository, policy, DTOs, responses, entity, status enum, transition service) plus estimate-specific services: `EstimateNumberGenerator` (E-YYYY-NNN via `estimate_counters`), `EstimateTotalsCalculator` (with contingency math), `EstimateReviser`, `EstimateFollowupScheduler`, `EstimateToQuoteConverter`, `EstimateResponseHandler`, `EstimateEmailSender`.
+2. **Renamed `document-token` module** (from `quote-token`) — generalised with `documentType: "quote" | "estimate"` discriminator and `documentId` (renamed from `quoteId`). Guard becomes `DocumentSessionAuthGuard`. One-shot MongoDB migration renames the collection. **Duplicating quote-token is explicitly rejected** because the guard encodes the most-tested customer-facing logic (rate limiting, expiry, revocation, `firstViewedAt`).
+3. **Renamed `document-settings` module** (from `quote-settings`) — adds `estimateEmailTemplate` alongside `quoteEmailTemplate` in one settings API and one Settings > Templates tab. **(Open question: is this rename in v1.8 scope or deferred?)**
+4. **Shared `quote_line_items` collection with `parentType` widening** — line items are the same thing for quotes and estimates, and the existing bundle/tax/pricing factories already operate on "a line item attached to a parent." Add `parentType: "quote" | "estimate"` + `estimateId?` fields; backfill existing rows with `updateMany({}, { $set: { parentType: "quote" } })`. Rejected alternative: separate `estimate_line_items` collection (would duplicate ~15 files of bundle/tax logic for zero gain).
+5. **New `ESTIMATE_FOLLOWUPS` BullMQ queue + `EstimateFollowupProcessor` in WorkerModule** — deterministic `jobId` pattern `estimate-followup:${estimateId}:${revisionNumber}:${step}` for O(1) idempotent cancellation via `queue.remove()`. Defence-in-depth: worker re-reads estimate state at execution time and silently no-ops on `CONVERTED`/`DECLINED`/`EXPIRED`/`SITE_VISIT_REQUESTED`/deleted/non-current.
+6. **Revisions: flat collection, `parentEstimateId` + `revisionNumber` + `isCurrent`** — compound indexes `{ parentEstimateId: 1, revisionNumber: -1 }` and partial unique `{ parentEstimateId: 1, isCurrent: 1 }` guarantee one current per chain and O(log n) latest-revision lookup. Rejected embedded-array alternative (16MB doc limit, poor query patterns, line items already external).
+7. **New `src/features/estimates/` frontend feature module** mirroring `src/features/quotes/`, plus a tiny new `src/features/documents/` module owning the shared `CreateDocumentDialog` with the Quote/Estimate type toggle. Separate `publicEstimateApi` RTK Query slice (no Firebase JWT headers, same pattern as v1.3 `publicQuoteApi`). New public page `CustomerEstimatePage.tsx` at `/estimate/:token`.
+8. **Convert-to-Quote lives in the estimate module, not the quote module** — `EstimateToQuoteConverter` depends on `QuoteCreator` via standard DI (one-way; quote knows nothing about estimates). No `forwardRef`. Back-link stored as `convertedToQuoteId` on the estimate side.
 
 ### Critical Pitfalls
 
-1. **Existing users locked out by mandatory onboarding guard** — Guard must check actual data state (has `displayName` + business + subscription), not a boolean flag. Existing users with businesses and subscriptions pass automatically. Deploy backend state evaluation before enabling frontend mandatory flow. Test against at least five user state variations (existing active, existing trialing, existing canceled, existing no-subscription, brand new).
+See **[PITFALLS.md](./PITFALLS.md)** for all 21 pitfalls. These five are the highest-consequence and **must be encoded as requirements-level constraints**, not left as phase implementation details.
 
-2. **Stripe webhook flow change breaks new trial subscriptions** — Switching from Checkout to direct API changes the entry webhook event from `checkout.session.completed` to `customer.subscription.created`. If the webhook processor only creates local records from the Checkout event, new trial users get no local subscription record and hit the hard paywall immediately. Fix: ensure `customer.subscription.created` handler can create a fresh record (not just update), and also write the local record synchronously in the onboarding endpoint as belt-and-suspenders.
+1. **UK legal binding-offer exposure (Pitfall 1)** — default email template and customer page must include explicit non-binding disclaimer ("This is an estimate, not a fixed price… A firm quote will be provided after a site visit."); customer page MUST use "From £X" or range display (never a single "Total"); response buttons MUST NOT include the word "Accept"; email subject must include "Estimate" not "Quote"; rendered email HTML must be stored on the estimate for future dispute defence. **Requires legal-review pass on default copy before Phase E/F.**
+2. **Redis AOF persistence (Pitfall 4)** — production Redis (Railway) MUST have `appendonly yes` / `appendfsync everysec` before the first follow-up ships. Without it, a single Redis restart silently wipes 21 days of scheduled jobs with no alert. Previous milestones got away with ephemeral Redis because webhook jobs processed within seconds; delayed jobs live in Redis for weeks. Production smoke test: schedule a 60s delayed job, restart Redis, verify it still fires.
+3. **Deterministic jobIds for follow-up cancellation (Pitfall 2 + 15)** — the `jobId` MUST be `estimate-followup:${estimateId}:${revisionNumber}:${step}` so that (a) re-adding is a silent no-op (BullMQ dedup), (b) `queue.remove(jobId)` is O(1), (c) revision bump gets a fresh jobId namespace. Every exit transition (Responded/Converted/Declined/Expired/Lost/soft-deleted) MUST call `cancelAllFollowups()`; revising MUST cancel the previous revision's jobs and schedule the new revision's. Worker processor adds defence-in-depth by re-reading estimate state and skipping if no longer in a follow-up-worthy status.
+4. **Public token resolves to latest revision (Pitfall 3)** — customer's email link is token-bound, not revision-bound. Public endpoint `GET /v1/public/estimate/:token` MUST query by the token's root/parent reference and return the `isCurrent: true` revision. Revising MUST reuse the same token, not issue a new one. Without this, customers see stale numbers after "edit and resend" and dispute the price. Compound with Pitfall 1 and the legal exposure worsens.
+5. **Idempotent estimate-to-quote conversion with snapshot semantics (Pitfall 6)** — conversion copies line items (with literal tax rate percentages) into the new quote; NO live references to the estimate or source collections post-conversion. API accepts an `Idempotency-Key` header (or server-computes a key from `estimateId + revisionNumber + "convert"`), stores the resulting quote ID for 24h, and returns the same quote on retry. UI disables the Convert button as soon as clicked. Conversion always pulls from the **latest revision**, not whatever is loaded in the UI. After conversion, source estimate transitions to `Converted` and further revisions are blocked.
 
-3. **Duplicate businesses and subscriptions on retry or refresh** — Onboarding state resets on page refresh. Business creation and Stripe subscription creation must be idempotent: return existing business if one already exists for the user; use Stripe idempotency keys tied to `userId` on `subscriptions.create()`. Wizard must resume at the first incomplete step on mount, not always from step 1.
-
-4. **Hard paywall false positives for `past_due` subscriptions** — Stripe's payment retry window is 1-4 weeks during which status fluctuates. A hard block during `past_due` locks out users who are actively retrying payment. Define an explicit status-to-access mapping: `trialing` and `active` = full access; `past_due` = grace period; `canceled` and `incomplete` = hard paywall. Never render the hard paywall while subscription status is loading.
-
-5. **Landing page loads the full 500KB+ app bundle** — Adding `/` as a standard React Router route pulls in React, Redux, RTK Query, and all feature modules. The landing page must import zero app-level dependencies. Use `React.lazy()` with bundle analysis verification as minimum viable; use `vite-plugin-prerender` for better SEO; consider separate Vite entry point if organic search is a day-one acquisition channel.
+Additional critical constraint from Pitfall 5 (rounding): **contingency range is computed on the API only**, using `dinero.js@1.9.1` `.percentage()`; the UI displays whatever the API returns. Never multiply by 1.10 anywhere. Never denormalize `lowAmount`/`highAmount` onto the entity — recompute on every read (the v1.2 quote-totals decision).
 
 ## Implications for Roadmap
 
-Based on combined research, the following phase structure is recommended. The architecture research explicitly specifies a build order based on dependencies; this maps directly to phases.
+Research strongly recommends the build order from ARCHITECTURE.md §10. The eight-phase sequence below is directly lifted from architecture research and annotated with the relevant pitfalls, features, and open questions for each phase.
 
-### Phase 1: No-Card Trial API Endpoint
+### Phase A — Foundations (prerequisite for everything)
 
-**Rationale:** Backend has no frontend dependency. Building it first means the onboarding wizard pages have a real endpoint to wire to. This is also the highest-risk technical change (Stripe API flow change) and benefits from being isolated and tested independently before the frontend mandatory flow is deployed.
+**Rationale:** Every subsequent phase depends on the renamed token module and widened line items. Doing the renames first means every new file in Phases B–H uses the correct names immediately — no rewrite later. This is the "do the refactors before the additions" principle.
 
-**Delivers:** `POST /v1/subscription/trial` endpoint; `createTrialWithoutCard` service method; updated webhook handler ensuring `customer.subscription.created` creates local records; Stripe idempotency key on subscription creation; schema audit confirming Checkout-created and API-created subscriptions produce compatible local records.
+**Delivers:**
+- Rename `quote-token` → `document-token` (entity widened with `documentType` + `documentId`; migration script renames collection and fields)
+- Rename `quote-settings` → `document-settings` (adds `estimateEmailTemplate` field alongside existing quote template) — **OPEN QUESTION: is this rename in v1.8 scope?**
+- Widen `quote_line_items` with `parentType: "quote" | "estimate"` + optional `estimateId` field; backfill existing rows via `updateMany({}, { $set: { parentType: "quote" } })`
+- Update `PublicQuoteController` to read `request.documentToken` instead of `request.quoteToken` (breaking change in controller request typing — audit all callers)
 
-**Addresses:** No-card trial feature, Stripe direct API pattern
+**Avoids:** Pitfalls 3 (stale token), 7 (document type confusion), 20 (N+1 on line items)
 
-**Avoids:** Pitfall 2 (webhook flow breaks new subscriptions), Pitfall 8 (schema incompatibility between Checkout and API paths)
+**Research flag:** NO additional research needed — all patterns verified against existing source.
 
-**Research flag:** Standard patterns — skip research-phase.
+### Phase B — Estimate Module CRUD (backend only)
 
----
+**Rationale:** Before worrying about customer communication, the API must be able to create, read, update, and delete estimates with correct numbering, policy, contingency math, and status transitions. This unblocks frontend work and establishes the happy path for all subsequent phases.
 
-### Phase 2: Public Landing Page and Route Restructure
+**Delivers:**
+- `EstimateEntity` (with contingency, display mode, uncertainty notes, revision fields, structured decline reason enum), `IEstimateDto`, `EstimateStatus` enum, transition table
+- `EstimateRepository`, `EstimatePolicy`, `EstimateNumberGenerator` (E-YYYY-NNN via new `estimate_counters` collection — mirror the v1.2 `quote_counters` atomic pattern verbatim)
+- `EstimateCreator`, `EstimateRetriever`, `EstimateUpdater`, `EstimateDeleter`
+- `EstimateTotalsCalculator` with contingency math (API side, dinero v1.9.1 `.percentage()`)
+- `EstimateTransitionService` (eight-state graph)
+- `EstimateController` (CRUD, no send yet)
+- MongoDB indexes from ARCHITECTURE.md §3: `(businessId, createdAt)`, `(jobId, createdAt)`, unique `(businessId, number)` with partial filter on `deletedAt`, plus the revision indexes (defensive even if Phase C ships later)
+- Backend unit tests
 
-**Rationale:** Can run in parallel with Phase 1 (separate repos). The route architecture decision must be locked before building the onboarding wizard pages — the guard nesting and page paths are dependencies for Phase 3. The landing page itself is independent of all Stripe changes.
+**Addresses (features):** Document type toggle, E-YYYY-NNN numbering, contingency slider data model, structured decline reason taxonomy, status lifecycle, non-binding legal framing at the type level
 
-**Delivers:** LandingPage at `/`; restructured App.tsx with three-tier guard nesting; OnboardingGuard and HardPaywallGuard as shells (redirect/block logic without full wizard pages wired yet); authenticated-user redirect from `/` to `/dashboard`; explicit auth loading state to prevent flash of landing content for authenticated users.
+**Avoids (pitfalls):** Pitfall 5 (rounding — API owns the math), Pitfall 7 (type confusion at discriminated-union boundary), Pitfall 8 (counter race — copy quote_counters exactly), Pitfall 12 (concurrent edit 409 via compound unique index on `(parentEstimateId, revisionNumber)`)
 
-**Addresses:** Public landing page, trade-specific copy and single pricing display, routing architecture
+**Research flag:** NO research needed — explicitly follows the v1.2 quote module pattern.
 
-**Avoids:** Pitfall 3 (root route conflict with auth-async state), Pitfall 7 (landing page bundle bloat — zero app imports enforced)
+### Phase C — Revisions (depends on B)
 
-**Research flag:** Standard SPA routing patterns — skip research-phase. Bundle analysis verification is the main deliverable check.
+**Rationale:** Revisions are a second-order concept on top of base estimates. Getting the base data model right first avoids reworking revision logic. Can slip in favour of Phase D if needed for schedule pressure.
 
----
+**Delivers:**
+- `isCurrent` / `parentEstimateId` / `revisionNumber` logic in `EstimateCreator`
+- `EstimateReviser` service (loads current, copies fields + line items, flips `isCurrent`, resets follow-up queue)
+- `GET /v1/estimate/:id/revisions` endpoint
+- Partial unique index on `(parentEstimateId, isCurrent: true)` to prevent duplicate currents
 
-### Phase 3: Onboarding Wizard Pages
+**Addresses (features):** Invisible versioned revisions; "edit and resend" UX
 
-**Rationale:** Depends on Phase 2 (route structure must exist) and Phase 1 (real trial endpoint must exist for wiring). This is the phase that makes onboarding mandatory. Must address existing user migration and wizard resumability before going live.
+**Avoids (pitfalls):** Pitfall 3 (latest revision resolution), Pitfall 12 (concurrent edit), Pitfall 15 (soft-delete follow-ups on old revisions)
 
-**Delivers:** ProfileSetupPage with display name form; BusinessSetupPage wired to `POST /v1/business` then `POST /v1/subscription/trial`; `useOnboardingStatus` hook deriving step from RTK Query cache; OnboardingGuard fully implemented; removal of old onboarding infrastructure (Redux slice, middleware, context, provider, dialog components — 10 files).
+**Research flag:** NO — MongoDB partial unique indexes are standard; the two-write `isCurrent` flip needs a short design note on failure handling (open question #4 below).
 
-**Addresses:** Mandatory profile setup, mandatory business setup, mandatory onboarding route guards, getting-started widget
+### Phase D — Frontend Estimate CRUD (parallel with Phase C)
 
-**Avoids:** Pitfall 1 (existing users locked out — guard uses derived data state), Pitfall 5 (duplicate creation — idempotent business creation and Stripe idempotency keys), Pitfall 9 (old onboarding removed too early — recommend feature flag)
+**Rationale:** Can be built against Phase B alone. Delivers visible progress to the user while backend revisions work proceeds in parallel.
 
-**Research flag:** The existing user migration edge case needs validation against a production data snapshot before this phase ships. Recommend `/gsd:research-phase` specifically for the migration test matrix (user states: existing active, existing trialing, existing canceled, existing no-subscription, brand new).
+**Delivers:**
+- `src/features/estimates/` scaffolding (api slice, components, hooks)
+- `EstimatesPage`, `EstimateDetailPage`
+- `EstimateFormDialog` with `ContingencySlider` (Radix Slider from `radix-ui` meta package, `min=0 max=30 step=5 defaultValue=10`)
+- `src/features/documents/CreateDocumentDialog` with Quote/Estimate type toggle
+- Wire into job detail page "Estimates" section alongside "Quotes"
+- Range / "From £X" display component powered by API-computed values
 
----
+**Addresses (features):** Contingency slider, range vs "From £X" display, uncertainty notes quick-tap chips, document type toggle
 
-### Phase 4: Hard Paywall and Soft Paywall Removal
+**Avoids (pitfalls):** Pitfall 5 (UI displays only; math on API), Pitfall 7 (discriminated props on shared components), Pitfall 12 (UI handles 409 with "refresh to see latest changes" banner)
 
-**Rationale:** Can run in parallel with Phase 3 (both depend on Phase 2 route structure but not on each other). Removing the soft paywall is a clean mechanical cut once HardPaywallGuard is in place — `openPaywall()` calls across eight business pages are straightforward removals.
+**Research flag:** NO — Radix Slider from the meta package is documented in STACK.md with a worked example.
 
-**Delivers:** PaywallPage full-screen component with differentiated states (trial expired, payment failed, canceled); HardPaywallGuard fully implemented with explicit subscription status-to-access mapping; grace period logic for `past_due` status; "Verify subscription" button on paywall; removal of PaywallModal, PersistentCta, DashboardBanner, paywallSlice, SubscriptionGatedLayout, and all `openPaywall()` dispatch calls (5 files removed, 8 pages modified).
+### Phase E — Email + Send Flow (depends on B, D)
 
-**Addresses:** Hard paywall, differentiated paywall states, data preservation messaging
+**Rationale:** Sending requires an estimate to exist (Phase B) and a settings module to host the template (Phase A rename). Nothing earlier depends on email.
 
-**Avoids:** Pitfall 4 (false positives for `past_due` — grace period required), Pitfall 6 (no-card trial churn — trial-expired CTA pointing directly to Billing Portal)
+**Delivers:**
+- Estimate Maizzle email template with mandatory non-binding disclaimer
+- `EstimateEmailRenderer` service (sibling to `QuoteEmailRenderer`)
+- `EstimateEmailSender` service
+- `POST /v1/estimate/:id/send` endpoint (transitions Draft → Sent, persists `sentAt`, stores rendered HTML on estimate for audit)
+- `SendEstimateDialog` UI (message editor)
+- Configurable estimate email template in Business settings tab
 
-**Research flag:** The `past_due` grace period duration is a product decision — flag for user input during planning. Standard guard pattern otherwise — skip research-phase.
+**Addresses (features):** Estimate email template with Maizzle, configurable template, non-binding legal language in default template
 
----
+**Avoids (pitfalls):** **Pitfall 1 (binding offer — CRITICAL, legal review required)**, Pitfall 13 (spam filter triggers), Pitfall 17 (GB date format via Luxon), Pitfall 18 (no tracking pixel)
 
-### Phase 5: Welcome Dashboard and Final Cleanup
+**Research flag:** **YES** — needs a targeted research pass on UK-consumer-law-appropriate template copy before the default template ships. Candidate for `/gsd:research` during phase planning.
 
-**Rationale:** Depends on Phase 3 (profile name from onboarding feeds the greeting; business existence drives the welcome variant). Last phase because it enhances rather than enables — the app is fully functional after Phase 4. Also the correct time for final cleanup after new flows have been validated.
+### Phase F — Public Customer Page (depends on A, E)
 
-**Delivers:** Welcome dashboard variant on DashboardPage (conditional on zero jobs); personalised greeting using `displayName`; GettingStartedWidget with "Create your first job" and "Send your first quote" checklist items; final removal of any remaining dead code from old onboarding and paywall systems.
+**Rationale:** Customer-facing is the most-scrutinised surface. Ship it after the happy path (create → send) works so testers can see what customers see.
 
-**Addresses:** Welcome dashboard with personalised greeting, getting-started widget, removal of existing dismissible onboarding flow
+**Delivers:**
+- Reuse `DocumentSessionAuthGuard` from Phase A
+- `PublicEstimateController` at `/v1/public/estimate/:token`
+- `PublicEstimateRetriever` (returns latest revision — Pitfall 3)
+- `EstimateResponseHandler` service handling the four response paths
+- `publicEstimateApi` RTK Query slice (no Firebase JWT, mirror `publicQuoteApi`)
+- `CustomerEstimatePage.tsx` at `/estimate/:token`
+- Four response buttons component: Book a site visit / Send me a quote / I have a question / Not right now
+- Structured decline reason form on "Not right now"
+- Site visit request form (preferred windows, availability notes)
+- View tracking via `firstViewedAt` on token (reuse v1.3 pattern)
 
-**Avoids:** Pitfall 9 (old onboarding removed too early — cleanup happens after Phases 3 and 4 are production-validated)
+**Addresses (features):** Customer-facing page via token, four-button soft response flow, structured decline reasons, view tracking parity, site visit request (message-based, no calendar sync)
 
-**Research flag:** Standard patterns — skip research-phase.
+**Avoids (pitfalls):** Pitfall 1 (no "Accept" button, non-binding copy on page), Pitfall 3 (latest revision resolution), Pitfall 14 (state check before accepting customer actions — terminal states show friendly message), Pitfall 16 (cryptographic token, no ID leakage), Pitfall 21 (zero non-essential cookies on public page)
 
----
+**Research flag:** POSSIBLY — if Phase E's legal-copy research has not covered the customer page, include it here. Otherwise NO.
+
+### Phase G — Follow-up Queue (depends on E, worker)
+
+**Rationale:** No reason to schedule follow-ups before basic send works (Phase E). Must ship before Phase H (convert) because convert calls `cancelAllFollowups`.
+
+**Delivers:**
+- `QUEUE_NAMES.ESTIMATE_FOLLOWUPS` registration in `queue.constant.ts` and `queue.module.ts`
+- `EstimateFollowupScheduler` service (producer side) with deterministic `jobId` scheme including `revisionNumber`
+- `EstimateFollowupProcessor` in WorkerModule with defence-in-depth state check
+- Wire scheduler into `EstimateEmailSender.send` (on success → schedule 3/10/21)
+- Wire `cancelAllFollowups` into `EstimateReviser`, `EstimateResponseHandler`, `EstimateDeleter`, `EstimateUpdater.markLost`
+- Three follow-up Maizzle templates (3d, 10d, 21d — non-binding copy maintained)
+- **Production Redis AOF persistence enabled (CRITICAL — infra work before first deploy)**
+- Production smoke test: schedule 60s delayed job, restart Redis, verify fires
+
+**Addresses (features):** Automated follow-up sequence at 3/10/21 days, reset on revision, cancel on response
+
+**Avoids (pitfalls):** Pitfall 2 (orphaned follow-ups — deterministic jobIds + unified cancellation helper + worker state check), **Pitfall 4 (Redis AOF — CRITICAL)**, Pitfall 10 (post-expiry firing — worker checks expiresAt), Pitfall 11 (timezone — relative delays in UTC ms are DST-safe), Pitfall 15 (soft-delete follow-ups)
+
+**Research flag:** NO — BullMQ delayed-job pattern is verified in STACK.md and ARCHITECTURE.md against official docs; just needs disciplined execution.
+
+### Phase H — Convert to Quote (depends on B, existing QuoteCreator, G)
+
+**Rationale:** Depends on follow-up cancellation (G), estimate persistence (B), and the existing QuoteCreator. Nothing downstream depends on it, so it can slip last without blocking anything.
+
+**Delivers:**
+- `EstimateToQuoteConverter` service (in `src/estimate/`, not `src/quote/` — preserves one-way DI)
+- `POST /v1/estimate/:id/convert` endpoint with `Idempotency-Key` header support
+- `EstimateUpdater.markConverted` method (transitions status, stores `convertedToQuoteId` back-link)
+- Convert button in `EstimateActionStrip` UI (disabled on click)
+- Back-link display on quote detail ("Converted from E-2026-0042")
+- E2E test: create → send → view → convert → verify follow-ups cancelled and quote independent of source
+
+**Addresses (features):** Convert to Quote with back-link, "drops contingency" (explicit pricing basis decision needed — see open questions), Revise Estimate action (Phase C component wired into action strip here)
+
+**Avoids (pitfalls):** Pitfall 6 (snapshot semantics + idempotency key + convert from latest revision), Pitfall 7 (separate services, no shared mutation path)
+
+**Research flag:** NO.
+
+### Phase I — Polish (parallel / ongoing)
+
+**Delivers:** Mark as Lost endpoint + structured reason; revision history panel UI (if Phase C shipped); `openapi.yaml` updates; E2E test coverage; optional estimate-expiry background sweep (may defer to future).
 
 ### Phase Ordering Rationale
 
-- **Phases 1 and 2 run in parallel** — different repos (API and UI), no dependencies between them. Maximises development throughput.
-- **Phases 3 and 4 run in parallel** — both depend on Phase 2 route structure, but not on each other.
-- **Phase 5 is last** — it depends on Phase 3 (displayName from onboarding) and cleans up after all other phases are validated in production.
-- **Stripe webhook changes ship in Phase 1** — before the onboarding wizard calls the new endpoint, preventing the failure mode where onboarding succeeds but the user has no local subscription record.
-- **Existing user migration must be validated before Phase 3 goes live** — the mandatory onboarding guard is the highest-risk user-facing change in this milestone.
+- **Refactors before additions.** Phase A lands the token and line-item widening before any estimate code is written, so every new file uses the canonical names and nothing needs renaming later.
+- **Backend-before-frontend at the data layer, parallel at the feature layer.** Phase B (backend CRUD) unblocks Phase D (frontend CRUD). Phase C (revisions) and Phase D can run in parallel.
+- **Ship the happy path before customer-facing.** Create and send (B, D, E) must be testable internally before the customer page (F) is exposed, because F is the highest-legal-risk surface.
+- **Convert-to-Quote is last backend phase.** It is the payoff feature but strictly downstream of everything else, and it's the only phase that can slip a few days without blocking the rest of the milestone.
+- **Infra gates block phase completion.** Phase G cannot ship without Redis AOF persistence enabled on production. Phase E cannot ship without a legal-review pass on default template copy. These are not soft constraints.
+- **Critical path for "estimates work end to end":** A → B → E → F → G. Phase C (revisions) and Phase H (convert) are value-add and can land slightly later without breaking the core estimate→send→response loop.
 
 ### Research Flags
 
-Phases likely needing deeper research during planning:
-- **Phase 3 (Onboarding Wizard):** Existing user migration test matrix. Run the onboarding guard logic against a production data snapshot to verify all user states pass correctly. This is a verification task, not research into unknowns — but it must happen before the mandatory redirect guards are deployed.
+**Phases likely needing deeper research during planning:**
+- **Phase E (Email + Send flow):** Default estimate template copy needs a targeted research pass on UK-consumer-law-appropriate non-binding language. Candidate for `/gsd:research-phase`. Also verify the ICO's January 2026 storage-and-access-technologies guidance before Phase E/F to confirm cookie/tracking assumptions haven't shifted.
+- **Phase F (Public customer page):** Legal-copy review for the customer-facing page (buttons, disclaimers, state-transition messaging). Can share the research pass with Phase E.
 
-Phases with standard patterns (skip research-phase):
-- **Phase 1 (No-Card Trial API):** Stripe API patterns fully documented; existing NestJS service/controller/repository structure is established.
-- **Phase 2 (Landing Page + Routes):** React Router layout routes are standard; landing page is a straightforward public component.
-- **Phase 4 (Hard Paywall):** Layout route guard pattern is identical to existing SubscriptionGatedLayout — just a stricter version.
-- **Phase 5 (Welcome Dashboard):** Standard conditional rendering on an existing page; getting-started widget follows existing patterns.
+**Phases with standard patterns (skip research-phase):**
+- **Phase A:** Existing source code directly demonstrates the refactor shape; no external research needed.
+- **Phase B:** Mirrors the v1.2 quote module pattern verbatim.
+- **Phase C:** MongoDB partial unique indexes are standard; only the transaction-semantics open question needs product sign-off.
+- **Phase D:** Radix Slider + RTK Query patterns documented in STACK.md with worked examples.
+- **Phase G:** BullMQ delayed-job pattern verified against official docs; just needs disciplined execution.
+- **Phase H:** Straightforward one-way DI against the existing `QuoteCreator`.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | Stripe API verified against official docs; Motion v12.38.0 confirmed current; all existing technology reuse confirmed from installed versions |
-| Features | HIGH | Competitor analysis conducted against live sites on 2026-03-31; Stripe trial conversion statistics from industry sources |
-| Architecture | HIGH | Route structure based on existing codebase patterns; Stripe subscription creation verified against official API docs; file removal inventory based on confirmed existing codebase structure |
-| Pitfalls | HIGH | Based on Stripe official docs, existing codebase knowledge (v1.6 implementation details), and established SPA routing patterns |
+| Stack | HIGH | Zero new dependencies; all versions confirmed against `node_modules` and v1.4/v1.7 phase research. Only medium-confidence note is the `dinero.js` v2 alpha pin (unchanged since v1.2). |
+| Features | MEDIUM-HIGH | Competitor analysis and UK legal framing HIGH (verified against Tradify docs, Citizens Advice, CRA 2015, Ombudsman guidance). Contingency percentages (10–25%) and follow-up cadence (3/10/21d) MEDIUM — drawn from US construction and B2B SaaS sales research adapted to UK trade context. Exact days and percentages are defensible defaults; adjust post-launch based on usage. |
+| Architecture | HIGH | Grounded in direct reads of `trade-flow-api/src/quote/*`, `src/quote-token/*`, `src/queue/*`, `src/worker/*`. Line-item `parentType` widening is MEDIUM (refactor shape is clear but production row count isn't verified). |
+| Pitfalls | HIGH | UK legal pitfalls cite CRA 2015 statute, ICO guidance, and solicitor commentary. BullMQ pitfalls verified against official docs. Dinero.js rounding pitfalls verified against both v1 and v2 API docs. Conversion/revision pitfalls derived from existing Trade Flow conventions + MongoDB community patterns (MEDIUM). |
 
-**Overall confidence:** HIGH
+**Overall confidence: HIGH.** The research leans heavily on verified source code reads and official documentation for the load-bearing decisions (module structure, BullMQ, Mongoose indexes, Radix Slider). The MEDIUM-confidence areas (contingency defaults, cadence days) are parameters, not architecture — they can be tuned after launch without refactoring.
 
 ### Gaps to Address
 
-- **`past_due` grace period duration:** Research recommends a grace period exists but does not prescribe duration (7 days? 14 days?). Flag for product decision during Phase 4 planning.
+These open questions should be resolved before the roadmap is finalised, or explicitly deferred into the roadmap's phase plans with owners.
 
-- **Landing page rendering strategy:** Three options with increasing complexity: `React.lazy()` with bundle analysis (minimum viable), `vite-plugin-prerender` (better SEO), separate Vite entry point (best SEO isolation). Right choice depends on whether organic search is a day-one acquisition channel — flag for decision during Phase 2 planning.
-
-- **`react-intersection-observer` inclusion:** Marked optional in research. Defer decision to Phase 2 implementation — evaluate whether Motion's `whileInView` covers all landing page visibility needs before adding the package.
-
-- **Old onboarding feature flag:** Research recommends an environment variable (`FEATURE_MANDATORY_ONBOARDING=true`) to allow rollback. Adds a small implementation cost in Phase 3. Flag for discussion during Phase 3 planning based on deployment risk tolerance.
+1. **Follow-up delivery time semantics.** Is "3 days from send" interpreted as "exactly 72 hours later" (simple, DST-safe, what the research assumes) or "9am the morning 3 days later in the tradesperson's local time" (better engagement, more complex)? Product decision for Phase G. Research recommends relative delay for v1.8.
+2. **Estimate expiry window default.** Status lifecycle includes `Expired` but the milestone spec doesn't define the default window or whether expiry is auto-transitioned via a background sweep in v1.8. Recommend: fixed default (e.g. 30 days from Sent), auto-expiry background job deferred to Phase I or later.
+3. **"Revise Estimate" semantics for "From £X" displays.** When revising a "From £X" estimate, does the trader re-enter the base price and contingency fresh, or is the new base computed from the old low bound? Product decision for Phase C.
+4. **Convert-to-Quote pricing basis.** Milestone spec says conversion "drops contingency." Concretely: does the new quote's line items use the estimate's base price (low end), the mid-point, or something else? And does the trader get a chance to edit before the quote is saved? Recommend: copy base price with a mandatory review step in the UI. Phase H decision.
+5. **`quote-settings` → `document-settings` rename scope.** Is the rename refactor in v1.8 (cleaner long-term shape) or deferred to a later cleanup milestone (tolerate a parallel `estimate-settings` module for now)? Architecture research recommends doing the rename in Phase A.
+6. **Revision `isCurrent` flip transaction semantics.** The existing codebase does not use MongoDB transactions. Is it acceptable to rely on the partial unique index as the correctness guard (with a downgrade-then-insert-else-rollback path), or should revisions be the first feature to introduce transactions? Phase C decision.
+7. **Worker module import strategy.** Does `WorkerModule` import the full `EstimateModule` (heavy but simple) or a minimal `EstimateWorkerModule` exporting only `EstimateRetriever` + `EstimateEmailSender` (cleaner but extra file)? Phase G decision.
+8. **GDPR right-to-be-forgotten policy for estimates.** Not a v1.8 code task but v1.8 materially expands the PII audit trail. Flag for data-protection policy review — recommend soft-redact (replace PII with `[redacted]`, retain amounts/dates/status history) as the documented stance.
+9. **Line items `parentType` backfill risk.** Safe to backfill `parentType: "quote"` during deploy, or stage through a feature flag? Depends on production `quote_line_items` row count. Phase A decision.
+10. **Estimate PDF export.** Out of scope for v1.8 per milestone spec, consistent with v1.3 quote PDF deferral. Flag for the future quote-PDF milestone to solve once for both document types.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- [Stripe: Use free trial periods on subscriptions](https://docs.stripe.com/billing/subscriptions/trials/free-trials) — no-card trial API, `trial_period_days`, `trial_settings.end_behavior.missing_payment_method`
-- [Stripe: Create a subscription API](https://docs.stripe.com/api/subscriptions/create) — `payment_behavior: "default_incomplete"`, idempotency keys
-- [Stripe: Using webhooks with subscriptions](https://docs.stripe.com/billing/subscriptions/webhooks) — event sequence for API-created vs Checkout-created subscriptions
-- [Motion official site + npm](https://motion.dev/) — v12.38.0 confirmed current, React 19 compatible, import from `motion/react`
-- [react-intersection-observer npm](https://www.npmjs.com/package/react-intersection-observer) — v10.0.3 confirmed current
-- Trade Flow existing codebase (ARCHITECTURE.md, STRUCTURE.md, PROJECT.md) — v1.6 implementation patterns, existing route structure, subscription schema
+- **Trade Flow source code** (read directly by architecture researcher): `trade-flow-api/src/quote/*`, `src/quote-token/*`, `src/quote-settings/*`, `src/queue/*`, `src/worker/*`, `trade-flow-api/CLAUDE.md`
+- **Trade Flow planning artifacts:** `.planning/codebase/ARCHITECTURE.md`, `.planning/codebase/CONVENTIONS.md`, `.planning/codebase/STACK.md` (v1.7 snapshot), `.planning/PROJECT.md` (v1.8 milestone spec and key decisions), v1.2/v1.3/v1.4/v1.6/v1.7 phase research
+- **BullMQ official docs:** [Delayed jobs](https://docs.bullmq.io/guide/jobs/delayed), [Job Ids](https://docs.bullmq.io/guide/jobs/job-ids), [Deduplication](https://docs.bullmq.io/guide/jobs/deduplication), [Removing Jobs](https://docs.bullmq.io/guide/queues/removing-jobs), [Auto-removal](https://docs.bullmq.io/guide/queues/auto-removal-of-jobs), [Going to Production](https://docs.bullmq.io/guide/going-to-production), [QueueScheduler deprecation](https://docs.bullmq.io/guide/queuescheduler)
+- **UK statute and regulator:** [Consumer Rights Act 2015, Part 1, Chapter 4 (Services)](https://www.legislation.gov.uk/ukpga/2015/15/part/1/chapter/4), [ICO direct marketing guidance](https://ico.org.uk/for-organisations/direct-marketing-and-privacy-and-electronic-communications/guidance-on-direct-marketing-using-electronic-mail/), [ICO storage and access technologies guidance](https://ico.org.uk/for-organisations/direct-marketing-and-privacy-and-electronic-communications/guidance-on-the-use-of-storage-and-access-technologies/)
+- **Radix / shadcn official:** [Radix Primitives Slider](https://www.radix-ui.com/primitives/docs/components/slider), [shadcn/ui February 2026 unified Radix package changelog](https://ui.shadcn.com/docs/changelog/2026-02-radix-ui)
+- **Dinero.js official:** [v2 is out (Sarah Dayan)](https://www.sarahdayan.com/blog/dinerojs-v2-is-out), [v2 Amount concept](https://v2.dinerojs.com/docs/core-concepts/amount), [v1.9.1 on npm](https://www.npmjs.com/package/dinero.js/v/1.9.1)
+- **MongoDB official:** [Document Versioning design pattern](https://www.mongodb.com/docs/manual/data-modeling/design-patterns/data-versioning/document-versioning/), [Mongoose Populate (self-refs)](https://mongoosejs.com/docs/populate.html)
 
 ### Secondary (MEDIUM confidence)
-- [ServiceM8](https://www.servicem8.com), [Fergus](https://fergus.com), [Tradify](https://www.tradifyhq.com), [Jobber](https://www.getjobber.com) — live competitor site analysis, 2026-03-31
-- [Stripe: Configure free trials (Checkout)](https://docs.stripe.com/payments/checkout/free-trials) — Checkout approach considered and rejected for no-card flow
-- [SaaS Free Trial Conversion Statistics 2025](https://www.amraandelma.com/free-trial-conversion-statistics/) — 18-25% opt-in vs ~49% opt-out conversion rates
-- [Hard Paywall vs Soft Paywall (RevenueCat)](https://www.revenuecat.com/blog/growth/hard-paywall-vs-soft-paywall/) — conversion trade-off analysis
+- **Competitor behaviour:** [Tradify — Sending an Estimate instead of a Quote](https://help.tradifyhq.com/hc/en-us/articles/22034309269785-Sending-an-Estimate-instead-of-a-Quote), [Tradify — Create an Estimate](https://help.tradifyhq.com/hc/en-us/articles/15070931267609-Create-an-Estimate), [Jobber — Converting a Request to a Quote or Job](https://help.getjobber.com/hc/en-us/articles/360056871013-Converting-a-Request-to-a-Quote-or-Job), [ServiceM8 — Quoting for Work](https://www.servicem8.com/us/articles/quoting-for-work-write-winning-job-estimates), [ServiceM8 vs Tradify vs Jobber comparison — tpsTech](https://tpstech.au/blog/service-scheduling-software-showdown-servicem8-vs-tradify-vs-jobber/)
+- **UK legal practitioner commentary:** [Hegarty Solicitors — Contractor Exceeds Original Quote](https://hegarty.co.uk/news/contractor-exceeds-original-quote-what-are-your-rights), [BTO Solicitors — Estimates: Beware!](https://www.bto.co.uk/blog/estimates-%E2%80%93-beware!.aspx), [Ralli Solicitors — Estimates and Quotations](https://ralli.co.uk/estimates-and-quotations/), [Go Legal AI — Quote vs Estimate UK Legal Guide](https://go-legal.ai/difference-between-a-quote-and-estimate-uk-legal-guide/), [Dispute Resolution Ombudsman](https://www.disputeresolutionombudsman.org/blogs/q-what-is-the-difference-between-and-estimate-and-a-quotation-and-why-is-it-important)
+- **Contingency percentages (US-adapted):** [Simpro Plumbing Estimate Template](https://www.simprogroup.com/blog/plumbing-estimate-template), [Housecall Pro 2026 Plumbing Price Guide](https://www.housecallpro.com/resources/marketing/how-to/how-to-price-plumbing-jobs/), [FreshBooks Plumbing Estimate](https://www.freshbooks.com/hub/estimates/plumbing-estimate), [Ultimate Calculators Plumbing Cost Calculator](https://ultimatecalculators.com/calculator/plumbing-cost-calculator/)
+- **Follow-up cadence:** [Belkins Sales Follow-Up Statistics 2025](https://belkins.io/blog/sales-follow-up-statistics), [Yesware Sales Follow-Up Statistics](https://www.yesware.com/blog/sales-follow-up-statistics/), [Apollo Sales Follow-Up Email Guide](https://www.apollo.io/insights/sales-follow-up-email), [Outreach Email Cadence Best Practices](https://www.outreach.ai/resources/blog/email-cadence)
+- **CRM lost-deal taxonomy:** [DealHub — What is Closed Lost](https://dealhub.io/glossary/closed-lost/), [Zendesk deal loss reasons](https://support.zendesk.com/hc/en-us/articles/4408828162330-Creating-and-using-deal-loss-reasons), [HubSpot Closed-Lost pipeline community thread](https://community.hubspot.com/t5/Tips-Tricks-Best-Practices/Closed-lost-stage-in-sales-pipeline/m-p/949918)
+- **UK PECR / GDPR on tracking pixels:** [DMA Email Council on Tracking Pixels](https://dma.org.uk/article/dma-email-council-understanding-email-tracking-pixels), [Transactional vs Marketing Emails under PECR — WDPS](https://wdps.co.uk/transactional-vs-marketing-emails-pecr/)
 
-### Tertiary (LOW confidence — needs validation)
-- [Airtable Onboarding Wizard case study](https://www.candu.ai/blog/airtables-best-wizard-onboarding-flow) — 20% activation lift from wizard approach (single source)
-- [SaaS Onboarding Best Practices 2025](https://productled.com/blog/5-best-practices-for-better-saas-user-onboarding) — checklist patterns and time-to-value benchmarks
+### Tertiary (LOW confidence — informational)
+- Online booking products (competitive anti-feature research): BUILT Booking, Tradease, Nabooki, SimplyBook, Acuity — not implemented, referenced to justify the message-based site-visit approach
+- Forum commentary on UK estimate disputes (Just Answer): used only to reinforce solicitor sources, not as primary legal reference
 
 ---
-*Research completed: 2026-03-31*
+
+*Research synthesized: 2026-04-10*
 *Ready for roadmap: yes*
