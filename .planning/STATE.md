@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Estimates
-status: defining_requirements
-stopped_at: Milestone v1.8 started
+status: roadmap_defined
+stopped_at: Roadmap created, ready to plan Phase 41
 last_updated: "2026-04-10T00:00:00.000Z"
 last_activity: 2026-04-10
 progress:
-  total_phases: 0
+  total_phases: 8
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,14 +21,38 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-07)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** v1.8 Estimates -- defining requirements
+**Current focus:** v1.8 Estimates -- roadmap defined, ready to plan Phase 41
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Phase 41 (Foundations & Refactor) -- not started
 Plan: —
-Status: Defining requirements
-Last activity: 2026-04-10 — Completed quick task 260410-tkt: Review onboarding defect fixes and refactor for better holistic solution
+Status: Roadmap defined (8 phases, 58 requirements mapped)
+Last activity: 2026-04-10 — v1.8 roadmap created: Phases 41-48, 100% requirement coverage, traceability filled
+
+**Next step:** `/gsd-plan-phase 41` to decompose Phase 41 (Foundations & Refactor) into executable plans.
+
+## Roadmap Summary
+
+**Milestone:** v1.8 Estimates
+**Phases:** 41-48 (8 phases)
+**Requirements:** 58/58 mapped (100% coverage)
+**Granularity:** fine
+**Full detail:** `.planning/milestones/v1.8-ROADMAP.md`
+
+| Phase | Goal | Requirements | Status |
+|-------|------|--------------|--------|
+| 41. Foundations & Refactor | Canonical token/settings renames land before estimate code | FND-01/02/03 | Not started |
+| 42. Estimate Module CRUD (Backend) | Trader can CRUD estimates with E-YYYY-NNN numbering and validated lifecycle | EST-01..08, CONT-01/02/05, RESP-08 | Not started |
+| 43. Revisions | Invisible versioned revisions with partial unique index and history | REV-01..05 | Not started |
+| 44. Estimate Frontend CRUD | Visual create/edit/list/detail with contingency slider and range display | CONT-03/04 | Not started |
+| 45. Email & Send Flow | Send estimate with mandatory non-binding legal copy and audit HTML | SND-01..07 | Not started |
+| 46. Public Customer Page & Response Handling | Latest-revision resolution, 4-button response flow, structured decline | CUST-01..07, RESP-01..07 | Not started |
+| 47. Follow-up Queue & Automation | BullMQ delayed 3/10/21d follow-ups with cancel-on-exit and AOF infra gate | FUP-01..08 | Not started |
+| 48. Convert to Quote & Mark as Lost | Idempotent convert with mandatory review, back-link, markLost | CONV-01..06, LOST-01/02 | Not started |
+
+**Critical path (estimates work end to end):** 41 -> 42 -> 45 -> 46 -> 47 -> 48
+**Parallel:** Phase 43 and Phase 44 can run in parallel after Phase 42 lands.
 
 ## Performance Metrics
 
@@ -47,6 +71,8 @@ Last activity: 2026-04-10 — Completed quick task 260410-tkt: Review onboarding
 | v1.3 Send Quotes | 5 | 18 | ~1 hour | 3min |
 | v1.4 Worker Infrastructure | 4 | 7 | ~13min | 2min |
 | v1.6 Stripe Billing | 6 | 14 | ~55min | 4min |
+| v1.7 Onboarding & Landing | 6 | 13 | (see phase rows below) | — |
+| v1.8 Estimates | 8 | TBD | — | — |
 | Phase 35 P01 | 4min | 2 tasks | 4 files |
 | Phase 35 P02 | 2min | 1 tasks | 2 files |
 | Phase 37 P01 | 4min | 2 tasks | 13 files |
@@ -64,7 +90,12 @@ v1.7 decisions archived with milestone completion.
 
 ### Roadmap Evolution
 
-v1.7 complete. No active milestone.
+v1.8 roadmap created 2026-04-10:
+- 8 phases (41-48) derived from 10 requirement categories
+- Separate EstimateModule pattern chosen over polymorphic discriminator (see ARCHITECTURE.md §10)
+- Foundations-first refactor (Phase 41) before any estimate code is written
+- Phase 47 gated on production Redis AOF persistence (FUP-08 is a hard infra gate)
+- Phase 45 gated on legal-review pass of non-binding email copy (SND-05 is non-removable)
 
 ### Pending Todos
 
@@ -73,6 +104,8 @@ None.
 ### Blockers/Concerns
 
 - v1.5 Playwright testing (Phases 25-28) still in progress -- paused during v1.6/v1.7 work
+- **Phase 45 legal-review gate**: Default estimate email template copy must pass UK-consumer-law review before Phase 45 can ship
+- **Phase 47 infra gate**: Production Redis must have `appendonly yes` / `appendfsync everysec` before Phase 47 can ship (FUP-08)
 
 ### Quick Tasks Completed
 
@@ -97,6 +130,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-07T17:01:00Z
-Stopped at: Completed quick task 260407-pwg
-Resume file: None
+Last session: 2026-04-10T00:00:00Z
+Stopped at: v1.8 roadmap created, ready to plan Phase 41
+Resume file: `.planning/milestones/v1.8-ROADMAP.md`

@@ -149,70 +149,70 @@ Explicitly excluded from v1.8. Documented to prevent scope creep.
 
 ## Traceability
 
-Requirements -> phases mapping (filled by roadmap).
+Requirements -> phases mapping (filled by roadmap 2026-04-10).
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| FND-01 | TBD | Pending |
-| FND-02 | TBD | Pending |
-| FND-03 | TBD | Pending |
-| EST-01 | TBD | Pending |
-| EST-02 | TBD | Pending |
-| EST-03 | TBD | Pending |
-| EST-04 | TBD | Pending |
-| EST-05 | TBD | Pending |
-| EST-06 | TBD | Pending |
-| EST-07 | TBD | Pending |
-| EST-08 | TBD | Pending |
-| CONT-01 | TBD | Pending |
-| CONT-02 | TBD | Pending |
-| CONT-03 | TBD | Pending |
-| CONT-04 | TBD | Pending |
-| CONT-05 | TBD | Pending |
-| REV-01 | TBD | Pending |
-| REV-02 | TBD | Pending |
-| REV-03 | TBD | Pending |
-| REV-04 | TBD | Pending |
-| REV-05 | TBD | Pending |
-| SND-01 | TBD | Pending |
-| SND-02 | TBD | Pending |
-| SND-03 | TBD | Pending |
-| SND-04 | TBD | Pending |
-| SND-05 | TBD | Pending |
-| SND-06 | TBD | Pending |
-| SND-07 | TBD | Pending |
-| CUST-01 | TBD | Pending |
-| CUST-02 | TBD | Pending |
-| CUST-03 | TBD | Pending |
-| CUST-04 | TBD | Pending |
-| CUST-05 | TBD | Pending |
-| CUST-06 | TBD | Pending |
-| CUST-07 | TBD | Pending |
-| RESP-01 | TBD | Pending |
-| RESP-02 | TBD | Pending |
-| RESP-03 | TBD | Pending |
-| RESP-04 | TBD | Pending |
-| RESP-05 | TBD | Pending |
-| RESP-06 | TBD | Pending |
-| RESP-07 | TBD | Pending |
-| RESP-08 | TBD | Pending |
-| FUP-01 | TBD | Pending |
-| FUP-02 | TBD | Pending |
-| FUP-03 | TBD | Pending |
-| FUP-04 | TBD | Pending |
-| FUP-05 | TBD | Pending |
-| FUP-06 | TBD | Pending |
-| FUP-07 | TBD | Pending |
-| FUP-08 | TBD | Pending |
-| CONV-01 | TBD | Pending |
-| CONV-02 | TBD | Pending |
-| CONV-03 | TBD | Pending |
-| CONV-04 | TBD | Pending |
-| CONV-05 | TBD | Pending |
-| CONV-06 | TBD | Pending |
-| LOST-01 | TBD | Pending |
-| LOST-02 | TBD | Pending |
+| FND-01 | Phase 41 | Pending |
+| FND-02 | Phase 41 | Pending |
+| FND-03 | Phase 41 | Pending |
+| EST-01 | Phase 42 | Pending |
+| EST-02 | Phase 42 | Pending |
+| EST-03 | Phase 42 | Pending |
+| EST-04 | Phase 42 | Pending |
+| EST-05 | Phase 42 | Pending |
+| EST-06 | Phase 42 | Pending |
+| EST-07 | Phase 42 | Pending |
+| EST-08 | Phase 42 | Pending |
+| CONT-01 | Phase 42 | Pending |
+| CONT-02 | Phase 42 | Pending |
+| CONT-03 | Phase 44 | Pending |
+| CONT-04 | Phase 44 | Pending |
+| CONT-05 | Phase 42 | Pending |
+| REV-01 | Phase 43 | Pending |
+| REV-02 | Phase 43 | Pending |
+| REV-03 | Phase 43 | Pending |
+| REV-04 | Phase 43 | Pending |
+| REV-05 | Phase 43 | Pending |
+| SND-01 | Phase 45 | Pending |
+| SND-02 | Phase 45 | Pending |
+| SND-03 | Phase 45 | Pending |
+| SND-04 | Phase 45 | Pending |
+| SND-05 | Phase 45 | Pending |
+| SND-06 | Phase 45 | Pending |
+| SND-07 | Phase 45 | Pending |
+| CUST-01 | Phase 46 | Pending |
+| CUST-02 | Phase 46 | Pending |
+| CUST-03 | Phase 46 | Pending |
+| CUST-04 | Phase 46 | Pending |
+| CUST-05 | Phase 46 | Pending |
+| CUST-06 | Phase 46 | Pending |
+| CUST-07 | Phase 46 | Pending |
+| RESP-01 | Phase 46 | Pending |
+| RESP-02 | Phase 46 | Pending |
+| RESP-03 | Phase 46 | Pending |
+| RESP-04 | Phase 46 | Pending |
+| RESP-05 | Phase 46 | Pending |
+| RESP-06 | Phase 46 | Pending |
+| RESP-07 | Phase 46 | Pending |
+| RESP-08 | Phase 42 | Pending |
+| FUP-01 | Phase 47 | Pending |
+| FUP-02 | Phase 47 | Pending |
+| FUP-03 | Phase 47 | Pending |
+| FUP-04 | Phase 47 | Pending |
+| FUP-05 | Phase 47 | Pending |
+| FUP-06 | Phase 47 | Pending |
+| FUP-07 | Phase 47 | Pending |
+| FUP-08 | Phase 47 | Pending |
+| CONV-01 | Phase 48 | Pending |
+| CONV-02 | Phase 48 | Pending |
+| CONV-03 | Phase 48 | Pending |
+| CONV-04 | Phase 48 | Pending |
+| CONV-05 | Phase 48 | Pending |
+| CONV-06 | Phase 48 | Pending |
+| LOST-01 | Phase 48 | Pending |
+| LOST-02 | Phase 48 | Pending |
 
 ---
 
-*Last updated: 2026-04-11 — v1.8 Estimates requirements defined*
+*Last updated: 2026-04-10 — v1.8 Estimates roadmap created, traceability filled*
