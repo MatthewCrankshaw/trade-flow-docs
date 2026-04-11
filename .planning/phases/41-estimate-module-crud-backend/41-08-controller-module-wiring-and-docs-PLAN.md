@@ -12,6 +12,7 @@ files_modified:
   - trade-flow-api/openapi.yaml
   - .planning/ROADMAP.md
   - .planning/milestones/v1.8-ROADMAP.md
+  - .planning/STATE.md
 autonomous: true
 requirements: [EST-01, EST-04, EST-05, EST-06, EST-07, EST-08, EST-09, CONT-01, CONT-02, CONT-05]
 must_haves:
@@ -25,6 +26,8 @@ must_haves:
     - `openapi.yaml` has 8 new endpoint entries under `/v1/estimates*` with full request/response schemas
     - `.planning/ROADMAP.md` Phase 41 success criterion #5 is rewritten per D-TKN-07
     - `.planning/milestones/v1.8-ROADMAP.md` Phase 41 success criterion #5 is also rewritten
+    - `.planning/STATE.md` Phase 41 criterion #5 reference matches the D-TKN-07 locked wording (or the absence of any such reference has been confirmed with a grep assertion)
+    - `.planning/ROADMAP.md` Phase 41 prose uses the locked collection name `estimatelineitems` (not `estimate_line_items`) per D-ENT-02
     - `cd trade-flow-api && npm run ci` exits 0 (FINAL gate for the phase)
   artifacts:
     - path: trade-flow-api/src/estimate/controllers/estimate.controller.ts
@@ -827,15 +830,17 @@ Commit message: `docs(41): add estimate endpoints and DTOs to openapi.yaml`.
 </task>
 
 <task type="auto">
-  <name>Task 4: Rewrite ROADMAP.md Phase 41 success criterion #5 per D-TKN-07</name>
+  <name>Task 4: Rewrite ROADMAP.md / v1.8-ROADMAP.md / STATE.md per D-TKN-07 and fix estimatelineitems prose drift per D-ENT-02</name>
   <files>
     .planning/ROADMAP.md,
-    .planning/milestones/v1.8-ROADMAP.md
+    .planning/milestones/v1.8-ROADMAP.md,
+    .planning/STATE.md
   </files>
   <read_first>
-    - .planning/ROADMAP.md (current Phase 41 section — specifically the line listing success criterion #5)
+    - .planning/ROADMAP.md (current Phase 41 section — success criterion #5 AND all prose using `estimate_line_items` vs `estimatelineitems` per D-ENT-02)
     - .planning/milestones/v1.8-ROADMAP.md (if it exists — the canonical milestone roadmap that mirrors the top-level ROADMAP.md)
-    - .planning/phases/41-estimate-module-crud-backend/41-CONTEXT.md (D-TKN-07 LOCKED replacement text)
+    - .planning/STATE.md (check whether Phase 41 criterion #5 is referenced anywhere; D-TKN-07 requires the planner to update STATE.md as part of this phase)
+    - .planning/phases/41-estimate-module-crud-backend/41-CONTEXT.md (D-TKN-07 LOCKED replacement text AND D-ENT-02 locked collection name)
   </read_first>
   <action>
 **Step 1: Locate the current success criterion #5 in `.planning/ROADMAP.md`** (Phase 41 section, which the executor already saw in Task 1 context). The current wording is:
@@ -848,11 +853,18 @@ Commit message: `docs(41): add estimate endpoints and DTOs to openapi.yaml`.
 
 **Step 3: Apply the same rewrite to `.planning/milestones/v1.8-ROADMAP.md`** if that file exists. Use the same locked wording. If the file does not exist, skip this step (the top-level ROADMAP.md is the only canonical source).
 
-**Step 4: Commit:**
+**Step 4: Update `.planning/STATE.md` per D-TKN-07.** D-TKN-07 explicitly directs the planner to update STATE.md as part of Phase 41 execution. Two paths:
+
+- If `grep -nE "one-shot reversible migration|quote-token.*rename.*document-token" .planning/STATE.md` returns any match, rewrite that text to align with the D-TKN-07 locked wording (use the same replacement text as Steps 1-2).
+- If no match exists (STATE.md has no Phase 41 criterion #5 reference), add a one-line note under the current Phase 41 section confirming the locked wording is authoritative, OR record the absence explicitly in the commit body. Either way, the acceptance criteria below must pass.
+
+**Step 5: Fix the `estimate_line_items` / `estimatelineitems` drift in `.planning/ROADMAP.md` per D-ENT-02.** The locked collection name (D-ENT-02) is `estimatelineitems` with no underscore. ROADMAP.md Phase 41 prose currently uses `estimate_line_items`. Replace every occurrence of the underscore form in the Phase 41 prose with the locked form. Scope the edit to the Phase 41 section only (between `### Phase 41` and `### Phase 42` headings) — do not alter the phase slug `estimate-module-crud-backend` or any hyphenated usage such as `estimate-line-item.repository`. Apply the same fix to `.planning/milestones/v1.8-ROADMAP.md` if that file references `estimate_line_items` in the Phase 41 section.
+
+**Step 6: Commit:**
 
 ```
-git add .planning/ROADMAP.md .planning/milestones/v1.8-ROADMAP.md
-git commit -m "docs(41): rewrite phase 41 success criterion #5 per D-TKN-07"
+git add .planning/ROADMAP.md .planning/milestones/v1.8-ROADMAP.md .planning/STATE.md
+git commit -m "docs(41): rewrite phase 41 success criterion #5 per D-TKN-07 and align estimatelineitems prose per D-ENT-02"
 ```
   </action>
   <acceptance_criteria>
@@ -861,12 +873,16 @@ git commit -m "docs(41): rewrite phase 41 success criterion #5 per D-TKN-07"
     - If `.planning/milestones/v1.8-ROADMAP.md` exists:
       - `grep -c "one-shot reversible migration" .planning/milestones/v1.8-ROADMAP.md` returns 0
       - `grep -c "No data migration is required" .planning/milestones/v1.8-ROADMAP.md` returns at least 1
+    - `grep -c "one-shot reversible migration" .planning/STATE.md` returns 0 (STATE.md contains no stale D-TKN wording)
+    - Either `grep -c "No data migration is required" .planning/STATE.md` returns at least 1 (locked wording present) OR `grep -c "Phase 41.*criterion #5\\|quote-token.*document-token" .planning/STATE.md` returns 0 (locked absence confirmed); the executor records which branch applied in the commit body
+    - `awk '/^### Phase 41/,/^### Phase 42/' .planning/ROADMAP.md | grep -c "estimate_line_items"` returns 0 (D-ENT-02 drift fixed in Phase 41 prose)
+    - `awk '/^### Phase 41/,/^### Phase 42/' .planning/ROADMAP.md | grep -c "estimatelineitems"` returns at least 1 (locked collection name present)
     - The rest of Phase 41 success criteria 1-4 and 6 are UNCHANGED (sanity check with `grep -c "atomically generated\\|paginated list with tab filtering" .planning/ROADMAP.md` returns at least 2)
   </acceptance_criteria>
   <verify>
     <automated>grep -c "No data migration is required" .planning/ROADMAP.md</automated>
   </verify>
-  <done>ROADMAP.md and v1.8-ROADMAP.md success criterion #5 match the D-TKN-07 locked wording</done>
+  <done>ROADMAP.md, v1.8-ROADMAP.md, and STATE.md success criterion #5 all match the D-TKN-07 locked wording; ROADMAP.md Phase 41 prose uses `estimatelineitems` per D-ENT-02</done>
 </task>
 
 <task type="auto">
