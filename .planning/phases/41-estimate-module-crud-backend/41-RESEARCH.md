@@ -1037,27 +1037,35 @@ export class EstimateMockGenerator {
 
 **If A1 turns out false**, the token rename becomes a two-step deploy: (1) ship code that writes to `document_tokens` and reads from both; (2) run the one-shot rename migration to move existing `quote_tokens` documents into `document_tokens` with `documentType: "quote"` added; (3) remove the dual-read path. This is the rejected "dual-read fallback" in CONTEXT.md <deferred> — but it resurfaces if production data exists. **Planner must verify A1 as the very first task in Phase 41 execution.**
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Pre-execution check: does prod `quote_tokens` have data?**
    - What we know: CONTEXT.md asserts production has no data; Trade Flow shipped v1.3 (Send Quotes) to production on 2026-03-21 and has been live for 21 days, so real customer quote tokens almost certainly exist in production.
    - What's unclear: Whether the "no production data" claim is strictly about Phase 41's own state (no estimate data exists yet, which is trivially true) or also about the token collection (which would be surprising).
    - Recommendation: **BLOCKING.** Before executing Phase 41, run `mongosh "$MONGO_URL" --eval 'db.quote_tokens.countDocuments({})'` against production. If count > 0, escalate to the user: either accept that existing customer links break OR add a one-shot migration task (currently in CONTEXT.md <deferred>, would need un-deferring). The author of CONTEXT.md explicitly stated the "no production data" assumption, and it is the planner/executor's job to verify or reject it.
 
+   **Resolution:** Addressed by Plan 41-01 Task 1 as a `checkpoint:human-action` gate; operator verifies `db.quote_tokens.countDocuments({}) === 0` before any code changes land. If non-empty, phase halts for escalation.
+
 2. **Should the existing quote module be migrated to use pagination in the same PR?**
    - What we know: `QuoteController.findAll` is unpaginated. Phase 43 (estimate frontend) may surface the inconsistency when the estimate list page has pagination but the quote list page does not.
    - What's unclear: Whether retrofitting quote pagination is in scope for Phase 41 or a separate concern.
    - Recommendation: **Out of scope for Phase 41.** Flag as a follow-up quick task after Phase 43 ships. Phase 41 focuses on estimates only; quote pagination is a parallel concern.
+
+   **Resolution:** Out of scope for Phase 41; recorded as follow-up. Phase 41 implements pagination for the estimate endpoints only, using the existing `IResponse<T>.pagination` envelope. Quote `findAll` remains unchanged.
 
 3. **Should `EstimateUpdater.update(authUser, id, UpdateEstimateRequest)` accept a full-replace body or per-field patches?**
    - What we know: The quote module does NOT have a full-quote update — it has `addLineItem`, `updateLineItem`, `deleteLineItem` as three separate endpoints on `QuoteController`. CONTEXT.md recommends "mirror `QuoteUpdater` (add/update/delete line items through the same single update request)" which is slightly contradictory.
    - What's unclear: Whether Phase 41 should expose three sub-endpoints (`PATCH /estimates/:id`, `POST /estimates/:id/line-item`, `PATCH /estimates/:id/line-item/:lineItemId`, `DELETE /estimates/:id/line-item/:lineItemId`) to match quote, or a single `PATCH /estimates/:id` that accepts `{ lineItemsToAdd, lineItemsToUpdate, lineItemsToDelete, ...otherFields }`.
    - Recommendation: **Mirror the quote module's multi-endpoint pattern** for consistency. The single `PATCH /estimates/:id` endpoint should handle non-line-item fields (scope/title/notes/customer/job/contingency/display mode/uncertainty). Separate `POST`/`PATCH`/`DELETE` sub-resource endpoints handle line items. This lets the planner reuse `QuoteUpdater` patterns literally. **Update the endpoint list under Claude's Discretion accordingly.** This changes the 5-endpoint list to 8 endpoints: `POST /estimates`, `GET /estimates`, `GET /estimates/:id`, `PATCH /estimates/:id`, `DELETE /estimates/:id`, `POST /estimates/:id/line-item`, `PATCH /estimates/:id/line-item/:lineItemId`, `DELETE /estimates/:id/line-item/:lineItemId`.
 
+   **Resolution:** Mirror the quote-module convention — Phase 41 ships 8 endpoints total (`POST/GET/GET/PATCH/DELETE /v1/estimates[/:id]` + `POST /v1/estimates/:id/line-item`, `PATCH /v1/estimates/:id/line-item/:lineItemId`, `DELETE /v1/estimates/:id/line-item/:lineItemId`). Implemented in Plan 41-08.
+
 4. **Where does `PublicQuoteController` live after the rename?**
    - What we know: CONTEXT.md recommends `src/quote/controllers/public-quote.controller.ts`.
    - What's unclear: Whether this creates a circular dependency between `QuoteModule` and `DocumentTokenModule` (quote module provides the controller that uses the document-token guard).
    - Recommendation: **Keep `PublicQuoteController` in `DocumentTokenModule` for Phase 41 to avoid a circular dependency.** The existing `quote-token/controllers/public-quote.controller.ts` already demonstrates this works (the file is colocated with the guard and depends on `QuoteModule` via a `forwardRef`). Rename the directory `quote-token/` → `document-token/` and keep the controller in place under `document-token/controllers/public-quote.controller.ts`. Future Phase 45 will add a sibling `public-estimate.controller.ts` under the same `document-token/controllers/` directory. This actually matches the existing pattern more cleanly than CONTEXT's recommendation.
+
+   **Resolution:** Stays under `src/document-token/controllers/public-quote.controller.ts` — moving to `src/quote/controllers/` would create a circular dependency. Plan 41-03 places it there.
 
 ## Environment Availability
 
