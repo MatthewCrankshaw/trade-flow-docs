@@ -316,6 +316,7 @@ if (clonedChildren.length > 0) {
     import { EstimateStatus } from "@estimate/enums/estimate-status.enum";
     import { EstimateLineItemStatus } from "@estimate/enums/estimate-line-item-status.enum";
     import { EstimateMockGenerator } from "@estimate/test/mocks/estimate-mock-generator";
+    import { EstimateLineItemMockGenerator } from "@estimate/test/mocks/estimate-line-item-mock-generator";
 
     export class EstimateRevisionMockGenerator {
       public static createRoot(overrides: Partial<IEstimateDto> = {}): IEstimateDto {
@@ -352,34 +353,53 @@ if (clonedChildren.length > 0) {
       }
 
       public static createBundleLineItemSet(estimateId: string): IEstimateLineItemDto[] {
-        const bundleParentId = new ObjectId().toString();
-        // Matches research §7.4 fixture: li-A (bundle parent), li-B / li-C (children of li-A),
-        // li-D (standalone), li-E (DELETED, should be skipped by findNonDeletedByEstimateId).
+        // Matches research §7.4 fixture:
+        //   li-A (bundle parent), li-B / li-C (children of li-A),
+        //   li-D (standalone), li-E (DELETED — excluded by findNonDeletedByEstimateId at repo level).
+        // ALL items are built through EstimateLineItemMockGenerator.createLineItemDto, which returns
+        // a fully-typed IEstimateLineItemDto with defaults for every required field. NO casts.
+        const liAId = new ObjectId().toString();
         return [
-          {
-            id: bundleParentId,
+          EstimateLineItemMockGenerator.createLineItemDto({
+            id: liAId,
             estimateId,
             parentLineItemId: null,
             status: EstimateLineItemStatus.APPROVED,
-            quantity: 1,
-            unit: "bundle",
-            unitPrice: { amount: 10000, currency: "GBP" },
-            lineTotal: { amount: 10000, currency: "GBP" },
-          } as unknown as IEstimateLineItemDto,
-          // ... the remaining four items; refer to the research §7.4 for exact shape
+          }),
+          EstimateLineItemMockGenerator.createLineItemDto({
+            estimateId,
+            parentLineItemId: liAId,
+            status: EstimateLineItemStatus.APPROVED,
+          }),
+          EstimateLineItemMockGenerator.createLineItemDto({
+            estimateId,
+            parentLineItemId: liAId,
+            status: EstimateLineItemStatus.APPROVED,
+          }),
+          EstimateLineItemMockGenerator.createLineItemDto({
+            estimateId,
+            parentLineItemId: null,
+            status: EstimateLineItemStatus.APPROVED,
+          }),
+          EstimateLineItemMockGenerator.createLineItemDto({
+            estimateId,
+            parentLineItemId: null,
+            status: EstimateLineItemStatus.DELETED,
+          }),
         ];
       }
     }
     ```
 
-    **Adapt the line-item shape to the actual `IEstimateLineItemDto` interface** — the fields above are examples. Read `trade-flow-api/src/estimate/data-transfer-objects/estimate-line-item.dto.ts` (the Phase-41-produced file) to determine the exact field names, then populate the fixture accordingly. Include `originalUnitPrice`, `originalLineTotal`, `discountAmount`, `taxRate`, `type` per D-CONC-04.
+    **Prerequisite helper:** this mock generator relies on `EstimateLineItemMockGenerator.createLineItemDto(overrides?: Partial<IEstimateLineItemDto>)`, which should already exist from Phase 41 (check `trade-flow-api/src/estimate/test/mocks/estimate-line-item-mock-generator.ts`). If Phase 41 did NOT produce this helper, add its creation as a preliminary step inside THIS task — a ~10-line factory that returns a fully-typed `IEstimateLineItemDto` with reasonable defaults (id via `new ObjectId().toString()`, type, quantity 1, unit "hour", unitPrice via dinero, etc.) and shallow-merges `overrides`. The helper MUST return a concrete `IEstimateLineItemDto` without any casts.
 
-    **The `as unknown as IEstimateLineItemDto` cast is the one allowed exception** — it's a test-only fixture and the full field inventory is tedious. If the existing `EstimateLineItemMockGenerator` has a `createLineItemDto(overrides)` helper that fills defaults, use it: `EstimateLineItemMockGenerator.createLineItemDto({estimateId, parentLineItemId: null, ...})`. That's cleaner than the `as unknown as` cast and aligns with CLAUDE.md.
+    **No casts allowed in the mock generator file.** Every `IEstimateLineItemDto` instance MUST be produced by `EstimateLineItemMockGenerator.createLineItemDto(...)`, which owns the default field inventory. Do NOT build partial objects and cast them.
 
     **Prohibitions:**
     - No `any`.
+    - **No `as unknown as IEstimateLineItemDto` or any other `as` cast** — CLAUDE.md and `feedback_no_type_assertions.md` apply to test mock files too.
     - No `eslint-disable` / `@ts-ignore` / `@ts-expect-error` / `@ts-nocheck`.
-    - Use `EstimateMockGenerator.createEstimateDto` if it exists, don't re-invent defaults.
+    - Use `EstimateMockGenerator.createEstimateDto` / `EstimateLineItemMockGenerator.createLineItemDto` if they exist — don't re-invent defaults.
 
     No spec file is needed for the mock generator itself — its correctness is tested indirectly by the reviser spec in Task 2.
   </action>
@@ -392,6 +412,10 @@ if (clonedChildren.length > 0) {
     - `grep -c "rootEstimateId: id" trade-flow-api/src/estimate/test/mocks/estimate-revision-mock-generator.ts` returns 1
     - `grep -c "revisionNumber: parent.revisionNumber + 1" trade-flow-api/src/estimate/test/mocks/estimate-revision-mock-generator.ts` returns 1
     - `grep -c "eslint-disable\\|@ts-ignore\\|@ts-expect-error\\|@ts-nocheck" trade-flow-api/src/estimate/test/mocks/estimate-revision-mock-generator.ts` returns 0
+    - `! grep -q "as unknown as" trade-flow-api/src/estimate/test/mocks/estimate-revision-mock-generator.ts` (no `as unknown as` casts in the mock fixture)
+    - `! grep -qE "[[:space:]]as IEstimateLineItemDto" trade-flow-api/src/estimate/test/mocks/estimate-revision-mock-generator.ts` (no `as IEstimateLineItemDto` casts)
+    - `! grep -qE "[[:space:]]as [A-Z]" trade-flow-api/src/estimate/test/mocks/estimate-revision-mock-generator.ts` (no `as SomeType` casts anywhere in the mock file)
+    - `grep -c "EstimateLineItemMockGenerator.createLineItemDto" trade-flow-api/src/estimate/test/mocks/estimate-revision-mock-generator.ts` returns at least 5 (every fixture item built via the Phase 41 helper)
     - `cd trade-flow-api && npm run typecheck` exits 0
   </acceptance_criteria>
   <verify>
@@ -557,21 +581,19 @@ if (clonedChildren.length > 0) {
     }
 
     private async compensatingRollback(sourceId: string, newIdOrNull: string | null): Promise<void> {
-      // Runbook note: if this rollback fails, the chain may be left with zero current rows or two.
-      // The partial unique index still prevents two-current state. Manual recovery:
+      // Runbook note: if this rollback fails, the chain may be left with zero current rows.
+      // The partial unique index still prevents a two-current state. Manual recovery:
       //   1. db.estimates.updateOne({_id: ObjectId(newId)}, {$set: {status: "deleted", isCurrent: false, deletedAt: new Date()}})
       //   2. db.estimates.updateOne({_id: ObjectId(sourceId)}, {$set: {isCurrent: true}})
       // The trader can retry the POST after manual recovery.
       try {
-        // If step 2 already created a new row, soft-delete it first so the partial unique index is freed.
+        // Ordering matters (D-REV-06): soft-delete the new row FIRST so the partial unique
+        // index on {rootEstimateId, isCurrent} is freed, THEN restore the old row's isCurrent.
+        // softDeleteRow encapsulates the Mongo update document (Date + status enum) inside
+        // the repository layer — the service stays free of any `as` / `as unknown as` casts
+        // (CLAUDE.md: no `as` in production code; feedback_no_type_assertions memory rule).
         if (newIdOrNull) {
-          const newRow = await this.estimateRepository.findByIdOrFail(newIdOrNull);
-          await this.estimateRepository.update({
-            ...newRow,
-            status: EstimateStatus.DELETED,
-            isCurrent: false,
-            deletedAt: new Date() as unknown as never,
-          });
+          await this.estimateRepository.softDeleteRow(newIdOrNull);
         }
         await this.estimateRepository.restoreCurrent(sourceId);
       } catch (rollbackError) {
@@ -596,8 +618,7 @@ if (clonedChildren.length > 0) {
 
     **Critical notes:**
 
-    - The `deletedAt: new Date() as unknown as never` cast is a Date/DateTime mismatch: `IEstimateDto.deletedAt` is typed `DateTime | null` per CLAUDE.md DTO standard but the entity stores `Date`. The repository's `update` method converts. The `as unknown as never` pattern is ugly and should be replaced — prefer passing through the repository's existing `softDelete(id)` method if one exists. **Check `estimate.repository.ts` for a `softDelete` or equivalent method and call THAT instead.** The goal is to avoid any `as` in production code.
-    - If no `softDelete` exists, the correct path is to import `DateTime` from luxon and set `deletedAt: DateTime.now()` — that matches the DTO contract and the repository handles the conversion to JS Date.
+    - **No `as` casts in the service file — period.** The compensating rollback path routes through `EstimateRepository.softDeleteRow(newIdOrNull)`, which is added by plan 42-03. That repository method encapsulates the `Date` + `EstimateStatus.DELETED` update document inside the Mongo-touching layer, so the service never assembles a partial entity and never needs an `as` / `as unknown as` cast. This honours CLAUDE.md ("no `as` type assertions") and the user's `feedback_no_type_assertions.md` memory rule. If for any reason `softDeleteRow` is unavailable at execution time (should not happen — plan 42-03 is a hard wave-2 dependency of plan 42-04), the executor MUST stop and escalate rather than introduce any cast here.
     - The DI injection for `followupCanceller` uses `@Inject(ESTIMATE_FOLLOWUP_CANCELLER)` because the token is a string, not a class reference.
     - ESLint may flag `followupCanceller` as unused because it's injected but never called (by design — D-HOOK-03). Options:
       - (a) Prefix the parameter name: `_followupCanceller` — but then the test can't spy on it via `reviser['_followupCanceller']`.
@@ -879,9 +900,9 @@ if (clonedChildren.length > 0) {
 
     **Prohibitions:**
     - No `any` in production code (service file).
-    - Absolutely no `as` casts in the service except the clearly-documented unavoidable `deletedAt: new Date() as unknown as never` — and prefer calling `repository.softDelete` to eliminate even that.
+    - **Absolutely no `as` / `as unknown as` casts in the service file.** The compensating rollback path must route through `EstimateRepository.softDeleteRow` (added by plan 42-03). There are no "unavoidable" carve-outs. If you find yourself reaching for `as`, stop and reconsider the approach — the repository layer owns Mongo primitives.
     - No `eslint-disable` / `@ts-ignore` / `@ts-expect-error` / `@ts-nocheck` in either file.
-    - `as unknown as jest.Mocked<X>` IS acceptable in spec files — it's the standard NestJS mocking pattern for Test.createTestingModule with useValue.
+    - `as unknown as jest.Mocked<X>` IS acceptable in spec files — it is the standard NestJS mocking pattern for `Test.createTestingModule` with `useValue`. This exception applies ONLY to spec files, ONLY to `jest.Mocked<T>` narrowing, and does NOT extend to production code.
     - Path aliases only.
   </action>
   <acceptance_criteria>
@@ -900,6 +921,10 @@ if (clonedChildren.length > 0) {
     - `grep -c "this.followupCanceller\\." trade-flow-api/src/estimate/services/estimate-reviser.service.ts` returns 0 (injected but never called — D-HOOK-03)
     - `grep -c "cancelAllFollowups" trade-flow-api/src/estimate/services/estimate-reviser.service.ts` returns 0 (never called from the reviser)
     - `grep -c " any " trade-flow-api/src/estimate/services/estimate-reviser.service.ts` returns 0
+    - `! grep -q "as unknown as" trade-flow-api/src/estimate/services/estimate-reviser.service.ts` (no `as unknown as` casts anywhere in the service file)
+    - `! grep -qE "[[:space:]]as [A-Z]" trade-flow-api/src/estimate/services/estimate-reviser.service.ts` (no `as SomeType` casts anywhere in the service file)
+    - `grep -c "this.estimateRepository.softDeleteRow" trade-flow-api/src/estimate/services/estimate-reviser.service.ts` returns 1 (compensating rollback routes through repository primitive)
+    - `! grep -q "this.estimateRepository.update" trade-flow-api/src/estimate/services/estimate-reviser.service.ts` (compensating rollback must NOT assemble a partial entity via the repository update method)
     - `grep -c "eslint-disable\\|@ts-ignore\\|@ts-expect-error\\|@ts-nocheck" trade-flow-api/src/estimate/services/estimate-reviser.service.ts` returns 0
     - `grep -c "D-HOOK-03" trade-flow-api/src/estimate/test/services/estimate-reviser.service.spec.ts` returns at least 1
     - `grep -c "cancelAllFollowups.*not.toHaveBeenCalled\\|expect(cancelSpy).not.toHaveBeenCalled" trade-flow-api/src/estimate/test/services/estimate-reviser.service.spec.ts` returns at least 1

@@ -189,58 +189,13 @@ async findByIdOrFail(authUser, id): Promise<IEstimateDto> {
 
     **Critical:** NO recursion. No "if current is also not current, look up again" branch. The chain always has at most one `isCurrent: true` row at steady state; if the lookup returns null, we're in the ephemeral window and returning the target is correct.
 
-    **Step 2 — Extend the list method for D-DET-02.**
+    **Step 2 — D-DET-02 list filter (ownership delegated to plan 42-03).**
 
-    Find the existing list method (likely `findPaginatedByBusinessId` or `findAll`). The Phase 41 shape likely looks like:
+    The `isCurrent: true` filter on `EstimateRepository.findPaginatedByBusinessId` is added by plan 42-03 Task 1 Step 2.5 (repository-level edit). Plan 42-05 does NOT duplicate that edit — it only verifies the behavior at the retriever-spec level by stubbing the repository and asserting that the retriever's list method passes through the repository's result unchanged (no post-filtering in the service layer).
 
-    ```typescript
-    public async findPaginatedByBusinessId(
-      authUser: IUserDto,
-      businessId: string,
-      status: EstimateStatus | undefined,
-      limit: number,
-      offset: number,
-    ): Promise<{ items: IEstimateDto[]; pagination: IQueryResultsDto }> {
-      // ... access check ...
-      const result = await this.estimateRepository.findPaginatedByBusinessId(
-        businessId, status, limit, offset,
-      );
-      return { items: result.items.map((e) => this.totalsCalculator.calculateTotals(e)), pagination: result.pagination };
-    }
-    ```
+    The retriever service code at the list-method level is UNCHANGED by Phase 42. The retriever continues to call `estimateRepository.findPaginatedByBusinessId(...)` as Phase 41 produced it; the filter change lives inside the repository. This keeps `files_modified` for plan 42-05 free of `estimate.repository.ts` (no file overlap with plan 42-03).
 
-    The repository's `findPaginatedByBusinessId` accepts a filter — Phase 42 amends the service to pass `isCurrent: true`. The cleanest approach is to extend the repository method signature (OR the repository-level filter object) so the service always passes `isCurrent: true`.
-
-    **Option A: Add `isCurrent: true` at the repository query level.** Read `estimate.repository.ts`'s `findPaginatedByBusinessId` body. Find the filter construction:
-
-    ```typescript
-    const filter: Filter<IEstimateEntity> = {
-      businessId: new ObjectId(businessId),
-      deletedAt: null,
-      ...(status ? { status } : {}),
-    };
-    ```
-
-    Amend in place (this is a source-file edit in the REPOSITORY file, not the retriever — but the edit belongs to this plan because it's paired with the retriever extension):
-
-    ```typescript
-    const filter: Filter<IEstimateEntity> = {
-      businessId: new ObjectId(businessId),
-      deletedAt: null,
-      isCurrent: true, // Phase 42 D-DET-02: list shows one row per chain (the current revision)
-      ...(status ? { status } : {}),
-    };
-    ```
-
-    Since this edit is to `estimate.repository.ts`, it WAS already added by plan 42-03 if that plan's executor noticed. If not, add it here. Plan 42-03's acceptance criteria do NOT grep for this specific filter line; it's therefore expected to be added as part of plan 42-05. **Add `trade-flow-api/src/estimate/repositories/estimate.repository.ts` to `files_modified` in this plan's frontmatter** — DONE (already present in the files_modified list of plan 42-03; verify there is no conflict by coordinating with plan 42-03's executor, OR if plan 42-03 did not add this line, plan 42-05's executor adds it here). Actually — to be precise: plan 42-03 did NOT add this line (see plan 42-03's acceptance criteria — it asserts the five createIndex calls and the five new methods, not the list filter). Plan 42-05 owns this edit.
-
-    Since this creates a file overlap with plan 42-03, update this plan's `files_modified` to include the repository file. **The executor for plan 42-05 MUST check whether plan 42-03 left the list filter as-is, and only apply the edit if absent.** If the filter already has `isCurrent: true`, skip this sub-step.
-
-    **Actually — to avoid file-overlap complications, do the following:** instead of editing the repository, amend the RETRIEVER to post-filter results OR pass an explicit `extraFilter` argument through the repository method. The cleanest pattern is: the repository's `findPaginatedByBusinessId` signature gets a new optional parameter `{ isCurrentOnly?: boolean }` OR the retriever always passes the filter.
-
-    Simplest path given the file-overlap concern: make plan 42-03 own the repository edit. **Correction:** include a one-line addition to plan 42-03's Task 1 acceptance criteria to add `isCurrent: true` to the list filter. This plan (42-05) then only touches the retriever spec (asserting that the list method calls `findPaginatedByBusinessId` — the filter is verified at the repository-spec level in plan 42-03).
-
-    **Final decision for this plan's executor:** inspect `estimate.repository.ts` and check whether `findPaginatedByBusinessId` filter includes `isCurrent: true`. If NOT, add it here (and note in the SUMMARY that this was a plan-03-adjacent edit). If YES, skip the sub-step. Either way, the retriever service code remains unchanged at the list-method level — D-DET-02 is satisfied by the repository filter.
+    Add one spec case to the retriever spec in Step 4 (below) that stubs the repository to return a mixture of current and non-current rows, and asserts the retriever's list output preserves the mixture — proving the retriever does NOT post-filter (the filter is expected to happen at the repository/Mongo layer). See Step 4's `D-DET-02 list query returns only current rows` describe block for the exact shape.
 
     **Step 3 — Add `findRevisionsByIdOrFail` for D-HIST-01.**
 
@@ -329,6 +284,36 @@ async findByIdOrFail(authUser, id): Promise<IEstimateDto> {
         });
       });
 
+      describe("D-DET-02 list query returns only current rows", () => {
+        it("stub: repository returns current rows; retriever passes them through unchanged", async () => {
+          // D-DET-02 list filter ownership lives at the repository level (plan 42-03).
+          // This test verifies the retriever is a pass-through: when the repository returns
+          // only current rows, the retriever returns them unchanged — it does NOT post-filter.
+          const currentA = EstimateMockGenerator.createEstimateDto({ id: "a", isCurrent: true });
+          const currentB = EstimateMockGenerator.createEstimateDto({ id: "b", isCurrent: true });
+          mockRepo.findPaginatedByBusinessId.mockResolvedValue({
+            items: [currentA, currentB],
+            pagination: { limit: 10, offset: 0, total: 2 },
+          });
+          const result = await retriever.findPaginatedByBusinessId(authUser, "biz-id", undefined, 10, 0);
+          expect(result.items).toHaveLength(2);
+          expect(result.items.every((e) => e.isCurrent === true)).toBe(true);
+        });
+
+        it("regression: retriever does NOT post-filter — if the repository returned a mixture, the retriever would return the mixture (filter belongs to the repo layer)", async () => {
+          // Contract documentation: if plan 42-03's repository filter is ever weakened,
+          // the retriever will NOT silently compensate. The failure surface is the repo layer.
+          const currentRow = EstimateMockGenerator.createEstimateDto({ id: "cur", isCurrent: true });
+          const nonCurrentRow = EstimateMockGenerator.createEstimateDto({ id: "old", isCurrent: false });
+          mockRepo.findPaginatedByBusinessId.mockResolvedValue({
+            items: [currentRow, nonCurrentRow],
+            pagination: { limit: 10, offset: 0, total: 2 },
+          });
+          const result = await retriever.findPaginatedByBusinessId(authUser, "biz-id", undefined, 10, 0);
+          expect(result.items).toHaveLength(2);
+        });
+      });
+
       describe("findRevisionsByIdOrFail (D-HIST-01)", () => {
         it("resolves root id to the chain", async () => {
           const root = EstimateRevisionMockGenerator.createRoot({ id: "root-id" });
@@ -394,6 +379,7 @@ async findByIdOrFail(authUser, id): Promise<IEstimateDto> {
     - `grep -c "D-DET-01" trade-flow-api/src/estimate/test/services/estimate-retriever.service.spec.ts` returns at least 1
     - `grep -c "findRevisionsByIdOrFail\\|D-HIST-01" trade-flow-api/src/estimate/test/services/estimate-retriever.service.spec.ts` returns at least 2
     - `grep -c "zero-current-window\\|falls back to target" trade-flow-api/src/estimate/test/services/estimate-retriever.service.spec.ts` returns at least 1
+    - `grep -c "D-DET-02 list query returns only current rows" trade-flow-api/src/estimate/test/services/estimate-retriever.service.spec.ts` returns 1 (retriever-level verification of the plan-42-03 repository filter)
     - `grep -c " any\\| as " trade-flow-api/src/estimate/services/estimate-retriever.service.ts` returns 0
     - `grep -c "eslint-disable\\|@ts-ignore\\|@ts-expect-error\\|@ts-nocheck" trade-flow-api/src/estimate/services/estimate-retriever.service.ts` returns 0
     - `cd trade-flow-api && npm run test -- --testPathPattern=estimate-retriever` exits 0

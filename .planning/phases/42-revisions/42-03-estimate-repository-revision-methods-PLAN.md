@@ -21,12 +21,14 @@ must_haves:
     - "`EstimateRepository.restoreCurrent(id)` issues `findOneAndUpdate` with filter `{_id, isCurrent: false}` update `{$set: {isCurrent: true}}` — idempotent no-op if the row is already current."
     - "`EstimateRepository.findRevisionsByRootId(rootEstimateId)` returns an array of DTOs filtered by `{rootEstimateId, deletedAt: null}` ordered by `{revisionNumber: 1}` ascending."
     - "`EstimateRepository.findCurrentInChainByRootId(rootEstimateId)` returns the single DTO matching `{rootEstimateId, isCurrent: true, deletedAt: null}` or `null` during the zero-current window."
+    - "`EstimateRepository.softDeleteRow(id)` issues `findOneAndUpdate` with filter `{_id, isCurrent: false}` update `{$set: {status: DELETED, deletedAt: new Date()}}` — used by the reviser's compensating rollback path to free the partial unique index without any `as` casts in the service layer."
+    - "`EstimateRepository.findPaginatedByBusinessId` filter includes `isCurrent: true` so list queries return one row per revision chain (D-DET-02, ownership moved from plan 42-05)."
     - "`EstimateLineItemRepository.findNonDeletedByEstimateId(estimateId)` returns all line items for an estimate excluding `status: DELETED`."
     - "`EstimateLineItemRepository.bulkInsertForRevision(entities)` inserts the given rows sequentially and returns the persisted DTOs (sequential insertOne calls, not a non-existent `insertMany`)."
     - "`createIndexes()` / `ensureIndexes()` declares all five indexes per Phase 41 PLAN-05 amendment (plan 42-01 precondition): `{businessId, createdAt: -1}`, `{jobId, createdAt: -1}`, `{businessId, number}` partial unique on `{deletedAt: null, isCurrent: true}`, `{rootEstimateId, isCurrent: 1}` partial unique on `{isCurrent: true}`, `{rootEstimateId, revisionNumber: 1}`."
   artifacts:
     - path: "trade-flow-api/src/estimate/repositories/estimate.repository.ts"
-      provides: "Five new methods + extended createIndexes"
+      provides: "Six new methods (downgradeCurrent, insertRevision, restoreCurrent, softDeleteRow, findRevisionsByRootId, findCurrentInChainByRootId) + extended createIndexes + D-DET-02 list filter"
       exports: ["EstimateRepository"]
     - path: "trade-flow-api/src/estimate/repositories/estimate-line-item.repository.ts"
       provides: "Two new methods for the reviser's line-item clone path"
@@ -85,6 +87,13 @@ public async downgradeCurrent(
 public async insertRevision(dto: IEstimateDto): Promise<IEstimateDto>;
 
 public async restoreCurrent(id: string): Promise<void>;
+
+// Compensating rollback: soft-delete a newly-inserted revision row after downstream
+// clone failure. Filter includes isCurrent: false so a competing writer that already
+// restored the old row cannot collide. Encapsulates the Mongo update document so the
+// service layer (plan 42-04) does NOT need any `as` / `as unknown as` casts for the
+// Date/DateTime field shapes (CLAUDE.md: no `as` in production code).
+public async softDeleteRow(id: string): Promise<void>;
 
 public async findRevisionsByRootId(rootEstimateId: string): Promise<IEstimateDto[]>;
 
@@ -163,6 +172,8 @@ If Phase 41 executed BEFORE plan 42-01 landed (unusual but possible), this plan'
     - **restoreCurrent:** calls `writer.findOneAndUpdate("estimates", {_id: new ObjectId(id), isCurrent: false}, {$set: {isCurrent: true, updatedAt: new Date()}})`. Returns `void`. Idempotent: a null result (no match) is NOT an error — it means some other code path already restored the row, which is fine.
     - **findRevisionsByRootId:** calls `fetcher.find("estimates", {rootEstimateId: new ObjectId(rootEstimateId), deletedAt: null}, {sort: {revisionNumber: 1}})` (or the equivalent based on the existing `MongoDbFetcher` primitive). Maps each entity to DTO. Returns an empty array if no matches.
     - **findCurrentInChainByRootId:** calls `fetcher.findOne("estimates", {rootEstimateId: new ObjectId(rootEstimateId), isCurrent: true, deletedAt: null})`. Returns `toDto(entity)` or `null`.
+    - **softDeleteRow:** calls `writer.findOneAndUpdate("estimates", {_id: new ObjectId(id), isCurrent: false}, {$set: {status: EstimateStatus.DELETED, deletedAt: new Date(), updatedAt: new Date()}})`. Returns `void`. Encapsulates the `Date` / `EstimateStatus.DELETED` update document so the service layer (plan 42-04 reviser compensating rollback) never touches these Mongo primitives directly — eliminating the need for any `as` / `as unknown as` cast in `estimate-reviser.service.ts` (CLAUDE.md no-`as` enforcement).
+    - **D-DET-02 list filter:** `findPaginatedByBusinessId` filter object gains `isCurrent: true` alongside the existing `deletedAt: null` clause. This belongs to plan 42-03 (ownership consolidated here; plan 42-05 only verifies the behavior at the retriever-spec level with a stubbed repository).
     - **Index topology check:** `createIndexes()` (or `ensureIndexes()` — whichever Phase 41 produced) declares the five indexes. If plan 42-01 already ran and Phase 41 PLAN-05 was amended, this was already done when Phase 41 executed. Task verifies the source file and ADDS the missing declarations if absent.
   </behavior>
   <action>
@@ -261,7 +272,75 @@ If Phase 41 executed BEFORE plan 42-01 landed (unusual but possible), this plan'
       }
       return this.toDto(entity);
     }
+
+    public async softDeleteRow(id: string): Promise<void> {
+      // Compensating-rollback primitive used by EstimateReviser when step-3 (line-item clone)
+      // fails after step-2 (insertRevision) succeeded. The filter includes `isCurrent: false`
+      // so a competing writer that already restored the old row cannot collide. Encapsulating
+      // the update document here (Date object + status enum) keeps the service layer free of
+      // any `as` / `as unknown as` casts — the repository layer is the only place allowed to
+      // touch Mongo entity primitives directly (CLAUDE.md no-`as` rule).
+      await this.writer.findOneAndUpdate<IEstimateEntity>(
+        EstimateRepository.COLLECTION,
+        {
+          _id: new ObjectId(id),
+          isCurrent: false,
+        },
+        {
+          $set: {
+            status: EstimateStatus.DELETED,
+            deletedAt: new Date(),
+            updatedAt: new Date(),
+          },
+        },
+      );
+    }
     ```
+
+    **Step 2.5 — D-DET-02 list filter edit (plan 42-05 delegates ownership here):**
+
+    Open `trade-flow-api/src/estimate/repositories/estimate.repository.ts` and find the existing `findPaginatedByBusinessId` method body (Phase 41 produced). Locate the filter construction block, which looks like:
+
+    ```typescript
+    const filter: Filter<IEstimateEntity> = {
+      businessId: new ObjectId(businessId),
+      deletedAt: null,
+      ...(status ? { status } : {}),
+    };
+    ```
+
+    Amend it in place to add `isCurrent: true`:
+
+    ```typescript
+    const filter: Filter<IEstimateEntity> = {
+      businessId: new ObjectId(businessId),
+      deletedAt: null,
+      isCurrent: true, // Phase 42 D-DET-02: list shows one row per revision chain (the current revision)
+      ...(status ? { status } : {}),
+    };
+    ```
+
+    This ensures that `GET /v1/estimates` returns exactly one row per revision chain at the repository layer. Plan 42-05 Task 1 does NOT duplicate this edit — it only verifies via a retriever spec case that the filter is honoured (stubbed at the repository boundary). Ownership is consolidated here to avoid file-overlap between plan 42-03 and plan 42-05.
+
+    Add a repository-spec case inside the existing `findPaginatedByBusinessId` describe block (or create one if absent):
+
+    ```typescript
+    it("D-DET-02: filter includes isCurrent: true so only current rows are returned", async () => {
+      const cursorSpy = jest.fn().mockReturnValue({
+        sort: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        toArray: jest.fn().mockResolvedValue([]),
+      });
+      mockCollection.find = cursorSpy;
+      await repository.findPaginatedByBusinessId("biz-id", undefined, 10, 0);
+      expect(cursorSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ isCurrent: true, deletedAt: null }),
+      );
+    });
+    ```
+
+    Mirror the Phase 41 spec's mock-cursor shape exactly — if Phase 41 uses a different helper (`mockWriter.find` / `mockFetcher.find`), adapt the spy target to match.
 
     **Convention notes:**
     - Uses the same `this.writer.findOneAndUpdate` primitive that `MongoDbWriter` exposes (verified in research §2.5).
@@ -357,6 +436,36 @@ If Phase 41 executed BEFORE plan 42-01 landed (unusual but possible), this plan'
         });
       });
 
+      describe("softDeleteRow", () => {
+        it("calls findOneAndUpdate with filter {_id, isCurrent: false} and sets status DELETED + deletedAt", async () => {
+          mockWriter.findOneAndUpdate.mockResolvedValue(mockEntity);
+          await repository.softDeleteRow("507f1f77bcf86cd799439011");
+          expect(mockWriter.findOneAndUpdate).toHaveBeenCalledWith(
+            "estimates",
+            expect.objectContaining({ _id: expect.any(ObjectId), isCurrent: false }),
+            expect.objectContaining({
+              $set: expect.objectContaining({
+                status: EstimateStatus.DELETED,
+                deletedAt: expect.any(Date),
+              }),
+            }),
+          );
+        });
+
+        it("returns void and does not throw on miss (idempotent rollback primitive)", async () => {
+          mockWriter.findOneAndUpdate.mockResolvedValue(null);
+          await expect(repository.softDeleteRow("507f1f77bcf86cd799439011")).resolves.toBeUndefined();
+        });
+      });
+
+      describe("findPaginatedByBusinessId — D-DET-02 filter", () => {
+        it("includes isCurrent: true in the filter so only current revisions are listed", async () => {
+          // Mirror the Phase 41 spec's mock-cursor shape exactly.
+          // Assert the filter object passed to collection.find (or equivalent fetcher primitive)
+          // contains { isCurrent: true, deletedAt: null }.
+        });
+      });
+
       describe("index declarations (Phase 42 D-CHAIN-05/06)", () => {
         it("createIndexes declares partial unique on {rootEstimateId, isCurrent} with filter {isCurrent: true}", async () => {
           // Spy on collection.createIndex calls from the MongoConnectionService mock.
@@ -395,6 +504,11 @@ If Phase 41 executed BEFORE plan 42-01 landed (unusual but possible), this plan'
     - `grep -c "public async restoreCurrent" trade-flow-api/src/estimate/repositories/estimate.repository.ts` returns 1
     - `grep -c "public async findRevisionsByRootId" trade-flow-api/src/estimate/repositories/estimate.repository.ts` returns 1
     - `grep -c "public async findCurrentInChainByRootId" trade-flow-api/src/estimate/repositories/estimate.repository.ts` returns 1
+    - `grep -c "public async softDeleteRow" trade-flow-api/src/estimate/repositories/estimate.repository.ts` returns 1
+    - `grep -c "status: EstimateStatus.DELETED" trade-flow-api/src/estimate/repositories/estimate.repository.ts` returns at least 1 (softDeleteRow update document)
+    - `awk '/findPaginatedByBusinessId/,/^  \}/' trade-flow-api/src/estimate/repositories/estimate.repository.ts | grep -c "isCurrent: true"` returns at least 1 (D-DET-02 list filter)
+    - `grep -c "D-DET-02" trade-flow-api/src/estimate/repositories/estimate.repository.ts` returns at least 1 (inline traceability for the list-filter edit)
+    - `grep -c "softDeleteRow\|D-DET-02" trade-flow-api/src/estimate/test/repositories/estimate.repository.spec.ts` returns at least 2
     - `grep -c "isCurrent: true" trade-flow-api/src/estimate/repositories/estimate.repository.ts` returns at least 4 (filters + index declarations)
     - `grep -c "status: { \\\$in: allowedSourceStatuses }" trade-flow-api/src/estimate/repositories/estimate.repository.ts` returns 1
     - `grep -c "rootEstimateId: 1, isCurrent: 1" trade-flow-api/src/estimate/repositories/estimate.repository.ts` returns at least 1

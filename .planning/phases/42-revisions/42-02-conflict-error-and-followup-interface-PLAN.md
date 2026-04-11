@@ -445,7 +445,7 @@ export class NoopEstimateFollowupCanceller implements IEstimateFollowupCanceller
 
     **Step 2 — Create or amend `trade-flow-api/src/core/errors/test/handle-error.utility.spec.ts`:**
 
-    If the file does not exist, create it with the full test shape:
+    If the file does not exist, create it with the full test shape. If it already exists, add ONLY the "ConflictError branch" `describe` block and reuse the existing `isErrorEntry` / `extractFirstError` helpers if they are already defined (otherwise add them once at file scope).
 
     ```typescript
     import { HttpException, HttpStatus } from "@nestjs/common";
@@ -455,6 +455,42 @@ export class NoopEstimateFollowupCanceller implements IEstimateFollowupCanceller
     import { ForbiddenError } from "@core/errors/forbidden-error.error";
     import { ErrorCodes } from "@core/errors/error-codes.enum";
     import { createHttpError } from "@core/errors/handle-error.utility";
+
+    interface IErrorEntry {
+      code: string;
+      message: string;
+      details: string | null;
+    }
+
+    function isErrorEntry(value: unknown): value is IErrorEntry {
+      return (
+        typeof value === "object" &&
+        value !== null &&
+        "code" in value &&
+        "message" in value &&
+        "details" in value &&
+        typeof (value as { code: unknown }).code === "string" &&
+        typeof (value as { message: unknown }).message === "string"
+      );
+    }
+
+    function extractFirstError(response: unknown): IErrorEntry {
+      if (typeof response !== "object" || response === null) {
+        throw new Error(`Expected object response, got ${typeof response}`);
+      }
+      if (!("errors" in response)) {
+        throw new Error("Response missing errors field");
+      }
+      const errors = (response as { errors: unknown }).errors;
+      if (!Array.isArray(errors) || errors.length === 0) {
+        throw new Error("errors array is missing or empty");
+      }
+      const first = errors[0];
+      if (!isErrorEntry(first)) {
+        throw new Error("first errors entry is not the expected shape");
+      }
+      return first;
+    }
 
     describe("createHttpError", () => {
       describe("ConflictError branch", () => {
@@ -470,11 +506,13 @@ export class NoopEstimateFollowupCanceller implements IEstimateFollowupCanceller
         it("preserves code, message, and details in the response body", () => {
           const err = new ConflictError(ErrorCodes.ESTIMATE_REVISION_CONFLICT, "my details");
           const result = createHttpError(err);
+          expect(result).toBeInstanceOf(HttpException);
           if (result instanceof HttpException) {
-            const body = result.getResponse() as { errors: Array<{ code: string; message: string; details: string }> };
-            expect(body.errors[0].code).toBe(ErrorCodes.ESTIMATE_REVISION_CONFLICT);
-            expect(body.errors[0].message).toBe("Estimate has already been revised or is no longer revisable");
-            expect(body.errors[0].details).toBe("my details");
+            const body = result.getResponse();
+            const first = extractFirstError(body);
+            expect(first.code).toBe(ErrorCodes.ESTIMATE_REVISION_CONFLICT);
+            expect(first.message).toBe("Estimate has already been revised or is no longer revisable");
+            expect(first.details).toBe("my details");
           }
         });
       });
@@ -507,21 +545,14 @@ export class NoopEstimateFollowupCanceller implements IEstimateFollowupCanceller
     });
     ```
 
-    If the file already exists (check first), add ONLY the "ConflictError branch" `describe` block to it, preserving all existing tests.
+    **Narrowing pattern — mandatory, no alternatives:**
 
-    **Important type narrowing note:** the test uses `if (result instanceof HttpException)` instead of `as HttpException`. This is the preferred type-guard pattern per CLAUDE.md (no `as` in domain code). The `as { errors: ... }` on `getResponse()` is the only allowed `as` because `HttpException.getResponse()` returns `string | object` and there is no runtime type information to narrow it — this matches the pattern used in other spec files across the repo if any exist, or is justified as a test-only necessity.
+    The spec uses the `typeof` + `in` narrowing pattern via the `isErrorEntry` type guard plus the `extractFirstError` helper. This is the ONLY allowed shape for narrowing `HttpException.getResponse()` in this plan's spec file.
 
-    Actually — to avoid `as` entirely, use this narrower pattern:
-
-    ```typescript
-    const body = result.getResponse();
-    if (typeof body === "object" && body !== null && "errors" in body) {
-      const errors = (body as { errors: unknown }).errors;
-      // ... further narrowing ...
-    }
-    ```
-
-    Or pragmatically: the repo may tolerate `as` in spec files (check existing specs). If existing specs use `as`, this spec may too. If not, use the narrowing pattern above. Default: use `as unknown as { errors: ... }` in spec code with a one-line "test-only — narrowing HttpException response body" comment per CLAUDE.md's self-documenting-code exception for non-obvious consequences.
+    - `if (result instanceof HttpException)` narrows the `HttpException | string` return to `HttpException` — type guard, no `as`.
+    - `extractFirstError(body)` walks the `unknown` response value through `typeof`, `!== null`, and `in` checks before returning an `IErrorEntry`. The `(value as { code: unknown }).code` expressions inside `isErrorEntry` are the SAME pattern CLAUDE.md prescribes for type guards — they cast to `unknown` (a no-op at runtime) purely to let the subsequent `typeof` check narrow the value. This is distinct from asserting a concrete runtime type and is the idiomatic TypeScript type-guard shape.
+    - Do NOT use `as { errors: ... }`, `as unknown as { errors: ... }`, or any direct cast of the response body to a concrete interface. Those are prohibited by CLAUDE.md and by the user's `feedback_no_type_assertions.md` memory rule.
+    - There is NO "self-documenting-code exception" for `as` casts — that exception in CLAUDE.md concerns comments, not type assertions. Any earlier draft text suggesting otherwise is incorrect and has been removed.
 
     **Step 3 — Run the slice:**
 
@@ -541,6 +572,10 @@ export class NoopEstimateFollowupCanceller implements IEstimateFollowupCanceller
       `awk '/InvalidRequestError/{a=NR} /ConflictError/{b=NR} /ResourceNotFoundError/{c=NR} END{exit !(a &lt; b &amp;&amp; b &lt; c)}' trade-flow-api/src/core/errors/handle-error.utility.ts`
     - `cd trade-flow-api && npm run test -- --testPathPattern=handle-error.utility` exits 0
     - `grep -c "eslint-disable\\|@ts-ignore\\|@ts-expect-error\\|@ts-nocheck" trade-flow-api/src/core/errors/handle-error.utility.ts` returns 0
+    - `! grep -q "as unknown as" trade-flow-api/src/core/errors/test/handle-error.utility.spec.ts` (no `as unknown as` casts in the spec file)
+    - `! grep -qE "as \{ errors:" trade-flow-api/src/core/errors/test/handle-error.utility.spec.ts` (no direct cast to a concrete response interface)
+    - `grep -c "function isErrorEntry" trade-flow-api/src/core/errors/test/handle-error.utility.spec.ts` returns 1 (type-guard helper present)
+    - `grep -c "function extractFirstError" trade-flow-api/src/core/errors/test/handle-error.utility.spec.ts` returns 1 (narrowing helper present)
   </acceptance_criteria>
   <verify>
     <automated>cd trade-flow-api &amp;&amp; npm run test -- --testPathPattern=handle-error.utility</automated>
