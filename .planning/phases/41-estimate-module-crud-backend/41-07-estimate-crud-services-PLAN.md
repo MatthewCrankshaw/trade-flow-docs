@@ -122,7 +122,7 @@ Phase 41 dependencies (injected):
     - Validates `customerId` resolves via `CustomerRetriever.findByIdOrFail(customerId)` — if not found, throws `ResourceNotFoundError(ESTIMATE_CUSTOMER_NOT_FOUND)`.
     - Validates `jobId` resolves via `JobRetrieverService.findByIdOrFail(jobId)` — if not found, throws `ResourceNotFoundError(ESTIMATE_JOB_NOT_FOUND)`.
     - Generates `number` via `EstimateNumberGenerator.generateNumber(dto.businessId)`.
-    - Applies defaults if not provided: `contingencyPercent ??= 10`, `displayMode ??= EstimateDisplayMode.RANGE`, `estimateDate ??= DateTime.now()`, `revisionNumber = 1`, `isCurrent = true`, `parentEstimateId = null`, `rootEstimateId = null`, `status = EstimateStatus.DRAFT`, `responseSummary = null`.
+    - Applies defaults if not provided: `contingencyPercent ??= 10`, `displayMode ??= EstimateDisplayMode.RANGE`, `estimateDate ??= DateTime.now()`, `revisionNumber = 1`, `isCurrent = true`, `parentEstimateId = null`, `status = EstimateStatus.DRAFT`, `responseSummary = null`. **Root rows are their own chain identity**: `rootEstimateId` starts as `null` in the prepared DTO, then `EstimateCreator.create()` issues a follow-up `updateOne` to set `rootEstimateId: created.id` on the newly-inserted row before returning. Amended per Phase 42 D-CHAIN-03 / D-CHAIN-04 (folded forward because Phase 41 has not executed).
     - Persists via `AuthorizedCreatorFactory.create(estimatePolicy)` wrapping `estimateRepository.create`.
     - Attaches totals + priceRange via `estimateTotalsCalculator.calculateTotals(created)` before returning.
     - Spec coverage: happy path, customer-not-found, job-not-found, default values applied, number-generator called with correct businessId, totals attached on return.
@@ -182,7 +182,7 @@ export class EstimateCreator {
       revisionNumber: 1,
       isCurrent: true,
       parentEstimateId: null,
-      rootEstimateId: null,
+      rootEstimateId: null, // overwritten by setRootEstimateId below
       responseSummary: null,
     };
 
@@ -193,10 +193,19 @@ export class EstimateCreator {
       (toPersist) => this.estimateRepository.create(toPersist),
     );
 
-    return this.totalsCalculator.calculateTotals(created);
+    // Phase 42 D-CHAIN-03/04: root rows carry rootEstimateId === self.id.
+    // Two-write pattern (no transactions in this codebase): insert first, then set chain identity.
+    // The brief window where rootEstimateId is null is tolerable because no other read path
+    // depends on rootEstimateId until a revision is created (Phase 42+).
+    await this.estimateRepository.setRootEstimateId(created.id);
+    const withRoot: IEstimateDto = { ...created, rootEstimateId: created.id };
+
+    return this.totalsCalculator.calculateTotals(withRoot);
   }
 }
 ```
+
+> **Repository contract addition (Phase 42 D-CHAIN-04 fold-forward):** `EstimateRepository` MUST expose `public async setRootEstimateId(id: string): Promise<void>` that wraps `writer.updateOne({_id: new ObjectId(id)}, {$set: {rootEstimateId: new ObjectId(id)}})`. This method has no error handling beyond what `updateOne` already provides; a zero-match result is an internal error because the caller just inserted the row. The acceptance criteria for PLAN-05's repository task is amended by plan 42-01 to include a grep for `setRootEstimateId`.
 
 Adjust the `AuthorizedCreatorFactory` invocation shape to match `quote-creator.service.ts` exactly — the factory may take the policy directly or return a wrapper. Do NOT invent a new API.
 
@@ -231,7 +240,8 @@ it("applies defaults when fields are not provided", async () => {
   expect(result.revisionNumber).toBe(1);
   expect(result.isCurrent).toBe(true);
   expect(result.parentEstimateId).toBeNull();
-  expect(result.rootEstimateId).toBeNull();
+  expect(result.rootEstimateId).toBe(result.id);  // Phase 42 D-CHAIN-03: root is its own chain identity
+  expect(mockRepo.setRootEstimateId).toHaveBeenCalledWith(result.id);
 });
 
 it("attaches totals and priceRange via EstimateTotalsCalculator", async () => {
@@ -274,7 +284,9 @@ Commit message: `feat(41): add EstimateCreator with number generation, defaults,
     - `grep -c "revisionNumber: 1" trade-flow-api/src/estimate/services/estimate-creator.service.ts` returns 1
     - `grep -c "isCurrent: true" trade-flow-api/src/estimate/services/estimate-creator.service.ts` returns 1
     - `grep -c "parentEstimateId: null" trade-flow-api/src/estimate/services/estimate-creator.service.ts` returns 1
-    - `grep -c "rootEstimateId: null" trade-flow-api/src/estimate/services/estimate-creator.service.ts` returns 1
+    - `grep -c "rootEstimateId: null" trade-flow-api/src/estimate/services/estimate-creator.service.ts` returns 1 (the initial prepared-DTO value)
+    - `grep -c "setRootEstimateId" trade-flow-api/src/estimate/services/estimate-creator.service.ts` returns at least 1
+    - `grep -c "rootEstimateId: created\\.id\\|withRoot" trade-flow-api/src/estimate/services/estimate-creator.service.ts` returns at least 1
     - `grep -c "EstimateStatus.DRAFT" trade-flow-api/src/estimate/services/estimate-creator.service.ts` returns at least 1
     - `grep -c "ESTIMATE_CUSTOMER_NOT_FOUND\\|ESTIMATE_JOB_NOT_FOUND" trade-flow-api/src/estimate/services/estimate-creator.service.ts` returns at least 1 (may be 0 if CustomerRetriever already throws)
     - `grep -c "applies defaults when fields are not provided" trade-flow-api/src/estimate/test/services/estimate-creator.service.spec.ts` returns 1
@@ -844,3 +856,8 @@ After completion, create `.planning/phases/41-estimate-module-crud-backend/41-07
 - Draft-only enforcement test scenarios (list of statuses tested)
 - The full `npm run ci` output
 </output>
+
+---
+
+**Amendment history:**
+- 2026-04-11 — Phase 42 wave 1 (plan 42-01): `EstimateCreator.create()` now performs a two-step root write — `insertOne` via `authorizedCreator.create(...)` returns the new `id`, then `EstimateRepository.setRootEstimateId(created.id)` persists `rootEstimateId = created._id` on the row. Spec assertions updated to expect `result.rootEstimateId === result.id` on root creation. Rationale: Phase 42 D-CHAIN-03 / D-CHAIN-04. Phase 41 has not executed; folding the retrofit forward avoids a one-shot backfill migration.
