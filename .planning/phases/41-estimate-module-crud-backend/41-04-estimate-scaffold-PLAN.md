@@ -83,6 +83,8 @@ Scaffold every type-level artifact of `src/estimate/` — enums, entities, DTOs,
 Purpose: Establishing the contract surface in one plan lets Plans 05-08 execute without needing to discover type shapes. Every downstream plan reads from this scaffold. The locked type shapes in CONTEXT.md §specifics (lines 230-610) and the locked transition map (lines 534-584) are copied here verbatim to prevent interpretation drift.
 
 Output: Complete `src/estimate/{enums,entities,data-transfer-objects,requests,responses,test/mocks}/` tree plus one executable spec file (`estimate-transitions.spec.ts`) proving the map is correct.
+
+**Scope note:** This plan intentionally groups 25 lightweight type-definition files into 4 tasks per scope sanity override — see checker Warning #3 resolution. The files are enums, interfaces, and DTOs with no runtime behavior (except `estimate-transitions.spec.ts`), so per-file complexity is low enough that the 15-file warning threshold is relaxed here.
 </objective>
 
 <execution_context>
