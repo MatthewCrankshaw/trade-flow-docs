@@ -161,7 +161,7 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. `POST /v1/estimates/:id/revisions` creates a new revision of a Sent estimate under the same `E-YYYY-NNN` number, setting `parentEstimateId`, incrementing `revisionNumber`, and flipping `isCurrent` so only the new revision is current (enforced by a partial unique index on `(rootEstimateId, isCurrent: true)`).
   2. `GET /v1/estimates/:id/revisions` returns the full revision chain in `revisionNumber` order (oldest first) with send/view timestamps for each, suitable for the trader-only collapsed History section.
-  3. Creating a revision atomically cancels all pending follow-ups for the previous revision and the trader sees only the latest revision when loading the estimate detail page by root id.
+  3. Creating a revision atomically transitions the chain: the new Draft revision becomes current, the previous revision keeps its existing status with `isCurrent: false`, and the trader sees only the latest revision when loading the estimate detail page by root id. Cancellation of the previous revision's pending follow-ups happens at the moment the new revision is actually Sent (Phase 44 owns the call via the `IEstimateFollowupCanceller` binding from Phase 42).
   4. Attempting to concurrently create two revisions for the same chain results in exactly one success and one 409 Conflict (index-enforced), with no duplicate `isCurrent: true` rows.
 **Plans**: 6 plans
 Plans:
