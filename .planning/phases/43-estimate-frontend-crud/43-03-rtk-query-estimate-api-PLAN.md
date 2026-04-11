@@ -16,13 +16,13 @@ requirements:
 
 must_haves:
   truths:
-    - "features/estimates/api/estimateApi.ts exports seven hooks corresponding to the Phase 41 CRUD surface"
+    - "features/estimates/api/estimateApi.ts exports eight hooks corresponding to the Phase 41 CRUD surface (useGetEstimatesQuery, useGetEstimateQuery, useCreateEstimateMutation, useUpdateEstimateMutation, useAddEstimateLineItemMutation, useUpdateEstimateLineItemMutation, useDeleteEstimateLineItemMutation, useDeleteEstimateMutation)"
     - "\"Estimate\" tag is registered in src/services/api.ts alongside \"Quote\""
     - "features/estimates/index.ts barrel re-exports the API module"
     - "Estimate mutations invalidate Job LIST so job rows reflect has-estimate state"
   artifacts:
     - path: "trade-flow-ui/src/features/estimates/api/estimateApi.ts"
-      provides: "RTK Query slice with 7 endpoints targeting Phase 41 /v1/estimates routes"
+      provides: "RTK Query slice with 8 endpoints targeting Phase 41 /v1/estimates routes"
       contains: "useGetEstimatesQuery"
     - path: "trade-flow-ui/src/services/api.ts"
       provides: "Base RTK Query slice with Estimate tag"
@@ -46,7 +46,7 @@ Build the RTK Query slice that Plans 04-06 consume to talk to Phase 41's CRUD su
 
 Purpose: Interface-first ordering — components cannot call hooks that do not yet exist, so this plan defines the API contracts before Plan 04's forms and Plan 05/06's pages reference them.
 
-Output: `features/estimates/api/estimateApi.ts` exporting seven hooks, `src/services/api.ts` with `"Estimate"` tag, `features/estimates/index.ts` barrel.
+Output: `features/estimates/api/estimateApi.ts` exporting eight hooks, `src/services/api.ts` with `"Estimate"` tag, `features/estimates/index.ts` barrel.
 </objective>
 
 <execution_context>
@@ -150,7 +150,7 @@ Do NOT touch `baseQuery`, `reducerPath`, or `endpoints`. Only the tagTypes array
 </task>
 
 <task type="auto" tdd="false">
-  <name>Task 2: Build features/estimates/api/estimateApi.ts with seven endpoints</name>
+  <name>Task 2: Build features/estimates/api/estimateApi.ts with eight endpoints</name>
   <files>trade-flow-ui/src/features/estimates/api/estimateApi.ts, trade-flow-ui/src/features/estimates/index.ts</files>
   <read_first>
     - trade-flow-ui/src/features/quotes/api/quoteApi.ts (full file — exact structural template)
@@ -160,7 +160,7 @@ Do NOT touch `baseQuery`, `reducerPath`, or `endpoints`. Only the tagTypes array
     - .planning/phases/43-estimate-frontend-crud/43-CONTEXT.md decisions D-MIR-04, D-MIR-05
   </read_first>
   <behavior>
-    - 7 hooks exported: useGetEstimatesQuery, useGetEstimateQuery, useCreateEstimateMutation, useUpdateEstimateMutation, useAddEstimateLineItemMutation, useUpdateEstimateLineItemMutation, useDeleteEstimateLineItemMutation, useDeleteEstimateMutation (that's 8 counting delete estimate — update phase requirements block to match)
+    - 8 hooks exported: useGetEstimatesQuery, useGetEstimateQuery, useCreateEstimateMutation, useUpdateEstimateMutation, useAddEstimateLineItemMutation, useUpdateEstimateLineItemMutation, useDeleteEstimateLineItemMutation, useDeleteEstimateMutation
     - Tag invalidation mirrors quoteApi exactly: per-id + LIST sentinel; cross-feature invalidation on Job LIST for create/delete to match quote pattern
     - deleteEstimate uses optimistic update via onQueryStarted + updateQueryData (mirrors quote deleteQuote)
     - transformResponse unwraps StandardResponse<Estimate> exactly as quoteApi does
@@ -414,3 +414,5 @@ Interface integration check: after this plan, a downstream plan can write `impor
 <output>
 After completion, create `.planning/phases/43-estimate-frontend-crud/43-03-SUMMARY.md`
 </output>
+</content>
+</invoke>

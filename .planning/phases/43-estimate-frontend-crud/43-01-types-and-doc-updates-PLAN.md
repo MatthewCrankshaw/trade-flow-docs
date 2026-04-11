@@ -239,7 +239,7 @@ export type {
 Do NOT touch any other existing re-exports. Do NOT unionise `Estimate` with `Quote`.
   </action>
   <verify>
-    <automated>cd trade-flow-ui && npm run typecheck</automated>
+    <automated>cd trade-flow-ui && npm run ci</automated>
   </verify>
   <acceptance_criteria>
     - File `trade-flow-ui/src/types/estimate.ts` exists
@@ -256,9 +256,9 @@ Do NOT touch any other existing re-exports. Do NOT unionise `Estimate` with `Quo
     - `grep -c "export interface UpdateEstimateRequest" trade-flow-ui/src/types/estimate.ts` returns at least 1
     - `grep -c "from \"./estimate\"" trade-flow-ui/src/types/index.ts` returns at least 1
     - `grep -c "from \"./quote\"" trade-flow-ui/src/types/estimate.ts` returns 0 (zero cross-imports)
-    - `cd trade-flow-ui && npm run typecheck` exits 0
+    - `cd trade-flow-ui && npm run ci` exits 0
   </acceptance_criteria>
-  <done>Estimate types exist as an independent module, are re-exported from the barrel, and typecheck passes.</done>
+  <done>Estimate types exist as an independent module, are re-exported from the barrel, and the full CI gate (`npm run ci`) passes.</done>
 </task>
 
 <task type="auto" tdd="false">
@@ -292,7 +292,7 @@ with:
 Do NOT touch any other requirements. Do NOT change existing SMART-01, SMART-02, SMART-03.
   </action>
   <verify>
-    <automated>grep -c "site_inspection\|hidden_conditions\|materials_supply\|access_working_space\|scope_unclear" .planning/REQUIREMENTS.md</automated>
+    <automated>cd trade-flow-ui && npm run ci</automated>
   </verify>
   <acceptance_criteria>
     - `grep -c "SMART-04" .planning/REQUIREMENTS.md` returns at least 1
@@ -305,8 +305,9 @@ Do NOT touch any other requirements. Do NOT change existing SMART-01, SMART-02, 
     - `grep -c "access_working_space" .planning/REQUIREMENTS.md` returns at least 1
     - `grep -c "scope_unclear" .planning/REQUIREMENTS.md` returns at least 1
     - `grep -c "SMART-01" .planning/REQUIREMENTS.md` returns at least 1 (existing line preserved)
+    - `cd trade-flow-ui && npm run ci` exits 0
   </acceptance_criteria>
-  <done>CONT-04 lists the five new chip values with their stored identifiers, SMART-04 appears in the Future section, and the old four-chip plumber-biased wording is removed.</done>
+  <done>CONT-04 lists the five new chip values with their stored identifiers, SMART-04 appears in the Future section, the old four-chip plumber-biased wording is removed, and the full CI gate passes.</done>
 </task>
 
 <task type="auto" tdd="false">
@@ -337,7 +338,7 @@ with:
 Do not change any other phase, any other success criterion, or any surrounding structure. Do not touch dependency arrows or requirement mappings.
   </action>
   <verify>
-    <automated>grep -c "five trade-agnostic uncertainty chips" .planning/ROADMAP.md .planning/milestones/v1.8-ROADMAP.md</automated>
+    <automated>cd trade-flow-ui && npm run ci</automated>
   </verify>
   <acceptance_criteria>
     - `grep -c "five trade-agnostic uncertainty chips" .planning/ROADMAP.md` returns at least 1
@@ -348,8 +349,9 @@ Do not change any other phase, any other success criterion, or any surrounding s
     - `grep -c "scope unclear until investigation" .planning/ROADMAP.md` returns at least 1
     - `grep -c "hidden conditions" .planning/milestones/v1.8-ROADMAP.md` returns at least 1
     - `grep -c "scope unclear until investigation" .planning/milestones/v1.8-ROADMAP.md` returns at least 1
+    - `cd trade-flow-ui && npm run ci` exits 0
   </acceptance_criteria>
-  <done>Both roadmap files reference the five new chip values in Phase 43 SC #1 and neither contains the obsolete four-chip wording.</done>
+  <done>Both roadmap files reference the five new chip values in Phase 43 SC #1, neither contains the obsolete four-chip wording, and the full CI gate passes.</done>
 </task>
 
 </tasks>
@@ -370,9 +372,7 @@ Do not change any other phase, any other success criterion, or any surrounding s
 </threat_model>
 
 <verification>
-Run `cd trade-flow-ui && npm run typecheck` — must exit 0.
-
-Run `cd trade-flow-ui && npm run lint && npm run format:check` — must exit 0 for any file this plan touches.
+Run `cd trade-flow-ui && npm run ci` — must exit 0. This is the full quality gate required by CLAUDE.md: unit tests, lint, format:check, and typecheck must all pass before the plan is considered done.
 
 Grep sanity: none of the old four-chip wording survives anywhere except in version history.
 </verification>
@@ -380,7 +380,7 @@ Grep sanity: none of the old four-chip wording survives anywhere except in versi
 <success_criteria>
 - `trade-flow-ui/src/types/estimate.ts` exists and exports all 10 listed type names
 - `trade-flow-ui/src/types/index.ts` barrel re-exports estimate types
-- `npm run typecheck` passes in trade-flow-ui
+- `cd trade-flow-ui && npm run ci` passes (tests + lint + format:check + typecheck)
 - REQUIREMENTS.md CONT-04 references all five chip stored values
 - REQUIREMENTS.md Future section has SMART-04 entry
 - ROADMAP.md and v1.8-ROADMAP.md Phase 43 SC #1 match the new chip list
@@ -390,3 +390,5 @@ Grep sanity: none of the old four-chip wording survives anywhere except in versi
 <output>
 After completion, create `.planning/phases/43-estimate-frontend-crud/43-01-SUMMARY.md`
 </output>
+</content>
+</invoke>
