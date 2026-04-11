@@ -3,11 +3,11 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Estimates
 status: roadmap_defined
-stopped_at: Roadmap created, ready to plan Phase 41
-last_updated: "2026-04-10T00:00:00.000Z"
-last_activity: 2026-04-10
+stopped_at: Roadmap restructured (Phase 41 dissolved), ready to plan new Phase 41
+last_updated: "2026-04-11T00:00:00.000Z"
+last_activity: 2026-04-11
 progress:
-  total_phases: 8
+  total_phases: 7
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,38 +21,37 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-07)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** v1.8 Estimates -- roadmap defined, ready to plan Phase 41
+**Current focus:** v1.8 Estimates -- roadmap restructured 2026-04-11, ready to plan new Phase 41
 
 ## Current Position
 
-Phase: Phase 41 (Foundations & Refactor) -- not started
+Phase: Phase 41 (Estimate Module CRUD (Backend)) -- not started
 Plan: —
-Status: Roadmap defined (8 phases, 58 requirements mapped)
-Last activity: 2026-04-11 — Completed quick task 260411-a41: Tightened comments in recent commits per new code standard (v1.8 roadmap was created 2026-04-10: Phases 41-48, 100% requirement coverage)
+Status: Roadmap restructured (7 phases, 58 requirements mapped). Original Phase 41 (Foundations & Refactor) dissolved; document-token rename folded into new Phase 41, estimate-settings module deferred to new Phase 44. See `.planning/notes/2026-04-11-v1.8-restructure-decisions.md`.
+Last activity: 2026-04-11 — Dissolved original Phase 41 (Foundations & Refactor) during discuss-phase; restructured v1.8 into 7 phases; separation-of-concerns chosen for line items and settings (new estimate-only collections/modules) while tokens remain unified as document-token.
 
-**Next step:** `/gsd-plan-phase 41` to decompose Phase 41 (Foundations & Refactor) into executable plans.
+**Next step:** `/gsd-discuss-phase 41` to gather context for the new Phase 41 (Estimate Module CRUD (Backend)) which now absorbs the document-token rename and the new `estimate_line_items` module.
 
 ## Roadmap Summary
 
 **Milestone:** v1.8 Estimates
-**Phases:** 41-48 (8 phases)
+**Phases:** 41-47 (7 phases, restructured 2026-04-11)
 **Requirements:** 58/58 mapped (100% coverage)
 **Granularity:** fine
 **Full detail:** `.planning/milestones/v1.8-ROADMAP.md`
 
 | Phase | Goal | Requirements | Status |
 |-------|------|--------------|--------|
-| 41. Foundations & Refactor | Canonical token/settings renames land before estimate code | FND-01/02/03 | Not started |
-| 42. Estimate Module CRUD (Backend) | Trader can CRUD estimates with E-YYYY-NNN numbering and validated lifecycle | EST-01..08, CONT-01/02/05, RESP-08 | Not started |
-| 43. Revisions | Invisible versioned revisions with partial unique index and history | REV-01..05 | Not started |
-| 44. Estimate Frontend CRUD | Visual create/edit/list/detail with contingency slider and range display | CONT-03/04 | Not started |
-| 45. Email & Send Flow | Send estimate with mandatory non-binding legal copy and audit HTML | SND-01..07 | Not started |
-| 46. Public Customer Page & Response Handling | Latest-revision resolution, 4-button response flow, structured decline | CUST-01..07, RESP-01..07 | Not started |
-| 47. Follow-up Queue & Automation | BullMQ delayed 3/10/21d follow-ups with cancel-on-exit and AOF infra gate | FUP-01..08 | Not started |
-| 48. Convert to Quote & Mark as Lost | Idempotent convert with mandatory review, back-link, markLost | CONV-01..06, LOST-01/02 | Not started |
+| 41. Estimate Module CRUD (Backend) | Trader can CRUD estimates with E-YYYY-NNN numbering and validated lifecycle; document-token unified; estimate_line_items module created | EST-01..09, CONT-01/02/05, RESP-08 | Not started |
+| 42. Revisions | Invisible versioned revisions with partial unique index and history | REV-01..05 | Not started |
+| 43. Estimate Frontend CRUD | Visual create/edit/list/detail with contingency slider and range display | CONT-03/04 | Not started |
+| 44. Email & Send Flow | Send estimate with mandatory non-binding legal copy and audit HTML; new estimate-settings module | SND-01..07 | Not started |
+| 45. Public Customer Page & Response Handling | Latest-revision resolution, 4-button response flow, structured decline | CUST-01..07, RESP-01..07 | Not started |
+| 46. Follow-up Queue & Automation | BullMQ delayed 3/10/21d follow-ups with cancel-on-exit and AOF infra gate | FUP-01..08 | Not started |
+| 47. Convert to Quote & Mark as Lost | Idempotent convert with mandatory review, back-link, markLost | CONV-01..06, LOST-01/02 | Not started |
 
-**Critical path (estimates work end to end):** 41 -> 42 -> 45 -> 46 -> 47 -> 48
-**Parallel:** Phase 43 and Phase 44 can run in parallel after Phase 42 lands.
+**Critical path (estimates work end to end):** 41 -> 44 -> 45 -> 46 -> 47
+**Parallel:** Phase 42 (revisions) and Phase 43 (frontend CRUD) can run in parallel after Phase 41 lands.
 
 ## Performance Metrics
 
@@ -94,8 +93,15 @@ v1.8 roadmap created 2026-04-10:
 - 8 phases (41-48) derived from 10 requirement categories
 - Separate EstimateModule pattern chosen over polymorphic discriminator (see ARCHITECTURE.md §10)
 - Foundations-first refactor (Phase 41) before any estimate code is written
-- Phase 47 gated on production Redis AOF persistence (FUP-08 is a hard infra gate)
-- Phase 45 gated on legal-review pass of non-binding email copy (SND-05 is non-removable)
+- Original Phase 47 gated on production Redis AOF persistence (FUP-08 is a hard infra gate)
+- Original Phase 45 gated on legal-review pass of non-binding email copy (SND-05 is non-removable)
+
+v1.8 roadmap restructured 2026-04-11 (during /gsd-discuss-phase 41):
+- Phase 41 (Foundations & Refactor) dissolved; renumbered to 7 phases (41-47)
+- Separation-of-concerns chosen over DRY for entity-level modules: `quote_line_items` untouched; new `estimate_line_items` collection and module (absorbed into new Phase 41). `quote-settings` untouched; new `estimate-settings` module (absorbed into new Phase 44).
+- Tokens remain unified: `quote-token` → `document-token` with `documentType` discriminator (absorbed into new Phase 41).
+- Phase 46 still gated on Redis AOF persistence; Phase 44 still gated on UK-consumer-law legal review.
+- See `.planning/notes/2026-04-11-v1.8-restructure-decisions.md` for full rationale.
 
 ### Pending Todos
 
@@ -131,6 +137,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-10T00:00:00Z
-Stopped at: v1.8 roadmap created, ready to plan Phase 41
+Last session: 2026-04-11T00:00:00Z
+Stopped at: v1.8 roadmap restructured (Phase 41 dissolved, renumbered to 7 phases), ready to discuss new Phase 41
 Resume file: `.planning/milestones/v1.8-ROADMAP.md`

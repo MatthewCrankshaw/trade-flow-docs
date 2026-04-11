@@ -10,7 +10,7 @@
 - v1.5 Automated E2E Playwright Testing -- Phases 24-28 (in progress)
 - v1.6 Stripe Subscription Billing -- Phases 29-34 (shipped 2026-03-31)
 - v1.7 Onboarding & Landing Page -- Phases 35-40 (shipped 2026-04-07)
-- v1.8 Estimates -- Phases 41-48 (in progress)
+- v1.8 Estimates -- Phases 41-47 (in progress)
 
 ## Phases
 
@@ -120,43 +120,34 @@ Full details: `.planning/milestones/v1.7-ROADMAP.md`
 
 **Milestone Goal:** Ship estimates as a parallel document type with price ranges, soft customer response flow, automated follow-ups, and seamless conversion to quotes -- handling the pre-site-visit "rough cost" conversation that currently lives in WhatsApp and missed calls.
 
-- [ ] **Phase 41: Foundations & Refactor** - Rename quote-token -> document-token, quote-settings -> document-settings, widen quote_line_items with parentType discriminator
-- [ ] **Phase 42: Estimate Module CRUD (Backend)** - Full `src/estimate/` module mirroring `src/quote/` with counter, policy, CRUD services, status transitions, indexes
-- [ ] **Phase 43: Revisions** - parentEstimateId/rootEstimateId/revisionNumber/isCurrent with EstimateReviser and partial unique index
-- [ ] **Phase 44: Estimate Frontend CRUD** - features/estimates, ContingencySlider, document-type toggle on create dialog, list/detail pages, range vs "from" display
-- [ ] **Phase 45: Email & Send Flow** - Maizzle estimate templates with non-binding legal copy, EstimateEmailSender, send endpoint, SendEstimateDialog, configurable template in Business settings
-- [ ] **Phase 46: Public Customer Page & Response Handling** - PublicEstimateController with latest-revision resolution, 4-button response flow, structured decline reasons, view tracking
-- [ ] **Phase 47: Follow-up Queue & Automation** - ESTIMATE_FOLLOWUPS BullMQ queue, scheduler, processor, deterministic jobIds, cancel on exit, auto-expiry, Redis AOF infra gate
-- [ ] **Phase 48: Convert to Quote & Mark as Lost** - EstimateToQuoteConverter with mandatory review, idempotent convert endpoint, convertedToQuoteId back-link, markLost service
+- [ ] **Phase 41: Estimate Module CRUD (Backend)** - Full `src/estimate/` module mirroring `src/quote/` with counter, policy, CRUD services, status transitions, indexes, plus the `quote-token` → `document-token` rename (unified token module) and a new standalone `estimate_line_items` collection and module
+- [ ] **Phase 42: Revisions** - parentEstimateId/rootEstimateId/revisionNumber/isCurrent with EstimateReviser and partial unique index
+- [ ] **Phase 43: Estimate Frontend CRUD** - features/estimates, ContingencySlider, document-type toggle on create dialog, list/detail pages, range vs "from" display
+- [ ] **Phase 44: Email & Send Flow** - Maizzle estimate templates with non-binding legal copy, EstimateEmailSender, send endpoint, SendEstimateDialog, plus a new standalone `estimate-settings` module and Business > Templates tab update
+- [ ] **Phase 45: Public Customer Page & Response Handling** - PublicEstimateController with latest-revision resolution, 4-button response flow, structured decline reasons, view tracking
+- [ ] **Phase 46: Follow-up Queue & Automation** - ESTIMATE_FOLLOWUPS BullMQ queue, scheduler, processor, deterministic jobIds, cancel on exit, auto-expiry, Redis AOF infra gate
+- [ ] **Phase 47: Convert to Quote & Mark as Lost** - EstimateToQuoteConverter with mandatory review, idempotent convert endpoint, convertedToQuoteId back-link, markLost service
 
 Full details: `.planning/milestones/v1.8-ROADMAP.md`
 
 ## Phase Details
 
-### Phase 41: Foundations & Refactor
-**Goal**: The canonical token and settings module names land before any estimate code is written, so every new file uses the final naming and schemas without later renames.
+### Phase 41: Estimate Module CRUD (Backend)
+**Goal**: An authenticated trader can create, read, update, list, and soft-delete estimates with E-YYYY-NNN numbering and a validated status lifecycle via HTTP endpoints, using a dedicated `estimate_line_items` collection; and the `quote-token` module is unified into `document-token` (with `quote_tokens` renamed to `document_tokens`) so both document types share one secure customer-facing guard.
 **Depends on**: Nothing (first phase of v1.8)
-**Requirements**: FND-01, FND-02, FND-03
+**Requirements**: EST-01, EST-02, EST-03, EST-04, EST-05, EST-06, EST-07, EST-08, EST-09, CONT-01, CONT-02, CONT-05, RESP-08
 **Success Criteria** (what must be TRUE):
-  1. `document-token` module replaces `quote-token` end-to-end: collection renamed, `documentType: "quote" | "estimate"` and `documentId` fields persist, existing quote tokens continue to validate, and the public quote page still resolves its token.
-  2. `document-settings` module replaces `quote-settings` with a single settings API exposing both `quoteEmailTemplate` and a new `estimateEmailTemplate`, and the Business > Templates tab still loads and saves quote template fields unchanged.
-  3. `quote_line_items` collection has been widened with `parentType: "quote" | "estimate"` and optional `estimateId`, with all existing rows backfilled to `parentType: "quote"` via a one-shot migration, and the quote detail page renders line items identically to before the migration.
-**Plans**: TBD
-
-### Phase 42: Estimate Module CRUD (Backend)
-**Goal**: An authenticated trader can create, read, update, list, and soft-delete estimates with E-YYYY-NNN numbering and a validated status lifecycle via HTTP endpoints.
-**Depends on**: Phase 41
-**Requirements**: EST-01, EST-02, EST-03, EST-04, EST-05, EST-06, EST-07, EST-08, CONT-01, CONT-02, CONT-05, RESP-08
-**Success Criteria** (what must be TRUE):
-  1. `POST /v1/estimates` creates an estimate with an atomically generated `E-YYYY-NNN` number (per-business, per-year counter), shares line-item/customer/job/tax-rate resolution with quotes, and returns an API-computed `{ low, high }` price range using a stored contingency percentage.
+  1. `POST /v1/estimates` creates an estimate with an atomically generated `E-YYYY-NNN` number (per-business, per-year counter), writes line items to a new dedicated `estimate_line_items` collection via a new `EstimateLineItem*` module (repository, creator, policy, bundle/tax factories mirroring the quote line-item stack), and returns an API-computed `{ low, high }` price range using a stored contingency percentage.
   2. `GET /v1/estimates` returns a paginated list with tab filtering by status and `GET /v1/estimates/:id` returns full detail including line items, contingency, totals, customer info, status, and a response summary structure.
   3. `PATCH /v1/estimates/:id` edits a Draft estimate (scope, line items, contingency 0-30 in steps of 5, display mode, notes, customer, job) and `DELETE /v1/estimates/:id` soft-deletes from Draft only (`status: DELETED`, line-item history preserved).
-  4. Status transition service enforces the lifecycle Draft -> Sent -> Viewed -> Responded -> (SiteVisitRequested / Converted / Declined / Expired / Lost) and rejects invalid transitions with a clear error code; required MongoDB indexes (`(businessId, createdAt)`, `(jobId, createdAt)`, unique `(businessId, number)` partial on `deletedAt`) are in place.
+  4. Status transition service enforces the lifecycle Draft -> Sent -> Viewed -> Responded -> (SiteVisitRequested / Converted / Declined / Expired / Lost) and rejects invalid transitions with a clear error code; required MongoDB indexes are in place.
+  5. `quote-token` module is renamed to `document-token` end-to-end: entity field `quoteId` -> `documentId`, `documentType: "quote" | "estimate"` discriminator added, collection `quote_tokens` -> `document_tokens` via one-shot reversible migration, guard renamed to `DocumentSessionAuthGuard`, existing quote tokens continue to validate, and the public quote page (`/v1/public/quote/:token`) still resolves its token unchanged.
+  6. `quote_line_items` collection is untouched -- no `parentType` field, no `estimateId` field, no migration, no backfill. The quote detail page renders line items identically to before this phase.
 **Plans**: TBD
 
-### Phase 43: Revisions
+### Phase 42: Revisions
 **Goal**: A trader can invisibly revise a Sent estimate -- the new revision becomes current, the previous becomes non-current, history is queryable -- and the data model guarantees exactly one current revision per estimate chain.
-**Depends on**: Phase 42
+**Depends on**: Phase 41
 **Requirements**: REV-01, REV-02, REV-03, REV-04, REV-05
 **Success Criteria** (what must be TRUE):
   1. `POST /v1/estimates/:id/revisions` creates a new revision of a Sent estimate under the same `E-YYYY-NNN` number, setting `parentEstimateId`, incrementing `revisionNumber`, and flipping `isCurrent` so only the new revision is current (enforced by a partial unique index on `(rootEstimateId, isCurrent: true)`).
@@ -165,9 +156,9 @@ Full details: `.planning/milestones/v1.8-ROADMAP.md`
   4. Attempting to concurrently create two revisions for the same chain results in exactly one success and one 409 Conflict (index-enforced), with no duplicate `isCurrent: true` rows.
 **Plans**: TBD
 
-### Phase 44: Estimate Frontend CRUD
-**Goal**: A trader can visually create and edit estimates from the app with a document-type toggle, contingency slider, and range-or-"from" price display, running against the Phase 42 backend.
-**Depends on**: Phase 42 (can run in parallel with Phase 43)
+### Phase 43: Estimate Frontend CRUD
+**Goal**: A trader can visually create and edit estimates from the app with a document-type toggle, contingency slider, and range-or-"from" price display, running against the Phase 41 backend.
+**Depends on**: Phase 41 (can run in parallel with Phase 42)
 **Requirements**: CONT-03, CONT-04
 **Success Criteria** (what must be TRUE):
   1. The shared Create Document dialog displays a Quote/Estimate toggle; selecting Estimate reveals the ContingencySlider (0-30% in 5% steps, default 10%), the display-mode toggle (range / "from £X"), and the quick-tap uncertainty chips (site inspection, pipework, materials, access) plus a freeform notes field, and the submitted estimate appears in the list.
@@ -177,22 +168,24 @@ Full details: `.planning/milestones/v1.8-ROADMAP.md`
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 45: Email & Send Flow
-**Goal**: A trader can review a pre-filled email, send an estimate via a secure public link, and re-send without creating a new revision -- with mandatory non-binding legal language baked into the default template.
-**Depends on**: Phase 41, Phase 42, Phase 44
+### Phase 44: Email & Send Flow
+**Goal**: A trader can review a pre-filled email, send an estimate via a secure public link, and re-send without creating a new revision -- with mandatory non-binding legal language baked into the default template stored in a new dedicated `estimate-settings` module that is entirely independent of `quote-settings`.
+**Depends on**: Phase 41, Phase 43
 **Requirements**: SND-01, SND-02, SND-03, SND-04, SND-05, SND-06, SND-07
 **Success Criteria** (what must be TRUE):
-  1. Trader clicks "Send Estimate" on a Draft estimate, reviews/edits the pre-filled subject and rich-text body in the SendEstimateDialog, and the estimate transitions to Sent with a secure `document-token` link delivered via Resend using a new Maizzle `estimate-sent` template.
-  2. The default estimate email template is configurable under Business > Templates and contains mandatory non-binding legal copy ("This is an estimate, not a fixed price commitment. A firm quote will be provided after a site visit.") that cannot be removed by the user, and the subject line includes "Estimate" (not "Quote").
-  3. The exact rendered HTML sent to the customer is persisted on the estimate at send time as an audit artefact.
-  4. Re-sending a Sent (or revised) estimate delivers the email again without creating a new revision and without regenerating the token, and the estimate detail page reflects the updated `lastSentAt`.
+  1. A new `estimate-settings` module is introduced (module, controller, service, repository, policy, DTOs, requests, responses, tests) with its own API surface exposing `estimateEmailTemplate`. `quote-settings` is untouched.
+  2. The Business > Templates tab in trade-flow-ui is updated to fetch and save both template types in parallel via two independent APIs, and the existing quote template UI/UX still loads and saves unchanged.
+  3. Trader clicks "Send Estimate" on a Draft estimate, reviews/edits the pre-filled subject and rich-text body in the SendEstimateDialog, and the estimate transitions to Sent with a secure `document-token` link delivered via Resend using a new Maizzle `estimate-sent` template.
+  4. The default estimate email template contains mandatory non-binding legal copy ("This is an estimate, not a fixed price commitment. A firm quote will be provided after a site visit.") that cannot be removed by the user, and the subject line includes "Estimate" (not "Quote").
+  5. The exact rendered HTML sent to the customer is persisted on the estimate at send time as an audit artefact.
+  6. Re-sending a Sent (or revised) estimate delivers the email again without creating a new revision and without regenerating the token, and the estimate detail page reflects the updated `lastSentAt`.
 **Plans**: TBD
 **UI hint**: yes
 **Legal-review gate**: Default template copy and subject-line wording must pass a targeted UK-consumer-law copy review before this phase ships. Non-binding disclaimer is mandatory and non-removable (SND-05).
 
-### Phase 46: Public Customer Page & Response Handling
+### Phase 45: Public Customer Page & Response Handling
 **Goal**: A customer can open the secure estimate link without logging in, always see the latest revision with non-binding language prominent, and respond via one of four structured buttons -- triggering notification and status transitions.
-**Depends on**: Phase 41, Phase 45
+**Depends on**: Phase 41, Phase 44
 **Requirements**: CUST-01, CUST-02, CUST-03, CUST-04, CUST-05, CUST-06, CUST-07, RESP-01, RESP-02, RESP-03, RESP-04, RESP-05, RESP-06, RESP-07
 **Success Criteria** (what must be TRUE):
   1. `GET /v1/public/estimate/:token` via `DocumentSessionAuthGuard` returns the latest revision of the estimate chain (resolved via `rootEstimateId` + `revisionNumber` desc, even if an older revision was the one emailed), sets `firstViewedAt` once, and triggers the Sent -> Viewed transition.
@@ -202,9 +195,9 @@ Full details: `.planning/milestones/v1.8-ROADMAP.md`
 **Plans**: TBD
 **UI hint**: yes
 
-### Phase 47: Follow-up Queue & Automation
+### Phase 46: Follow-up Queue & Automation
 **Goal**: Sending an estimate automatically schedules 3/10/21-day follow-up emails that fire reliably across worker restarts, cancel cleanly on any exit transition, and auto-expire estimates 30 days after send.
-**Depends on**: Phase 45, Phase 46
+**Depends on**: Phase 44, Phase 45
 **Requirements**: FUP-01, FUP-02, FUP-03, FUP-04, FUP-05, FUP-06, FUP-07, FUP-08
 **Success Criteria** (what must be TRUE):
   1. Sending an estimate calls `EstimateFollowupScheduler.scheduleFollowups()` which enqueues three delayed BullMQ jobs on a new `ESTIMATE_FOLLOWUPS` queue with relative UTC delays (72h, 240h, 504h) and deterministic jobIds of shape `estimate-followup:{estimateId}:{revisionNumber}:{step}` -- a second call for the same estimate/revision is a silent no-op.
@@ -214,12 +207,12 @@ Full details: `.planning/milestones/v1.8-ROADMAP.md`
 **Plans**: TBD
 **Infra gate**: Production Redis must have AOF persistence enabled (`appendonly yes`, `appendfsync everysec`) before any follow-up ships. This is a hard gate, not a soft constraint -- without it, all scheduled follow-ups are silently lost on restart (FUP-08).
 
-### Phase 48: Convert to Quote & Mark as Lost
+### Phase 47: Convert to Quote & Mark as Lost
 **Goal**: A trader can idempotently convert a Sent/Responded estimate into a fully independent quote with mandatory review, and can manually mark an estimate as Lost with a structured reason -- both flows cancel any pending follow-ups and lock the source estimate.
-**Depends on**: Phase 42, Phase 43, Phase 47
+**Depends on**: Phase 41, Phase 42, Phase 46
 **Requirements**: CONV-01, CONV-02, CONV-03, CONV-04, CONV-05, CONV-06, LOST-01, LOST-02
 **Success Criteria** (what must be TRUE):
-  1. `POST /v1/estimates/:id/convert` (accepting an `Idempotency-Key` header) pulls from the latest revision, copies line items with literal tax-rate percentages as a snapshot, drops contingency entirely, creates a new quote in Draft status, transitions the source estimate to Converted, sets `convertedToQuoteId` as a back-link, and locks the estimate from further revisions.
+  1. `POST /v1/estimates/:id/convert` (accepting an `Idempotency-Key` header) pulls from the latest revision, reads line items from `estimate_line_items`, copies them into `quote_line_items` with literal tax-rate percentages as a snapshot, drops contingency entirely, creates a new quote in Draft status, transitions the source estimate to Converted, sets `convertedToQuoteId` as a back-link, and locks the estimate from further revisions.
   2. The trader opens the convert flow from the estimate detail page, the new quote opens in edit mode for mandatory review before saving, and a double-click submission with the same `Idempotency-Key` within 24h returns the same quote id (exactly one quote created).
   3. The converted quote's detail page shows a "Converted from E-YYYY-NNN" back-link linking to the source estimate, and the source estimate is visibly locked (no Edit, no Revise) once Converted.
   4. `POST /v1/estimates/:id/mark-lost` transitions the estimate to Lost with a structured reason (same taxonomy as customer decline) or freeform text, cancels all pending follow-ups, and renders a locked detail page with the recorded reason visible to the trader.
@@ -270,11 +263,10 @@ Full details: `.planning/milestones/v1.8-ROADMAP.md`
 | 38. Hard Paywall and Soft Paywall Removal | v1.7 | 2/2 | Complete | 2026-04-02 |
 | 39. Welcome Dashboard and Final Cleanup | v1.7 | 2/2 | Complete | 2026-04-07 |
 | 40. SubscriptionGuard Onboarding Bypass | v1.7 | 1/1 | Complete | 2026-04-07 |
-| 41. Foundations & Refactor | v1.8 | 0/? | Not started | - |
-| 42. Estimate Module CRUD (Backend) | v1.8 | 0/? | Not started | - |
-| 43. Revisions | v1.8 | 0/? | Not started | - |
-| 44. Estimate Frontend CRUD | v1.8 | 0/? | Not started | - |
-| 45. Email & Send Flow | v1.8 | 0/? | Not started | - |
-| 46. Public Customer Page & Response Handling | v1.8 | 0/? | Not started | - |
-| 47. Follow-up Queue & Automation | v1.8 | 0/? | Not started | - |
-| 48. Convert to Quote & Mark as Lost | v1.8 | 0/? | Not started | - |
+| 41. Estimate Module CRUD (Backend) | v1.8 | 0/? | Not started | - |
+| 42. Revisions | v1.8 | 0/? | Not started | - |
+| 43. Estimate Frontend CRUD | v1.8 | 0/? | Not started | - |
+| 44. Email & Send Flow | v1.8 | 0/? | Not started | - |
+| 45. Public Customer Page & Response Handling | v1.8 | 0/? | Not started | - |
+| 46. Follow-up Queue & Automation | v1.8 | 0/? | Not started | - |
+| 47. Convert to Quote & Mark as Lost | v1.8 | 0/? | Not started | - |
