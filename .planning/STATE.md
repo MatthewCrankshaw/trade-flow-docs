@@ -2,16 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Estimates
-status: roadmap_defined
-stopped_at: Roadmap restructured (Phase 41 dissolved), ready to plan new Phase 41
-last_updated: "2026-04-11T00:00:00.000Z"
-last_activity: 2026-04-11
+status: planning
+stopped_at: Phase 41 context gathered
+last_updated: "2026-04-11T09:26:29.203Z"
+last_activity: 2026-04-11 — Dissolved original Phase 41 (Foundations & Refactor) during discuss-phase; restructured v1.8 into 7 phases; separation-of-concerns chosen for line items and settings (new estimate-only collections/modules) while tokens remain unified as document-token.
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
-  percent: 0
 ---
 
 # Project State
@@ -90,6 +89,7 @@ v1.7 decisions archived with milestone completion.
 ### Roadmap Evolution
 
 v1.8 roadmap created 2026-04-10:
+
 - 8 phases (41-48) derived from 10 requirement categories
 - Separate EstimateModule pattern chosen over polymorphic discriminator (see ARCHITECTURE.md §10)
 - Foundations-first refactor (Phase 41) before any estimate code is written
@@ -97,6 +97,7 @@ v1.8 roadmap created 2026-04-10:
 - Original Phase 45 gated on legal-review pass of non-binding email copy (SND-05 is non-removable)
 
 v1.8 roadmap restructured 2026-04-11 (during /gsd-discuss-phase 41):
+
 - Phase 41 (Foundations & Refactor) dissolved; renumbered to 7 phases (41-47)
 - Separation-of-concerns chosen over DRY for entity-level modules: `quote_line_items` untouched; new `estimate_line_items` collection and module (absorbed into new Phase 41). `quote-settings` untouched; new `estimate-settings` module (absorbed into new Phase 44).
 - Tokens remain unified: `quote-token` → `document-token` with `documentType` discriminator (absorbed into new Phase 41).
@@ -137,6 +138,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-11T00:00:00Z
-Stopped at: v1.8 roadmap restructured (Phase 41 dissolved, renumbered to 7 phases), ready to discuss new Phase 41
-Resume file: `.planning/milestones/v1.8-ROADMAP.md`
+Last session: 2026-04-11T09:26:29.194Z
+Stopped at: Phase 41 context gathered
+Resume file: .planning/phases/41-estimate-module-crud-backend/41-CONTEXT.md
