@@ -4,12 +4,12 @@ milestone: v1.8
 milestone_name: Estimates
 status: executing
 stopped_at: Phase 43 context gathered
-last_updated: "2026-04-11T16:54:49.021Z"
-last_activity: 2026-04-11 -- Phase 41 planning complete
+last_updated: "2026-04-11T20:26:37.937Z"
+last_activity: 2026-04-11 -- Phase 42 execution started
 progress:
   total_phases: 7
   completed_phases: 0
-  total_plans: 10
+  total_plans: 19
   completed_plans: 0
   percent: 0
 ---
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-07)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** v1.8 Estimates -- roadmap restructured 2026-04-11, ready to plan new Phase 41
+**Current focus:** Phase 42 — revisions
 
 ## Current Position
 
-Phase: Phase 41 (Estimate Module CRUD (Backend)) -- not started
-Plan: —
-Status: Ready to execute
-Last activity: 2026-04-11 -- Phase 41 planning complete
+Phase: 42 (revisions) — EXECUTING
+Plan: 1 of 6
+Status: Executing Phase 42
+Last activity: 2026-04-11 -- Phase 42 execution started
 
 **Next step:** `/gsd-discuss-phase 41` to gather context for the new Phase 41 (Estimate Module CRUD (Backend)) which now absorbs the document-token rename and the new `estimate_line_items` module.
 

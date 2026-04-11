@@ -165,8 +165,8 @@ Plans:
   4. Attempting to concurrently create two revisions for the same chain results in exactly one success and one 409 Conflict (index-enforced), with no duplicate `isCurrent: true` rows.
 **Plans**: 6 plans
 Plans:
-- [ ] 42-01-phase-41-amendments-and-roadmap-rewrite-PLAN.md — Amend Phase 41 PLAN-05 (index topology) and PLAN-07 (root-write retrofit), rewrite Phase 42 SC #3 per D-HOOK-05 in both roadmap files
-- [ ] 42-02-conflict-error-and-followup-interface-PLAN.md — ConflictError class + error codes + createHttpError branch + IEstimateFollowupCanceller interface + NoopEstimateFollowupCanceller default binding
+- [x] 42-01-phase-41-amendments-and-roadmap-rewrite-PLAN.md — Amend Phase 41 PLAN-05 (index topology) and PLAN-07 (root-write retrofit), rewrite Phase 42 SC #3 per D-HOOK-05 in both roadmap files
+- [x] 42-02-conflict-error-and-followup-interface-PLAN.md — ConflictError class + error codes + createHttpError branch + IEstimateFollowupCanceller interface + NoopEstimateFollowupCanceller default binding
 - [ ] 42-03-estimate-repository-revision-methods-PLAN.md — EstimateRepository.downgradeCurrent/insertRevision/restoreCurrent/findRevisionsByRootId/findCurrentInChainByRootId + EstimateLineItemRepository clone helpers + verify index declarations
 - [ ] 42-04-estimate-reviser-service-PLAN.md — EstimateReviser service with two-write revise flow, compensating rollback, bundle parent/child line-item clone, D-HOOK-03 non-call assertion, EstimateRevisionMockGenerator
 - [ ] 42-05-retriever-and-deleter-extensions-PLAN.md — EstimateRetriever (D-DET-01 non-current resolution, D-DET-02 list filter, findRevisionsByIdOrFail) + EstimateDeleter (D-REV-05/06 predecessor restoration)
@@ -287,7 +287,7 @@ Plans:
 | 39. Welcome Dashboard and Final Cleanup | v1.7 | 2/2 | Complete | 2026-04-07 |
 | 40. SubscriptionGuard Onboarding Bypass | v1.7 | 1/1 | Complete | 2026-04-07 |
 | 41. Estimate Module CRUD (Backend) | v1.8 | 0/8 | Not started | - |
-| 42. Revisions | v1.8 | 0/6 | Not started | - |
+| 42. Revisions | v1.8 | 2/6 | In Progress|  |
 | 43. Estimate Frontend CRUD | v1.8 | 0/6 | Not started | - |
 | 44. Email & Send Flow | v1.8 | 0/? | Not started | - |
 | 45. Public Customer Page & Response Handling | v1.8 | 0/? | Not started | - |
