@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-07)
 Phase: Phase 41 (Foundations & Refactor) -- not started
 Plan: —
 Status: Roadmap defined (8 phases, 58 requirements mapped)
-Last activity: 2026-04-10 — v1.8 roadmap created: Phases 41-48, 100% requirement coverage, traceability filled
+Last activity: 2026-04-11 — Completed quick task 260411-a41: Tightened comments in recent commits per new code standard (v1.8 roadmap was created 2026-04-10: Phases 41-48, 100% requirement coverage)
 
 **Next step:** `/gsd-plan-phase 41` to decompose Phase 41 (Foundations & Refactor) into executable plans.
 
@@ -127,6 +127,7 @@ None.
 | 260407-rp3 | Ensure API and UI have passing unit tests, prettier, linting checks and Railway pre-build CI gate | 2026-04-07 | 3e7de43 | [260407-rp3-ensure-api-and-ui-have-passing-unit-test](./quick/260407-rp3-ensure-api-and-ui-have-passing-unit-test/) |
 | 260407-s9g | Fix Railway build to run npm run ci instead of npm ci before deployment | 2026-04-07 | 9642daa, d3a8f6f | [260407-s9g-fix-railway-build-to-run-npm-run-ci-inst](./quick/260407-s9g-fix-railway-build-to-run-npm-run-ci-inst/) |
 | 260410-tkt | Review onboarding defect fixes and refactor for better holistic solution | 2026-04-10 | 8715966 (api), 380345b (ui) | [260410-tkt-review-onboarding-defect-fixes-and-refac](./quick/260410-tkt-review-onboarding-defect-fixes-and-refac/) |
+| 260411-a41 | Review recent commits against new comments code standard and refactor | 2026-04-11 | fa07323 (api), aa44616 (ui) | [260411-a41-review-recent-commits-against-new-commen](./quick/260411-a41-review-recent-commits-against-new-commen/) |
 
 ## Session Continuity
 
