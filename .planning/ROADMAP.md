@@ -143,7 +143,16 @@ Full details: `.planning/milestones/v1.8-ROADMAP.md`
   4. Status transition service enforces the lifecycle Draft -> Sent -> Viewed -> Responded -> (SiteVisitRequested / Converted / Declined / Expired / Lost) and rejects invalid transitions with a clear error code; required MongoDB indexes are in place.
   5. `quote-token` module is renamed to `document-token` end-to-end: entity field `quoteId` -> `documentId`, `documentType: "quote" | "estimate"` discriminator added, collection `quote_tokens` -> `document_tokens` via one-shot reversible migration, guard renamed to `DocumentSessionAuthGuard`, existing quote tokens continue to validate, and the public quote page (`/v1/public/quote/:token`) still resolves its token unchanged.
   6. `quote_line_items` collection is untouched -- no `parentType` field, no `estimateId` field, no migration, no backfill. The quote detail page renders line items identically to before this phase.
-**Plans**: TBD
+**Plans**: 8 plans
+Plans:
+- [ ] 41-01-prechecks-and-foundation-PLAN.md — BLOCKING prod quote_tokens check, tsconfig path aliases, ErrorCodes enum extension
+- [ ] 41-02-lift-bundle-helpers-PLAN.md — Move BundleConfigValidator/BundlePricingPlanner/BundleTaxRateCalculator from @quote/services to @item/services, generalise to ILineItemTaxInput
+- [ ] 41-03-document-token-rename-PLAN.md — Pure code rename quote-token → document-token with documentType discriminator and PublicQuoteController type assertion
+- [ ] 41-04-estimate-scaffold-PLAN.md — Estimate enums, entities, DTOs, requests, responses, mock generators, locked transition map + spec
+- [ ] 41-05-estimate-repositories-and-stateless-services-PLAN.md — EstimateRepository (paginated), EstimateLineItemRepository, EstimateNumberGenerator, EstimateTotalsCalculator (range math), EstimateTransitionService, EstimatePolicy, EstimateLineItemPolicy
+- [ ] 41-06-estimate-line-item-factories-PLAN.md — EstimateStandardLineItemFactory, EstimateBundleLineItemFactory, EstimateLineItemCreator, EstimateLineItemRetriever (mirror quote 1:1)
+- [ ] 41-07-estimate-crud-services-PLAN.md — EstimateCreator, EstimateRetriever, EstimateUpdater (Draft-only, line-item CRUD), EstimateDeleter (soft-delete via transition)
+- [ ] 41-08-controller-module-wiring-and-docs-PLAN.md — EstimateController (8 endpoints), EstimateModule wiring, AppModule registration, openapi.yaml update, ROADMAP success criterion #5 rewrite, final CI gate
 
 ### Phase 42: Revisions
 **Goal**: A trader can invisibly revise a Sent estimate -- the new revision becomes current, the previous becomes non-current, history is queryable -- and the data model guarantees exactly one current revision per estimate chain.
@@ -263,7 +272,7 @@ Full details: `.planning/milestones/v1.8-ROADMAP.md`
 | 38. Hard Paywall and Soft Paywall Removal | v1.7 | 2/2 | Complete | 2026-04-02 |
 | 39. Welcome Dashboard and Final Cleanup | v1.7 | 2/2 | Complete | 2026-04-07 |
 | 40. SubscriptionGuard Onboarding Bypass | v1.7 | 1/1 | Complete | 2026-04-07 |
-| 41. Estimate Module CRUD (Backend) | v1.8 | 0/? | Not started | - |
+| 41. Estimate Module CRUD (Backend) | v1.8 | 0/8 | Not started | - |
 | 42. Revisions | v1.8 | 0/? | Not started | - |
 | 43. Estimate Frontend CRUD | v1.8 | 0/? | Not started | - |
 | 44. Email & Send Flow | v1.8 | 0/? | Not started | - |
