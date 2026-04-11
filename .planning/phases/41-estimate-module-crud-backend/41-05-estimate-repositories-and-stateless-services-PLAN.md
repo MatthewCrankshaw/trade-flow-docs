@@ -144,7 +144,7 @@ Error throwing:
     - `EstimateRepository` is a single `@Injectable()` class extending the existing repository base (or none — mirror `QuoteRepository`).
     - `COLLECTION = "estimates"` (static readonly).
     - Methods: `create(dto): Promise<IEstimateDto>`, `findByIdOrFail(id): Promise<IEstimateDto>`, `update(dto): Promise<IEstimateDto>`, `findPaginatedByBusinessId(businessId, status?, limit, offset): Promise<{ items: IEstimateDto[]; pagination: IQueryResultsDto }>`, `findAllByBusinessId(businessId)` (unpaginated convenience for internal use — mirrors `QuoteRepository.findAllByBusinessId` for consumers that don't need pagination).
-    - `createIndexes()` method (called from constructor or module bootstrap — mirror the quote pattern) creates the three indexes from D-ENT-03.
+    - `createIndexes()` method (called from `onModuleInit()` — mirror the `SubscriptionRepository` pattern, NOT the quote pattern which has no index bootstrap) creates the **five** indexes: Phase 41's `{businessId, createdAt: -1}`, `{jobId, createdAt: -1}`, and `{businessId, number}` partial unique (now filtered on `{deletedAt: null, isCurrent: true}` per Phase 42 D-CHAIN-06), plus Phase 42's new `{rootEstimateId, isCurrent}` partial unique and `{rootEstimateId, revisionNumber}` sort index. `EstimateRepository` MUST declare `implements OnModuleInit` and inject `MongoConnectionService` via constructor. Rationale: folded forward from Phase 42 D-CHAIN-03/05/06 because Phase 41 has not executed — this avoids a runtime drop-and-recreate.
     - `toEntity(dto)` converts `DateTime` → `Date` via `@core/utilities/to-date-time.utility`, converts `string` id → `ObjectId`, and does NOT write `firstViewedAt: null` when undefined (Pitfall 8).
     - `toDto(entity)` converts `Date` → `DateTime`, `ObjectId` → hex string, and attaches `lineItems: DtoCollection.empty()`, `totals: { zero Money }`, `priceRange: { zero bounds }`, `responseSummary: null` placeholders (the creator / retriever / totals-calculator populate these on the service layer).
     - `EstimateLineItemRepository.COLLECTION = "estimatelineitems"` (no underscore — D-ENT-02).
@@ -187,14 +187,24 @@ public async createIndexes(): Promise<void> {
   const collection = db.collection(EstimateRepository.COLLECTION);
   await collection.createIndex({ businessId: 1, createdAt: -1 });
   await collection.createIndex({ jobId: 1, createdAt: -1 });
+  // Partial unique on the "visible" number: a historical revision of the same chain can carry the
+  // same E-YYYY-NNN because only the current non-deleted row is included in the partial filter.
+  // Revised to add `isCurrent: true` per Phase 42 D-CHAIN-06 (folded forward because Phase 41 has not executed).
   await collection.createIndex(
     { businessId: 1, number: 1 },
-    { unique: true, partialFilterExpression: { deletedAt: null } },
+    { unique: true, partialFilterExpression: { deletedAt: null, isCurrent: true } },
   );
+  // Phase 42 D-CHAIN-05: exactly one current revision per chain.
+  await collection.createIndex(
+    { rootEstimateId: 1, isCurrent: 1 },
+    { unique: true, partialFilterExpression: { isCurrent: true } },
+  );
+  // Phase 42: ordered chain lookup for the history endpoint.
+  await collection.createIndex({ rootEstimateId: 1, revisionNumber: 1 });
 }
 ```
 
-(If `QuoteRepository` uses an `onModuleInit` hook or lifecycle method, mirror that.)
+> NOTE (Phase 42 D-CHAIN-07): `QuoteRepository` does NOT create indexes. The blessed precedent is `SubscriptionRepository` which implements `OnModuleInit` and calls `ensureIndexes()` from the lifecycle hook. `EstimateRepository` MUST follow the same pattern: declare `implements OnModuleInit`, inject `MongoConnectionService` in the constructor, and call `await this.createIndexes()` from `onModuleInit()`. Do NOT create indexes in the constructor — the `MongoConnectionService` may not be ready yet.
 
 Pagination method (`findPaginatedByBusinessId`) — per RESEARCH.md Pattern 6:
 ```typescript
@@ -307,8 +317,13 @@ Commit message: `feat(41): add EstimateRepository and EstimateLineItemRepository
     - `grep -c "\"estimate_line_items\"" trade-flow-api/src/estimate/repositories/estimate-line-item.repository.ts` returns 0 (NOT with underscore)
     - `grep -c "\"quotes\"\\|\"quotelineitems\"" trade-flow-api/src/estimate/repositories/estimate.repository.ts trade-flow-api/src/estimate/repositories/estimate-line-item.repository.ts` returns 0
     - `grep -c "findPaginatedByBusinessId" trade-flow-api/src/estimate/repositories/estimate.repository.ts` returns at least 2 (definition + implementation)
-    - `grep -c "createIndex" trade-flow-api/src/estimate/repositories/estimate.repository.ts` returns at least 3 (three indexes per D-ENT-03)
-    - `grep -c "partialFilterExpression" trade-flow-api/src/estimate/repositories/estimate.repository.ts` returns at least 1 (partial unique on deletedAt:null)
+    - `grep -c "createIndex" trade-flow-api/src/estimate/repositories/estimate.repository.ts` returns at least 5
+    - `grep -c "partialFilterExpression" trade-flow-api/src/estimate/repositories/estimate.repository.ts` returns at least 2
+    - `grep -c "rootEstimateId: 1, isCurrent: 1" trade-flow-api/src/estimate/repositories/estimate.repository.ts` returns at least 1
+    - `grep -c "rootEstimateId: 1, revisionNumber: 1" trade-flow-api/src/estimate/repositories/estimate.repository.ts` returns at least 1
+    - `grep -c "deletedAt: null, isCurrent: true" trade-flow-api/src/estimate/repositories/estimate.repository.ts` returns at least 1
+    - `grep -c "implements OnModuleInit" trade-flow-api/src/estimate/repositories/estimate.repository.ts` returns 1
+    - `grep -c "onModuleInit" trade-flow-api/src/estimate/repositories/estimate.repository.ts` returns at least 1
     - `grep -c "{ businessId: 1, number: 1 }" trade-flow-api/src/estimate/repositories/estimate.repository.ts` returns at least 1
     - `grep -c "never writes firstViewedAt on create when not provided" trade-flow-api/src/estimate/test/repositories/estimate.repository.spec.ts` returns 1
     - `grep -c "estimatelineitems" trade-flow-api/src/estimate/test/repositories/estimate-line-item.repository.spec.ts` returns at least 1
@@ -974,3 +989,8 @@ After completion, create `.planning/phases/41-estimate-module-crud-backend/41-05
 - Transition service: list of every (from, to) tested
 - The full `npm run ci` output
 </output>
+
+---
+
+**Amendment history:**
+- 2026-04-11 — Phase 42 wave 1 (plan 42-01): added `{rootEstimateId, isCurrent}` partial unique index, `{rootEstimateId, revisionNumber}` sort index, and tightened `{businessId, number}` partial filter to `{deletedAt: null, isCurrent: true}`. Switched index bootstrap precedent from `QuoteRepository` (has no indexes) to `SubscriptionRepository` (`OnModuleInit` + `ensureIndexes`). Rationale: Phase 42 D-CHAIN-03 / D-CHAIN-05 / D-CHAIN-06 / D-CHAIN-07. Phase 41 has not executed; folding the final index topology forward avoids a runtime drop-and-recreate in Phase 42.
