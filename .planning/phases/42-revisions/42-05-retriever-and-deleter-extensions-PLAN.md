@@ -523,9 +523,13 @@ async findByIdOrFail(authUser, id): Promise<IEstimateDto> {
         });
 
         it("handles parentEstimateId: undefined same as null", async () => {
+          // IEstimateDto declares `parentEstimateId?: string | null` (optional AND nullable),
+          // so `undefined` is a type-valid value — no cast needed. The deleter normalizes
+          // with `parentEstimateId ?? null` (Pitfall §8) so both representations are treated
+          // identically as "root revision, no predecessor to restore".
           const root = EstimateRevisionMockGenerator.createRoot({
             status: EstimateStatus.DRAFT,
-            parentEstimateId: undefined as unknown as null,
+            parentEstimateId: undefined,
           });
           mockRetriever.findByIdOrFail.mockResolvedValue(root);
           await deleter.delete(authUser, root.id);
@@ -610,8 +614,9 @@ async findByIdOrFail(authUser, id): Promise<IEstimateDto> {
     ```
 
     **Prohibitions:**
-    - No `any`, no `as` in service code.
-    - `undefined as unknown as null` in spec is the one test-only allowed cast (to simulate the undefined vs null ambiguity).
+    - No `any` in production or spec code.
+    - **No `as` / `as unknown as` casts anywhere — production OR spec.** There are no test-only carve-outs (CLAUDE.md + `feedback_no_type_assertions.md`). `IEstimateDto` declares `parentEstimateId?: string | null`, so `undefined` can be passed directly without any cast. If a future test case needs to force an unusual DTO shape, widen the fixture generator's override type or normalize at the service boundary — do not cast.
+    - `as unknown as jest.Mocked<X>` IS acceptable in spec files — it is the standard NestJS mocking pattern for `Test.createTestingModule` with `useValue`. This exception applies ONLY to spec files, ONLY to `jest.Mocked<T>` narrowing, and does NOT extend to any other cast shape.
     - No `eslint-disable` / `@ts-ignore` / `@ts-expect-error` / `@ts-nocheck`.
   </action>
   <acceptance_criteria>
@@ -626,6 +631,8 @@ async findByIdOrFail(authUser, id): Promise<IEstimateDto> {
     - `grep -c "Phase 42 non-root revision delete" trade-flow-api/src/estimate/test/services/estimate-deleter.service.spec.ts` returns 1
     - `grep -c "invocationCallOrder" trade-flow-api/src/estimate/test/services/estimate-deleter.service.spec.ts` returns at least 1 (call order asserted)
     - `grep -c "restoreCurrent" trade-flow-api/src/estimate/test/services/estimate-deleter.service.spec.ts` returns at least 3
+    - `! grep -q "as unknown as null" trade-flow-api/src/estimate/test/services/estimate-deleter.service.spec.ts` — the offending `undefined as unknown as null` pattern from iteration 2 must be gone
+    - `grep -c "as unknown as" trade-flow-api/src/estimate/test/services/estimate-deleter.service.spec.ts` count equals `grep -c "as unknown as jest\.Mocked" trade-flow-api/src/estimate/test/services/estimate-deleter.service.spec.ts` — the ONLY permitted shape for `as unknown as` is the `jest.Mocked<X>` NestJS mocking narrowing in `beforeEach`
     - `cd trade-flow-api && npm run test -- --testPathPattern=estimate-deleter` exits 0
   </acceptance_criteria>
   <verify>

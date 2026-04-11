@@ -669,7 +669,7 @@ if (clonedChildren.length > 0) {
           insertRevision: jest.fn(),
           restoreCurrent: jest.fn(),
           findByIdOrFail: jest.fn(),
-          update: jest.fn(),
+          softDeleteRow: jest.fn(),
         } as unknown as jest.Mocked<EstimateRepository>;
         mockLineItemRepo = {
           findNonDeletedByEstimateId: jest.fn(),
@@ -799,10 +799,13 @@ if (clonedChildren.length > 0) {
           mockLineItemRepo.bulkInsertForRevision.mockRejectedValue(new Error("clone failed"));
 
           await expect(reviser.revise(authUser, source.id)).rejects.toBeInstanceOf(InternalServerError);
-          expect(mockRepo.update).toHaveBeenCalledWith(
-            expect.objectContaining({ status: EstimateStatus.DELETED, isCurrent: false }),
-          );
+          expect(mockRepo.softDeleteRow).toHaveBeenCalledWith(inserted.id);
           expect(mockRepo.restoreCurrent).toHaveBeenCalledWith(source.id);
+
+          // D-REV-06 ordering: soft-delete new row BEFORE restore old row.
+          const softDeleteOrder = mockRepo.softDeleteRow.mock.invocationCallOrder[0];
+          const restoreOrder = mockRepo.restoreCurrent.mock.invocationCallOrder[0];
+          expect(softDeleteOrder).toBeLessThan(restoreOrder);
         });
       });
 
@@ -930,6 +933,9 @@ if (clonedChildren.length > 0) {
     - `grep -c "cancelAllFollowups.*not.toHaveBeenCalled\\|expect(cancelSpy).not.toHaveBeenCalled" trade-flow-api/src/estimate/test/services/estimate-reviser.service.spec.ts` returns at least 1
     - `grep -c "ConflictError" trade-flow-api/src/estimate/test/services/estimate-reviser.service.spec.ts` returns at least 3
     - `grep -c "restoreCurrent" trade-flow-api/src/estimate/test/services/estimate-reviser.service.spec.ts` returns at least 2
+    - `grep -c "mockRepo\.softDeleteRow" trade-flow-api/src/estimate/test/services/estimate-reviser.service.spec.ts` returns at least 2 (mock setup + assertion)
+    - `! grep -q "mockRepo\.update" trade-flow-api/src/estimate/test/services/estimate-reviser.service.spec.ts` (obsolete — replaced by softDeleteRow)
+    - `grep -c "invocationCallOrder" trade-flow-api/src/estimate/test/services/estimate-reviser.service.spec.ts` returns at least 1 (D-REV-06 ordering asserted)
     - `grep -c "it.each" trade-flow-api/src/estimate/test/services/estimate-reviser.service.spec.ts` returns at least 2 (parameterized allowed + disallowed status tests)
     - `cd trade-flow-api && npm run test -- --testPathPattern=estimate-reviser` exits 0
     - `cd trade-flow-api && npm run lint:check` exits 0 (confirms `followupCanceller` class-field injection does not trigger unused-var warning)
