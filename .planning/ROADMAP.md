@@ -177,11 +177,18 @@ Plans:
 **Depends on**: Phase 41 (can run in parallel with Phase 42)
 **Requirements**: CONT-03, CONT-04
 **Success Criteria** (what must be TRUE):
-  1. The shared Create Document dialog displays a Quote/Estimate toggle; selecting Estimate reveals the ContingencySlider (0-30% in 5% steps, default 10%), the display-mode toggle (range / "from £X"), and the quick-tap uncertainty chips (site inspection, pipework, materials, access) plus a freeform notes field, and the submitted estimate appears in the list.
+  1. The shared Create Document dialog displays a Quote/Estimate toggle; selecting Estimate reveals the ContingencySlider (0-30% in 5% steps, default 10%), the display-mode toggle (range / "from £X"), the five trade-agnostic uncertainty chips (site inspection needed, hidden conditions, materials & supply, access & working space, scope unclear until investigation) plus a freeform notes field, and the submitted estimate appears in the list.
   2. The Estimates list page renders all estimates with status tab filtering; each row shows customer name, job title, `E-YYYY-NNN`, status badge, and API-returned price range formatted as `£X - £Y` or `From £X` per the estimate's display mode.
   3. The Estimate detail page shows line items, contingency percentage, the formatted price range/"from" display, status, customer info, a placeholder for response summary, and action buttons (Edit, Delete) that Draft estimates can use while non-Draft estimates show the appropriate disabled/locked states.
   4. The UI never multiplies base x contingency on the client; `formatRange(low, high, mode)` renders only what the API returns, verified by a golden-file test asserting API and UI agree to the penny.
-**Plans**: TBD
+**Plans**: 6 plans
+Plans:
+- [ ] 43-01-types-and-doc-updates-PLAN.md — src/types/estimate.ts, CONT-04 + SMART-04 edits, ROADMAP + v1.8-ROADMAP success criterion sync
+- [ ] 43-02-slider-primitive-and-format-range-PLAN.md — @radix-ui/react-slider, shadcn Slider wrapper, formatRange helper, golden-file test + fixture
+- [ ] 43-03-rtk-query-estimate-api-PLAN.md — "Estimate" tag, features/estimates/api/estimateApi.ts with 8 hooks targeting /v1/estimates routes
+- [ ] 43-04-shared-create-dialog-and-estimate-form-PLAN.md — Extract CreateQuoteForm, build CreateDocumentDialog shell, ContingencySlider, UncertaintyChipGroup, UNCERTAINTY_CHIP_LABELS, CreateEstimateForm
+- [ ] 43-05-estimate-list-components-and-page-PLAN.md — 9 mirrored components (table/cards/skeletons/line-items/action strip), EstimatesPage with 7 grouped tabs
+- [ ] 43-06-estimate-detail-routing-and-migration-PLAN.md — EstimateDetailPage with inline Draft edits, /estimates routing, sidebar link, JobDetailPage + QuotesPage migration, delete CreateQuoteDialog.tsx, final CI gate
 **UI hint**: yes
 
 ### Phase 44: Email & Send Flow
@@ -281,7 +288,7 @@ Plans:
 | 40. SubscriptionGuard Onboarding Bypass | v1.7 | 1/1 | Complete | 2026-04-07 |
 | 41. Estimate Module CRUD (Backend) | v1.8 | 0/8 | Not started | - |
 | 42. Revisions | v1.8 | 0/6 | Not started | - |
-| 43. Estimate Frontend CRUD | v1.8 | 0/? | Not started | - |
+| 43. Estimate Frontend CRUD | v1.8 | 0/6 | Not started | - |
 | 44. Email & Send Flow | v1.8 | 0/? | Not started | - |
 | 45. Public Customer Page & Response Handling | v1.8 | 0/? | Not started | - |
 | 46. Follow-up Queue & Automation | v1.8 | 0/? | Not started | - |
