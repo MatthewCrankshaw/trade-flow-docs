@@ -1040,37 +1040,27 @@ The planner MUST honor every directive below. Every one is enforced by `npm run 
 
 ---
 
-## 10. Open Questions
+## 10. Open Questions (RESOLVED 2026-04-11)
 
-### Q1: `mongodb-memory-server` approval (MUST be answered before planner proceeds)
-**Question:** Does the user approve adding `mongodb-memory-server@^10` as a dev dependency to unlock SC #4 integration testing (§7.2 Option A)?
-**Context:** The existing test infrastructure is pure unit tests with mocked MongoDB primitives. SC #4 ("concurrent revise → exactly one success") cannot be meaningfully tested against mocks. Alternative: Option B (unit filter-inspection only) + manual smoke test (Option C).
-**Recommendation:** YES — Option A. The ~100 MB binary pull at install time is a one-off; the ~3-5 second test startup cost is amortized across future phases that also need real-MongoDB integration tests.
+All six research questions have been answered by the user before planning. Plans 42-01..42-06 encode these resolutions.
 
-### Q2: Phase 41 amendment ownership
-**Question:** Is it acceptable for Phase 42's planner to amend `.planning/phases/41-estimate-module-crud-backend/41-05-*PLAN.md` and `41-07-*PLAN.md` as part of Phase 42's task plan?
-**Context:** Phase 41 is in "planning complete, not executed" state. Folding the `rootEstimateId` retrofit and the index partial-filter rework into Phase 41 plans (rather than shipping a migration + drop-recreate in Phase 42) is the cleanest path. But it crosses the phase boundary — Phase 42's commit history will include edits to Phase 41 plan files.
-**Recommendation:** YES. Per GSD philosophy, plans are drafts until executed. The amendments are small, well-scoped, and commit messages credit Phase 42 context D-CHAIN-03 and D-CHAIN-06 as rationale. The alternative (ship a migration) is more code and more runtime risk.
+### Q1: `mongodb-memory-server` approval — RESOLVED: **Rejected**
+**Decision:** Do NOT add `mongodb-memory-server` as a dev dependency. SC #4 is verified via (a) unit test asserting the exact atomic filter shape used by `EstimateRepository.downgradeCurrent`, (b) unit test asserting reviser throws `ConflictError` when `downgradeCurrent` returns `null`, and (c) a new manual smoke procedure at `trade-flow-api/docs/smoke/phase-42-concurrent-revise.md` with docker-compose + parallel-curl steps. The existing test infra is pure unit tests with mocked MongoDB primitives and that pattern is preserved.
 
-### Q3: Error code ordinal allocation
-**Question:** What ordinals do `ESTIMATE_REVISION_CONFLICT` and `ESTIMATE_NOT_REVISABLE` get in `error-codes.enum.ts`?
-**Context:** Phase 41 reserves `ESTIMATE_0..ESTIMATE_N` for its own codes. Phase 42 needs the next two. Coordination risk: if Phase 41 lands more codes than expected, Phase 42's ordinals collide.
-**Recommendation:** Phase 42's planner reads Phase 41's final PLAN-01 error-codes section before assigning slots. If unresolved, use placeholder `ESTIMATE_REVISION_CONFLICT = "ESTIMATE_REVISION_CONFLICT"` (string-value-matches-key) and rename in a follow-up commit once Phase 41 executes. This is unusual but valid — the enum string value is what's persisted in API responses, and users don't care about the ordinal as long as it's stable.
+### Q2: Phase 41 amendment ownership — RESOLVED: **Amend in place**
+**Decision:** Phase 42's plans edit `.planning/phases/41-estimate-module-crud-backend/41-05-*-PLAN.md` and `41-07-*-PLAN.md` directly (Phase 41 is still in the "plans written, not executed" state). Phase 42 does NOT ship a runtime migration and does NOT perform runtime index drop-and-recreate. Plan 42-01 owns the amendments and commits them under Phase 42 with rationale crediting D-CHAIN-03/04/06.
 
-### Q4: `NoopEstimateFollowupCanceller` — is Phase 42 responsible for a unit test?
-**Question:** Does the no-op service need its own spec file, or is the test that "reviser's injected canceller is an instance of NoopEstimateFollowupCanceller" enough?
-**Context:** The no-op service has one method that logs and returns resolved. Testing it directly is borderline useless. The more valuable test is that the DI wiring works and that `reviser.followupCanceller` is defined.
-**Recommendation:** Ship a minimal spec that (a) confirms the class is `@Injectable()` and (b) confirms `cancelAllFollowups` returns a resolved promise. Total ~10 lines. The real value is the "reviser doesn't call it" assertion in `estimate-reviser.service.spec.ts`.
+### Q3: Error code ordinal allocation — RESOLVED: **String-value-equals-key fallback**
+**Decision:** Use `ESTIMATE_REVISION_CONFLICT = "ESTIMATE_REVISION_CONFLICT"` and `ESTIMATE_NOT_REVISABLE = "ESTIMATE_NOT_REVISABLE"` to sidestep coordination with Phase 41's ordinal namespace. The enum string value is what's persisted in API responses; ordinals are internal.
 
-### Q5: `EstimateRetriever.findRevisionsByIdOrFail` — handle invalid `:id`?
-**Question:** When `GET /v1/estimates/:id/revisions` is called with an id that doesn't exist, does it return 404, empty array, or something else?
-**Context:** D-HIST-05 says the endpoint resolves to a chain via `target.rootEstimateId`. If the target doesn't exist, there's no rootEstimateId to extract. CONTEXT.md doesn't specify.
-**Recommendation:** Throw `ResourceNotFoundError` — same as `GET /v1/estimates/:id` does today. 404. Matches trader expectation.
+### Q4: `NoopEstimateFollowupCanceller` unit test — RESOLVED: **Ship minimal spec**
+**Decision:** ~10-line spec asserting `@Injectable()` + `cancelAllFollowups` returns a resolved promise. Real test value lives in `estimate-reviser.service.spec.ts` via the `jest.spyOn(..., "cancelAllFollowups")` non-call assertion.
 
-### Q6: How many in-flight Drafts can a trader have per chain?
-**Question:** Can a trader create multiple Draft revisions on the same chain before sending any? Example: revise from SENT → Draft (revision 2), don't edit, revise from Draft → ??? (should be blocked).
-**Context:** D-REV-02 says Drafts are not revisable ("DRAFT is blocked explicitly"). D-CHAIN-05 enforces exactly one current per chain. So the answer is: at most one in-flight Draft per chain. If the trader tries to POST `/revisions` on a Draft, D-REV-02 returns 422 `ESTIMATE_NOT_REVISABLE`.
-**Recommendation:** No action — the constraint is already correct by construction. Add a spec test: "POST `/revisions` on a Draft returns 422".
+### Q5: `GET /v1/estimates/:id/revisions` with invalid id — RESOLVED: **404 ResourceNotFoundError**
+**Decision:** Throw `ResourceNotFoundError` — same as `GET /v1/estimates/:id`. Achieved via the underlying `findByIdOrFail` call that precedes the chain lookup.
+
+### Q6: Multiple in-flight Drafts per chain — RESOLVED: **Already blocked by D-REV-02**
+**Decision:** No new code. D-REV-02 already blocks Draft-source revisions (returns 422 `ESTIMATE_NOT_REVISABLE`). Plan 42-04 includes a spec case "POST `/revisions` on a Draft source returns 422".
 
 ---
 
