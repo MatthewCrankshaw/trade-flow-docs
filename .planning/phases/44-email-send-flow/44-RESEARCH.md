@@ -410,22 +410,19 @@ updateEstimateSettings: builder.mutation<
 | A3 | `@Matches` class-validator decorator supports regex flags (case-insensitive `/i`) | Code Examples | LOW -- verified `@Matches` is used in codebase with regex; regex flags are standard JS. |
 | A4 | `MongoDbWriter.findOneAndUpdate` returns the updated document (returnDocument: 'after' default) | Code Examples | LOW -- already relied upon in `quote-settings.repository.ts` upsert pattern. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Phase 41 execution status**
+1. **Phase 41 execution status** — RESOLVED: Plans 44-01 through 44-04 explicitly depend on Phase 41 via `depends_on` chains and context references. Execute Phase 41 first if not yet landed.
    - What we know: Phase 41 plans exist (41-01 through 41-08). Phase 41 code has NOT been executed -- `estimate` module only has followup canceller interface.
-   - What's unclear: When Phase 41 will land. All Phase 44 plans assume it's complete.
-   - Recommendation: Plans should explicitly state "assumes Phase 41 artifacts exist" in prerequisites. If Phase 41 hasn't landed when Phase 44 execution begins, execute Phase 41 first.
+   - Resolution: Plans explicitly state Phase 41 as prerequisite. If Phase 41 has not landed when Phase 44 execution begins, execute Phase 41 first.
 
-2. **`format-range.utility.ts` location**
+2. **`format-range.utility.ts` location** — RESOLVED: Placed under `@estimate/utilities/` per Plan 02.
    - What we know: D-TPL-02 says it should produce byte-identical output to Phase 43's frontend helper. It's estimate-specific today.
-   - What's unclear: Whether any non-estimate code will ever need range formatting.
-   - Recommendation: Place under `@estimate/utilities/` since it's domain-specific. If needed elsewhere later, move to `@core/utilities/`.
+   - Resolution: `format-range.utility.ts` lives at `src/estimate/utilities/format-range.utility.ts` with import path `@estimate/utilities/format-range.utility`. Domain-specific placement; move to `@core/utilities/` only if needed elsewhere later.
 
-3. **Path alias for estimate-settings module**
+3. **Path alias for estimate-settings module** — RESOLVED: Plan 01 Task 2 adds `@estimate-settings/*` alias.
    - What we know: The codebase uses `@quote-settings/*` for `src/quote-settings/`. Phase 44 needs `@estimate-settings/*`.
-   - What's unclear: Whether Phase 41 already registered this alias in `tsconfig.json`.
-   - Recommendation: Verify `tsconfig.json` paths include `@estimate-settings/*` -> `src/estimate-settings/*`. If missing, add it.
+   - Resolution: Plan 01 Task 2 (tsconfig.json update) adds `@estimate-settings/*` -> `src/estimate-settings/*` alongside the existing path aliases. If Phase 41 already registered it, the task verifies and skips.
 
 ## Environment Availability
 
