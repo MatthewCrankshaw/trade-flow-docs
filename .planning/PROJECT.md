@@ -252,6 +252,8 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 
 Trade Flow is a monetized SaaS product with a complete user acquisition funnel: public landing page, mandatory onboarding wizard, no-card free trial, and hard paywall. The core product flow -- from customer management through job tracking, quoting, and payment -- is fully functional. New users discover the product at the root URL, sign up, set up their profile and business in a two-step wizard, and start a 30-day trial automatically. The getting-started checklist guides them to create their first job and send their first quote.
 
+Phase 42 complete — Estimate revision chain (parentEstimateId/rootEstimateId/revisionNumber/isCurrent) with EstimateReviser service, ConflictError for concurrent writes, and IEstimateFollowupCanceller DI hook for Phase 44.
+
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
@@ -270,4 +272,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-10 starting v1.8 Estimates milestone*
+*Last updated: 2026-04-12 Phase 42 Revisions complete*
