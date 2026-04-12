@@ -298,7 +298,7 @@ Plans:
 | 39. Welcome Dashboard and Final Cleanup | v1.7 | 2/2 | Complete | 2026-04-07 |
 | 40. SubscriptionGuard Onboarding Bypass | v1.7 | 1/1 | Complete | 2026-04-07 |
 | 41. Estimate Module CRUD (Backend) | v1.8 | 8/8 | Complete   | 2026-04-12 |
-| 42. Revisions | v1.8 | 6/6 | Complete   | 2026-04-12 |
+| 42. Revisions | v1.8 | 6/6 | Complete    | 2026-04-12 |
 | 43. Estimate Frontend CRUD | v1.8 | 0/6 | Not started | - |
 | 44. Email & Send Flow | v1.8 | 0/4 | Not started | - |
 | 45. Public Customer Page & Response Handling | v1.8 | 0/5 | Not started | - |
