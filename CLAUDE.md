@@ -312,6 +312,10 @@ Two independent codebases: `trade-flow-api` (NestJS/MongoDB) and `trade-flow-ui`
 - Use `let` only when accumulating state
 - Never use `var`
 ### Comments
+- Prefer self-documenting code over comments. If a comment feels necessary, first consider renaming or extracting a method.
+- Acceptable comments: legal headers, TODO with ticket numbers, warnings about non-obvious consequences, clarification of intent when no better naming exists.
+- Never commit commented-out code — use version control history instead.
+- Never write comments that restate what the code does.
 ## Frontend (UI) Conventions
 ### File Naming Patterns
 - Components: PascalCase → `CustomersCardList.tsx`, `BusinessFormDialog.tsx` in `src/features/customers/components/`
@@ -348,6 +352,10 @@ Two independent codebases: `trade-flow-api` (NestJS/MongoDB) and `trade-flow-ui`
 - **Constants**: camelCase or UPPER_SNAKE_CASE → `API_BASE_URL`, `defaultTimeout`
 - **Boolean variables**: `is`, `has`, `can` prefix → `isOpen`, `hasError`, `canSubmit`
 ### Comments
+- Prefer self-documenting code over comments. If a comment feels necessary, first consider renaming or extracting a method.
+- Acceptable comments: legal headers, TODO with ticket numbers, warnings about non-obvious consequences, clarification of intent when no better naming exists.
+- Never commit commented-out code — use version control history instead.
+- Never write comments that restate what the code does.
 ### Validation
 - Use Valibot for schema validation (from `package.json`)
 - React Hook Form with Valibot resolvers for form validation (from `@hookform/resolvers`)

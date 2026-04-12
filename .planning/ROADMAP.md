@@ -146,9 +146,9 @@ Full details: `.planning/milestones/v1.8-ROADMAP.md`
 **Plans**: 8 plans
 Plans:
 - [x] 41-01-prechecks-and-foundation-PLAN.md — BLOCKING prod quote_tokens check, tsconfig path aliases, ErrorCodes enum extension
-- [ ] 41-02-lift-bundle-helpers-PLAN.md — Move BundleConfigValidator/BundlePricingPlanner/BundleTaxRateCalculator from @quote/services to @item/services, generalise to ILineItemTaxInput
-- [ ] 41-03-document-token-rename-PLAN.md — Pure code rename quote-token → document-token with documentType discriminator and PublicQuoteController type assertion
-- [ ] 41-04-estimate-scaffold-PLAN.md — Estimate enums, entities, DTOs, requests, responses, mock generators, locked transition map + spec
+- [x] 41-02-lift-bundle-helpers-PLAN.md — Move BundleConfigValidator/BundlePricingPlanner/BundleTaxRateCalculator from @quote/services to @item/services, generalise to ILineItemTaxInput
+- [x] 41-03-document-token-rename-PLAN.md — Pure code rename quote-token → document-token with documentType discriminator and PublicQuoteController type assertion
+- [x] 41-04-estimate-scaffold-PLAN.md — Estimate enums, entities, DTOs, requests, responses, mock generators, locked transition map + spec
 - [ ] 41-05-estimate-repositories-and-stateless-services-PLAN.md — EstimateRepository (paginated), EstimateLineItemRepository, EstimateNumberGenerator, EstimateTotalsCalculator (range math), EstimateTransitionService, EstimatePolicy, EstimateLineItemPolicy
 - [ ] 41-06-estimate-line-item-factories-PLAN.md — EstimateStandardLineItemFactory, EstimateBundleLineItemFactory, EstimateLineItemCreator, EstimateLineItemRetriever (mirror quote 1:1)
 - [ ] 41-07-estimate-crud-services-PLAN.md — EstimateCreator, EstimateRetriever, EstimateUpdater (Draft-only, line-item CRUD), EstimateDeleter (soft-delete via transition)
@@ -291,7 +291,7 @@ Plans:
 | 38. Hard Paywall and Soft Paywall Removal | v1.7 | 2/2 | Complete | 2026-04-02 |
 | 39. Welcome Dashboard and Final Cleanup | v1.7 | 2/2 | Complete | 2026-04-07 |
 | 40. SubscriptionGuard Onboarding Bypass | v1.7 | 1/1 | Complete | 2026-04-07 |
-| 41. Estimate Module CRUD (Backend) | v1.8 | 1/8 | In Progress|  |
+| 41. Estimate Module CRUD (Backend) | v1.8 | 4/8 | In Progress|  |
 | 42. Revisions | v1.8 | 2/6 | In Progress|  |
 | 43. Estimate Frontend CRUD | v1.8 | 0/6 | Not started | - |
 | 44. Email & Send Flow | v1.8 | 0/4 | Not started | - |
