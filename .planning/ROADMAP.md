@@ -120,7 +120,7 @@ Full details: `.planning/milestones/v1.7-ROADMAP.md`
 
 **Milestone Goal:** Ship estimates as a parallel document type with price ranges, soft customer response flow, automated follow-ups, and seamless conversion to quotes -- handling the pre-site-visit "rough cost" conversation that currently lives in WhatsApp and missed calls.
 
-- [ ] **Phase 41: Estimate Module CRUD (Backend)** - Full `src/estimate/` module mirroring `src/quote/` with counter, policy, CRUD services, status transitions, indexes, plus the `quote-token` → `document-token` rename (unified token module) and a new standalone `estimate_line_items` collection and module
+- [x] **Phase 41: Estimate Module CRUD (Backend)** - Full `src/estimate/` module mirroring `src/quote/` with counter, policy, CRUD services, status transitions, indexes, plus the `quote-token` → `document-token` rename (unified token module) and a new standalone `estimate_line_items` collection and module (completed 2026-04-12)
 - [ ] **Phase 42: Revisions** - parentEstimateId/rootEstimateId/revisionNumber/isCurrent with EstimateReviser and partial unique index
 - [ ] **Phase 43: Estimate Frontend CRUD** - features/estimates, ContingencySlider, document-type toggle on create dialog, list/detail pages, range vs "from" display
 - [ ] **Phase 44: Email & Send Flow** - Maizzle estimate templates with non-binding legal copy, EstimateEmailSender, send endpoint, SendEstimateDialog, plus a new standalone `estimate-settings` module and Business > Documents tab update
@@ -152,7 +152,7 @@ Plans:
 - [x] 41-05-estimate-repositories-and-stateless-services-PLAN.md — EstimateRepository (paginated), EstimateLineItemRepository, EstimateNumberGenerator, EstimateTotalsCalculator (range math), EstimateTransitionService, EstimatePolicy, EstimateLineItemPolicy
 - [x] 41-06-estimate-line-item-factories-PLAN.md — EstimateStandardLineItemFactory, EstimateBundleLineItemFactory, EstimateLineItemCreator, EstimateLineItemRetriever (mirror quote 1:1)
 - [x] 41-07-estimate-crud-services-PLAN.md — EstimateCreator, EstimateRetriever, EstimateUpdater (Draft-only, line-item CRUD), EstimateDeleter (soft-delete via transition)
-- [ ] 41-08-controller-module-wiring-and-docs-PLAN.md — EstimateController (8 endpoints), EstimateModule wiring, AppModule registration, openapi.yaml update, ROADMAP success criterion #5 rewrite, final CI gate
+- [x] 41-08-controller-module-wiring-and-docs-PLAN.md — EstimateController (8 endpoints), EstimateModule wiring, AppModule registration, openapi.yaml update, ROADMAP success criterion #5 rewrite, final CI gate
 
 ### Phase 42: Revisions
 **Goal**: A trader can invisibly revise a Sent estimate -- the new revision becomes current, the previous becomes non-current, history is queryable -- and the data model guarantees exactly one current revision per estimate chain.
@@ -297,7 +297,7 @@ Plans:
 | 38. Hard Paywall and Soft Paywall Removal | v1.7 | 2/2 | Complete | 2026-04-02 |
 | 39. Welcome Dashboard and Final Cleanup | v1.7 | 2/2 | Complete | 2026-04-07 |
 | 40. SubscriptionGuard Onboarding Bypass | v1.7 | 1/1 | Complete | 2026-04-07 |
-| 41. Estimate Module CRUD (Backend) | v1.8 | 7/8 | In Progress|  |
+| 41. Estimate Module CRUD (Backend) | v1.8 | 8/8 | Complete   | 2026-04-12 |
 | 42. Revisions | v1.8 | 2/6 | In Progress|  |
 | 43. Estimate Frontend CRUD | v1.8 | 0/6 | Not started | - |
 | 44. Email & Send Flow | v1.8 | 0/4 | Not started | - |
