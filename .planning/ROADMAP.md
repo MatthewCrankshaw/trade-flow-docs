@@ -123,7 +123,7 @@ Full details: `.planning/milestones/v1.7-ROADMAP.md`
 - [ ] **Phase 41: Estimate Module CRUD (Backend)** - Full `src/estimate/` module mirroring `src/quote/` with counter, policy, CRUD services, status transitions, indexes, plus the `quote-token` → `document-token` rename (unified token module) and a new standalone `estimate_line_items` collection and module
 - [ ] **Phase 42: Revisions** - parentEstimateId/rootEstimateId/revisionNumber/isCurrent with EstimateReviser and partial unique index
 - [ ] **Phase 43: Estimate Frontend CRUD** - features/estimates, ContingencySlider, document-type toggle on create dialog, list/detail pages, range vs "from" display
-- [ ] **Phase 44: Email & Send Flow** - Maizzle estimate templates with non-binding legal copy, EstimateEmailSender, send endpoint, SendEstimateDialog, plus a new standalone `estimate-settings` module and Business > Templates tab update
+- [ ] **Phase 44: Email & Send Flow** - Maizzle estimate templates with non-binding legal copy, EstimateEmailSender, send endpoint, SendEstimateDialog, plus a new standalone `estimate-settings` module and Business > Documents tab update
 - [ ] **Phase 45: Public Customer Page & Response Handling** - PublicEstimateController with latest-revision resolution, 4-button response flow, structured decline reasons, view tracking
 - [ ] **Phase 46: Follow-up Queue & Automation** - ESTIMATE_FOLLOWUPS BullMQ queue, scheduler, processor, deterministic jobIds, cancel on exit, auto-expiry, Redis AOF infra gate
 - [ ] **Phase 47: Convert to Quote & Mark as Lost** - EstimateToQuoteConverter with mandatory review, idempotent convert endpoint, convertedToQuoteId back-link, markLost service
@@ -145,7 +145,7 @@ Full details: `.planning/milestones/v1.8-ROADMAP.md`
   6. `quote_line_items` collection is untouched -- no `parentType` field, no `estimateId` field, no migration, no backfill. The quote detail page renders line items identically to before this phase.
 **Plans**: 8 plans
 Plans:
-- [ ] 41-01-prechecks-and-foundation-PLAN.md — BLOCKING prod quote_tokens check, tsconfig path aliases, ErrorCodes enum extension
+- [x] 41-01-prechecks-and-foundation-PLAN.md — BLOCKING prod quote_tokens check, tsconfig path aliases, ErrorCodes enum extension
 - [ ] 41-02-lift-bundle-helpers-PLAN.md — Move BundleConfigValidator/BundlePricingPlanner/BundleTaxRateCalculator from @quote/services to @item/services, generalise to ILineItemTaxInput
 - [ ] 41-03-document-token-rename-PLAN.md — Pure code rename quote-token → document-token with documentType discriminator and PublicQuoteController type assertion
 - [ ] 41-04-estimate-scaffold-PLAN.md — Estimate enums, entities, DTOs, requests, responses, mock generators, locked transition map + spec
@@ -197,12 +197,17 @@ Plans:
 **Requirements**: SND-01, SND-02, SND-03, SND-04, SND-05, SND-06, SND-07
 **Success Criteria** (what must be TRUE):
   1. A new `estimate-settings` module is introduced (module, controller, service, repository, policy, DTOs, requests, responses, tests) with its own API surface exposing `estimateEmailTemplate`. `quote-settings` is untouched.
-  2. The Business > Templates tab in trade-flow-ui is updated to fetch and save both template types in parallel via two independent APIs, and the existing quote template UI/UX still loads and saves unchanged.
+  2. The Business > Documents tab in trade-flow-ui is updated to fetch and save both template types in parallel via two independent APIs, and the existing quote template UI/UX still loads and saves unchanged.
   3. Trader clicks "Send Estimate" on a Draft estimate, reviews/edits the pre-filled subject and rich-text body in the SendEstimateDialog, and the estimate transitions to Sent with a secure `document-token` link delivered via Resend using a new Maizzle `estimate-sent` template.
   4. The default estimate email template contains mandatory non-binding legal copy ("This is an estimate, not a fixed price commitment. A firm quote will be provided after a site visit.") that cannot be removed by the user, and the subject line includes "Estimate" (not "Quote").
   5. The exact rendered HTML sent to the customer is persisted on the estimate at send time as an audit artefact.
   6. Re-sending a Sent (or revised) estimate delivers the email again without creating a new revision and without regenerating the token, and the estimate detail page reflects the updated `lastSentAt`.
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 44-01-PLAN.md — estimate-settings backend module + BusinessCreator extension + tsconfig paths
+- [ ] 44-02-PLAN.md — Maizzle estimate-sent.html template + EstimateEmailRenderer + audit collection + DocumentTokenRepository extensions + formatRange utility
+- [ ] 44-03-PLAN.md — EstimateEmailSender service + SendEstimateRequest + transition map extensions + controller endpoint + OpenAPI + doc updates
+- [ ] 44-04-PLAN.md — Frontend: Documents tab + EstimateEmailSettings + SendEstimateDialog + SendEstimateForm + EstimateActionStrip + EstimateDetailPage wiring
 **UI hint**: yes
 **Legal-review gate**: Default template copy and subject-line wording must pass a targeted UK-consumer-law copy review before this phase ships. Non-binding disclaimer is mandatory and non-removable (SND-05).
 
@@ -286,10 +291,10 @@ Plans:
 | 38. Hard Paywall and Soft Paywall Removal | v1.7 | 2/2 | Complete | 2026-04-02 |
 | 39. Welcome Dashboard and Final Cleanup | v1.7 | 2/2 | Complete | 2026-04-07 |
 | 40. SubscriptionGuard Onboarding Bypass | v1.7 | 1/1 | Complete | 2026-04-07 |
-| 41. Estimate Module CRUD (Backend) | v1.8 | 0/8 | Not started | - |
+| 41. Estimate Module CRUD (Backend) | v1.8 | 1/8 | In Progress|  |
 | 42. Revisions | v1.8 | 2/6 | In Progress|  |
 | 43. Estimate Frontend CRUD | v1.8 | 0/6 | Not started | - |
-| 44. Email & Send Flow | v1.8 | 0/? | Not started | - |
+| 44. Email & Send Flow | v1.8 | 0/4 | Not started | - |
 | 45. Public Customer Page & Response Handling | v1.8 | 0/? | Not started | - |
 | 46. Follow-up Queue & Automation | v1.8 | 0/? | Not started | - |
 | 47. Convert to Quote & Mark as Lost | v1.8 | 0/? | Not started | - |
