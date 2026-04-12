@@ -124,7 +124,7 @@ Full details: `.planning/milestones/v1.7-ROADMAP.md`
 - [ ] **Phase 42: Revisions** - parentEstimateId/rootEstimateId/revisionNumber/isCurrent with EstimateReviser and partial unique index
 - [ ] **Phase 43: Estimate Frontend CRUD** - features/estimates, ContingencySlider, document-type toggle on create dialog, list/detail pages, range vs "from" display
 - [ ] **Phase 44: Email & Send Flow** - Maizzle estimate templates with non-binding legal copy, EstimateEmailSender, send endpoint, SendEstimateDialog, plus a new standalone `estimate-settings` module and Business > Documents tab update
-- [ ] **Phase 45: Public Customer Page & Response Handling** - PublicEstimateController with latest-revision resolution, 4-button response flow, structured decline reasons, view tracking
+- [ ] **Phase 45: Public Customer Page & Response Handling** - PublicEstimateController with latest-revision resolution, 3-action conversational response flow (proceed/message/decline), structured decline reasons, view tracking
 - [ ] **Phase 46: Follow-up Queue & Automation** - ESTIMATE_FOLLOWUPS BullMQ queue, scheduler, processor, deterministic jobIds, cancel on exit, auto-expiry, Redis AOF infra gate
 - [ ] **Phase 47: Convert to Quote & Mark as Lost** - EstimateToQuoteConverter with mandatory review, idempotent convert endpoint, convertedToQuoteId back-link, markLost service
 
@@ -151,7 +151,7 @@ Plans:
 - [x] 41-04-estimate-scaffold-PLAN.md — Estimate enums, entities, DTOs, requests, responses, mock generators, locked transition map + spec
 - [x] 41-05-estimate-repositories-and-stateless-services-PLAN.md — EstimateRepository (paginated), EstimateLineItemRepository, EstimateNumberGenerator, EstimateTotalsCalculator (range math), EstimateTransitionService, EstimatePolicy, EstimateLineItemPolicy
 - [x] 41-06-estimate-line-item-factories-PLAN.md — EstimateStandardLineItemFactory, EstimateBundleLineItemFactory, EstimateLineItemCreator, EstimateLineItemRetriever (mirror quote 1:1)
-- [ ] 41-07-estimate-crud-services-PLAN.md — EstimateCreator, EstimateRetriever, EstimateUpdater (Draft-only, line-item CRUD), EstimateDeleter (soft-delete via transition)
+- [x] 41-07-estimate-crud-services-PLAN.md — EstimateCreator, EstimateRetriever, EstimateUpdater (Draft-only, line-item CRUD), EstimateDeleter (soft-delete via transition)
 - [ ] 41-08-controller-module-wiring-and-docs-PLAN.md — EstimateController (8 endpoints), EstimateModule wiring, AppModule registration, openapi.yaml update, ROADMAP success criterion #5 rewrite, final CI gate
 
 ### Phase 42: Revisions
@@ -212,15 +212,20 @@ Plans:
 **Legal-review gate**: Default template copy and subject-line wording must pass a targeted UK-consumer-law copy review before this phase ships. Non-binding disclaimer is mandatory and non-removable (SND-05).
 
 ### Phase 45: Public Customer Page & Response Handling
-**Goal**: A customer can open the secure estimate link without logging in, always see the latest revision with non-binding language prominent, and respond via one of four structured buttons -- triggering notification and status transitions.
+**Goal**: A customer can open the secure estimate link without logging in, always see the latest revision with non-binding language prominent, and respond via one of three conversational actions -- triggering notification and status transitions.
 **Depends on**: Phase 41, Phase 44
 **Requirements**: CUST-01, CUST-02, CUST-03, CUST-04, CUST-05, CUST-06, CUST-07, RESP-01, RESP-02, RESP-03, RESP-04, RESP-05, RESP-06, RESP-07
 **Success Criteria** (what must be TRUE):
-  1. `GET /v1/public/estimate/:token` via `DocumentSessionAuthGuard` returns the latest revision of the estimate chain (resolved via `rootEstimateId` + `revisionNumber` desc, even if an older revision was the one emailed), sets `firstViewedAt` once, and triggers the Sent -> Viewed transition.
+  1. `GET /v1/public/estimate/:token` via `DocumentSessionAuthGuard` returns the latest revision of the estimate chain (resolved via `rootEstimateId` + `isCurrent: true`, even if an older revision was the one emailed), sets `firstViewedAt` once, and triggers the Sent -> Viewed transition.
   2. The customer page (`/estimate/:token`) displays scope, price as range or "from £X", contingency explanation, validity, uncertainty notes, trader business info, and the non-binding legal language prominently at the top -- with NO "Accept" button, NO signature mechanism, NO single fixed total, and zero non-essential cookies (PECR-clean).
-  3. The four response buttons work end-to-end: "Book a site visit" opens a pre-populated availability message field capturing a structured site-visit-request; "Send me a quote" records proceed intent; "I have a question" opens a freeform inline message; "Not right now" captures a structured decline reason (Too expensive / Decided not to do the work / Going with another tradesperson / Just getting an idea of costs / Timing isn't right / Other + freeform).
-  4. Any customer action persists the full response (type, reason, message, timestamp) on the estimate, transitions the estimate status to Responded / SiteVisitRequested / Declined as appropriate, sends a notification email to the trader with response type and message preview, and future visits to the token on a terminal-state estimate show a friendly read-only message with no active buttons.
-**Plans**: TBD
+  3. The three response actions work end-to-end: "Happy to Proceed" records proceed intent and transitions to RESPONDED; "Message [First Name]" opens an inline textarea capturing a freeform message and transitions to RESPONDED; "Not right for me" captures a structured decline reason (5 presets plus optional freeform) and transitions to DECLINED. Each response persists to the estimate's responses array, sends a trader notification email, and replaces the action area with an inline confirmation.
+  4. Any customer action persists the full response (type, reason, message, timestamp) on the estimate, transitions the estimate status to Responded / Declined as appropriate, sends a notification email to the trader with response type and message preview, and future visits to the token on a terminal-state estimate show a friendly read-only message with no active buttons.
+**Plans**: 4 plans
+Plans:
+- [ ] 45-01-PLAN.md — Enum/entity/doc updates: remove SITE_VISIT_REQUESTED, add responses[] array, update REQUIREMENTS.md RESP-01..04
+- [ ] 45-02-PLAN.md — PublicEstimateRetriever + PublicEstimateController GET + public response class + publicTransition method
+- [ ] 45-03-PLAN.md — EstimateResponseHandler + notification email + controller POST + module wiring + guard fix + CI gate
+- [ ] 45-04-PLAN.md — Frontend: public estimate page with 3-action response buttons, terminal states, RTK Query, routing
 **UI hint**: yes
 
 ### Phase 46: Follow-up Queue & Automation
@@ -291,10 +296,10 @@ Plans:
 | 38. Hard Paywall and Soft Paywall Removal | v1.7 | 2/2 | Complete | 2026-04-02 |
 | 39. Welcome Dashboard and Final Cleanup | v1.7 | 2/2 | Complete | 2026-04-07 |
 | 40. SubscriptionGuard Onboarding Bypass | v1.7 | 1/1 | Complete | 2026-04-07 |
-| 41. Estimate Module CRUD (Backend) | v1.8 | 6/8 | In Progress|  |
+| 41. Estimate Module CRUD (Backend) | v1.8 | 7/8 | In Progress|  |
 | 42. Revisions | v1.8 | 2/6 | In Progress|  |
 | 43. Estimate Frontend CRUD | v1.8 | 0/6 | Not started | - |
 | 44. Email & Send Flow | v1.8 | 0/4 | Not started | - |
-| 45. Public Customer Page & Response Handling | v1.8 | 0/? | Not started | - |
+| 45. Public Customer Page & Response Handling | v1.8 | 0/4 | Not started | - |
 | 46. Follow-up Queue & Automation | v1.8 | 0/? | Not started | - |
 | 47. Convert to Quote & Mark as Lost | v1.8 | 0/? | Not started | - |
