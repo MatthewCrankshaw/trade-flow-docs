@@ -133,6 +133,16 @@ None - no external service configuration required.
 - findRevisionsByIdOrFail provides the service layer for the GET /revisions endpoint
 - Delete-rollback path is complete for the DELETE endpoint's non-root revision handling
 
+## Self-Check: PASSED
+
+- [x] 42-05-SUMMARY.md exists
+- [x] estimate-retriever.service.ts exists on disk (gitignored trade-flow-api)
+- [x] estimate-deleter.service.ts exists on disk (gitignored trade-flow-api)
+- [x] estimate-retriever.service.spec.ts exists on disk
+- [x] estimate-deleter.service.spec.ts exists on disk
+- [x] 20 retriever tests pass, 11 deleter tests pass (31 total)
+- [x] npm run ci exits 0
+
 ---
 *Phase: 42-revisions*
 *Completed: 2026-04-12*

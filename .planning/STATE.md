@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Estimates
 status: executing
-stopped_at: Completed 42-04-PLAN.md
-last_updated: "2026-04-12T18:38:03.435Z"
+stopped_at: Completed 42-05-PLAN.md
+last_updated: "2026-04-12T18:42:39.448Z"
 last_activity: 2026-04-12
 progress:
   total_phases: 7
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-07)
 ## Current Position
 
 Phase: 42 (revisions) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-04-12
 
@@ -80,6 +80,7 @@ Last activity: 2026-04-12
 | Phase 38 P02 | 5min | 2 tasks | 19 files |
 | Phase 37 P04 | 3min | 2 tasks | 5 files |
 | Phase 42 P04 | 6min | 2 tasks | 3 files |
+| Phase 42 P05 | 3min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -89,6 +90,7 @@ Key decisions archived in PROJECT.md Key Decisions table.
 v1.7 decisions archived with milestone completion.
 
 - [Phase 42]: Used undefined instead of null for optional DateTime fields in buildNewRevisionDto (IEstimateDto optional fields are typed as ?: DateTime)
+- [Phase 42]: Defense-in-depth canRead re-applied on resolved current row in D-DET-01; rootEstimateId ?? target.id fallback for null/undefined
 
 ### Roadmap Evolution
 
@@ -142,6 +144,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-12T18:38:03.433Z
-Stopped at: Completed 42-04-PLAN.md
+Last session: 2026-04-12T18:42:39.446Z
+Stopped at: Completed 42-05-PLAN.md
 Resume file: None
