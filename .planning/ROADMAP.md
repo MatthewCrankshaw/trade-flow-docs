@@ -220,12 +220,13 @@ Plans:
   2. The customer page (`/estimate/:token`) displays scope, price as range or "from £X", contingency explanation, validity, uncertainty notes, trader business info, and the non-binding legal language prominently at the top -- with NO "Accept" button, NO signature mechanism, NO single fixed total, and zero non-essential cookies (PECR-clean).
   3. The three response actions work end-to-end: "Happy to Proceed" records proceed intent and transitions to RESPONDED; "Message [First Name]" opens an inline textarea capturing a freeform message and transitions to RESPONDED; "Not right for me" captures a structured decline reason (5 presets plus optional freeform) and transitions to DECLINED. Each response persists to the estimate's responses array, sends a trader notification email, and replaces the action area with an inline confirmation.
   4. Any customer action persists the full response (type, reason, message, timestamp) on the estimate, transitions the estimate status to Responded / Declined as appropriate, sends a notification email to the trader with response type and message preview, and future visits to the token on a terminal-state estimate show a friendly read-only message with no active buttons.
-**Plans**: 4 plans
+**Plans**: 5 plans
 Plans:
-- [ ] 45-01-PLAN.md — Enum/entity/doc updates: remove SITE_VISIT_REQUESTED, add responses[] array, update REQUIREMENTS.md RESP-01..04
-- [ ] 45-02-PLAN.md — PublicEstimateRetriever + PublicEstimateController GET + public response class + publicTransition method
-- [ ] 45-03-PLAN.md — EstimateResponseHandler + notification email + controller POST + module wiring + guard fix + CI gate
-- [ ] 45-04-PLAN.md — Frontend: public estimate page with 3-action response buttons, terminal states, RTK Query, routing
+- [ ] 45-01-PLAN.md — Foundation: remove SITE_VISIT_REQUESTED, add responses[] array, rewrite RESP-01..04 docs
+- [ ] 45-02-PLAN.md — Backend public GET endpoint: PublicEstimateRetriever, controller, response class, Sent->Viewed transition
+- [ ] 45-03-PLAN.md — Backend response POST endpoint: EstimateResponseHandler, notification email, guard fix, module wiring, CI gate
+- [ ] 45-04-PLAN.md — Frontend: public estimate page components, RTK Query (no auth), page route, response buttons
+- [ ] 45-05-PLAN.md — E2E verification checkpoint: full flow validation across both repos
 **UI hint**: yes
 
 ### Phase 46: Follow-up Queue & Automation
@@ -300,6 +301,6 @@ Plans:
 | 42. Revisions | v1.8 | 2/6 | In Progress|  |
 | 43. Estimate Frontend CRUD | v1.8 | 0/6 | Not started | - |
 | 44. Email & Send Flow | v1.8 | 0/4 | Not started | - |
-| 45. Public Customer Page & Response Handling | v1.8 | 0/4 | Not started | - |
+| 45. Public Customer Page & Response Handling | v1.8 | 0/5 | Not started | - |
 | 46. Follow-up Queue & Automation | v1.8 | 0/? | Not started | - |
 | 47. Convert to Quote & Mark as Lost | v1.8 | 0/? | Not started | - |
