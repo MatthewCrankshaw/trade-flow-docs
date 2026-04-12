@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Estimates
-status: executing
-stopped_at: Phase 44 context gathered
+status: blocked
+stopped_at: Phase 42 Wave 2 blocked on Phase 41
 last_updated: "2026-04-11T20:46:22.657Z"
-last_activity: 2026-04-11 -- Phase 43 planning complete
+last_activity: 2026-04-12 -- Phase 42 Wave 1 complete, Wave 2 blocked on Phase 41
 progress:
   total_phases: 7
   completed_phases: 0
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-04-07)
 
 ## Current Position
 
-Phase: 42 (revisions) — EXECUTING
-Plan: 1 of 6
-Status: Ready to execute
-Last activity: 2026-04-11 -- Phase 43 planning complete
+Phase: 42 (revisions) — PAUSED (Wave 2 blocked on Phase 41)
+Plan: 2 of 6 complete (42-01, 42-02), 4 remaining blocked
+Status: Blocked — Phase 41 prerequisite not executed
+Last activity: 2026-04-12 -- Phase 42 Wave 1 complete, Wave 2 blocked
 
-**Next step:** `/gsd-discuss-phase 41` to gather context for the new Phase 41 (Estimate Module CRUD (Backend)) which now absorbs the document-token rename and the new `estimate_line_items` module.
+**Next step:** `/gsd-execute-phase 41` — land Phase 41 (Estimate Module CRUD Backend), then resume Phase 42 with `/gsd-execute-phase 42`.
 
 ## Roadmap Summary
 
