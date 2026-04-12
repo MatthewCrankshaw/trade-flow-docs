@@ -31,10 +31,10 @@ Requirements for Estimates milestone. Each maps to roadmap phases.
 ### Revisions
 
 - [ ] **REV-01**: Estimate entity stores `parentEstimateId`, `revisionNumber`, and `isCurrent` to support versioned revisions
-- [ ] **REV-02**: User can revise a Sent estimate via an "Edit and resend" action which creates a new revision under the same E-YYYY-NNN number and marks the previous revision as non-current
-- [ ] **REV-03**: Only one revision per estimate chain can have `isCurrent: true`, enforced by a partial unique index on `(parentEstimateId, isCurrent: true)`
+- [x] **REV-02**: User can revise a Sent estimate via an "Edit and resend" action which creates a new revision under the same E-YYYY-NNN number and marks the previous revision as non-current
+- [x] **REV-03**: Only one revision per estimate chain can have `isCurrent: true`, enforced by a partial unique index on `(parentEstimateId, isCurrent: true)`
 - [ ] **REV-04**: Estimate detail shows a collapsed History section listing previous revisions with send/view timestamps (trader-only, not on customer page)
-- [ ] **REV-05**: Revising an estimate cancels pending follow-ups and schedules a fresh 3/10/21-day sequence for the new revision
+- [x] **REV-05**: Revising an estimate cancels pending follow-ups and schedules a fresh 3/10/21-day sequence for the new revision
 
 ### Send & Email
 
@@ -163,10 +163,10 @@ Requirements -> phases mapping (filled by roadmap 2026-04-10).
 | CONT-04 | Phase 43 | Pending |
 | CONT-05 | Phase 41 | Pending |
 | REV-01 | Phase 42 | Pending |
-| REV-02 | Phase 42 | Pending |
-| REV-03 | Phase 42 | Pending |
+| REV-02 | Phase 42 | Complete |
+| REV-03 | Phase 42 | Complete |
 | REV-04 | Phase 42 | Pending |
-| REV-05 | Phase 42 | Pending |
+| REV-05 | Phase 42 | Complete |
 | SND-01 | Phase 44 | Pending |
 | SND-02 | Phase 44 | Pending |
 | SND-03 | Phase 44 | Pending |
