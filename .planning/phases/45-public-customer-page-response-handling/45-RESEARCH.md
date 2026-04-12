@@ -405,7 +405,7 @@ export interface IPublicEstimateResponseEntry {
 
 ```typescript
 // Source: CONTEXT.md D-API-03 [VERIFIED: 45-CONTEXT.md]
-import { IsEnum, IsOptional, IsString, MaxLength, ValidateIf } from "class-validator";
+import { IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength, ValidateIf } from "class-validator";
 import { EstimateResponseType } from "@estimate/enums/estimate-response-type.enum";
 import { EstimateDeclineReason } from "@estimate/enums/estimate-decline-reason.enum";
 
@@ -415,6 +415,7 @@ export class RespondToEstimateRequest {
 
   @ValidateIf((o) => o.type === EstimateResponseType.MESSAGE)
   @IsString()
+  @IsNotEmpty()
   @MaxLength(2000)
   message?: string;
 
@@ -502,22 +503,19 @@ const [view, setView] = useState<ResponseView>("buttons");
 | A2 | The guard's expired/revoked path can be extended with estimate repository injection without circular dependency | Pitfall 1 | May need to move lookup logic to a shared service; medium risk |
 | A3 | Existing estimate entity flat fields (lastResponseType etc.) should be kept alongside the responses array for summary access | Pitfall 2 | Could simplify to array-only if flat fields are unused elsewhere; low risk |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **DocumentSessionAuthGuard circular dependency risk**
    - What we know: The guard lives in `document-token` module and currently imports `QuoteRepository`. Adding `EstimateRepository` may create a circular dependency if `estimate.module` imports `document-token.module`.
-   - What's unclear: Whether `EstimateModule` already imports `DocumentTokenModule` (for the send flow in Phase 44).
-   - Recommendation: Check module imports at plan time. If circular, extract the business-name-lookup into a small service that both repositories inject into, or use `forwardRef()`.
+   - **Resolution:** Plan 03 Task 2 addresses this with a three-tier approach: (1) try direct injection of EstimateRepository, (2) if circular, use `@Inject(forwardRef(() => EstimateRepository))`, (3) if forwardRef is too complex, use a try/catch fallback where quoteRepository is tried first and estimateRepository is tried on failure. The executor will read the actual module imports at implementation time to determine which approach is needed.
 
 2. **PublicEstimateController registration location**
    - What we know: D-API-01 says "within the existing EstimateModule." The existing `PublicQuoteController` is registered in `DocumentTokenModule`.
-   - What's unclear: Whether the estimate module should own its public controller or follow the quote pattern of having it in the token module.
-   - Recommendation: Follow D-API-01 and register in `EstimateModule`. This is a cleaner separation than the quote pattern where public and token concerns are mixed.
+   - **Resolution:** Following D-API-01, the PublicEstimateController is registered in EstimateModule (Plan 03 Task 2 step 3). This is a cleaner separation than the quote pattern. The EstimateModule imports DocumentTokenModule for guard/token access.
 
 3. **REQUIREMENTS.md RESP-01..04 updates**
    - What we know: CONTEXT.md explicitly states these requirements need rewriting to reflect the 3-action model.
-   - What's unclear: Whether the planner should include doc updates as a separate wave/task or fold them into the enum update task.
-   - Recommendation: Include as the first task in the plan since subsequent tasks reference the new model.
+   - **Resolution:** Included as Plan 01 Task 3 (doc updates alongside enum changes in Wave 1). The requirement rewrites land before any implementation plans reference them.
 
 ## Validation Architecture
 
@@ -570,7 +568,7 @@ const [view, setView] = useState<ResponseView>("buttons");
 | V2 Authentication | yes | DocumentSessionAuthGuard token-based (no login required) |
 | V3 Session Management | no | Token-based, no server sessions |
 | V4 Access Control | yes | documentType assertion prevents token-type confusion; respondable state validation |
-| V5 Input Validation | yes | class-validator on RespondToEstimateRequest; MaxLength on message/reason fields |
+| V5 Input Validation | yes | class-validator on RespondToEstimateRequest; @IsNotEmpty() + MaxLength on message; MaxLength on reason fields |
 | V6 Cryptography | no | Tokens already generated via crypto.randomBytes in Phase 41 |
 
 ### Known Threat Patterns
@@ -580,9 +578,10 @@ const [view, setView] = useState<ResponseView>("buttons");
 | Token-type confusion (quote token used on estimate endpoint) | Spoofing | documentType assertion in controller [VERIFIED: existing pattern] |
 | Response replay (submitting same response twice) | Tampering | Respondable state check (VIEWED/SENT only); idempotent array push |
 | Rate limiting bypass on response endpoint | Denial of Service | ThrottlerGuard with 10/min limit [VERIFIED: existing pattern] |
-| XSS via customer message in notification email | Tampering | escapeHtml() on all user-provided content before email rendering [VERIFIED: existing pattern] |
+| XSS via customer message in notification email | Tampering | HTML-escape user content before email rendering (use Maizzle auto-escaping syntax or pre-escape utility) [VERIFIED: existing pattern] |
 | PECR violation via third-party scripts | Information Disclosure | Zero non-essential cookies; separate RTK Query instance with no auth [VERIFIED: D-PAGE-06] |
 | Expired/revoked token accessing estimate data | Spoofing | DocumentSessionAuthGuard checks expiry/revocation before controller [VERIFIED: existing pattern] |
+| Empty message submission bypassing intent | Tampering | @IsNotEmpty() on message field rejects empty strings [VERIFIED: D-CTA-03] |
 
 ## Sources
 
