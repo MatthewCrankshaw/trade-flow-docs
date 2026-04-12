@@ -121,7 +121,7 @@ Full details: `.planning/milestones/v1.7-ROADMAP.md`
 **Milestone Goal:** Ship estimates as a parallel document type with price ranges, soft customer response flow, automated follow-ups, and seamless conversion to quotes -- handling the pre-site-visit "rough cost" conversation that currently lives in WhatsApp and missed calls.
 
 - [x] **Phase 41: Estimate Module CRUD (Backend)** - Full `src/estimate/` module mirroring `src/quote/` with counter, policy, CRUD services, status transitions, indexes, plus the `quote-token` → `document-token` rename (unified token module) and a new standalone `estimate_line_items` collection and module (completed 2026-04-12)
-- [ ] **Phase 42: Revisions** - parentEstimateId/rootEstimateId/revisionNumber/isCurrent with EstimateReviser and partial unique index
+- [x] **Phase 42: Revisions** - parentEstimateId/rootEstimateId/revisionNumber/isCurrent with EstimateReviser and partial unique index (completed 2026-04-12)
 - [ ] **Phase 43: Estimate Frontend CRUD** - features/estimates, ContingencySlider, document-type toggle on create dialog, list/detail pages, range vs "from" display
 - [ ] **Phase 44: Email & Send Flow** - Maizzle estimate templates with non-binding legal copy, EstimateEmailSender, send endpoint, SendEstimateDialog, plus a new standalone `estimate-settings` module and Business > Documents tab update
 - [ ] **Phase 45: Public Customer Page & Response Handling** - PublicEstimateController with latest-revision resolution, 3-action conversational response flow (proceed/message/decline), structured decline reasons, view tracking
@@ -170,7 +170,7 @@ Plans:
 - [x] 42-03-estimate-repository-revision-methods-PLAN.md — EstimateRepository.downgradeCurrent/insertRevision/restoreCurrent/findRevisionsByRootId/findCurrentInChainByRootId + EstimateLineItemRepository clone helpers + verify index declarations
 - [x] 42-04-estimate-reviser-service-PLAN.md — EstimateReviser service with two-write revise flow, compensating rollback, bundle parent/child line-item clone, D-HOOK-03 non-call assertion, EstimateRevisionMockGenerator
 - [x] 42-05-retriever-and-deleter-extensions-PLAN.md — EstimateRetriever (D-DET-01 non-current resolution, D-DET-02 list filter, findRevisionsByIdOrFail) + EstimateDeleter (D-REV-05/06 predecessor restoration)
-- [ ] 42-06-controller-module-openapi-smoke-PLAN.md — POST + GET /v1/estimates/:id/revisions handlers, EstimateModule wiring, openapi.yaml update, manual smoke procedure for SC #4
+- [x] 42-06-controller-module-openapi-smoke-PLAN.md — POST + GET /v1/estimates/:id/revisions handlers, EstimateModule wiring, openapi.yaml update, manual smoke procedure for SC #4
 
 ### Phase 43: Estimate Frontend CRUD
 **Goal**: A trader can visually create and edit estimates from the app with a document-type toggle, contingency slider, and range-or-"from" price display, running against the Phase 41 backend.
@@ -298,7 +298,7 @@ Plans:
 | 39. Welcome Dashboard and Final Cleanup | v1.7 | 2/2 | Complete | 2026-04-07 |
 | 40. SubscriptionGuard Onboarding Bypass | v1.7 | 1/1 | Complete | 2026-04-07 |
 | 41. Estimate Module CRUD (Backend) | v1.8 | 8/8 | Complete   | 2026-04-12 |
-| 42. Revisions | v1.8 | 5/6 | In Progress|  |
+| 42. Revisions | v1.8 | 6/6 | Complete   | 2026-04-12 |
 | 43. Estimate Frontend CRUD | v1.8 | 0/6 | Not started | - |
 | 44. Email & Send Flow | v1.8 | 0/4 | Not started | - |
 | 45. Public Customer Page & Response Handling | v1.8 | 0/5 | Not started | - |
