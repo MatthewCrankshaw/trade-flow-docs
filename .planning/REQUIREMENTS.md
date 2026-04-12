@@ -25,7 +25,7 @@ Requirements for Estimates milestone. Each maps to roadmap phases.
 - [ ] **CONT-01**: User can set contingency percentage via a slider in the estimate form (0-30% in 5% increments, default 10%)
 - [ ] **CONT-02**: Estimate displays price as a range (£X-£Y) by default, computed from base total + contingency percentage
 - [ ] **CONT-03**: User can toggle estimate price display to "From £X" mode for diagnostic/repair work where the upper bound is genuinely unknown
-- [ ] **CONT-04**: User can add optional uncertainty notes via quick-tap preset reasons (site inspection, pipework condition, materials, access) plus freeform text
+- [ ] **CONT-04**: User can add optional uncertainty reasons via five quick-tap preset chips — Site inspection needed (`site_inspection`), Hidden conditions (`hidden_conditions`), Materials & supply (`materials_supply`), Access & working space (`access_working_space`), Scope unclear until investigation (`scope_unclear`) — plus a freeform notes textarea. The five chip values are trade-agnostic and cover all ten `BusinessTrade` values without requiring per-trade dispatch.
 - [ ] **CONT-05**: Contingency range math is computed API-side only; UI displays API-returned low/high values without client-side multiplication
 
 ### Revisions
@@ -101,6 +101,7 @@ Deferred to future release. Tracked but not in current roadmap.
 - **SMART-01**: App suggests contingency percentage based on job type (boiler swap 5-10%, Victorian bathroom 15-20%, insurance repair 20-25%)
 - **SMART-02**: App learns contingency accuracy from user's own estimate-vs-actual history over time
 - **SMART-03**: User sees "your estimates typically come in X% under actual cost" feedback on estimate creation
+- **SMART-04**: Trade-specific uncertainty chip presets per `BusinessTrade`. Plumber surfaces pipework-specific chips, electrician surfaces wiring/consumer-unit chips, carpenter surfaces timber-rot chips, builder surfaces structural/foundations chips, etc. Phase 43 ships five trade-agnostic chips as the v1.8 baseline; SMART-04 introduces trade-aware dispatch once content design bandwidth is available.
 
 ### Follow-up Customization (v1.9+)
 
