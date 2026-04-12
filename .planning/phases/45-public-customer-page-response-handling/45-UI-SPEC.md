@@ -35,22 +35,26 @@ Declared values (multiples of 4 only):
 |-------|-------|----------|---------------------|
 | 2xs | 4px | `1` | Icon-text gap within buttons, inline padding |
 | sm | 8px | `2` | Field-level spacing within decline reason chips |
-| base | 16px | `4` | Card content rhythm, gap between response buttons, stacked section spacing |
+| base | 16px | `4` | Card content rhythm, stacked section spacing |
 | lg | 24px | `6` | Section-level spacing between card sections (disclaimer to content, content to actions) |
 | xl | 48px | `12` | Error/empty state vertical padding, page-level top/bottom padding on mobile |
 
-Exceptions: 44px touch target minimum for all response buttons on mobile (use `min-h-11` which is 44px). Source: Phase 19 UI-SPEC precedent.
+Exceptions:
+- 44px touch target minimum for all response buttons on mobile (use `min-h-11` which is 44px). Source: Phase 19 UI-SPEC precedent.
+- 12px (`gap-3`) used between response buttons. Justification: 8px (`gap-2`) is too tight for three stacked full-width buttons of different visual weight (primary, outline, text link); 16px (`gap-4`) creates excessive separation that weakens the visual grouping of the action area. 12px provides clear separation while maintaining cohesion. This is a phase-specific exception; the standard scale applies everywhere else.
 
 ### Phase-Specific Spacing
 
+Per shadcn rules, all vertical stacking uses `flex flex-col gap-*` instead of `space-y-*`.
+
 | Element | Spacing | Rationale |
 |---------|---------|-----------|
-| Business header to disclaimer card | `space-y-4` (16px) | Tight coupling -- disclaimer is part of document header |
-| Disclaimer card to estimate content | `space-y-6` (24px) | Visual break before main content |
-| Price range to "Why is this a range?" | `space-y-2` (8px) | Closely related content |
-| Estimate content to response actions | `space-y-6` (24px) | Visual break before decision point (matches Phase 19 pattern) |
-| Between response buttons | `gap-3` (12px) | Enough separation between primary, secondary, tertiary actions |
-| Inline textarea expansion to submit button | `space-y-4` (16px) | Standard form field rhythm |
+| Business header to disclaimer card | `flex flex-col gap-4` (16px) | Tight coupling -- disclaimer is part of document header |
+| Disclaimer card to estimate content | `flex flex-col gap-6` (24px) | Visual break before main content |
+| Price range to "Why is this a range?" | `flex flex-col gap-2` (8px) | Closely related content |
+| Estimate content to response actions | `flex flex-col gap-6` (24px) | Visual break before decision point (matches Phase 19 pattern) |
+| Between response buttons | `gap-3` (12px) | Enough separation between primary, secondary, tertiary actions (see exception above) |
+| Inline textarea expansion to submit button | `flex flex-col gap-4` (16px) | Standard form field rhythm |
 | Decline reason chips | `gap-2` (8px) | Compact chip grid |
 
 ---
@@ -62,12 +66,12 @@ From project design system (established in Phase 17/19):
 | Role | Size | Weight | Line Height | Tailwind | Usage in this phase |
 |------|------|--------|-------------|----------|---------------------|
 | Body | 14px | 400 (normal) | normal | `text-sm` | Scope description, uncertainty notes, validity text, disclaimer body |
-| Label | 14px | 500 (medium) | none | `text-sm font-medium leading-none` | "Why is this a range?" heading, decline prompt, section labels |
+| Label | 14px | 600 (semibold) | none | `text-sm font-semibold leading-none` | "Why is this a range?" heading, decline prompt, section labels |
 | Section heading | 18px | 600 (semibold) | none | `text-lg font-semibold` | Business name, price range display |
 | Display | 24px | 600 (semibold) | default | `text-2xl font-semibold` | Estimate number heading |
 | Metadata | 12px | 400 (normal) | default | `text-xs` | Estimate date, validity date, response timestamps |
 
-Declared weights: 400 (normal), 600 (semibold). Two weights only.
+Declared weights: 400 (normal), 600 (semibold). Two weights only. Note: shadcn Button components use `font-medium` (weight 500) internally as their default styling; this is an inherited component internal and not a project-declared weight. All project-authored text uses only 400 or 600.
 
 ### Phase-Specific Typography
 
@@ -76,11 +80,12 @@ Declared weights: 400 (normal), 600 (semibold). Two weights only.
 | Price range value | `text-lg font-semibold` | Focal point of the estimate -- must stand out |
 | "From X" value | `text-lg font-semibold` | Same treatment as range |
 | Disclaimer body text | `text-sm` | Body copy weight; the border/background treatment provides emphasis |
-| "Happy to Proceed" button | `text-sm font-medium` (Button default) | Standard shadcn button typography |
-| "Message [Name]" button | `text-sm font-medium` (Button default) | Standard shadcn button typography |
+| "Happy to Proceed" button | Button default (inherits component styling) | Standard shadcn button typography |
+| "Message [Name]" button | Button default (inherits component styling) | Standard shadcn button typography |
 | "Not right for me" link | `text-sm text-muted-foreground underline` | Visually subdued tertiary action |
 | Decline reason chips | `text-sm` | Standard chip text |
-| "Why is this a range?" heading | `text-sm font-medium` | Label weight for section heading |
+| "Why is this a range?" heading | `text-sm font-semibold` | Label weight for section heading -- uses declared semibold weight |
+| Decline prompt | `text-sm font-semibold` | Label weight for inline heading -- uses declared semibold weight |
 | Uncertainty note items | `text-sm text-muted-foreground` | Secondary information, not primary content |
 | Terminal state message | `text-sm` | Body copy for summary messages |
 | CTA disclaimer text | `text-xs text-muted-foreground` | Fine print below primary button |
@@ -97,10 +102,28 @@ From project design system (established in Phase 17/19):
 | Secondary (30%) | `card` | oklch(1 0 0) / #FFFFFF | Estimate card surface, inline form surfaces |
 | Accent (10%) | `primary` | oklch(0.31 0.09 245) Petrol Blue | "Happy to Proceed" button only |
 | Destructive | `destructive` | oklch(0.64 0.21 25) | Not used this phase (decline is not destructive) |
-| Muted text | `muted-foreground` | — | Secondary labels, metadata, tertiary link, uncertainty notes |
+| Muted text | `muted-foreground` | -- | Secondary labels, metadata, tertiary link, uncertainty notes |
 | Foreground | `foreground` | #1A1A1A | Business name, price range, scope text, primary copy |
-| Warning surface | `bg-amber-50 border-amber-200` | — | Non-binding disclaimer card background and border |
+| Warning surface | `--warning` | amber-50 equivalent | Non-binding disclaimer card background |
+| Warning border | `--warning-border` | amber-200 equivalent | Non-binding disclaimer card border |
+| Warning foreground | `--warning-foreground` | amber-900 equivalent | Non-binding disclaimer card body text |
+| Warning icon | `--warning-icon` | amber-600 equivalent | Non-binding disclaimer card icon color |
 | Success | `success` | oklch(0.69 0.18 165) | Success confirmation after response submission |
+
+### Warning Semantic Tokens
+
+The disclaimer card requires a warning color palette. Rather than using raw Tailwind amber utilities (`bg-amber-50`, `border-amber-200`, `text-amber-600`, `text-amber-900`), define semantic CSS variables in the global CSS file (`src/index.css`) under `@theme inline`:
+
+```css
+--warning: oklch(0.96 0.03 90);          /* amber-50 equivalent - surface */
+--warning-border: oklch(0.88 0.07 85);   /* amber-200 equivalent - border */
+--warning-foreground: oklch(0.28 0.06 60); /* amber-900 equivalent - body text */
+--warning-icon: oklch(0.55 0.15 55);     /* amber-600 equivalent - icon */
+```
+
+Usage in components: `bg-warning`, `border-warning-border`, `text-warning-foreground`, `text-warning-icon`.
+
+If defining new CSS variables is not feasible in this phase's scope, document the raw amber utilities as an accepted one-off exception with this comment in the component: `// TODO: Replace raw amber utilities with --warning semantic tokens when available`.
 
 ### Phase-Specific Color Assignments
 
@@ -109,8 +132,8 @@ From project design system (established in Phase 17/19):
 | "Happy to Proceed" button | `variant="default"` (primary) | Primary CTA. Petrol Blue bg, white text. |
 | "Message [Name]" button | `variant="outline"` | Secondary action. Neutral border, foreground text. |
 | "Not right for me" link | `text-muted-foreground hover:text-foreground` | Tertiary action. Muted, not attention-grabbing. |
-| Disclaimer card | `bg-amber-50 border border-amber-200 rounded-lg` | Warm, attention-drawing without being alarming. Distinct from content cards. |
-| Disclaimer icon | `text-amber-600` | Matches disclaimer card warmth. Use `Info` icon from Lucide. |
+| Disclaimer card | `bg-warning border border-warning-border rounded-lg` | Warm, attention-drawing without being alarming. Distinct from content cards. |
+| Disclaimer icon | `text-warning-icon` | Matches disclaimer card warmth. Use `Info` icon from Lucide. |
 | Decline reason chips (unselected) | `variant="outline"` | Neutral, selectable appearance |
 | Decline reason chips (selected) | `bg-primary text-primary-foreground` | Clear selection state using accent |
 | Response success state | `text-foreground` with `CheckCircle` icon `text-success` | Confirmation without being a full banner |
@@ -128,17 +151,17 @@ Accent reserved for: "Happy to Proceed" primary CTA button, selected decline rea
 
 | Component | Location | shadcn Primitives Used |
 |-----------|----------|----------------------|
-| `PublicEstimatePage` | `pages/` | — (route-level composition) |
+| `PublicEstimatePage` | `pages/` | -- (route-level composition) |
 | `PublicEstimateCard` | `features/public-estimate/components/` | Card, CardHeader, CardContent, CardFooter, Separator |
-| `PublicEstimateDisclaimer` | `features/public-estimate/components/` | — (styled div with Info icon) |
-| `PublicEstimatePriceRange` | `features/public-estimate/components/` | — (uses formatRange from Phase 43) |
-| `PublicEstimateUncertainty` | `features/public-estimate/components/` | — (conditional "Why is this a range?" section) |
+| `PublicEstimateDisclaimer` | `features/public-estimate/components/` | -- (styled div with Info icon) |
+| `PublicEstimatePriceRange` | `features/public-estimate/components/` | -- (uses formatRange from Phase 43) |
+| `PublicEstimateUncertainty` | `features/public-estimate/components/` | -- (conditional "Why is this a range?" section) |
 | `PublicEstimateResponseButtons` | `features/public-estimate/components/` | Button |
 | `PublicEstimateMessageForm` | `features/public-estimate/components/` | Textarea, Button |
 | `PublicEstimateDeclineForm` | `features/public-estimate/components/` | Button (chips), Textarea, Button |
-| `PublicEstimateTerminalState` | `features/public-estimate/components/` | — (text display) |
+| `PublicEstimateTerminalState` | `features/public-estimate/components/` | -- (text display) |
 | `PublicEstimateSkeleton` | `features/public-estimate/components/` | Skeleton, Card |
-| `PublicEstimateError` | `features/public-estimate/components/` | — (error card with icon) |
+| `PublicEstimateError` | `features/public-estimate/components/` | -- (error card with icon) |
 
 ### Existing shadcn Components Required
 
@@ -386,15 +409,17 @@ Source: D-PAGE-02.
 | Property | Value |
 |----------|-------|
 | Position | Below business header, before estimate content |
-| Background | `bg-amber-50` |
-| Border | `border border-amber-200 rounded-lg` |
+| Background | `bg-warning` (semantic token, amber-50 equivalent) |
+| Border | `border border-warning-border rounded-lg` (semantic token, amber-200 equivalent) |
 | Padding | `p-4` |
-| Icon | `Info` from Lucide, `h-4 w-4 text-amber-600 shrink-0 mt-0.5` |
+| Icon | `Info` from Lucide, `h-4 w-4 text-warning-icon shrink-0 mt-0.5` |
 | Layout | `flex gap-3` (icon left, text right) |
-| Text | `text-sm text-amber-900` |
+| Text | `text-sm text-warning-foreground` (semantic token, amber-900 equivalent) |
 | Copy | "This is an estimate, not a fixed price commitment. A firm quote will be provided after a site visit." |
 
 Verbatim copy from SND-05 / Phase 44 D-LGL-02. Non-removable.
+
+Fallback: If `--warning` semantic tokens are not yet defined in the global CSS, use raw Tailwind utilities (`bg-amber-50 border-amber-200 text-amber-900`) with a `// TODO: Replace raw amber utilities with --warning semantic tokens` comment. This is an accepted temporary exception.
 
 ---
 
@@ -405,8 +430,8 @@ Source: D-PAGE-04.
 | Property | Value |
 |----------|-------|
 | Condition | Only displayed when `uncertaintyReasons` array is non-empty |
-| Position | Directly below the price range value, separated by `space-y-2` |
-| Heading | "Why is this a range?" in `text-sm font-medium text-foreground` |
+| Position | Directly below the price range value, separated by `flex flex-col gap-2` (8px) |
+| Heading | "Why is this a range?" in `text-sm font-semibold text-foreground` |
 | Body | "The final cost may vary depending on:" in `text-sm text-muted-foreground` |
 | Reasons | Rendered as a dot-separated inline list: "[reason 1] . [reason 2] . [reason 3]" in `text-sm text-muted-foreground` |
 | Dot separator | `·` (middle dot) with `mx-1` spacing |
@@ -476,7 +501,7 @@ No destructive actions in this phase. Decline is a customer choice, not a destru
 
 | Element | Icon | Size | Color |
 |---------|------|------|-------|
-| Disclaimer card | `Info` | `h-4 w-4` | `text-amber-600` |
+| Disclaimer card | `Info` | `h-4 w-4` | `text-warning-icon` |
 | Response success | `CheckCircle` | `h-5 w-5` | `text-success` |
 | Trader-closed terminal | `FileX` | `h-12 w-12` | `text-muted-foreground` |
 | Error: not found / expired / revoked | `AlertCircle` | `h-12 w-12` | `text-muted-foreground` |
