@@ -58,10 +58,10 @@ Requirements for Estimates milestone. Each maps to roadmap phases.
 
 ### Customer Response Handling
 
-- [ ] **RESP-01**: Customer can tap "Book a site visit" which opens a message field pre-populated with "I'd like to arrange a site visit. My availability is:" and captures availability as a structured site-visit-request
-- [ ] **RESP-02**: Customer can tap "Send me a quote" to signal intent to proceed (trader notified, can convert)
-- [ ] **RESP-03**: Customer can tap "I have a question" which opens an inline freeform message field sent to the trader as a general question
-- [ ] **RESP-04**: Customer can tap "Not right now" to decline with a structured reason (Too expensive / Decided not to do the work / Going with another tradesperson / Just getting an idea of costs / Timing isn't right / Other with freeform)
+- [ ] **RESP-01**: Customer can tap "Happy to Proceed" to signal intent to proceed with the work; status transitions to RESPONDED and trader is notified
+- [ ] **RESP-02**: Customer can tap "Message [Tradesperson First Name]" to send a freeform message (max 2000 characters) inline; status transitions to RESPONDED and trader is notified with the message
+- [ ] **RESP-03**: Customer can tap "Not right for me" to decline with a structured reason (Too expensive / Going with someone else / Decided not to do the work / Just getting an idea of costs / Timing isn't right) plus optional freeform text (max 500 characters); status transitions to DECLINED and trader is notified with reason and message
+- [ ] **RESP-04**: After any response submission, the action area is replaced with an inline success confirmation ("Thanks! [Name] has been notified and will be in touch.") and future visits show a read-only terminal view
 - [ ] **RESP-05**: Trader receives an email notification on any customer response with the response type and message preserved for targeted follow-up
 - [ ] **RESP-06**: Estimate status automatically transitions on customer response (Responded / SiteVisitRequested / Declined)
 - [ ] **RESP-07**: Terminal-state estimates (Converted / Declined / Expired / Lost) show a friendly read-only message on the customer page with no active response buttons

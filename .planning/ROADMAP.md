@@ -204,9 +204,9 @@ Plans:
   6. Re-sending a Sent (or revised) estimate delivers the email again without creating a new revision and without regenerating the token, and the estimate detail page reflects the updated `lastSentAt`.
 **Plans**: 4 plans
 Plans:
-- [ ] 44-01-PLAN.md — estimate-settings backend module + BusinessCreator extension + tsconfig paths
-- [ ] 44-02-PLAN.md — Maizzle estimate-sent.html template + EstimateEmailRenderer + audit collection + DocumentTokenRepository extensions + formatRange utility
-- [ ] 44-03-PLAN.md — EstimateEmailSender service + SendEstimateRequest + transition map extensions + controller endpoint + OpenAPI + doc updates
+- [x] 44-01-PLAN.md — estimate-settings backend module + BusinessCreator extension + tsconfig paths
+- [x] 44-02-PLAN.md — Maizzle estimate-sent.html template + EstimateEmailRenderer + audit collection + DocumentTokenRepository extensions + formatRange utility
+- [x] 44-03-PLAN.md — EstimateEmailSender service + SendEstimateRequest + transition map extensions + controller endpoint + OpenAPI + doc updates
 - [ ] 44-04-PLAN.md — Frontend: Documents tab + EstimateEmailSettings + SendEstimateDialog + SendEstimateForm + EstimateActionStrip + EstimateDetailPage wiring
 **UI hint**: yes
 **Legal-review gate**: Default template copy and subject-line wording must pass a targeted UK-consumer-law copy review before this phase ships. Non-binding disclaimer is mandatory and non-removable (SND-05).
@@ -306,7 +306,7 @@ Plans:
 | 41. Estimate Module CRUD (Backend) | v1.8 | 8/8 | Complete   | 2026-04-12 |
 | 42. Revisions | v1.8 | 6/6 | Complete    | 2026-04-12 |
 | 43. Estimate Frontend CRUD | v1.8 | 6/6 | Complete | 2026-04-13 |
-| 44. Email & Send Flow | v1.8 | 0/4 | Not started | - |
+| 44. Email & Send Flow | v1.8 | 3/4 | In Progress|  |
 | 45. Public Customer Page & Response Handling | v1.8 | 0/5 | Not started | - |
 | 46. Follow-up Queue & Automation | v1.8 | 0/5 | Not started | - |
 | 47. Convert to Quote & Mark as Lost | v1.8 | 0/? | Not started | - |
