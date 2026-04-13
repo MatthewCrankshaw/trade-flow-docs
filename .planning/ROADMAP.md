@@ -238,7 +238,13 @@ Plans:
   2. `EstimateFollowupProcessor` performs a defence-in-depth status re-read before sending each follow-up and silently no-ops if the estimate is no longer in a follow-up-worthy status; each follow-up email uses its own Maizzle template (3d/10d/21d) and includes the estimate summary plus the same four response buttons as the initial send.
   3. Every exit transition (customer response, revision, conversion, manual delete, mark-as-lost) cancels all pending follow-ups for that estimate/revision via `cancelAllFollowups()`, verified by an integration test that walks each transition with a mocked queue and asserts removal.
   4. An estimate auto-transitions to Expired exactly 30 days after its Sent timestamp via a scheduled sweep or a delayed job, and production Redis is configured with `appendonly yes` / `appendfsync everysec` -- verified by a smoke test that schedules a 60-second delayed job, restarts Redis, and confirms the job still fires.
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 46-01-PLAN.md — Queue infrastructure: ESTIMATE_FOLLOWUPS queue name, job DTOs, delay constants, jobId builders, EstimateFollowupsModule shell, tsconfig/jest path aliases, Wave 0 test stubs
+- [ ] 46-02-PLAN.md — Scheduler and canceller services: EstimateFollowupScheduler (4 delayed jobs), BullMQEstimateFollowupCanceller (DI token rebinding), module wiring
+- [ ] 46-03-PLAN.md — Maizzle estimate-followup.html template with followupStep variable, 3 CTAs, disclaimer; EstimateFollowupEmailRenderer service
+- [ ] 46-04-PLAN.md — EstimateFollowupProcessor (defence-in-depth status re-read, email send, audit row) and EstimateExpiryProcessor (30-day auto-expiry transition), WorkerModule registration
+- [ ] 46-05-PLAN.md — Wire EstimateFollowupScheduler into EstimateEmailSender step 9, Redis AOF startup check in worker.ts, Docker Compose AOF config, AppModule import, CI gate
 **Infra gate**: Production Redis must have AOF persistence enabled (`appendonly yes`, `appendfsync everysec`) before any follow-up ships. This is a hard gate, not a soft constraint -- without it, all scheduled follow-ups are silently lost on restart (FUP-08).
 
 ### Phase 47: Convert to Quote & Mark as Lost
@@ -302,5 +308,5 @@ Plans:
 | 43. Estimate Frontend CRUD | v1.8 | 6/6 | Complete | 2026-04-13 |
 | 44. Email & Send Flow | v1.8 | 0/4 | Not started | - |
 | 45. Public Customer Page & Response Handling | v1.8 | 0/5 | Not started | - |
-| 46. Follow-up Queue & Automation | v1.8 | 0/? | Not started | - |
+| 46. Follow-up Queue & Automation | v1.8 | 0/5 | Not started | - |
 | 47. Convert to Quote & Mark as Lost | v1.8 | 0/? | Not started | - |
