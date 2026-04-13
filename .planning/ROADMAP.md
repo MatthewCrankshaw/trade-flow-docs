@@ -123,7 +123,7 @@ Full details: `.planning/milestones/v1.7-ROADMAP.md`
 - [x] **Phase 41: Estimate Module CRUD (Backend)** - Full `src/estimate/` module mirroring `src/quote/` with counter, policy, CRUD services, status transitions, indexes, plus the `quote-token` → `document-token` rename (unified token module) and a new standalone `estimate_line_items` collection and module (completed 2026-04-12)
 - [x] **Phase 42: Revisions** - parentEstimateId/rootEstimateId/revisionNumber/isCurrent with EstimateReviser and partial unique index (completed 2026-04-12)
 - [x] **Phase 43: Estimate Frontend CRUD** - features/estimates, ContingencySlider, document-type toggle on create dialog, list/detail pages, range vs "from" display (completed 2026-04-13)
-- [ ] **Phase 44: Email & Send Flow** - Maizzle estimate templates with non-binding legal copy, EstimateEmailSender, send endpoint, SendEstimateDialog, plus a new standalone `estimate-settings` module and Business > Documents tab update
+- [x] **Phase 44: Email & Send Flow** - Maizzle estimate templates with non-binding legal copy, EstimateEmailSender, send endpoint, SendEstimateDialog, plus a new standalone `estimate-settings` module and Business > Documents tab update (completed 2026-04-13)
 - [ ] **Phase 45: Public Customer Page & Response Handling** - PublicEstimateController with latest-revision resolution, 3-action conversational response flow (proceed/message/decline), structured decline reasons, view tracking
 - [ ] **Phase 46: Follow-up Queue & Automation** - ESTIMATE_FOLLOWUPS BullMQ queue, scheduler, processor, deterministic jobIds, cancel on exit, auto-expiry, Redis AOF infra gate
 - [ ] **Phase 47: Convert to Quote & Mark as Lost** - EstimateToQuoteConverter with mandatory review, idempotent convert endpoint, convertedToQuoteId back-link, markLost service
@@ -207,7 +207,7 @@ Plans:
 - [x] 44-01-PLAN.md — estimate-settings backend module + BusinessCreator extension + tsconfig paths
 - [x] 44-02-PLAN.md — Maizzle estimate-sent.html template + EstimateEmailRenderer + audit collection + DocumentTokenRepository extensions + formatRange utility
 - [x] 44-03-PLAN.md — EstimateEmailSender service + SendEstimateRequest + transition map extensions + controller endpoint + OpenAPI + doc updates
-- [ ] 44-04-PLAN.md — Frontend: Documents tab + EstimateEmailSettings + SendEstimateDialog + SendEstimateForm + EstimateActionStrip + EstimateDetailPage wiring
+- [x] 44-04-PLAN.md — Frontend: Documents tab + EstimateEmailSettings + SendEstimateDialog + SendEstimateForm + EstimateActionStrip + EstimateDetailPage wiring
 **UI hint**: yes
 **Legal-review gate**: Default template copy and subject-line wording must pass a targeted UK-consumer-law copy review before this phase ships. Non-binding disclaimer is mandatory and non-removable (SND-05).
 
@@ -306,7 +306,7 @@ Plans:
 | 41. Estimate Module CRUD (Backend) | v1.8 | 8/8 | Complete   | 2026-04-12 |
 | 42. Revisions | v1.8 | 6/6 | Complete    | 2026-04-12 |
 | 43. Estimate Frontend CRUD | v1.8 | 6/6 | Complete | 2026-04-13 |
-| 44. Email & Send Flow | v1.8 | 3/4 | In Progress|  |
+| 44. Email & Send Flow | v1.8 | 4/4 | Complete   | 2026-04-13 |
 | 45. Public Customer Page & Response Handling | v1.8 | 0/5 | Not started | - |
 | 46. Follow-up Queue & Automation | v1.8 | 0/5 | Not started | - |
 | 47. Convert to Quote & Mark as Lost | v1.8 | 0/? | Not started | - |
