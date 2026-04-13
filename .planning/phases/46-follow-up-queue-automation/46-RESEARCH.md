@@ -563,27 +563,31 @@ private static readonly FOLLOWUP_WORTHY_STATUSES: EstimateStatus[] = [
 | A5 | `@InjectQueue` injection for scheduler services (not processors) requires `BullModule.registerQueue` in the owning module | Architecture Patterns §Pattern 5 | If not registered in `EstimateFollowupsModule`, injection fails at runtime |
 | A6 | BullMQ `jobId` deduplication on `add()` is handled by the queue layer — a duplicate `add()` returns without error | Architecture Patterns §Pattern 2 | If it throws on duplicate, scheduler needs existence check first |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Does `Queue.remove(jobId)` throw if the job does not exist?**
    - What we know: BullMQ docs describe `remove()` as returning `Promise<number>` (number of removed jobs). A jobId not found likely returns `0`.
    - What's unclear: Whether it throws or returns 0 for missing jobIds.
    - Recommendation: Planner wraps each `remove()` call in a try/catch per jobId, or validates against BullMQ docs before assuming no-op behaviour. Tagging as A2.
+   - **RESOLVED (Plan 02, Task 2):** `BullMQEstimateFollowupCanceller` wraps each `Queue.remove()` call in a per-job try/catch. Test 3 asserts "does not throw if jobs do not exist." Safe no-op behaviour confirmed.
 
 2. **Where does the AOF startup check live — `src/worker.ts` or `WorkerModule.onModuleInit()`?**
    - What we know: D-AOF-01 says "worker startup validates." Claude's Discretion covers "exact order of operations."
    - What's unclear: Whether the check should block processor registration (easier in `worker.ts` bootstrap) or be a module lifecycle hook.
    - Recommendation: Place it in `src/worker.ts` immediately after `NestFactory.createApplicationContext(WorkerModule)` but before the app starts listening. This matches the "refuse to register processor" language — the module is created but the processor registration can be skipped conditionally.
+   - **RESOLVED (Plan 05, Task 2):** AOF check lives in `src/worker.ts` after `NestFactory.createApplicationContext(WorkerModule)`. If check fails, logs fatal error and conditionally skips `EstimateFollowupProcessor` and `EstimateExpiryProcessor` registration.
 
 3. **What is the retry policy for failed follow-up email sends?**
    - What we know: Claude's Discretion covers error handling strategy for failed follow-up sends.
    - What's unclear: Whether to use BullMQ's built-in `attempts` + `backoff` option, or log and swallow failures.
    - Recommendation: Use BullMQ `attempts: 3` with `backoff: { type: "exponential", delay: 60000 }` (1-minute base, exponential). After 3 failures, the job moves to the BullMQ failed queue for inspection. Matches the STRIPE_WEBHOOKS pattern from Phase 30.
+   - **RESOLVED (Plan 04, Task 1):** `EstimateFollowupProcessor` configured with `attempts: 3, backoff: { type: "exponential", delay: 60000 }`. Matches STRIPE_WEBHOOKS precedent.
 
 4. **Does `EstimateFollowupsModule` need to be imported in `AppModule` or only in `WorkerModule`?**
    - What we know: `EstimateEmailSender` (in the API process) injects `EstimateFollowupScheduler` via `@Inject(ESTIMATE_FOLLOWUP_CANCELLER)` and needs `scheduleFollowups()`. The processors run in the worker process.
    - What's unclear: The exact import graph.
    - Recommendation: `EstimateFollowupsModule` is imported in both `AppModule` (for scheduler injection into `EstimateEmailSender`) and `WorkerModule` (for processor + canceller access). The module exports `EstimateFollowupScheduler` and the `ESTIMATE_FOLLOWUP_CANCELLER` token.
+   - **RESOLVED (Plan 05, Task 1):** `EstimateFollowupsModule` imported in both `AppModule` (after `EstimateModule` for DI rebinding) and `WorkerModule`. Exports `EstimateFollowupScheduler` and the `ESTIMATE_FOLLOWUP_CANCELLER` token binding.
 
 ## Environment Availability
 
