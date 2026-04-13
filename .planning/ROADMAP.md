@@ -222,10 +222,10 @@ Plans:
   4. Any customer action persists the full response (type, reason, message, timestamp) on the estimate, transitions the estimate status to Responded / Declined as appropriate, sends a notification email to the trader with response type and message preview, and future visits to the token on a terminal-state estimate show a friendly read-only message with no active buttons.
 **Plans**: 5 plans
 Plans:
-- [ ] 45-01-PLAN.md — Foundation: remove SITE_VISIT_REQUESTED, add responses[] array, rewrite RESP-01..04 docs
-- [ ] 45-02-PLAN.md — Backend public GET endpoint: PublicEstimateRetriever, controller, response class, Sent->Viewed transition
-- [ ] 45-03-PLAN.md — Backend response POST endpoint: EstimateResponseHandler, notification email, guard fix, module wiring, CI gate
-- [ ] 45-04-PLAN.md — Frontend: public estimate page components, RTK Query (no auth), page route, response buttons
+- [x] 45-01-PLAN.md — Foundation: remove SITE_VISIT_REQUESTED, add responses[] array, rewrite RESP-01..04 docs
+- [x] 45-02-PLAN.md — Backend public GET endpoint: PublicEstimateRetriever, controller, response class, Sent->Viewed transition
+- [x] 45-03-PLAN.md — Backend response POST endpoint: EstimateResponseHandler, notification email, guard fix, module wiring, CI gate
+- [x] 45-04-PLAN.md — Frontend: public estimate page components, RTK Query (no auth), page route, response buttons
 - [ ] 45-05-PLAN.md — E2E verification checkpoint: full flow validation across both repos
 **UI hint**: yes
 
@@ -256,7 +256,12 @@ Plans:
   2. The trader opens the convert flow from the estimate detail page, the new quote opens in edit mode for mandatory review before saving, and a double-click submission with the same `Idempotency-Key` within 24h returns the same quote id (exactly one quote created).
   3. The converted quote's detail page shows a "Converted from E-YYYY-NNN" back-link linking to the source estimate, and the source estimate is visibly locked (no Edit, no Revise) once Converted.
   4. `POST /v1/estimates/:id/mark-lost` transitions the estimate to Lost with a structured reason (same taxonomy as customer decline) or freeform text, cancels all pending follow-ups, and renders a locked detail page with the recorded reason visible to the trader.
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 47-01-PLAN.md — Backend entity/DTO schema extensions, request classes, EstimateToQuoteConverter and EstimateLostMarker services with unit tests
+- [ ] 47-02-PLAN.md — Controller endpoints, module wiring, OpenAPI documentation, CI gate
+- [ ] 47-03-PLAN.md — Frontend types, RTK Query mutations, MarkAsLostDialog, locked state components, EstimateActionStrip integration
+- [ ] 47-04-PLAN.md — QuoteSourceEstimateLink back-link component, quote detail page integration, E2E verification
 **UI hint**: yes
 
 ## Progress
@@ -307,6 +312,6 @@ Plans:
 | 42. Revisions | v1.8 | 6/6 | Complete    | 2026-04-12 |
 | 43. Estimate Frontend CRUD | v1.8 | 6/6 | Complete | 2026-04-13 |
 | 44. Email & Send Flow | v1.8 | 4/4 | Complete   | 2026-04-13 |
-| 45. Public Customer Page & Response Handling | v1.8 | 0/5 | Not started | - |
+| 45. Public Customer Page & Response Handling | v1.8 | 4/5 | In Progress|  |
 | 46. Follow-up Queue & Automation | v1.8 | 0/5 | Not started | - |
-| 47. Convert to Quote & Mark as Lost | v1.8 | 0/? | Not started | - |
+| 47. Convert to Quote & Mark as Lost | v1.8 | 0/4 | Not started | - |
