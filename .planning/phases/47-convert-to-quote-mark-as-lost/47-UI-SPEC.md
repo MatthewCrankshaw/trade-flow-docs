@@ -34,7 +34,7 @@ Declared values from project design system (established in Phase 18, unchanged):
 | Token | Value | Tailwind | Usage in this phase |
 |-------|-------|----------|---------------------|
 | 2xs | 4px | `1` | Icon-text gap inside buttons, chip internal padding |
-| sm | 8px | `2` | Button group gaps in action strip, reason chip grid gaps |
+| sm | 8px | `2` | Button group gaps in action strip, reason chip grid gaps, back-link icon-text gap |
 | base | 16px | `4` | Dialog content rhythm (`flex flex-col gap-4`), lost reason card internal padding |
 | lg | 24px | `6` | Section-level spacing between estimate detail sections, dialog section spacing |
 | xl | 48px | `12` | Not used this phase |
@@ -224,7 +224,7 @@ Source: CONTEXT.md D-LOST-02, D-LOST-03, D-LOST-04.
 |  |                                      ||
 |  +--------------------------------------+|
 |                                          |
-|             [Cancel]  [Mark as Lost]     |
+|         [Keep Estimate]  [Mark as Lost]  |
 +------------------------------------------+
 ```
 
@@ -262,7 +262,7 @@ Same taxonomy as customer decline (Phase 45 D-CTA-04), same labels verbatim:
 |-------|--------|
 | Ready | `<Button variant="destructive">Mark as Lost</Button>` |
 | Submitting | `<Button variant="destructive" disabled>Marking...</Button>` with `Loader2 animate-spin` |
-| Cancel | `<Button variant="outline">Cancel</Button>` |
+| Keep Estimate | `<Button variant="outline">Keep Estimate</Button>` |
 
 ### Validation
 
@@ -303,8 +303,8 @@ Renders on the estimate detail page when `estimate.status === "lost"`, positione
 | Background | `bg-warning` (amber-50 equivalent, same semantic token as disclaimer) |
 | Border | `border border-warning-border rounded-lg` |
 | Padding | `p-4` |
-| Icon | `AlertTriangle` from Lucide, `h-4 w-4 text-warning-icon shrink-0 mt-0.5` |
-| Layout | `flex gap-3` (icon left, content right) |
+| Icon | `AlertTriangle` from Lucide, `h-4 w-4 text-warning-icon shrink-0` |
+| Layout | `flex items-start gap-3` (icon left, content right) |
 | "Lost" label | `text-sm font-semibold text-warning-foreground` |
 | Reason line | `text-sm text-warning-foreground` -- "Reason: {label}" or omitted if null |
 | Freeform notes | `text-sm text-warning-foreground italic` -- rendered in quotes, or omitted if null |
@@ -337,7 +337,7 @@ Renders on the quote detail page when `quote.sourceEstimateId` is present. Posit
 
 | Property | Value |
 |----------|-------|
-| Container | `flex items-center gap-1.5` |
+| Container | `flex items-center gap-2` |
 | Icon | `ArrowLeft` from Lucide, `h-3.5 w-3.5 text-muted-foreground` |
 | Text | `text-sm text-muted-foreground` |
 | Link text | `text-sm text-primary hover:underline cursor-pointer` wrapping "E-YYYY-NNN" |
@@ -391,7 +391,7 @@ No empty states in this phase. Both flows operate on an existing estimate detail
 | Reason chips | "Too expensive" / "Going with someone else" / "Decided not to do the work" / "Just getting an idea of costs" / "Timing isn't right" |
 | Freeform label | "Anything else? (optional)" |
 | Freeform placeholder | "Add a note if you'd like" |
-| Dialog cancel button | "Cancel" |
+| Dialog cancel button | "Keep Estimate" |
 | Dialog confirm button | "Mark as Lost" |
 | Dialog confirm button (loading) | "Marking..." |
 | Mark as Lost success toast | "Estimate marked as lost" |
@@ -408,7 +408,7 @@ No empty states in this phase. Both flows operate on an existing estimate detail
 
 | Action | Confirmation Approach |
 |--------|----------------------|
-| Mark as Lost | Dialog with optional structured reason and freeform text. Confirm button uses `variant="destructive"`. Dialog description warns about locking the estimate and cancelling follow-ups. |
+| Mark as Lost | Dialog with optional structured reason and freeform text. Confirm button uses `variant="destructive"`. Dialog description warns about locking the estimate and cancelling follow-ups. Cancel button labeled "Keep Estimate" to clarify what returning does. |
 
 Convert to Quote is NOT destructive -- it creates a new resource. No confirmation dialog needed.
 
