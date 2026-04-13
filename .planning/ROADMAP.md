@@ -122,7 +122,7 @@ Full details: `.planning/milestones/v1.7-ROADMAP.md`
 
 - [x] **Phase 41: Estimate Module CRUD (Backend)** - Full `src/estimate/` module mirroring `src/quote/` with counter, policy, CRUD services, status transitions, indexes, plus the `quote-token` → `document-token` rename (unified token module) and a new standalone `estimate_line_items` collection and module (completed 2026-04-12)
 - [x] **Phase 42: Revisions** - parentEstimateId/rootEstimateId/revisionNumber/isCurrent with EstimateReviser and partial unique index (completed 2026-04-12)
-- [ ] **Phase 43: Estimate Frontend CRUD** - features/estimates, ContingencySlider, document-type toggle on create dialog, list/detail pages, range vs "from" display
+- [x] **Phase 43: Estimate Frontend CRUD** - features/estimates, ContingencySlider, document-type toggle on create dialog, list/detail pages, range vs "from" display (completed 2026-04-13)
 - [ ] **Phase 44: Email & Send Flow** - Maizzle estimate templates with non-binding legal copy, EstimateEmailSender, send endpoint, SendEstimateDialog, plus a new standalone `estimate-settings` module and Business > Documents tab update
 - [ ] **Phase 45: Public Customer Page & Response Handling** - PublicEstimateController with latest-revision resolution, 3-action conversational response flow (proceed/message/decline), structured decline reasons, view tracking
 - [ ] **Phase 46: Follow-up Queue & Automation** - ESTIMATE_FOLLOWUPS BullMQ queue, scheduler, processor, deterministic jobIds, cancel on exit, auto-expiry, Redis AOF infra gate
@@ -183,12 +183,12 @@ Plans:
   4. The UI never multiplies base x contingency on the client; `formatRange(low, high, mode)` renders only what the API returns, verified by a golden-file test asserting API and UI agree to the penny.
 **Plans**: 6 plans
 Plans:
-- [ ] 43-01-types-and-doc-updates-PLAN.md — src/types/estimate.ts, CONT-04 + SMART-04 edits, ROADMAP + v1.8-ROADMAP success criterion sync
-- [ ] 43-02-slider-primitive-and-format-range-PLAN.md — @radix-ui/react-slider, shadcn Slider wrapper, formatRange helper, golden-file test + fixture
-- [ ] 43-03-rtk-query-estimate-api-PLAN.md — "Estimate" tag, features/estimates/api/estimateApi.ts with 8 hooks targeting /v1/estimates routes
-- [ ] 43-04-shared-create-dialog-and-estimate-form-PLAN.md — Extract CreateQuoteForm, build CreateDocumentDialog shell, ContingencySlider, UncertaintyChipGroup, UNCERTAINTY_CHIP_LABELS, CreateEstimateForm
-- [ ] 43-05-estimate-list-components-and-page-PLAN.md — 9 mirrored components (table/cards/skeletons/line-items/action strip), EstimatesPage with 7 grouped tabs
-- [ ] 43-06-estimate-detail-routing-and-migration-PLAN.md — EstimateDetailPage with inline Draft edits, /estimates routing, sidebar link, JobDetailPage + QuotesPage migration, delete CreateQuoteDialog.tsx, final CI gate
+- [x] 43-01-types-and-doc-updates-PLAN.md — src/types/estimate.ts, CONT-04 + SMART-04 edits, ROADMAP + v1.8-ROADMAP success criterion sync
+- [x] 43-02-slider-primitive-and-format-range-PLAN.md — @radix-ui/react-slider, shadcn Slider wrapper, formatRange helper, golden-file test + fixture
+- [x] 43-03-rtk-query-estimate-api-PLAN.md — "Estimate" tag, features/estimates/api/estimateApi.ts with 8 hooks targeting /v1/estimates routes
+- [x] 43-04-shared-create-dialog-and-estimate-form-PLAN.md — Extract CreateQuoteForm, build CreateDocumentDialog shell, ContingencySlider, UncertaintyChipGroup, UNCERTAINTY_CHIP_LABELS, CreateEstimateForm
+- [x] 43-05-estimate-list-components-and-page-PLAN.md — 9 mirrored components (table/cards/skeletons/line-items/action strip), EstimatesPage with 7 grouped tabs
+- [x] 43-06-estimate-detail-routing-and-migration-PLAN.md — EstimateDetailPage with inline Draft edits, /estimates routing, sidebar link, JobDetailPage + QuotesPage migration, delete CreateQuoteDialog.tsx, final CI gate
 **UI hint**: yes
 
 ### Phase 44: Email & Send Flow
@@ -299,7 +299,7 @@ Plans:
 | 40. SubscriptionGuard Onboarding Bypass | v1.7 | 1/1 | Complete | 2026-04-07 |
 | 41. Estimate Module CRUD (Backend) | v1.8 | 8/8 | Complete   | 2026-04-12 |
 | 42. Revisions | v1.8 | 6/6 | Complete    | 2026-04-12 |
-| 43. Estimate Frontend CRUD | v1.8 | 0/6 | Not started | - |
+| 43. Estimate Frontend CRUD | v1.8 | 6/6 | Complete | 2026-04-13 |
 | 44. Email & Send Flow | v1.8 | 0/4 | Not started | - |
 | 45. Public Customer Page & Response Handling | v1.8 | 0/5 | Not started | - |
 | 46. Follow-up Queue & Automation | v1.8 | 0/? | Not started | - |

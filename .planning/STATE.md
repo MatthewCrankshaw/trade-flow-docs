@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: Estimates
 status: executing
-stopped_at: Completed 42-06-PLAN.md
-last_updated: "2026-04-12T19:04:54.069Z"
-last_activity: 2026-04-12
+stopped_at: Completed 43-06-PLAN.md
+last_updated: "2026-04-13T00:00:00.000Z"
+last_activity: 2026-04-13
 progress:
   total_phases: 7
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 29
-  completed_plans: 14
-  percent: 48
+  completed_plans: 20
+  percent: 63
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-07)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 42 — revisions
+**Current focus:** Phase 44 — Email & Send Flow
 
 ## Current Position
 
-Phase: 43
+Phase: 44
 Plan: Not started
 Status: Ready to execute
-Last activity: 2026-04-12
+Last activity: 2026-04-13
 
-**Next step:** `/gsd-execute-phase 41` — land Phase 41 (Estimate Module CRUD Backend), then resume Phase 42 with `/gsd-execute-phase 42`.
+**Next step:** `/gsd-execute-phase 44` — land Phase 44 (Email & Send Flow).
 
 ## Roadmap Summary
 
@@ -42,9 +42,9 @@ Last activity: 2026-04-12
 
 | Phase | Goal | Requirements | Status |
 |-------|------|--------------|--------|
-| 41. Estimate Module CRUD (Backend) | Trader can CRUD estimates with E-YYYY-NNN numbering and validated lifecycle; document-token unified; estimate_line_items module created | EST-01..09, CONT-01/02/05, RESP-08 | Not started |
-| 42. Revisions | Invisible versioned revisions with partial unique index and history | REV-01..05 | Not started |
-| 43. Estimate Frontend CRUD | Visual create/edit/list/detail with contingency slider and range display | CONT-03/04 | Not started |
+| 41. Estimate Module CRUD (Backend) | Trader can CRUD estimates with E-YYYY-NNN numbering and validated lifecycle; document-token unified; estimate_line_items module created | EST-01..09, CONT-01/02/05, RESP-08 | Complete |
+| 42. Revisions | Invisible versioned revisions with partial unique index and history | REV-01..05 | Complete |
+| 43. Estimate Frontend CRUD | Visual create/edit/list/detail with contingency slider and range display | CONT-03/04 | Complete |
 | 44. Email & Send Flow | Send estimate with mandatory non-binding legal copy and audit HTML; new estimate-settings module | SND-01..07 | Not started |
 | 45. Public Customer Page & Response Handling | Latest-revision resolution, 4-button response flow, structured decline | CUST-01..07, RESP-01..07 | Not started |
 | 46. Follow-up Queue & Automation | BullMQ delayed 3/10/21d follow-ups with cancel-on-exit and AOF infra gate | FUP-01..08 | Not started |
@@ -57,7 +57,7 @@ Last activity: 2026-04-12
 
 **Velocity (cumulative):**
 
-- Total plans completed: 75 (16 v1.0 + 6 v1.1 + 12 v1.2 + 18 v1.3 + 7 v1.4 + 7 v1.6-partial)
+- Total plans completed: 81 (16 v1.0 + 6 v1.1 + 12 v1.2 + 18 v1.3 + 7 v1.4 + 7 v1.6-partial)
 - Total execution time: ~5 hours
 
 **By Milestone:**
@@ -82,6 +82,12 @@ Last activity: 2026-04-12
 | Phase 42 P04 | 6min | 2 tasks | 3 files |
 | Phase 42 P05 | 3min | 2 tasks | 4 files |
 | Phase 42 P06 | 9min | 5 tasks | 5 files |
+| Phase 43 P01 | 3min | 3 tasks | 5 files |
+| Phase 43 P02 | 5min | 2 tasks | 5 files |
+| Phase 43 P03 | 5min | 2 tasks | 3 files |
+| Phase 43 P04 | 10min | 2 tasks | 10 files |
+| Phase 43 P05 | 15min | 3 tasks | 12 files |
+| Phase 43 P06 | 12min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -94,6 +100,11 @@ v1.7 decisions archived with milestone completion.
 - [Phase 42]: Defense-in-depth canRead re-applied on resolved current row in D-DET-01; rootEstimateId ?? target.id fallback for null/undefined
 - [Phase 42]: No @Body on POST revise -- endpoint takes no body per D-REV-01; ValidationPipe strips anything sent
 - [Phase 42]: ESTIMATE_FOLLOWUP_CANCELLER exported from EstimateModule for Phase 44/46 override
+- [Phase 43]: CreateQuoteDialog deleted; all consumers migrated to CreateDocumentDialog with defaultType prop
+- [Phase 43]: EstimateActionStrip is a minimal stub (Delete only on Draft); Phase 44 extends with Send/Convert/MarkLost
+- [Phase 43]: EstimateDetailPage split into EstimateDetailContent (outer) + EstimateEditor (inner with key={estimate.id}) to satisfy react-hooks/set-state-in-effect ESLint rule
+- [Phase 43]: formatRange performs NO arithmetic -- renders only API-returned low/high values (SC #4)
+- [Phase 43]: EstimateLineItemsCard edit gate is draft-only (not draft||sent) per D-EDIT-02
 
 ### Roadmap Evolution
 
@@ -147,6 +158,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-12T18:54:25.148Z
-Stopped at: Completed 42-06-PLAN.md
+Last session: 2026-04-13T00:00:00.000Z
+Stopped at: Completed 43-06-PLAN.md
 Resume file: None
