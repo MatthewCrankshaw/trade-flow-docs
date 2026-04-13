@@ -438,7 +438,7 @@ CONTEXT.md D-API-02 references `cancelAllFollowupsForChain(rootEstimateId)` but 
 | A2 | `markedLostAt` is redundant with `lostAt` (set by transition service) | Entity Schema Findings | Low -- if they differ, add a separate field; planner decides |
 | A3 | Converting from VIEWED status (allowed by transition map but not by D-CONV-01) should be blocked at the service level | Transition Map Analysis | Medium -- if VIEWED estimates should be convertible, the service restriction is wrong |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should `EstimateToQuoteConverter` call `QuoteCreator.create()` or write directly?**
    - What we know: `QuoteCreator.create()` validates customer status and job existence, generates Q-YYYY-NNN number, uses `AuthorizedCreatorFactory` for policy enforcement, and attaches totals. [VERIFIED: `quote-creator.service.ts`]
