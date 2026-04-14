@@ -4,14 +4,14 @@ milestone: v1.8
 milestone_name: Estimates
 status: executing
 stopped_at: Phase 47 UI-SPEC approved
-last_updated: "2026-04-13T19:59:27.478Z"
-last_activity: 2026-04-13 -- Phase 47 planning complete
+last_updated: "2026-04-14T07:19:42.100Z"
+last_activity: 2026-04-14 -- Phase 46 planning complete
 progress:
   total_phases: 7
   completed_phases: 4
-  total_plans: 38
-  completed_plans: 28
-  percent: 74
+  total_plans: 40
+  completed_plans: 34
+  percent: 85
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-07)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 45 — Public Customer Page & Response Handling
+**Current focus:** Phase 47 — convert-to-quote-mark-as-lost
 
 ## Current Position
 
-Phase: 44
-Plan: 44-04-PLAN.md
+Phase: 47 (convert-to-quote-mark-as-lost) — EXECUTING
+Plan: 1 of 4
 Status: Ready to execute
-Last activity: 2026-04-13 -- Phase 47 planning complete
+Last activity: 2026-04-14 -- Phase 46 planning complete
 
 **Next step:** `/gsd-execute-phase 45` — land Phase 45 (Public Customer Page & Response Handling).
 

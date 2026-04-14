@@ -260,7 +260,7 @@ Plans:
   4. `POST /v1/estimates/:id/mark-lost` transitions the estimate to Lost with a structured reason (same taxonomy as customer decline) or freeform text, cancels all pending follow-ups, and renders a locked detail page with the recorded reason visible to the trader.
 **Plans**: 4 plans
 Plans:
-- [ ] 47-01-PLAN.md — Backend entity/DTO schema extensions, request classes, EstimateToQuoteConverter and EstimateLostMarker services with unit tests
+- [x] 47-01-PLAN.md — Backend entity/DTO schema extensions, request classes, EstimateToQuoteConverter and EstimateLostMarker services with unit tests
 - [ ] 47-02-PLAN.md — Controller endpoints, module wiring, OpenAPI documentation, CI gate
 - [ ] 47-03-PLAN.md — Frontend types, RTK Query mutations, MarkAsLostDialog, locked state components, EstimateActionStrip integration
 - [ ] 47-04-PLAN.md — QuoteSourceEstimateLink back-link component, quote detail page integration, E2E verification
@@ -316,4 +316,4 @@ Plans:
 | 44. Email & Send Flow | v1.8 | 4/4 | Complete   | 2026-04-13 |
 | 45. Public Customer Page & Response Handling | v1.8 | 4/5 | In Progress|  |
 | 46. Follow-up Queue & Automation | v1.8 | 5/7 | In Progress|  |
-| 47. Convert to Quote & Mark as Lost | v1.8 | 0/4 | Not started | - |
+| 47. Convert to Quote & Mark as Lost | v1.8 | 1/4 | In Progress|  |
