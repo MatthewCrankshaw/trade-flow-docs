@@ -125,7 +125,7 @@ Full details: `.planning/milestones/v1.7-ROADMAP.md`
 - [x] **Phase 43: Estimate Frontend CRUD** - features/estimates, ContingencySlider, document-type toggle on create dialog, list/detail pages, range vs "from" display (completed 2026-04-13)
 - [x] **Phase 44: Email & Send Flow** - Maizzle estimate templates with non-binding legal copy, EstimateEmailSender, send endpoint, SendEstimateDialog, plus a new standalone `estimate-settings` module and Business > Documents tab update (completed 2026-04-13)
 - [ ] **Phase 45: Public Customer Page & Response Handling** - PublicEstimateController with latest-revision resolution, 3-action conversational response flow (proceed/message/decline), structured decline reasons, view tracking
-- [ ] **Phase 46: Follow-up Queue & Automation** - ESTIMATE_FOLLOWUPS BullMQ queue, scheduler, processor, deterministic jobIds, cancel on exit, auto-expiry, Redis AOF infra gate
+- [x] **Phase 46: Follow-up Queue & Automation** - ESTIMATE_FOLLOWUPS BullMQ queue, scheduler, processor, deterministic jobIds, cancel on exit, auto-expiry, Redis AOF infra gate (completed 2026-04-14)
 - [ ] **Phase 47: Convert to Quote & Mark as Lost** - EstimateToQuoteConverter with mandatory review, idempotent convert endpoint, convertedToQuoteId back-link, markLost service
 
 Full details: `.planning/milestones/v1.8-ROADMAP.md`
@@ -238,13 +238,15 @@ Plans:
   2. `EstimateFollowupProcessor` performs a defence-in-depth status re-read before sending each follow-up and silently no-ops if the estimate is no longer in a follow-up-worthy status; each follow-up email uses its own Maizzle template (3d/10d/21d) and includes the estimate summary plus the same three response CTAs as the initial send (Go Ahead, Message [FirstName], Not right for me -- per D-EMAIL-04).
   3. Every exit transition (customer response, revision, conversion, manual delete, mark-as-lost) cancels all pending follow-ups for that estimate/revision via `cancelAllFollowups()`, verified by an integration test that walks each transition with a mocked queue and asserts removal.
   4. An estimate auto-transitions to Expired exactly 30 days after its Sent timestamp via a scheduled sweep or a delayed job, and production Redis is configured with `appendonly yes` / `appendfsync everysec` -- verified by a smoke test that schedules a 60-second delayed job, restarts Redis, and confirms the job still fires.
-**Plans**: 5 plans
+**Plans**: 7 plans
 Plans:
-- [ ] 46-01-PLAN.md — Queue infrastructure: ESTIMATE_FOLLOWUPS queue name, job DTOs, delay constants, jobId builders, EstimateFollowupsModule shell, tsconfig/jest path aliases, Wave 0 test stubs
-- [ ] 46-02-PLAN.md — Scheduler and canceller services: EstimateFollowupScheduler (4 delayed jobs), BullMQEstimateFollowupCanceller (DI token rebinding), module wiring
-- [ ] 46-03-PLAN.md — Maizzle estimate-followup.html template with followupStep variable, 3 CTAs, disclaimer; EstimateFollowupEmailRenderer service
-- [ ] 46-04-PLAN.md — EstimateFollowupProcessor (defence-in-depth status re-read, email send, audit row) and EstimateExpiryProcessor (30-day auto-expiry transition), WorkerModule registration
-- [ ] 46-05-PLAN.md — Wire EstimateFollowupScheduler into EstimateEmailSender step 9, Redis AOF startup check in worker.ts, Docker Compose AOF config, AppModule import, CI gate
+- [x] 46-01-PLAN.md — Queue infrastructure: ESTIMATE_FOLLOWUPS queue name, job DTOs, delay constants, jobId builders, EstimateFollowupsModule shell, tsconfig/jest path aliases, Wave 0 test stubs
+- [x] 46-02-PLAN.md — Scheduler and canceller services: EstimateFollowupScheduler (4 delayed jobs), BullMQEstimateFollowupCanceller (DI token rebinding), module wiring
+- [x] 46-03-PLAN.md — Maizzle estimate-followup.html template with followupStep variable, 3 CTAs, disclaimer; EstimateFollowupEmailRenderer service
+- [x] 46-04-PLAN.md — EstimateFollowupProcessor (defence-in-depth status re-read, email send, audit row) and EstimateExpiryProcessor (30-day auto-expiry transition), WorkerModule registration
+- [x] 46-05-PLAN.md — Wire EstimateFollowupScheduler into EstimateEmailSender step 9, Redis AOF startup check in worker.ts, Docker Compose AOF config, AppModule import, CI gate
+- [ ] 46-06-PLAN.md — Gap closure: fix processor to use EstimateFollowupEmailRenderer instead of EstimateEmailRenderer (CR-01)
+- [ ] 46-07-PLAN.md — Gap closure: wire ESTIMATE_FOLLOWUP_CANCELLER into EstimateResponseHandler for customer response cancellation
 **Infra gate**: Production Redis must have AOF persistence enabled (`appendonly yes`, `appendfsync everysec`) before any follow-up ships. This is a hard gate, not a soft constraint -- without it, all scheduled follow-ups are silently lost on restart (FUP-08).
 
 ### Phase 47: Convert to Quote & Mark as Lost
@@ -313,5 +315,5 @@ Plans:
 | 43. Estimate Frontend CRUD | v1.8 | 6/6 | Complete | 2026-04-13 |
 | 44. Email & Send Flow | v1.8 | 4/4 | Complete   | 2026-04-13 |
 | 45. Public Customer Page & Response Handling | v1.8 | 4/5 | In Progress|  |
-| 46. Follow-up Queue & Automation | v1.8 | 0/5 | Not started | - |
+| 46. Follow-up Queue & Automation | v1.8 | 5/7 | In Progress|  |
 | 47. Convert to Quote & Mark as Lost | v1.8 | 0/4 | Not started | - |
