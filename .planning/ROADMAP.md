@@ -314,6 +314,10 @@ Plans:
   2. EstimateDetailPage renders a response card showing the customer's response type, message, reason (if declined), and timestamp — replacing the Phase 43 placeholder text.
   3. Frontend types align with backend: `lastResponseType`/`lastResponseAt` field names match the API response shape.
   4. `navigate(\`/quotes/\${result.quoteId}/edit\`)` resolves to a valid route in App.tsx that opens the new quote in edit mode for mandatory review before saving.
+**Plans**: 2 plans
+Plans:
+- [ ] 50-01-PLAN.md — Backend responseSummary derivation fix, frontend type alignment, dead status cleanup
+- [ ] 50-02-PLAN.md — Response display card on EstimateDetailPage, /quotes/:quoteId/edit route addition
 
 ## Progress
 
