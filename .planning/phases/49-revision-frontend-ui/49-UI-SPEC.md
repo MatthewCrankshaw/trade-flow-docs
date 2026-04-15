@@ -35,7 +35,7 @@ Declared values from project design system (established in Phase 18, unchanged):
 |-------|-------|----------|---------------------|
 | 2xs | 4px | `1` | Icon-text gap inside buttons, chevron icon padding |
 | sm | 8px | `2` | Button group gaps in action strip, revision list item internal gaps |
-| base | 16px | `4` | History card content rhythm (`flex flex-col gap-4`), card padding |
+| base | 16px | `4` | History card content rhythm (`flex flex-col gap-4`), card padding, revision list item vertical padding |
 | lg | 24px | `6` | Section-level spacing between estimate detail sections |
 | xl | 48px | `12` | Not used this phase |
 
@@ -209,7 +209,7 @@ Each revision renders as a block within the collapsible content:
 | Viewed line | `text-xs text-muted-foreground` -- "Viewed {formatDateTime(firstViewedAt)}" or omitted if `firstViewedAt` is null |
 | Not sent state | `text-xs text-muted-foreground` -- "Draft -- not yet sent" when `sentAt` is null |
 | Item separator | `border-b border-border` between items, no border after last item |
-| Item padding | `py-3` per item (12px vertical padding) |
+| Item padding | `py-4` per item (16px vertical padding) |
 
 ### Revision list ordering
 
