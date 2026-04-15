@@ -282,12 +282,23 @@ Plans:
   2. `NoopEstimateFollowupCanceller` is registered exactly once (as the default in `EstimateFollowupsModule` for test/dev environments where BullMQ is absent), not duplicated.
   3. `ConvertEstimateRequest` empty class is removed and its references updated.
   4. `site_visit_requested` status is removed from all frontend types, components, filter tabs, and status mappings — no dead branches remain.
+**Plans:** 2 plans
+Plans:
+- [ ] 48-01-PLAN.md — API: Fix DI token override, remove duplicate Noop registration, delete empty ConvertEstimateRequest
+- [ ] 48-02-PLAN.md — UI: Remove dead site_visit_requested from 6 frontend files
+**UI hint**: no
+
 
 ### Phase 49: Revision Frontend UI
 **Goal**: A trader can trigger "Edit and resend" from the estimate detail page and view the full revision history — completing the frontend half of the revision feature whose backend shipped in Phase 42.
 **Depends on**: Phase 42, Phase 43
 **Requirements**: REV-02, REV-04
 **Gap Closure:** Closes REV-02, REV-04 requirement gaps and "Revision lifecycle" broken flow from v1.8 audit
+**Plans:** 1 plan
+
+Plans:
+- [ ] 49-01-PLAN.md — Revision type extension, RTK Query endpoints, Edit-and-resend button, History section
+
 **Success Criteria** (what must be TRUE):
   1. EstimateActionStrip shows an "Edit and resend" button on Sent estimates that calls `POST /v1/estimates/:id/revisions` via a new RTK Query mutation, creates a new Draft revision, and navigates to the estimate detail page for editing.
   2. EstimateDetailPage shows a collapsed History section listing previous revisions with revision number, send date, and view date — fetched via `GET /v1/estimates/:id/revisions` RTK Query hook.
