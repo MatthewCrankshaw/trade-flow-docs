@@ -31,9 +31,9 @@ Requirements for Estimates milestone. Each maps to roadmap phases.
 ### Revisions
 
 - [ ] **REV-01**: Estimate entity stores `parentEstimateId`, `revisionNumber`, and `isCurrent` to support versioned revisions
-- [x] **REV-02**: User can revise a Sent estimate via an "Edit and resend" action which creates a new revision under the same E-YYYY-NNN number and marks the previous revision as non-current
+- [ ] **REV-02**: User can revise a Sent estimate via an "Edit and resend" action which creates a new revision under the same E-YYYY-NNN number and marks the previous revision as non-current
 - [x] **REV-03**: Only one revision per estimate chain can have `isCurrent: true`, enforced by a partial unique index on `(parentEstimateId, isCurrent: true)`
-- [x] **REV-04**: Estimate detail shows a collapsed History section listing previous revisions with send/view timestamps (trader-only, not on customer page)
+- [ ] **REV-04**: Estimate detail shows a collapsed History section listing previous revisions with send/view timestamps (trader-only, not on customer page)
 - [x] **REV-05**: Revising an estimate cancels pending follow-ups and schedules a fresh 3/10/21-day sequence for the new revision
 
 ### Send & Email
@@ -164,9 +164,9 @@ Requirements -> phases mapping (filled by roadmap 2026-04-10).
 | CONT-04 | Phase 43 | Pending |
 | CONT-05 | Phase 41 | Pending |
 | REV-01 | Phase 42 | Pending |
-| REV-02 | Phase 42 | Complete |
+| REV-02 | Phase 49 | Pending |
 | REV-03 | Phase 42 | Complete |
-| REV-04 | Phase 42 | Complete |
+| REV-04 | Phase 49 | Pending |
 | REV-05 | Phase 42 | Complete |
 | SND-01 | Phase 44 | Pending |
 | SND-02 | Phase 44 | Pending |
@@ -189,7 +189,7 @@ Requirements -> phases mapping (filled by roadmap 2026-04-10).
 | RESP-05 | Phase 45 | Pending |
 | RESP-06 | Phase 45 | Pending |
 | RESP-07 | Phase 45 | Pending |
-| RESP-08 | Phase 41 | Pending |
+| RESP-08 | Phase 50 | Pending |
 | FUP-01 | Phase 46 | Pending |
 | FUP-02 | Phase 46 | Pending |
 | FUP-03 | Phase 46 | Pending |
@@ -200,7 +200,7 @@ Requirements -> phases mapping (filled by roadmap 2026-04-10).
 | FUP-08 | Phase 46 | Pending |
 | CONV-01 | Phase 47 | Pending |
 | CONV-02 | Phase 47 | Pending |
-| CONV-03 | Phase 47 | Pending |
+| CONV-03 | Phase 50 | Pending |
 | CONV-04 | Phase 47 | Pending |
 | CONV-05 | Phase 47 | Pending |
 | CONV-06 | Phase 47 | Pending |

@@ -10,7 +10,7 @@
 - v1.5 Automated E2E Playwright Testing -- Phases 24-28 (in progress)
 - v1.6 Stripe Subscription Billing -- Phases 29-34 (shipped 2026-03-31)
 - v1.7 Onboarding & Landing Page -- Phases 35-40 (shipped 2026-04-07)
-- v1.8 Estimates -- Phases 41-47 (in progress)
+- v1.8 Estimates -- Phases 41-50 (in progress)
 
 ## Phases
 
@@ -129,6 +129,12 @@ Full details: `.planning/milestones/v1.7-ROADMAP.md`
 - [x] **Phase 47: Convert to Quote & Mark as Lost** - EstimateToQuoteConverter with mandatory review, idempotent convert endpoint, convertedToQuoteId back-link, markLost service (completed 2026-04-15)
 
 Full details: `.planning/milestones/v1.8-ROADMAP.md`
+
+### v1.8 Gap Closure (Phases 48-50)
+
+- [ ] **Phase 48: DI Token Fix & Cleanup** - Fix NoopEstimateFollowupCanceller local provider override, remove duplicate registration, remove empty ConvertEstimateRequest, remove dead site_visit_requested from frontend
+- [ ] **Phase 49: Revision Frontend UI** - "Edit and resend" button with RTK Query mutation, History section on EstimateDetailPage
+- [ ] **Phase 50: Response Display & Convert Route Fix** - Fix responseSummary null, add response card to trader detail page, fix type mismatch, add /quotes/:quoteId/edit route for mandatory review
 
 ## Phase Details
 
@@ -266,6 +272,38 @@ Plans:
 - [x] 47-04-PLAN.md — QuoteSourceEstimateLink back-link component, quote detail page integration, E2E verification
 **UI hint**: yes
 
+### Phase 48: DI Token Fix & Cleanup
+**Goal**: Fix the critical DI token resolution risk where NoopEstimateFollowupCanceller overrides the real BullMQ canceller, clean up dead code (duplicate noop registration, empty ConvertEstimateRequest), and remove the dead `site_visit_requested` status from 6+ frontend files after its backend removal in Phase 45-01.
+**Depends on**: Phase 46, Phase 47
+**Requirements**: (none directly — secures FUP-05, REV-05, LOST-02, CONV-05 indirectly)
+**Gap Closure:** Closes DI token integration gap and tech debt from v1.8 audit
+**Success Criteria** (what must be TRUE):
+  1. `EstimateModule` no longer registers a local `{ provide: ESTIMATE_FOLLOWUP_CANCELLER, useClass: NoopEstimateFollowupCanceller }` provider — the real `BullMQEstimateFollowupCanceller` exported by `EstimateFollowupsModule` is the only binding resolved in production.
+  2. `NoopEstimateFollowupCanceller` is registered exactly once (as the default in `EstimateFollowupsModule` for test/dev environments where BullMQ is absent), not duplicated.
+  3. `ConvertEstimateRequest` empty class is removed and its references updated.
+  4. `site_visit_requested` status is removed from all frontend types, components, filter tabs, and status mappings — no dead branches remain.
+
+### Phase 49: Revision Frontend UI
+**Goal**: A trader can trigger "Edit and resend" from the estimate detail page and view the full revision history — completing the frontend half of the revision feature whose backend shipped in Phase 42.
+**Depends on**: Phase 42, Phase 43
+**Requirements**: REV-02, REV-04
+**Gap Closure:** Closes REV-02, REV-04 requirement gaps and "Revision lifecycle" broken flow from v1.8 audit
+**Success Criteria** (what must be TRUE):
+  1. EstimateActionStrip shows an "Edit and resend" button on Sent estimates that calls `POST /v1/estimates/:id/revisions` via a new RTK Query mutation, creates a new Draft revision, and navigates to the estimate detail page for editing.
+  2. EstimateDetailPage shows a collapsed History section listing previous revisions with revision number, send date, and view date — fetched via `GET /v1/estimates/:id/revisions` RTK Query hook.
+  3. The "Edit and resend" button is hidden for Draft, Converted, Lost, Expired, and Deleted estimates.
+
+### Phase 50: Response Display & Convert Route Fix
+**Goal**: The trader's estimate detail page shows actual customer response data instead of placeholder text, and converting an estimate navigates to a working quote edit route for mandatory review.
+**Depends on**: Phase 45, Phase 47
+**Requirements**: RESP-08, CONV-03
+**Gap Closure:** Closes RESP-08, CONV-03 requirement gaps, Phase 45→43 integration gap, and "Convert to Quote mandatory review" broken flow from v1.8 audit
+**Success Criteria** (what must be TRUE):
+  1. `EstimateRepository.toDto()` derives `responseSummary` from the `responses[]` array (latest response type, reason, message, timestamp) instead of returning null.
+  2. EstimateDetailPage renders a response card showing the customer's response type, message, reason (if declined), and timestamp — replacing the Phase 43 placeholder text.
+  3. Frontend types align with backend: `lastResponseType`/`lastResponseAt` field names match the API response shape.
+  4. `navigate(\`/quotes/\${result.quoteId}/edit\`)` resolves to a valid route in App.tsx that opens the new quote in edit mode for mandatory review before saving.
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -317,3 +355,6 @@ Plans:
 | 45. Public Customer Page & Response Handling | v1.8 | 4/5 | In Progress|  |
 | 46. Follow-up Queue & Automation | v1.8 | 7/7 | Complete    | 2026-04-15 |
 | 47. Convert to Quote & Mark as Lost | v1.8 | 4/4 | Complete    | 2026-04-15 |
+| 48. DI Token Fix & Cleanup | v1.8 | 0/? | Not started | - |
+| 49. Revision Frontend UI | v1.8 | 0/? | Not started | - |
+| 50. Response Display & Convert Route Fix | v1.8 | 0/? | Not started | - |
