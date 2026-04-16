@@ -3,11 +3,11 @@
 Out-of-scope issues discovered during plan execution. These were NOT fixed because
 they are unrelated to the task at hand. They should be handled in a separate quick task.
 
-## Pre-existing format:check failures in trade-flow-ui (discovered during 48-02)
+## Pre-existing format:check failures in trade-flow-ui (discovered during 48-02, re-confirmed during 48-03)
 
 `npm run ci` in `trade-flow-ui` is currently failing on `format:check` step due to
 Prettier formatting drift in 5 files that were last modified by Phase 45 and earlier
-commits. None of these files were modified by this plan.
+commits. None of these files were modified by Plan 48-02 or Plan 48-03.
 
 Files with format drift:
 
