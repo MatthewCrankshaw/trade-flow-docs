@@ -254,6 +254,8 @@ Trade Flow is a monetized SaaS product with a complete user acquisition funnel: 
 
 Phase 42 complete — Estimate revision chain (parentEstimateId/rootEstimateId/revisionNumber/isCurrent) with EstimateReviser service, ConflictError for concurrent writes, and IEstimateFollowupCanceller DI hook for Phase 44.
 
+Phase 49 complete — revision-frontend-ui. Closed REV-02/REV-04 frontend gap: Estimate type extended with revision fields, `useReviseEstimateMutation` and `useGetEstimateRevisionsQuery` RTK Query endpoints added, "Edit and resend" button on `EstimateActionStrip` for Sent/Viewed/Responded statuses, collapsible `EstimateRevisionHistory` card on `EstimateDetailPage` for revised estimates.
+
 Phase 50 complete — response-display-convert-route-fix. Backend `EstimateRepository.toDto()` now derives `responseSummary` from the `responses[]` array; trader sees the customer's response type, message, decline reason, and timestamp on the estimate detail page (RESP-08). Added `/quotes/:quoteId/edit` route so the convert-to-quote flow lands on a working page for mandatory review (CONV-03).
 
 ## Evolution
@@ -274,4 +276,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-16 Phase 50 Response Display & Convert Route Fix complete*
+*Last updated: 2026-04-16 Phase 49 Revision Frontend UI complete*
