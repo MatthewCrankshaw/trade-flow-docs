@@ -132,7 +132,7 @@ Full details: `.planning/milestones/v1.8-ROADMAP.md`
 
 ### v1.8 Gap Closure (Phases 48-50)
 
-- [x] **Phase 48: DI Token Fix & Cleanup** - Fix NoopEstimateFollowupCanceller local provider override, remove duplicate registration, remove empty ConvertEstimateRequest, remove dead site_visit_requested from frontend (completed 2026-04-16)
+- [ ] **Phase 48: DI Token Fix & Cleanup** - Fix NoopEstimateFollowupCanceller local provider override, remove duplicate registration, remove empty ConvertEstimateRequest, remove dead site_visit_requested from frontend (gap closure 48-03 pending for EstimateActionStrip.tsx)
 - [x] **Phase 49: Revision Frontend UI** - "Edit and resend" button with RTK Query mutation, History section on EstimateDetailPage (completed 2026-04-16)
 - [x] **Phase 50: Response Display & Convert Route Fix** - Fix responseSummary null, add response card to trader detail page, fix type mismatch, add /quotes/:quoteId/edit route for mandatory review (completed 2026-04-16)
 
@@ -276,17 +276,18 @@ Plans:
 **Goal**: Fix the critical DI token resolution risk where NoopEstimateFollowupCanceller overrides the real BullMQ canceller, clean up dead code (duplicate noop registration, empty ConvertEstimateRequest), and remove the dead `site_visit_requested` status from 6+ frontend files after its backend removal in Phase 45-01.
 **Depends on**: Phase 46, Phase 47
 **Requirements**: (none directly — secures FUP-05, REV-05, LOST-02, CONV-05 indirectly)
-**Gap Closure:** Closes DI token integration gap and tech debt from v1.8 audit
+**Gap Closure:** Closes DI token integration gap and tech debt from v1.8 audit; Plan 48-03 closes the SC-4 verification gap (surviving `site_visit_requested` literal + widening-cast anti-patterns in `EstimateActionStrip.tsx`).
 **Success Criteria** (what must be TRUE):
   1. `EstimateModule` no longer registers a local `{ provide: ESTIMATE_FOLLOWUP_CANCELLER, useClass: NoopEstimateFollowupCanceller }` provider — the real `BullMQEstimateFollowupCanceller` exported by `EstimateFollowupsModule` is the only binding resolved in production.
   2. `NoopEstimateFollowupCanceller` is registered exactly once (as the default in `EstimateFollowupsModule` for test/dev environments where BullMQ is absent), not duplicated.
   3. `ConvertEstimateRequest` empty class is removed and its references updated.
   4. `site_visit_requested` status is removed from all frontend types, components, filter tabs, and status mappings — no dead branches remain.
-**Plans:** 2/2 plans complete
+**Plans:** 3 plans (2 complete, 1 pending gap closure)
 Plans:
 - [x] 48-01-PLAN.md — API: Fix DI token override, remove duplicate Noop registration, delete empty ConvertEstimateRequest
 - [x] 48-02-PLAN.md — UI: Remove dead site_visit_requested from 6 frontend files
-**UI hint**: no
+- [ ] 48-03-PLAN.md — Gap closure: remove surviving `site_visit_requested` literal in `EstimateActionStrip.tsx` and replace three `as readonly string[]` widening casts with `readonly EstimateStatus[]` typing to restore TypeScript union exhaustiveness
+**UI hint**: yes
 
 
 ### Phase 49: Revision Frontend UI
@@ -370,6 +371,6 @@ Plans:
 | 45. Public Customer Page & Response Handling | v1.8 | 4/5 | In Progress|  |
 | 46. Follow-up Queue & Automation | v1.8 | 7/7 | Complete    | 2026-04-15 |
 | 47. Convert to Quote & Mark as Lost | v1.8 | 4/4 | Complete    | 2026-04-15 |
-| 48. DI Token Fix & Cleanup | v1.8 | 2/2 | Complete   | 2026-04-16 |
+| 48. DI Token Fix & Cleanup | v1.8 | 2/3 | In Progress | |
 | 49. Revision Frontend UI | v1.8 | 1/1 | Complete   | 2026-04-16 |
 | 50. Response Display & Convert Route Fix | v1.8 | 2/2 | Complete   | 2026-04-16 |
