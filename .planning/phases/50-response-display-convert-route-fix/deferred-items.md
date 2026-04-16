@@ -24,3 +24,9 @@ From the same `npm run ci` run in `trade-flow-ui`:
 ## Pending uncommitted UI modification (not mine)
 
 `src/features/estimates/components/EstimateActionStrip.tsx` has an uncommitted working-tree modification (introducing `REVISABLE_STATUSES` which includes `"site_visit_requested"`). This modification was present when this plan started and was not authored as part of plan 50-01. Left untouched per destructive-git prohibition and scope boundary.
+
+## Plan 50-02 follow-up: same pre-existing format:check failures
+
+Plan 50-02 ran `npm run ci` in `trade-flow-ui` as part of Task 2 verification and hit the same 5 format:check failures as plan 50-01 (same files, same pre-Phase-50 commits). All files changed by plan 50-02 (`EstimateResponseCard.tsx`, `index.ts`, `EstimateDetailPage.tsx`, `App.tsx`) pass `prettier --check` cleanly in isolation. The blocker for a green `npm run ci` is still the 5 unrelated Phase 45 files listed above; a single `prettier --write` pass on those files will clear both plans' CI gates.
+
+Lint and typecheck continue to report 0 errors; the 1 lint warning (`BusinessStep.tsx:51`) is also pre-existing and orthogonal.
