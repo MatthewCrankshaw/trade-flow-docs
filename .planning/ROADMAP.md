@@ -133,7 +133,7 @@ Full details: `.planning/milestones/v1.8-ROADMAP.md`
 ### v1.8 Gap Closure (Phases 48-50)
 
 - [x] **Phase 48: DI Token Fix & Cleanup** - Fix NoopEstimateFollowupCanceller local provider override, remove duplicate registration, remove empty ConvertEstimateRequest, remove dead site_visit_requested from frontend (completed 2026-04-16)
-- [ ] **Phase 49: Revision Frontend UI** - "Edit and resend" button with RTK Query mutation, History section on EstimateDetailPage
+- [x] **Phase 49: Revision Frontend UI** - "Edit and resend" button with RTK Query mutation, History section on EstimateDetailPage (completed 2026-04-16)
 - [ ] **Phase 50: Response Display & Convert Route Fix** - Fix responseSummary null, add response card to trader detail page, fix type mismatch, add /quotes/:quoteId/edit route for mandatory review
 
 ## Phase Details
@@ -294,10 +294,10 @@ Plans:
 **Depends on**: Phase 42, Phase 43
 **Requirements**: REV-02, REV-04
 **Gap Closure:** Closes REV-02, REV-04 requirement gaps and "Revision lifecycle" broken flow from v1.8 audit
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 49-01-PLAN.md — Revision type extension, RTK Query endpoints, Edit-and-resend button, History section
+- [x] 49-01-PLAN.md — Revision type extension, RTK Query endpoints, Edit-and-resend button, History section
 
 **Success Criteria** (what must be TRUE):
   1. EstimateActionStrip shows an "Edit and resend" button on Sent estimates that calls `POST /v1/estimates/:id/revisions` via a new RTK Query mutation, creates a new Draft revision, and navigates to the estimate detail page for editing.
@@ -371,5 +371,5 @@ Plans:
 | 46. Follow-up Queue & Automation | v1.8 | 7/7 | Complete    | 2026-04-15 |
 | 47. Convert to Quote & Mark as Lost | v1.8 | 4/4 | Complete    | 2026-04-15 |
 | 48. DI Token Fix & Cleanup | v1.8 | 2/2 | Complete   | 2026-04-16 |
-| 49. Revision Frontend UI | v1.8 | 0/? | Not started | - |
+| 49. Revision Frontend UI | v1.8 | 1/1 | Complete   | 2026-04-16 |
 | 50. Response Display & Convert Route Fix | v1.8 | 0/? | Not started | - |
