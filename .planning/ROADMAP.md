@@ -134,7 +134,7 @@ Full details: `.planning/milestones/v1.8-ROADMAP.md`
 
 - [x] **Phase 48: DI Token Fix & Cleanup** - Fix NoopEstimateFollowupCanceller local provider override, remove duplicate registration, remove empty ConvertEstimateRequest, remove dead site_visit_requested from frontend (completed 2026-04-16)
 - [x] **Phase 49: Revision Frontend UI** - "Edit and resend" button with RTK Query mutation, History section on EstimateDetailPage (completed 2026-04-16)
-- [ ] **Phase 50: Response Display & Convert Route Fix** - Fix responseSummary null, add response card to trader detail page, fix type mismatch, add /quotes/:quoteId/edit route for mandatory review
+- [x] **Phase 50: Response Display & Convert Route Fix** - Fix responseSummary null, add response card to trader detail page, fix type mismatch, add /quotes/:quoteId/edit route for mandatory review (completed 2026-04-16)
 
 ## Phase Details
 
@@ -317,7 +317,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 50-01-PLAN.md — Backend responseSummary derivation fix, frontend type alignment, dead status cleanup
-- [ ] 50-02-PLAN.md — Response display card on EstimateDetailPage, /quotes/:quoteId/edit route addition
+- [x] 50-02-PLAN.md — Response display card on EstimateDetailPage, /quotes/:quoteId/edit route addition
 
 ## Progress
 
@@ -372,4 +372,4 @@ Plans:
 | 47. Convert to Quote & Mark as Lost | v1.8 | 4/4 | Complete    | 2026-04-15 |
 | 48. DI Token Fix & Cleanup | v1.8 | 2/2 | Complete   | 2026-04-16 |
 | 49. Revision Frontend UI | v1.8 | 1/1 | Complete   | 2026-04-16 |
-| 50. Response Display & Convert Route Fix | v1.8 | 1/2 | In Progress|  |
+| 50. Response Display & Convert Route Fix | v1.8 | 2/2 | Complete   | 2026-04-16 |
