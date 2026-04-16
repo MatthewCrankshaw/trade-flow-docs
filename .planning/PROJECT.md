@@ -258,6 +258,8 @@ Phase 49 complete — revision-frontend-ui. Closed REV-02/REV-04 frontend gap: E
 
 Phase 50 complete — response-display-convert-route-fix. Backend `EstimateRepository.toDto()` now derives `responseSummary` from the `responses[]` array; trader sees the customer's response type, message, decline reason, and timestamp on the estimate detail page (RESP-08). Added `/quotes/:quoteId/edit` route so the convert-to-quote flow lands on a working page for mandatory review (CONV-03).
 
+Phase 48 complete — di-token-fix-cleanup. Fixed critical DI token override (EstimateModule's local NoopEstimateFollowupCanceller no longer shadows the real BullMQ canceller in production), removed duplicate Noop registration and empty ConvertEstimateRequest class, eliminated dead `site_visit_requested` status across 6+ frontend files, and retyped three status tuples in `EstimateActionStrip.tsx` as `readonly EstimateStatus[]` to restore TypeScript union exhaustiveness — preventing the recurrence of the exact class of bug that slipped past Plan 48-02 review.
+
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
@@ -276,4 +278,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-16 Phase 49 Revision Frontend UI complete*
+*Last updated: 2026-04-16 Phase 48 DI Token Fix & Cleanup complete*
