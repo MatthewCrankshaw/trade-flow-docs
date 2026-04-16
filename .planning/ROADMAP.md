@@ -373,4 +373,4 @@ Plans:
 | 47. Convert to Quote & Mark as Lost | v1.8 | 4/4 | Complete    | 2026-04-15 |
 | 48. DI Token Fix & Cleanup | v1.8 | 2/3 | In Progress | |
 | 49. Revision Frontend UI | v1.8 | 1/1 | Complete   | 2026-04-16 |
-| 50. Response Display & Convert Route Fix | v1.8 | 2/2 | Complete   | 2026-04-16 |
+| 50. Response Display & Convert Route Fix | v1.8 | 2/2 | Complete    | 2026-04-16 |
