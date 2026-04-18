@@ -456,22 +456,22 @@ function ImpersonationBanner() {
 
 **Note on A2:** Phase 56 CONTEXT.md (D-06) confirms expired JWT returns 401 with a message. [CITED: Phase 56 CONTEXT.md D-06]
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Phase 56 response shape for `POST /v1/impersonation/start`**
+1. **Phase 56 response shape for `POST /v1/impersonation/start`** (RESOLVED)
    - What we know: Returns an impersonation JWT token (D-10). Session includes `targetUserId`, `supportUserId`, `sessionId` (D-02, D-08).
    - What's unclear: Whether the response also includes the target user's name/email, or if the frontend must already have this from the user detail page.
-   - Recommendation: The frontend likely already has the target user's name/email from the user detail page context. Pass it into the `startImpersonation` Redux action alongside the API response. No extra API call needed.
+   - Resolution: Frontend already has target user name/email from the SupportUserDetailPage context. The `useImpersonation.startSession()` accepts name and email as parameters and passes them directly into the `startImpersonation` Redux action alongside the API response token/sessionId. No extra API call needed.
 
-2. **Permission checking mechanism on frontend**
+2. **Permission checking mechanism on frontend** (RESOLVED)
    - What we know: Phase 52 builds `@RequiresPermission` and `hasPermission()` on the backend. Phase 51 hydrates permissions onto user DTOs.
    - What's unclear: Whether the frontend `User` type includes a `permissions` array or just `supportRoles`, and how to check `impersonate_user` permission client-side.
-   - Recommendation: Check `user.supportRoles` for a role that includes `impersonate_user` permission, or check a `permissions` field if Phase 52 adds one to the User response. The implementer should verify the User type shape after Phases 51-52 are complete.
+   - Resolution: The executor should read the User type shape at implementation time and use whichever mechanism is available (permissions array or role-based check). Plan 03 documents both approaches with fallback logic.
 
-3. **Support routes currently inside OnboardingGuard + PaywallGuard**
+3. **Support routes currently inside OnboardingGuard + PaywallGuard** (RESOLVED)
    - What we know: In `App.tsx`, support routes (`/support/*`) are nested inside `OnboardingGuard` > `PaywallGuard`. Phase 53 may restructure this.
    - What's unclear: Whether Phase 53 moves support routes outside these guards or adds a `SupportGuard`.
-   - Recommendation: Plan should account for the current route structure but note that Phase 53 may change it. The impersonation bypass logic in guards is needed regardless.
+   - Resolution: Plan 02 adds impersonation bypass checks in both OnboardingGuard and PaywallGuard. These bypasses are needed regardless of whether Phase 53 restructures the route hierarchy, since the support user must traverse these guards to reach business routes during impersonation.
 
 ## Project Constraints (from CLAUDE.md)
 
