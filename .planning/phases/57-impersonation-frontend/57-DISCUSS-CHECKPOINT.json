@@ -1,0 +1,21 @@
+{
+  "phase": "57",
+  "phase_name": "Impersonation Frontend",
+  "timestamp": "2026-04-18T15:10:00.000Z",
+  "areas_completed": ["Auth token switching", "Banner design & placement"],
+  "areas_remaining": ["Impersonation entry point", "Session termination"],
+  "decisions": {
+    "Auth token switching": [
+      {"question": "How should the frontend send the impersonation token to the API?", "answer": "Replace Bearer token — store impersonation token in state, use it instead of Firebase token in RTK Query prepareHeaders", "options_presented": ["Replace Bearer token", "Custom header alongside Firebase", "You decide"]},
+      {"question": "Where should impersonation state be stored?", "answer": "Redux slice — dedicated impersonationSlice in the Redux store", "options_presented": ["Redux slice", "Redux slice + sessionStorage", "React Context"]},
+      {"question": "What happens on page refresh during impersonation?", "answer": "End impersonation — Redux state lost on refresh, support user returns to their own dashboard", "options_presented": ["End impersonation", "Persist via sessionStorage", "You decide"]}
+    ],
+    "Banner design & placement": [
+      {"question": "Where should the impersonation banner be positioned?", "answer": "Above header — fixed bar at very top of viewport, pushes content down, z-50, Shopify/Stripe pattern", "options_presented": ["Above header", "Inside header bar", "Floating bottom bar"]},
+      {"question": "What visual style should the banner use?", "answer": "Warning amber — amber/yellow background with dark text, conventional impersonation bar pattern", "options_presented": ["Warning amber", "Destructive red", "Neutral dark"]},
+      {"question": "Should sidebar show customer or support navigation during impersonation?", "answer": "Customer navigation — show business nav items (Jobs, Customers, Quotes) since support user needs to see exactly what customer sees", "options_presented": ["Customer navigation", "Support navigation", "You decide"]}
+    ]
+  },
+  "deferred_ideas": [],
+  "canonical_refs": []
+}
