@@ -1,5 +1,25 @@
 # Milestones
 
+## v1.8 Estimates (Shipped: 2026-04-18)
+
+**Phases completed:** 10 phases (41-50), 45 plans
+**Timeline:** 7 days (2026-04-11 -> 2026-04-18)
+
+**Key accomplishments:**
+
+- Full estimate backend module mirroring quote architecture with E-YYYY-NNN numbering, dedicated estimate_line_items collection, contingency range math (API-side only), and document-token unification (quote-token -> document-token with documentType discriminator)
+- Revision system with parentEstimateId/rootEstimateId chain, partial unique index enforcing single isCurrent per chain, EstimateReviser service, and "Edit and resend" frontend button with History card
+- Estimate frontend CRUD with document-type toggle on create dialog, ContingencySlider, five trade-agnostic uncertainty chips, range vs "from" price display, and status-aware action buttons
+- Estimate email sending via standalone estimate-settings module with mandatory non-binding legal copy, Maizzle HTML template, SendEstimateDialog with rich text editor, and re-send without new revision
+- Public customer page with 3-action conversational response model (proceed/message/decline), latest-revision resolution, view tracking, structured decline reasons, and trader email notifications
+- BullMQ follow-up automation with ESTIMATE_FOLLOWUPS queue, 3/10/21-day delayed jobs, deterministic jobIds for idempotent scheduling and O(1) cancellation, defence-in-depth processor, and 30-day auto-expiry
+- Convert-to-quote with idempotent endpoint (Idempotency-Key), literal tax-rate snapshots, mandatory review step, convertedToQuoteId back-link, and mark-as-lost with structured reasons
+- Three gap closure phases (48-50) fixing DI token override, adding revision frontend UI, fixing responseSummary derivation and convert route navigation
+
+Known deferred items at close: 46 (see STATE.md Deferred Items)
+
+---
+
 ## v1.7 Onboarding & Landing Page (Shipped: 2026-04-07)
 
 **Phases completed:** 6 phases (35-40), 13 plans
