@@ -74,7 +74,7 @@ Inherited from project design system. All values use OKLCH CSS custom properties
 | Destructive | `destructive` | Not used in this phase |
 
 Accent reserved for:
-- "Impersonate" button on user detail page (primary action)
+- "Impersonate User" button on user detail page (primary action)
 - Focus rings on dialog form fields
 - Focus rings on "Return to Support" banner button
 
@@ -95,13 +95,13 @@ Custom amber palette -- does NOT use design system semantic tokens. This is deli
 
 | Element | Copy |
 |---------|------|
-| Primary CTA | "Impersonate" |
+| Primary CTA | "Impersonate User" |
 | Confirmation dialog title | "Impersonate User" |
 | Confirmation dialog description | "You will see exactly what {name} sees, including their data, subscription, and permissions. All actions are logged." |
 | Reason field label | "Reason" |
 | Reason field placeholder | "Why are you impersonating this user?" |
 | Confirmation action button | "Start Impersonation" |
-| Confirmation cancel button | "Cancel" |
+| Confirmation cancel button | "Keep Reviewing" |
 | Banner text | "Impersonating: {user name}" |
 | Banner action button | "Return to Support" |
 | Session ended toast | "Impersonation session ended" |
@@ -131,7 +131,7 @@ Custom amber palette -- does NOT use design system semantic tokens. This is deli
 
 | Component | Change | Source Decision |
 |-----------|--------|----------------|
-| `SupportUserDetailPage.tsx` | Add "Impersonate" button below role actions (or in header area), conditionally visible based on `impersonate_user` permission and target user type | D-08, D-10, D-11 |
+| `SupportUserDetailPage.tsx` | Add "Impersonate User" button below role actions (or in header area), conditionally visible based on `impersonate_user` permission and target user type | D-08, D-10, D-11 |
 | `api.ts` (RTK Query base) | Modify `prepareHeaders` to check impersonation slice state before falling back to Firebase token | D-01 |
 | `DashboardLayout.tsx` | Conditionally render `ImpersonationBanner` above the header when impersonation is active; add `pt-[40px]` to push layout content below fixed banner | D-04 |
 | `navigation.ts` | When impersonation is active, return customer business navigation items instead of support navigation items | D-07 |
@@ -143,7 +143,7 @@ Custom amber palette -- does NOT use design system semantic tokens. This is deli
 | Component | Usage |
 |-----------|-------|
 | `AlertDialog`, `AlertDialogTrigger`, `AlertDialogContent`, `AlertDialogHeader`, `AlertDialogTitle`, `AlertDialogDescription`, `AlertDialogFooter`, `AlertDialogCancel`, `AlertDialogAction` | Impersonation confirmation dialog |
-| `Button` | Impersonate button, Return to Support button |
+| `Button` | Impersonate User button, Return to Support button |
 | `Textarea` | Reason field in confirmation dialog |
 | `Label` | Reason field label in confirmation dialog |
 | `Sonner toast` | Session ended/expired/error notifications |
@@ -159,7 +159,7 @@ Custom amber palette -- does NOT use design system semantic tokens. This is deli
    - The target user is a customer user (has no support roles)
    - Impersonation is not already active
 2. **Hidden entirely** when conditions are not met -- no disabled/greyed-out state (D-10).
-3. **Button**: `Button variant="default"` with `UserCheck` icon (16x16, `mr-2`) and label "Impersonate".
+3. **Button**: `Button variant="default"` with `UserCheck` icon (16x16, `mr-2`) and label "Impersonate User".
 4. **Placement**: In the user detail page header area, to the right of the user name/badges. On mobile, below the user name in the header stack.
 5. **Click**: Opens `ImpersonateUserDialog`.
 
@@ -170,7 +170,7 @@ Custom amber palette -- does NOT use design system semantic tokens. This is deli
 3. **Description**: "You will see exactly what {name} sees, including their data, subscription, and permissions. All actions are logged."
 4. **Reason field**: `Textarea` with `Label` "Reason", placeholder "Why are you impersonating this user?", required. Minimum 1 character after trim.
 5. **Validation**: If reason is empty on submit, show inline validation message "A reason is required before impersonating a user." below the textarea in `text-sm text-destructive`. Action button remains enabled but submission is blocked until valid.
-6. **Cancel button**: "Cancel" (`AlertDialogCancel`).
+6. **Cancel button**: "Keep Reviewing" (`AlertDialogCancel`).
 7. **Action button**: "Start Impersonation" (`AlertDialogAction`, default variant). Disabled during loading.
 8. **On confirm**: Calls `POST /v1/impersonation/start` with `{ targetUserId, reason }` via RTK Query mutation.
 9. **Loading state**: Action button shows spinner with "Starting..." text. Cancel button disabled during mutation.
@@ -241,7 +241,7 @@ Custom amber palette -- does NOT use design system semantic tokens. This is deli
 
 1. `ImpersonationBanner` uses `role="alert"` and `aria-live="assertive"` to announce impersonation state to screen readers.
 2. "Return to Support" button has `aria-label="End impersonation and return to support dashboard"`.
-3. "Impersonate" button on user detail has `aria-label="Impersonate {name}"`.
+3. "Impersonate User" button on user detail has `aria-label="Impersonate {name}"`.
 4. Confirmation dialog uses Radix AlertDialog which provides modal focus trap and Escape key to cancel.
 5. Reason textarea has associated `Label` via `htmlFor` attribute.
 6. Banner has sufficient color contrast: amber-950 text on amber-500 background exceeds WCAG AA (contrast ratio > 7:1).
