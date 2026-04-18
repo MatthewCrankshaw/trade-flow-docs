@@ -10,7 +10,8 @@
 - v1.5 Automated E2E Playwright Testing -- Phases 24-28 (in progress)
 - v1.6 Stripe Subscription Billing -- Phases 29-34 (shipped 2026-03-31)
 - v1.7 Onboarding & Landing Page -- Phases 35-40 (shipped 2026-04-07)
-- v1.8 Estimates -- Phases 41-50 (in progress)
+- v1.8 Estimates -- Phases 41-50 (shipped 2026-04-18)
+- v1.9 Support & Admin Tools -- Phases 51-57 (in progress)
 
 ## Phases
 
@@ -116,209 +117,118 @@ Full details: `.planning/milestones/v1.7-ROADMAP.md`
 
 </details>
 
-### v1.8 Estimates (In Progress)
+<details>
+<summary>v1.8 Estimates (Phases 41-50) -- SHIPPED 2026-04-18</summary>
 
-**Milestone Goal:** Ship estimates as a parallel document type with price ranges, soft customer response flow, automated follow-ups, and seamless conversion to quotes -- handling the pre-site-visit "rough cost" conversation that currently lives in WhatsApp and missed calls.
-
-- [x] **Phase 41: Estimate Module CRUD (Backend)** - Full `src/estimate/` module mirroring `src/quote/` with counter, policy, CRUD services, status transitions, indexes, plus the `quote-token` → `document-token` rename (unified token module) and a new standalone `estimate_line_items` collection and module (completed 2026-04-12)
+- [x] **Phase 41: Estimate Module CRUD (Backend)** - Full `src/estimate/` module mirroring `src/quote/` with counter, policy, CRUD services, status transitions, indexes, plus the `quote-token` -> `document-token` rename (completed 2026-04-12)
 - [x] **Phase 42: Revisions** - parentEstimateId/rootEstimateId/revisionNumber/isCurrent with EstimateReviser and partial unique index (completed 2026-04-12)
 - [x] **Phase 43: Estimate Frontend CRUD** - features/estimates, ContingencySlider, document-type toggle on create dialog, list/detail pages, range vs "from" display (completed 2026-04-13)
-- [x] **Phase 44: Email & Send Flow** - Maizzle estimate templates with non-binding legal copy, EstimateEmailSender, send endpoint, SendEstimateDialog, plus a new standalone `estimate-settings` module and Business > Documents tab update (completed 2026-04-13)
-- [ ] **Phase 45: Public Customer Page & Response Handling** - PublicEstimateController with latest-revision resolution, 3-action conversational response flow (proceed/message/decline), structured decline reasons, view tracking
-- [x] **Phase 46: Follow-up Queue & Automation** - ESTIMATE_FOLLOWUPS BullMQ queue, scheduler, processor, deterministic jobIds, cancel on exit, auto-expiry, Redis AOF infra gate (completed 2026-04-14)
-- [x] **Phase 47: Convert to Quote & Mark as Lost** - EstimateToQuoteConverter with mandatory review, idempotent convert endpoint, convertedToQuoteId back-link, markLost service (completed 2026-04-15)
+- [x] **Phase 44: Email & Send Flow** - Maizzle estimate templates with non-binding legal copy, EstimateEmailSender, send endpoint, SendEstimateDialog (completed 2026-04-13)
+- [x] **Phase 45: Public Customer Page & Response Handling** - PublicEstimateController with latest-revision resolution, 3-action conversational response flow (completed 2026-04-18)
+- [x] **Phase 46: Follow-up Queue & Automation** - ESTIMATE_FOLLOWUPS BullMQ queue, scheduler, processor, deterministic jobIds, cancel on exit, auto-expiry (completed 2026-04-14)
+- [x] **Phase 47: Convert to Quote & Mark as Lost** - EstimateToQuoteConverter with mandatory review, idempotent convert endpoint, markLost service (completed 2026-04-15)
+- [x] **Phase 48: DI Token Fix & Cleanup** - Fix NoopEstimateFollowupCanceller, remove dead code, remove site_visit_requested from frontend (completed 2026-04-16)
+- [x] **Phase 49: Revision Frontend UI** - "Edit and resend" button, History section on EstimateDetailPage (completed 2026-04-16)
+- [x] **Phase 50: Response Display & Convert Route Fix** - Fix responseSummary null, add response card, fix convert route (completed 2026-04-16)
 
 Full details: `.planning/milestones/v1.8-ROADMAP.md`
 
-### v1.8 Gap Closure (Phases 48-50)
+</details>
 
-- [x] **Phase 48: DI Token Fix & Cleanup** - Fix NoopEstimateFollowupCanceller local provider override, remove duplicate registration, remove empty ConvertEstimateRequest, remove dead site_visit_requested from frontend (gap closure 48-03 pending for EstimateActionStrip.tsx) (completed 2026-04-16)
-- [x] **Phase 49: Revision Frontend UI** - "Edit and resend" button with RTK Query mutation, History section on EstimateDetailPage (completed 2026-04-16)
-- [x] **Phase 50: Response Display & Convert Route Fix** - Fix responseSummary null, add response card to trader detail page, fix type mismatch, add /quotes/:quoteId/edit route for mandatory review (completed 2026-04-16)
+### v1.9 Support & Admin Tools (In Progress)
+
+**Milestone Goal:** Give the support team a dedicated experience -- login without onboarding, user management dashboard with membership summaries, customer impersonation for debugging, and super-user role administration. Built on a proper RBAC foundation that supports future team roles without exposing complexity to solo operators.
+
+- [ ] **Phase 51: RBAC Data Model & Seed** - Permissions, roles, and user-role assignment collections with seeded support and customer roles
+- [ ] **Phase 52: Permission Guard & Migration** - Permission-checking guard/decorator infrastructure and migration of existing hardcoded role checks
+- [ ] **Phase 53: Support Access & Routing** - Support user login bypass, /support redirect, and route protection
+- [ ] **Phase 54: User Management** - Paginated user list, user detail, and membership summary dashboard for support users
+- [ ] **Phase 55: Role Administration** - Super user can grant/revoke support admin role with confirmation and immediate effect
+- [ ] **Phase 56: Impersonation Backend & Audit** - "Login as" session creation, time limits, audit logging in dedicated append-only collection
+- [ ] **Phase 57: Impersonation Frontend** - Impersonation banner, customer-identical rendering, and clean session termination
+
+Full details: `.planning/milestones/v1.9-ROADMAP.md`
 
 ## Phase Details
 
-### Phase 41: Estimate Module CRUD (Backend)
-**Goal**: An authenticated trader can create, read, update, list, and soft-delete estimates with E-YYYY-NNN numbering and a validated status lifecycle via HTTP endpoints, using a dedicated `estimate_line_items` collection; and the `quote-token` module is unified into `document-token` (with `quote_tokens` renamed to `document_tokens`) so both document types share one secure customer-facing guard.
-**Depends on**: Nothing (first phase of v1.8)
-**Requirements**: EST-01, EST-02, EST-03, EST-04, EST-05, EST-06, EST-07, EST-08, EST-09, CONT-01, CONT-02, CONT-05, RESP-08
+### Phase 51: RBAC Data Model & Seed
+**Goal**: The system has a proper permissions and roles data model with seeded support roles and a default business administrator role, ready for enforcement in Phase 52
+**Depends on**: Nothing (first phase of v1.9)
+**Requirements**: RBAC-01, RBAC-02, RBAC-03, RBAC-04, RBAC-05, RBAC-06, RBAC-07
 **Success Criteria** (what must be TRUE):
-  1. `POST /v1/estimates` creates an estimate with an atomically generated `E-YYYY-NNN` number (per-business, per-year counter), writes line items to a new dedicated `estimate_line_items` collection via a new `EstimateLineItem*` module (repository, creator, policy, bundle/tax factories mirroring the quote line-item stack), and returns an API-computed `{ low, high }` price range using a stored contingency percentage.
-  2. `GET /v1/estimates` returns a paginated list with tab filtering by status and `GET /v1/estimates/:id` returns full detail including line items, contingency, totals, customer info, status, and a response summary structure.
-  3. `PATCH /v1/estimates/:id` edits a Draft estimate (scope, line items, contingency 0-30 in steps of 5, display mode, notes, customer, job) and `DELETE /v1/estimates/:id` soft-deletes from Draft only (`status: DELETED`, line-item history preserved).
-  4. Status transition service enforces the lifecycle Draft -> Sent -> Viewed -> Responded -> (SiteVisitRequested / Converted / Declined / Expired / Lost) and rejects invalid transitions with a clear error code; required MongoDB indexes are in place.
-  5. `quote-token` module is renamed to `document-token` end-to-end: entity field `quoteId` -> `documentId`, `documentType: "quote" | "estimate"` discriminator added, collection `quote_tokens` -> `document_tokens` via one-shot reversible migration, guard renamed to `DocumentSessionAuthGuard`, existing quote tokens continue to validate, and the public quote page (`/v1/public/quote/:token`) still resolves its token unchanged.
-  6. `quote_line_items` collection is untouched -- no `parentType` field, no `estimateId` field, no migration, no backfill. The quote detail page renders line items identically to before this phase.
-**Plans**: 8 plans
-Plans:
-- [x] 41-01-prechecks-and-foundation-PLAN.md — BLOCKING prod quote_tokens check, tsconfig path aliases, ErrorCodes enum extension
-- [x] 41-02-lift-bundle-helpers-PLAN.md — Move BundleConfigValidator/BundlePricingPlanner/BundleTaxRateCalculator from @quote/services to @item/services, generalise to ILineItemTaxInput
-- [x] 41-03-document-token-rename-PLAN.md — Pure code rename quote-token → document-token with documentType discriminator and PublicQuoteController type assertion
-- [x] 41-04-estimate-scaffold-PLAN.md — Estimate enums, entities, DTOs, requests, responses, mock generators, locked transition map + spec
-- [x] 41-05-estimate-repositories-and-stateless-services-PLAN.md — EstimateRepository (paginated), EstimateLineItemRepository, EstimateNumberGenerator, EstimateTotalsCalculator (range math), EstimateTransitionService, EstimatePolicy, EstimateLineItemPolicy
-- [x] 41-06-estimate-line-item-factories-PLAN.md — EstimateStandardLineItemFactory, EstimateBundleLineItemFactory, EstimateLineItemCreator, EstimateLineItemRetriever (mirror quote 1:1)
-- [x] 41-07-estimate-crud-services-PLAN.md — EstimateCreator, EstimateRetriever, EstimateUpdater (Draft-only, line-item CRUD), EstimateDeleter (soft-delete via transition)
-- [x] 41-08-controller-module-wiring-and-docs-PLAN.md — EstimateController (8 endpoints), EstimateModule wiring, AppModule registration, openapi.yaml update, ROADMAP success criterion #5 rewrite, final CI gate
+  1. A `permissions` collection stores workflow-based permissions (e.g., `send_quote`, `manage_schedules`, `view_financials`, `manage_users`, `impersonate_user`) with name, description, and category -- not CRUD-based permissions like `create_job` or `read_customer`.
+  2. A `roles` collection stores roles with name, description, type (`support` or `customer`), and an array of permission IDs; Super User and Admin support roles and Business Administrator customer role are seeded on application startup.
+  3. Super User role has all permissions and is marked as unrestrictable; Admin support role has a configurable default permission set; Business Administrator customer role has full business-scoped permissions.
+  4. User-role assignments are stored per user with scope (support = global, customer = business-specific), and the data model supports future team roles without building team features yet.
+**Plans**: TBD
 
-### Phase 42: Revisions
-**Goal**: A trader can invisibly revise a Sent estimate -- the new revision becomes current, the previous becomes non-current, history is queryable -- and the data model guarantees exactly one current revision per estimate chain.
-**Depends on**: Phase 41
-**Requirements**: REV-01, REV-02, REV-03, REV-04, REV-05
+### Phase 52: Permission Guard & Migration
+**Goal**: API endpoints can be protected by permission-based decorators, and existing hardcoded support role checks are migrated to the new permission system
+**Depends on**: Phase 51
+**Requirements**: RBAC-08, RBAC-09, RBAC-10
 **Success Criteria** (what must be TRUE):
-  1. `POST /v1/estimates/:id/revisions` creates a new revision of a Sent estimate under the same `E-YYYY-NNN` number, setting `parentEstimateId`, incrementing `revisionNumber`, and flipping `isCurrent` so only the new revision is current (enforced by a partial unique index on `(rootEstimateId, isCurrent: true)`).
-  2. `GET /v1/estimates/:id/revisions` returns the full revision chain in `revisionNumber` order (oldest first) with send/view timestamps for each, suitable for the trader-only collapsed History section.
-  3. Creating a revision atomically transitions the chain: the new Draft revision becomes current, the previous revision keeps its existing status with `isCurrent: false`, and the trader sees only the latest revision when loading the estimate detail page by root id. Cancellation of the previous revision's pending follow-ups happens at the moment the new revision is actually Sent (Phase 44 owns the call via the `IEstimateFollowupCanceller` binding from Phase 42).
-  4. Attempting to concurrently create two revisions for the same chain results in exactly one success and one 409 Conflict (index-enforced), with no duplicate `isCurrent: true` rows.
-**Plans**: 6 plans
-Plans:
-- [x] 42-01-phase-41-amendments-and-roadmap-rewrite-PLAN.md — Amend Phase 41 PLAN-05 (index topology) and PLAN-07 (root-write retrofit), rewrite Phase 42 SC #3 per D-HOOK-05 in both roadmap files
-- [x] 42-02-conflict-error-and-followup-interface-PLAN.md — ConflictError class + error codes + createHttpError branch + IEstimateFollowupCanceller interface + NoopEstimateFollowupCanceller default binding
-- [x] 42-03-estimate-repository-revision-methods-PLAN.md — EstimateRepository.downgradeCurrent/insertRevision/restoreCurrent/findRevisionsByRootId/findCurrentInChainByRootId + EstimateLineItemRepository clone helpers + verify index declarations
-- [x] 42-04-estimate-reviser-service-PLAN.md — EstimateReviser service with two-write revise flow, compensating rollback, bundle parent/child line-item clone, D-HOOK-03 non-call assertion, EstimateRevisionMockGenerator
-- [x] 42-05-retriever-and-deleter-extensions-PLAN.md — EstimateRetriever (D-DET-01 non-current resolution, D-DET-02 list filter, findRevisionsByIdOrFail) + EstimateDeleter (D-REV-05/06 predecessor restoration)
-- [x] 42-06-controller-module-openapi-smoke-PLAN.md — POST + GET /v1/estimates/:id/revisions handlers, EstimateModule wiring, openapi.yaml update, manual smoke procedure for SC #4
+  1. A `@RequiresPermission('manage_users')` decorator and corresponding guard validate that the authenticated user has the specified permission before the endpoint handler executes, returning 403 Forbidden with a clear error code if the permission is missing.
+  2. Existing hardcoded role checks in SubscriptionGuard (support bypass) and PaywallGuard (support bypass) are migrated to use the new permission system -- the observable behavior is identical but enforcement flows through the RBAC infrastructure.
+  3. Solo business users never see role management UI; the permission infrastructure is entirely backend-enforced with no customer-facing complexity exposed.
+**Plans**: TBD
 
-### Phase 43: Estimate Frontend CRUD
-**Goal**: A trader can visually create and edit estimates from the app with a document-type toggle, contingency slider, and range-or-"from" price display, running against the Phase 41 backend.
-**Depends on**: Phase 41 (can run in parallel with Phase 42)
-**Requirements**: CONT-03, CONT-04
+### Phase 53: Support Access & Routing
+**Goal**: Support users can log in and reach a dedicated /support dashboard without going through onboarding or needing a business association
+**Depends on**: Phase 52
+**Requirements**: SACC-01, SACC-02, SACC-03, SACC-04
 **Success Criteria** (what must be TRUE):
-  1. The shared Create Document dialog displays a Quote/Estimate toggle; selecting Estimate reveals the ContingencySlider (0-30% in 5% steps, default 10%), the display-mode toggle (range / "from £X"), the five trade-agnostic uncertainty chips (site inspection needed, hidden conditions, materials & supply, access & working space, scope unclear until investigation) plus a freeform notes field, and the submitted estimate appears in the list.
-  2. The Estimates list page renders all estimates with status tab filtering; each row shows customer name, job title, `E-YYYY-NNN`, status badge, and API-returned price range formatted as `£X - £Y` or `From £X` per the estimate's display mode.
-  3. The Estimate detail page shows line items, contingency percentage, the formatted price range/"from" display, status, customer info, a placeholder for response summary, and action buttons (Edit, Delete) that Draft estimates can use while non-Draft estimates show the appropriate disabled/locked states.
-  4. The UI never multiplies base x contingency on the client; `formatRange(low, high, mode)` renders only what the API returns, verified by a golden-file test asserting API and UI agree to the penny.
-**Plans**: 6 plans
-Plans:
-- [x] 43-01-types-and-doc-updates-PLAN.md — src/types/estimate.ts, CONT-04 + SMART-04 edits, ROADMAP + v1.8-ROADMAP success criterion sync
-- [x] 43-02-slider-primitive-and-format-range-PLAN.md — @radix-ui/react-slider, shadcn Slider wrapper, formatRange helper, golden-file test + fixture
-- [x] 43-03-rtk-query-estimate-api-PLAN.md — "Estimate" tag, features/estimates/api/estimateApi.ts with 8 hooks targeting /v1/estimates routes
-- [x] 43-04-shared-create-dialog-and-estimate-form-PLAN.md — Extract CreateQuoteForm, build CreateDocumentDialog shell, ContingencySlider, UncertaintyChipGroup, UNCERTAINTY_CHIP_LABELS, CreateEstimateForm
-- [x] 43-05-estimate-list-components-and-page-PLAN.md — 9 mirrored components (table/cards/skeletons/line-items/action strip), EstimatesPage with 7 grouped tabs
-- [x] 43-06-estimate-detail-routing-and-migration-PLAN.md — EstimateDetailPage with inline Draft edits, /estimates routing, sidebar link, JobDetailPage + QuotesPage migration, delete CreateQuoteDialog.tsx, final CI gate
+  1. A user with a support role can log in and is immediately redirected to `/support` dashboard -- they never see the onboarding wizard or business setup, even if they have no business association.
+  2. Routes under `/support/*` are protected by a frontend route guard that checks for a support role; non-support users attempting to access `/support` are redirected away.
+  3. Support users bypass subscription gating (existing v1.6 behaviour preserved through the RBAC migration in Phase 52, not a separate hardcoded check).
+  4. The `/support` dashboard renders as a shell page ready for user management content in Phase 54.
+**Plans**: TBD
 **UI hint**: yes
 
-### Phase 44: Email & Send Flow
-**Goal**: A trader can review a pre-filled email, send an estimate via a secure public link, and re-send without creating a new revision -- with mandatory non-binding legal language baked into the default template stored in a new dedicated `estimate-settings` module that is entirely independent of `quote-settings`.
-**Depends on**: Phase 41, Phase 43
-**Requirements**: SND-01, SND-02, SND-03, SND-04, SND-05, SND-06, SND-07
+### Phase 54: User Management
+**Goal**: Support users can browse all platform users, search by name or email, view user details with subscription and role information, and see membership summary metrics on their dashboard
+**Depends on**: Phase 53
+**Requirements**: UMGT-01, UMGT-02, UMGT-03, UMGT-04
 **Success Criteria** (what must be TRUE):
-  1. A new `estimate-settings` module is introduced (module, controller, service, repository, policy, DTOs, requests, responses, tests) with its own API surface exposing `estimateEmailTemplate`. `quote-settings` is untouched.
-  2. The Business > Documents tab in trade-flow-ui is updated to fetch and save both template types in parallel via two independent APIs, and the existing quote template UI/UX still loads and saves unchanged.
-  3. Trader clicks "Send Estimate" on a Draft estimate, reviews/edits the pre-filled subject and rich-text body in the SendEstimateDialog, and the estimate transitions to Sent with a secure `document-token` link delivered via Resend using a new Maizzle `estimate-sent` template.
-  4. The default estimate email template contains mandatory non-binding legal copy ("This is an estimate, not a fixed price commitment. A firm quote will be provided after a site visit.") that cannot be removed by the user, and the subject line includes "Estimate" (not "Quote").
-  5. The exact rendered HTML sent to the customer is persisted on the estimate at send time as an audit artefact.
-  6. Re-sending a Sent (or revised) estimate delivers the email again without creating a new revision and without regenerating the token, and the estimate detail page reflects the updated `lastSentAt`.
-**Plans**: 4 plans
-Plans:
-- [x] 44-01-PLAN.md — estimate-settings backend module + BusinessCreator extension + tsconfig paths
-- [x] 44-02-PLAN.md — Maizzle estimate-sent.html template + EstimateEmailRenderer + audit collection + DocumentTokenRepository extensions + formatRange utility
-- [x] 44-03-PLAN.md — EstimateEmailSender service + SendEstimateRequest + transition map extensions + controller endpoint + OpenAPI + doc updates
-- [x] 44-04-PLAN.md — Frontend: Documents tab + EstimateEmailSettings + SendEstimateDialog + SendEstimateForm + EstimateActionStrip + EstimateDetailPage wiring
-**UI hint**: yes
-**Legal-review gate**: Default template copy and subject-line wording must pass a targeted UK-consumer-law copy review before this phase ships. Non-binding disclaimer is mandatory and non-removable (SND-05).
-
-### Phase 45: Public Customer Page & Response Handling
-**Goal**: A customer can open the secure estimate link without logging in, always see the latest revision with non-binding language prominent, and respond via one of three conversational actions -- triggering notification and status transitions.
-**Depends on**: Phase 41, Phase 44
-**Requirements**: CUST-01, CUST-02, CUST-03, CUST-04, CUST-05, CUST-06, CUST-07, RESP-01, RESP-02, RESP-03, RESP-04, RESP-05, RESP-06, RESP-07
-**Success Criteria** (what must be TRUE):
-  1. `GET /v1/public/estimate/:token` via `DocumentSessionAuthGuard` returns the latest revision of the estimate chain (resolved via `rootEstimateId` + `isCurrent: true`, even if an older revision was the one emailed), sets `firstViewedAt` once, and triggers the Sent -> Viewed transition.
-  2. The customer page (`/estimate/:token`) displays scope, price as range or "from £X", contingency explanation, validity, uncertainty notes, trader business info, and the non-binding legal language prominently at the top -- with NO "Accept" button, NO signature mechanism, NO single fixed total, and zero non-essential cookies (PECR-clean).
-  3. The three response actions work end-to-end: "Happy to Proceed" records proceed intent and transitions to RESPONDED; "Message [First Name]" opens an inline textarea capturing a freeform message and transitions to RESPONDED; "Not right for me" captures a structured decline reason (5 presets plus optional freeform) and transitions to DECLINED. Each response persists to the estimate's responses array, sends a trader notification email, and replaces the action area with an inline confirmation.
-  4. Any customer action persists the full response (type, reason, message, timestamp) on the estimate, transitions the estimate status to Responded / Declined as appropriate, sends a notification email to the trader with response type and message preview, and future visits to the token on a terminal-state estimate show a friendly read-only message with no active buttons.
-**Plans**: 5 plans
-Plans:
-- [x] 45-01-PLAN.md — Foundation: remove SITE_VISIT_REQUESTED, add responses[] array, rewrite RESP-01..04 docs
-- [x] 45-02-PLAN.md — Backend public GET endpoint: PublicEstimateRetriever, controller, response class, Sent->Viewed transition
-- [x] 45-03-PLAN.md — Backend response POST endpoint: EstimateResponseHandler, notification email, guard fix, module wiring, CI gate
-- [x] 45-04-PLAN.md — Frontend: public estimate page components, RTK Query (no auth), page route, response buttons
-- [ ] 45-05-PLAN.md — E2E verification checkpoint: full flow validation across both repos
+  1. Support user can view a paginated list of all users (both support and customer) with search by name or email, where each row shows the user's name, email, role (support badge if applicable), subscription status (trialing/active/past_due/canceled/expired), and associated business name.
+  2. Support user can click into a user detail page showing the user's profile information, business association, current subscription status with dates, and role assignments.
+  3. The `/support` dashboard shows membership summary cards: total users, active trials, active subscriptions, expired subscriptions, and canceled subscriptions -- computed from real data.
+  4. The user list loads within a reasonable time and paginates correctly for the expected user base size.
+**Plans**: TBD
 **UI hint**: yes
 
-### Phase 46: Follow-up Queue & Automation
-**Goal**: Sending an estimate automatically schedules 3/10/21-day follow-up emails that fire reliably across worker restarts, cancel cleanly on any exit transition, and auto-expire estimates 30 days after send.
-**Depends on**: Phase 44, Phase 45
-**Requirements**: FUP-01, FUP-02, FUP-03, FUP-04, FUP-05, FUP-06, FUP-07, FUP-08
+### Phase 55: Role Administration
+**Goal**: A super user can grant and revoke the support admin role on other users, with immediate effect and safety guardrails
+**Depends on**: Phase 54
+**Requirements**: RADM-01, RADM-02, RADM-03, RADM-04, RADM-05
 **Success Criteria** (what must be TRUE):
-  1. Sending an estimate calls `EstimateFollowupScheduler.scheduleFollowups()` which enqueues three delayed BullMQ jobs on a new `ESTIMATE_FOLLOWUPS` queue with relative UTC delays (72h, 240h, 504h) and deterministic jobIds of shape `estimate-followup:{estimateId}:{revisionNumber}:{step}` -- a second call for the same estimate/revision is a silent no-op.
-  2. `EstimateFollowupProcessor` performs a defence-in-depth status re-read before sending each follow-up and silently no-ops if the estimate is no longer in a follow-up-worthy status; each follow-up email uses its own Maizzle template (3d/10d/21d) and includes the estimate summary plus the same three response CTAs as the initial send (Go Ahead, Message [FirstName], Not right for me -- per D-EMAIL-04).
-  3. Every exit transition (customer response, revision, conversion, manual delete, mark-as-lost) cancels all pending follow-ups for that estimate/revision via `cancelAllFollowups()`, verified by an integration test that walks each transition with a mocked queue and asserts removal.
-  4. An estimate auto-transitions to Expired exactly 30 days after its Sent timestamp via a scheduled sweep or a delayed job, and production Redis is configured with `appendonly yes` / `appendfsync everysec` -- verified by a smoke test that schedules a 60-second delayed job, restarts Redis, and confirms the job still fires.
-**Plans**: 7 plans
-Plans:
-- [x] 46-01-PLAN.md — Queue infrastructure: ESTIMATE_FOLLOWUPS queue name, job DTOs, delay constants, jobId builders, EstimateFollowupsModule shell, tsconfig/jest path aliases, Wave 0 test stubs
-- [x] 46-02-PLAN.md — Scheduler and canceller services: EstimateFollowupScheduler (4 delayed jobs), BullMQEstimateFollowupCanceller (DI token rebinding), module wiring
-- [x] 46-03-PLAN.md — Maizzle estimate-followup.html template with followupStep variable, 3 CTAs, disclaimer; EstimateFollowupEmailRenderer service
-- [x] 46-04-PLAN.md — EstimateFollowupProcessor (defence-in-depth status re-read, email send, audit row) and EstimateExpiryProcessor (30-day auto-expiry transition), WorkerModule registration
-- [x] 46-05-PLAN.md — Wire EstimateFollowupScheduler into EstimateEmailSender step 9, Redis AOF startup check in worker.ts, Docker Compose AOF config, AppModule import, CI gate
-- [x] 46-06-PLAN.md — Gap closure: fix processor to use EstimateFollowupEmailRenderer instead of EstimateEmailRenderer (CR-01)
-- [x] 46-07-PLAN.md — Gap closure: wire ESTIMATE_FOLLOWUP_CANCELLER into EstimateResponseHandler for customer response cancellation
-**Infra gate**: Production Redis must have AOF persistence enabled (`appendonly yes`, `appendfsync everysec`) before any follow-up ships. This is a hard gate, not a soft constraint -- without it, all scheduled follow-ups are silently lost on restart (FUP-08).
-
-### Phase 47: Convert to Quote & Mark as Lost
-**Goal**: A trader can idempotently convert a Sent/Responded estimate into a fully independent quote with mandatory review, and can manually mark an estimate as Lost with a structured reason -- both flows cancel any pending follow-ups and lock the source estimate.
-**Depends on**: Phase 41, Phase 42, Phase 46
-**Requirements**: CONV-01, CONV-02, CONV-03, CONV-04, CONV-05, CONV-06, LOST-01, LOST-02
-**Success Criteria** (what must be TRUE):
-  1. `POST /v1/estimates/:id/convert` (accepting an `Idempotency-Key` header) pulls from the latest revision, reads line items from `estimate_line_items`, copies them into `quote_line_items` with literal tax-rate percentages as a snapshot, drops contingency entirely, creates a new quote in Draft status, transitions the source estimate to Converted, sets `convertedToQuoteId` as a back-link, and locks the estimate from further revisions.
-  2. The trader opens the convert flow from the estimate detail page, the new quote opens in edit mode for mandatory review before saving, and a double-click submission with the same `Idempotency-Key` within 24h returns the same quote id (exactly one quote created).
-  3. The converted quote's detail page shows a "Converted from E-YYYY-NNN" back-link linking to the source estimate, and the source estimate is visibly locked (no Edit, no Revise) once Converted.
-  4. `POST /v1/estimates/:id/mark-lost` transitions the estimate to Lost with a structured reason (same taxonomy as customer decline) or freeform text, cancels all pending follow-ups, and renders a locked detail page with the recorded reason visible to the trader.
-**Plans**: 4 plans
-Plans:
-- [x] 47-01-PLAN.md — Backend entity/DTO schema extensions, request classes, EstimateToQuoteConverter and EstimateLostMarker services with unit tests
-- [x] 47-02-PLAN.md — Controller endpoints, module wiring, OpenAPI documentation, CI gate
-- [x] 47-03-PLAN.md — Frontend types, RTK Query mutations, MarkAsLostDialog, locked state components, EstimateActionStrip integration
-- [x] 47-04-PLAN.md — QuoteSourceEstimateLink back-link component, quote detail page integration, E2E verification
+  1. Super user can grant the support admin role to any customer user from the user detail page, and the target user gains support access immediately without re-logging in.
+  2. Super user can revoke the support admin role from any support user, and the target user loses support access immediately without re-logging in.
+  3. A super user cannot revoke their own super user role (last-admin protection), and the revoke action is disabled or hidden for self.
+  4. Both grant and revoke actions require a confirmation dialog in the UI before executing.
+**Plans**: TBD
 **UI hint**: yes
 
-### Phase 48: DI Token Fix & Cleanup
-**Goal**: Fix the critical DI token resolution risk where NoopEstimateFollowupCanceller overrides the real BullMQ canceller, clean up dead code (duplicate noop registration, empty ConvertEstimateRequest), and remove the dead `site_visit_requested` status from 6+ frontend files after its backend removal in Phase 45-01.
-**Depends on**: Phase 46, Phase 47
-**Requirements**: (none directly — secures FUP-05, REV-05, LOST-02, CONV-05 indirectly)
-**Gap Closure:** Closes DI token integration gap and tech debt from v1.8 audit; Plan 48-03 closes the SC-4 verification gap (surviving `site_visit_requested` literal + widening-cast anti-patterns in `EstimateActionStrip.tsx`).
+### Phase 56: Impersonation Backend & Audit
+**Goal**: The API supports creating time-limited impersonation sessions with full audit logging in a dedicated append-only collection
+**Depends on**: Phase 52
+**Requirements**: IMP-01, IMP-02, IMP-06, IAUD-01, IAUD-02, IAUD-03
 **Success Criteria** (what must be TRUE):
-  1. `EstimateModule` no longer registers a local `{ provide: ESTIMATE_FOLLOWUP_CANCELLER, useClass: NoopEstimateFollowupCanceller }` provider — the real `BullMQEstimateFollowupCanceller` exported by `EstimateFollowupsModule` is the only binding resolved in production.
-  2. `NoopEstimateFollowupCanceller` is registered exactly once (as the default in `EstimateFollowupsModule` for test/dev environments where BullMQ is absent), not duplicated.
-  3. `ConvertEstimateRequest` empty class is removed and its references updated.
-  4. `site_visit_requested` status is removed from all frontend types, components, filter tabs, and status mappings — no dead branches remain.
-**Plans:** 3/3 plans complete
-Plans:
-- [x] 48-01-PLAN.md — API: Fix DI token override, remove duplicate Noop registration, delete empty ConvertEstimateRequest
-- [x] 48-02-PLAN.md — UI: Remove dead site_visit_requested from 6 frontend files
-- [x] 48-03-PLAN.md — Gap closure: remove surviving `site_visit_requested` literal in `EstimateActionStrip.tsx` and replace three `as readonly string[]` widening casts with `readonly EstimateStatus[]` typing to restore TypeScript union exhaustiveness
+  1. A support user with the `impersonate_user` permission can initiate a "login as" session for any customer user via `POST /v1/impersonation/start`, receiving a time-limited impersonation token that resolves to the target user's identity and business context on subsequent API calls.
+  2. Attempting to impersonate another support user returns 403 Forbidden -- the API prevents lateral privilege movement.
+  3. Impersonation sessions have a maximum duration (enforced server-side); expired sessions are rejected with a clear error directing the support user to start a new session.
+  4. Every impersonation session is logged in a dedicated `impersonation_audit` collection with: support user ID, target user ID, start timestamp, end timestamp, and reason (required text field at session start). Audit entries are append-only -- no update or delete operations exist on the collection.
+**Plans**: TBD
+
+### Phase 57: Impersonation Frontend
+**Goal**: A support user can impersonate a customer and see exactly what that customer sees, with a persistent banner and a clean exit back to the support dashboard
+**Depends on**: Phase 56, Phase 54
+**Requirements**: IMP-03, IMP-04, IMP-05
+**Success Criteria** (what must be TRUE):
+  1. During impersonation, the app renders exactly what the customer sees -- same data, same subscription state, same permissions -- as if the support user were logged in as that customer.
+  2. A fixed impersonation banner is visible at all times during an impersonation session, showing the impersonated user's name and a "Return to Support" button that cannot be scrolled away or dismissed.
+  3. Clicking "Return to Support" terminates the impersonation session (recording the end timestamp in the audit log) and cleanly navigates back to the support dashboard with the support user's own identity restored.
+**Plans**: TBD
 **UI hint**: yes
-
-
-### Phase 49: Revision Frontend UI
-**Goal**: A trader can trigger "Edit and resend" from the estimate detail page and view the full revision history — completing the frontend half of the revision feature whose backend shipped in Phase 42.
-**Depends on**: Phase 42, Phase 43
-**Requirements**: REV-02, REV-04
-**Gap Closure:** Closes REV-02, REV-04 requirement gaps and "Revision lifecycle" broken flow from v1.8 audit
-**Plans:** 1/1 plans complete
-
-Plans:
-- [x] 49-01-PLAN.md — Revision type extension, RTK Query endpoints, Edit-and-resend button, History section
-
-**Success Criteria** (what must be TRUE):
-  1. EstimateActionStrip shows an "Edit and resend" button on Sent estimates that calls `POST /v1/estimates/:id/revisions` via a new RTK Query mutation, creates a new Draft revision, and navigates to the estimate detail page for editing.
-  2. EstimateDetailPage shows a collapsed History section listing previous revisions with revision number, send date, and view date — fetched via `GET /v1/estimates/:id/revisions` RTK Query hook.
-  3. The "Edit and resend" button is hidden for Draft, Converted, Lost, Expired, and Deleted estimates.
-
-### Phase 50: Response Display & Convert Route Fix
-**Goal**: The trader's estimate detail page shows actual customer response data instead of placeholder text, and converting an estimate navigates to a working quote edit route for mandatory review.
-**Depends on**: Phase 45, Phase 47
-**Requirements**: RESP-08, CONV-03
-**Gap Closure:** Closes RESP-08, CONV-03 requirement gaps, Phase 45→43 integration gap, and "Convert to Quote mandatory review" broken flow from v1.8 audit
-**Success Criteria** (what must be TRUE):
-  1. `EstimateRepository.toDto()` derives `responseSummary` from the `responses[]` array (latest response type, reason, message, timestamp) instead of returning null.
-  2. EstimateDetailPage renders a response card showing the customer's response type, message, reason (if declined), and timestamp — replacing the Phase 43 placeholder text.
-  3. Frontend types align with backend: `lastResponseType`/`lastResponseAt` field names match the API response shape.
-  4. `navigate(\`/quotes/\${result.quoteId}/edit\`)` resolves to a valid route in App.tsx that opens the new quote in edit mode for mandatory review before saving.
-**Plans**: 2 plans
-Plans:
-- [x] 50-01-PLAN.md — Backend responseSummary derivation fix, frontend type alignment, dead status cleanup
-- [x] 50-02-PLAN.md — Response display card on EstimateDetailPage, /quotes/:quoteId/edit route addition
 
 ## Progress
 
@@ -364,13 +274,20 @@ Plans:
 | 38. Hard Paywall and Soft Paywall Removal | v1.7 | 2/2 | Complete | 2026-04-02 |
 | 39. Welcome Dashboard and Final Cleanup | v1.7 | 2/2 | Complete | 2026-04-07 |
 | 40. SubscriptionGuard Onboarding Bypass | v1.7 | 1/1 | Complete | 2026-04-07 |
-| 41. Estimate Module CRUD (Backend) | v1.8 | 8/8 | Complete   | 2026-04-12 |
-| 42. Revisions | v1.8 | 6/6 | Complete    | 2026-04-12 |
+| 41. Estimate Module CRUD (Backend) | v1.8 | 8/8 | Complete | 2026-04-12 |
+| 42. Revisions | v1.8 | 6/6 | Complete | 2026-04-12 |
 | 43. Estimate Frontend CRUD | v1.8 | 6/6 | Complete | 2026-04-13 |
-| 44. Email & Send Flow | v1.8 | 4/4 | Complete   | 2026-04-13 |
-| 45. Public Customer Page & Response Handling | v1.8 | 4/5 | In Progress|  |
-| 46. Follow-up Queue & Automation | v1.8 | 7/7 | Complete    | 2026-04-15 |
-| 47. Convert to Quote & Mark as Lost | v1.8 | 4/4 | Complete    | 2026-04-15 |
-| 48. DI Token Fix & Cleanup | v1.8 | 3/3 | Complete    | 2026-04-16 |
-| 49. Revision Frontend UI | v1.8 | 1/1 | Complete    | 2026-04-16 |
-| 50. Response Display & Convert Route Fix | v1.8 | 2/2 | Complete    | 2026-04-16 |
+| 44. Email & Send Flow | v1.8 | 4/4 | Complete | 2026-04-13 |
+| 45. Public Customer Page & Response Handling | v1.8 | 5/5 | Complete | 2026-04-18 |
+| 46. Follow-up Queue & Automation | v1.8 | 7/7 | Complete | 2026-04-15 |
+| 47. Convert to Quote & Mark as Lost | v1.8 | 4/4 | Complete | 2026-04-15 |
+| 48. DI Token Fix & Cleanup | v1.8 | 3/3 | Complete | 2026-04-16 |
+| 49. Revision Frontend UI | v1.8 | 1/1 | Complete | 2026-04-16 |
+| 50. Response Display & Convert Route Fix | v1.8 | 2/2 | Complete | 2026-04-16 |
+| 51. RBAC Data Model & Seed | v1.9 | 0/TBD | Not started | - |
+| 52. Permission Guard & Migration | v1.9 | 0/TBD | Not started | - |
+| 53. Support Access & Routing | v1.9 | 0/TBD | Not started | - |
+| 54. User Management | v1.9 | 0/TBD | Not started | - |
+| 55. Role Administration | v1.9 | 0/TBD | Not started | - |
+| 56. Impersonation Backend & Audit | v1.9 | 0/TBD | Not started | - |
+| 57. Impersonation Frontend | v1.9 | 0/TBD | Not started | - |

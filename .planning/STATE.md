@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: Support & Admin Tools
-status: defining-requirements
+status: ready-to-plan
 stopped_at: null
 last_updated: "2026-04-18T00:00:00.000Z"
 last_activity: 2026-04-18
 progress:
-  total_phases: 0
+  total_phases: 7
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,20 +21,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-18)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Defining requirements for v1.9 Support & Admin Tools
+**Current focus:** Phase 51 - RBAC Data Model & Seed
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-04-18 — Milestone v1.9 started
+Phase: 51 of 57 (RBAC Data Model & Seed)
+Plan: 0 of TBD in current phase
+Status: Ready to plan
+Last activity: 2026-04-18 -- v1.9 roadmap created (7 phases, 32 requirements mapped)
 
 ## Roadmap Summary
 
 **Milestone:** v1.9 Support & Admin Tools
-**Phases:** TBD (defining requirements)
-**Requirements:** TBD
+**Phases:** 7 (Phases 51-57)
+**Requirements:** 32 mapped (100% coverage)
 **Granularity:** fine
 
 ## Performance Metrics
@@ -54,59 +54,20 @@ Last activity: 2026-04-18 — Milestone v1.9 started
 | v1.3 Send Quotes | 5 | 18 | ~1 hour | 3min |
 | v1.4 Worker Infrastructure | 4 | 7 | ~13min | 2min |
 | v1.6 Stripe Billing | 6 | 14 | ~55min | 4min |
-| v1.7 Onboarding & Landing | 6 | 13 | (see phase rows below) | — |
-| v1.8 Estimates | 8 | TBD | — | — |
-| Phase 35 P01 | 4min | 2 tasks | 4 files |
-| Phase 35 P02 | 2min | 1 tasks | 2 files |
-| Phase 37 P01 | 4min | 2 tasks | 13 files |
-| Phase 37 P03 | 2min | 2 tasks | 4 files |
-| Phase 38 P01 | 3min | 2 tasks | 5 files |
-| Phase 38 P02 | 5min | 2 tasks | 19 files |
-| Phase 37 P04 | 3min | 2 tasks | 5 files |
-| Phase 42 P04 | 6min | 2 tasks | 3 files |
-| Phase 42 P05 | 3min | 2 tasks | 4 files |
-| Phase 42 P06 | 9min | 5 tasks | 5 files |
-| Phase 43 P01 | 3min | 3 tasks | 5 files |
-| Phase 43 P02 | 5min | 2 tasks | 5 files |
-| Phase 43 P03 | 5min | 2 tasks | 3 files |
-| Phase 43 P04 | 10min | 2 tasks | 10 files |
-| Phase 43 P05 | 15min | 3 tasks | 12 files |
-| Phase 43 P06 | 12min | 2 tasks | 10 files |
+| v1.7 Onboarding & Landing | 6 | 13 | -- | -- |
+| v1.8 Estimates | 10 | 49 | -- | -- |
+| v1.9 Support & Admin Tools | 0/7 | 0/TBD | -- | -- |
 
 ## Accumulated Context
 
 ### Decisions
 
 Key decisions archived in PROJECT.md Key Decisions table.
-v1.7 decisions archived with milestone completion.
 
-- [Phase 42]: Used undefined instead of null for optional DateTime fields in buildNewRevisionDto (IEstimateDto optional fields are typed as ?: DateTime)
-- [Phase 42]: Defense-in-depth canRead re-applied on resolved current row in D-DET-01; rootEstimateId ?? target.id fallback for null/undefined
-- [Phase 42]: No @Body on POST revise -- endpoint takes no body per D-REV-01; ValidationPipe strips anything sent
-- [Phase 42]: ESTIMATE_FOLLOWUP_CANCELLER exported from EstimateModule for Phase 44/46 override
-- [Phase 43]: CreateQuoteDialog deleted; all consumers migrated to CreateDocumentDialog with defaultType prop
-- [Phase 43]: EstimateActionStrip is a minimal stub (Delete only on Draft); Phase 44 extends with Send/Convert/MarkLost
-- [Phase 43]: EstimateDetailPage split into EstimateDetailContent (outer) + EstimateEditor (inner with key={estimate.id}) to satisfy react-hooks/set-state-in-effect ESLint rule
-- [Phase 43]: formatRange performs NO arithmetic -- renders only API-returned low/high values (SC #4)
-- [Phase 43]: EstimateLineItemsCard edit gate is draft-only (not draft||sent) per D-EDIT-02
-
-### Roadmap Evolution
-
-v1.8 roadmap created 2026-04-10:
-
-- 8 phases (41-48) derived from 10 requirement categories
-- Separate EstimateModule pattern chosen over polymorphic discriminator (see ARCHITECTURE.md §10)
-- Foundations-first refactor (Phase 41) before any estimate code is written
-- Original Phase 47 gated on production Redis AOF persistence (FUP-08 is a hard infra gate)
-- Original Phase 45 gated on legal-review pass of non-binding email copy (SND-05 is non-removable)
-
-v1.8 roadmap restructured 2026-04-11 (during /gsd-discuss-phase 41):
-
-- Phase 41 (Foundations & Refactor) dissolved; renumbered to 7 phases (41-47)
-- Separation-of-concerns chosen over DRY for entity-level modules: `quote_line_items` untouched; new `estimate_line_items` collection and module (absorbed into new Phase 41). `quote-settings` untouched; new `estimate-settings` module (absorbed into new Phase 44).
-- Tokens remain unified: `quote-token` → `document-token` with `documentType` discriminator (absorbed into new Phase 41).
-- Phase 46 still gated on Redis AOF persistence; Phase 44 still gated on UK-consumer-law legal review.
-- See `.planning/notes/2026-04-11-v1.8-restructure-decisions.md` for full rationale.
+- Existing support role (v1.6) uses hardcoded checks in SubscriptionGuard/PaywallGuard -- must migrate to RBAC
+- Data model must support future team roles without building team features or exposing role UI to solo operators
+- Impersonation audit ships WITH impersonation, not separately (Phase 56)
+- Separation over DRY at entity boundaries (project convention) -- permissions, roles, user-role assignments are separate collections
 
 ### Pending Todos
 
@@ -115,8 +76,6 @@ None.
 ### Blockers/Concerns
 
 - v1.5 Playwright testing (Phases 25-28) still in progress -- paused during v1.6/v1.7 work
-- **Phase 45 legal-review gate**: Default estimate email template copy must pass UK-consumer-law review before Phase 45 can ship
-- **Phase 47 infra gate**: Production Redis must have `appendonly yes` / `appendfsync everysec` before Phase 47 can ship (FUP-08)
 
 ### Quick Tasks Completed
 
@@ -144,5 +103,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-04-18
-Stopped at: Milestone v1.9 started — defining requirements
-Resume file: .planning/REQUIREMENTS.md
+Stopped at: v1.9 roadmap created -- ready to plan Phase 51
+Resume file: None

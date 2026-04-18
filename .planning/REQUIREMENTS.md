@@ -98,44 +98,44 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| RBAC-01 | TBD | Pending |
-| RBAC-02 | TBD | Pending |
-| RBAC-03 | TBD | Pending |
-| RBAC-04 | TBD | Pending |
-| RBAC-05 | TBD | Pending |
-| RBAC-06 | TBD | Pending |
-| RBAC-07 | TBD | Pending |
-| RBAC-08 | TBD | Pending |
-| RBAC-09 | TBD | Pending |
-| RBAC-10 | TBD | Pending |
-| SACC-01 | TBD | Pending |
-| SACC-02 | TBD | Pending |
-| SACC-03 | TBD | Pending |
-| SACC-04 | TBD | Pending |
-| UMGT-01 | TBD | Pending |
-| UMGT-02 | TBD | Pending |
-| UMGT-03 | TBD | Pending |
-| UMGT-04 | TBD | Pending |
-| RADM-01 | TBD | Pending |
-| RADM-02 | TBD | Pending |
-| RADM-03 | TBD | Pending |
-| RADM-04 | TBD | Pending |
-| RADM-05 | TBD | Pending |
-| IMP-01 | TBD | Pending |
-| IMP-02 | TBD | Pending |
-| IMP-03 | TBD | Pending |
-| IMP-04 | TBD | Pending |
-| IMP-05 | TBD | Pending |
-| IMP-06 | TBD | Pending |
-| IAUD-01 | TBD | Pending |
-| IAUD-02 | TBD | Pending |
-| IAUD-03 | TBD | Pending |
+| RBAC-01 | Phase 51 | Pending |
+| RBAC-02 | Phase 51 | Pending |
+| RBAC-03 | Phase 51 | Pending |
+| RBAC-04 | Phase 51 | Pending |
+| RBAC-05 | Phase 51 | Pending |
+| RBAC-06 | Phase 51 | Pending |
+| RBAC-07 | Phase 51 | Pending |
+| RBAC-08 | Phase 52 | Pending |
+| RBAC-09 | Phase 52 | Pending |
+| RBAC-10 | Phase 52 | Pending |
+| SACC-01 | Phase 53 | Pending |
+| SACC-02 | Phase 53 | Pending |
+| SACC-03 | Phase 53 | Pending |
+| SACC-04 | Phase 53 | Pending |
+| UMGT-01 | Phase 54 | Pending |
+| UMGT-02 | Phase 54 | Pending |
+| UMGT-03 | Phase 54 | Pending |
+| UMGT-04 | Phase 54 | Pending |
+| RADM-01 | Phase 55 | Pending |
+| RADM-02 | Phase 55 | Pending |
+| RADM-03 | Phase 55 | Pending |
+| RADM-04 | Phase 55 | Pending |
+| RADM-05 | Phase 55 | Pending |
+| IMP-01 | Phase 56 | Pending |
+| IMP-02 | Phase 56 | Pending |
+| IMP-03 | Phase 57 | Pending |
+| IMP-04 | Phase 57 | Pending |
+| IMP-05 | Phase 57 | Pending |
+| IMP-06 | Phase 56 | Pending |
+| IAUD-01 | Phase 56 | Pending |
+| IAUD-02 | Phase 56 | Pending |
+| IAUD-03 | Phase 56 | Pending |
 
 **Coverage:**
 - v1.9 requirements: 32 total
-- Mapped to phases: 0
-- Unmapped: 32
+- Mapped to phases: 32
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-18*
-*Last updated: 2026-04-18 after initial definition*
+*Last updated: 2026-04-18 after roadmap creation*
