@@ -58,7 +58,7 @@ Inherited from project design system -- see `trade-flow-ui/.github/copilot-instr
 Phase-specific usage:
 - **Support Dashboard h1**: `text-3xl font-bold tracking-tight` -- "Support Dashboard"
 - **Page description**: `text-muted-foreground` (inherits `text-sm`) -- "Administrative tools and system management"
-- **Navigation section headers**: `text-xs font-semibold uppercase tracking-wider text-sidebar-foreground/60`
+- **Navigation section headers**: `text-xs font-medium uppercase tracking-wider text-sidebar-foreground/60`
 - **Navigation item labels**: `text-sm font-medium`
 
 ---
