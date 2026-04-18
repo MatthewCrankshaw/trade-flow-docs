@@ -131,7 +131,7 @@ trade-flow-api/src/user/
 ├── services/
 │   └── support-role-assigner.service.ts   # NEW: grant() and revoke() methods
 ├── repositories/
-│   └── user.repository.ts                 # MODIFY: add setSupportRoleIds() or addSupportRoleId()/removeSupportRoleId()
+│   └── user.repository.ts                 # MODIFY: add addSupportRoleId()/removeSupportRoleId()/countBySupportRoleId()
 │   └── support-role.repository.ts         # MODIFY: add findByRoleName() method
 └── test/
     ├── services/
@@ -431,17 +431,19 @@ No technology changes relevant to this phase. All patterns are stable and well-e
 | A2 | MongoDbWriter supports `$addToSet` and `$pull` operators directly | Code Examples | Medium -- if MongoDbWriter wraps operations differently, need to use native MongoDB driver approach |
 | A3 | RTK Query mutation `invalidatesTags` accepts string array shorthand | Architecture Patterns | Low -- may need object format `{ type: 'User' }` instead |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **SupportRoleRepository.findByRoleName() -- does it already exist?**
    - What we know: CONTEXT.md mentions it as a needed addition in Integration Points
    - What's unclear: Whether Phase 51 already adds this method during seeding
    - Recommendation: Check if Phase 51 plan includes this method; if not, add it in this phase
+   - RESOLVED: `findByRoleName()` does not exist in the current codebase. Phase 55 Plan 01 adds it to `SupportRoleRepository` as part of Task 1.
 
 2. **UserRepository.addSupportRoleId() / removeSupportRoleId() -- which pattern?**
    - What we know: CONTEXT.md says there is a `setBusinessRoleIds()` pattern for business roles and needs "equivalent for support roles"
    - What's unclear: Whether to follow `setBusinessRoleIds()` (replace entire array) or use atomic `$addToSet`/`$pull` (add/remove individual IDs)
    - Recommendation: Use `$addToSet`/`$pull` for atomic add/remove -- safer for concurrent operations and more semantically correct for grant/revoke
+   - RESOLVED: Use `$addToSet`/`$pull` atomic operators. Phase 55 Plan 01 adds `addSupportRoleId()`, `removeSupportRoleId()`, and `countBySupportRoleId()` to `UserRepository` using these operators.
 
 ## Validation Architecture
 
