@@ -519,22 +519,21 @@ public async getMetrics(): Promise<IDashboardMetricsDto> {
 | A3 | The `SubscriptionStatus` enum lacks an "expired" value; "incomplete" maps to expired display status | Code Examples / Metrics | Medium -- UI shows "Expired" but enum has `INCOMPLETE`; may need mapping logic or a new enum value |
 | A4 | Firebase Admin SDK `getUser()` returns `metadata.creationTime` and `metadata.lastSignInTime` as RFC 2822 strings | Code Examples | Low -- well-documented API, but exact format affects Luxon parsing |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **What does "expired" mean in subscription status context?**
+All three open questions have been operationally resolved through planning decisions. Implementors should verify assumptions A2 during Plan 02 execution.
+
+1. **What does "expired" mean in subscription status context?** (RESOLVED)
    - What we know: `SubscriptionStatus` enum has `TRIALING`, `ACTIVE`, `PAST_DUE`, `CANCELED`, `INCOMPLETE`. No `EXPIRED` value.
-   - What's unclear: D-12 and the UI spec reference "expired" subscriptions. Is this the `INCOMPLETE` status, or is it computed from `trialEnd` being in the past without an active subscription?
-   - Recommendation: Treat "expired" as a computed state: `status === "trialing" && trialEnd < now` or `status === "incomplete"`. Define in the metrics aggregation pipeline.
+   - Resolution: Plan 03 treats "expired" as mapping to `INCOMPLETE` and `INCOMPLETE_EXPIRED` statuses in the metrics aggregation pipeline. The UI displays "Expired" as the user-facing label for these statuses. See Plan 03 Task 1 (dashboard metrics service) for implementation.
 
-2. **Does `subscription.userId` match `user._id.toString()` or `user.externalAuthUserId`?**
+2. **Does `subscription.userId` match `user._id.toString()` or `user.externalAuthUserId`?** (RESOLVED)
    - What we know: `ISubscriptionEntity.userId` is typed as `string`. The subscription is created during Stripe checkout flow.
-   - What's unclear: Whether it stores the internal MongoDB `_id` or the Firebase `externalAuthUserId`.
-   - Recommendation: Verify by checking the subscription creation code or checking the database directly. The `$lookup` pipeline depends on this.
+   - Resolution: Plan 02 uses pipeline-style `$lookup` with `$expr` and `{ $toString: "$_id" }` to handle the ObjectId-to-string conversion. The implementor should verify by inspecting the database during execution. If `userId` stores the Firebase UID instead, the `$lookup` `let` variable should use `$externalAuthUserId` instead of `$toString("$_id")`.
 
-3. **Firebase Admin SDK credentials strategy for production (Railway)**
+3. **Firebase Admin SDK credentials strategy for production (Railway)** (RESOLVED)
    - What we know: Railway uses environment variables. Firebase Admin needs credentials.
-   - What's unclear: Whether the project already has a Firebase service account configured for Railway.
-   - Recommendation: Support both `GOOGLE_APPLICATION_CREDENTIALS` (file path) and inline credentials via env vars (`FIREBASE_PRIVATE_KEY`, `FIREBASE_CLIENT_EMAIL`).
+   - Resolution: Plan 03 Task 1 implements `FirebaseAuthMetadataService` that supports both service account credentials (`FIREBASE_CLIENT_EMAIL` + `FIREBASE_PRIVATE_KEY` env vars) and Application Default Credentials (just `FIREBASE_PROJECT_ID`). Plan 05 includes a `user_setup` section for generating the Firebase service account key.
 
 ## Environment Availability
 
