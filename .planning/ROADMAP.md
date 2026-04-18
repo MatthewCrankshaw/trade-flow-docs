@@ -213,7 +213,10 @@ Plans:
   2. Super user can revoke the support admin role from any support user, and the target user loses support access immediately without re-logging in.
   3. A super user cannot revoke their own super user role (last-admin protection), and the revoke action is disabled or hidden for self.
   4. Both grant and revoke actions require a confirmation dialog in the UI before executing.
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 55-01-PLAN.md -- Backend: repository methods, SupportRoleAssigner service, SupportRoleAdminController, unit tests
+- [ ] 55-02-PLAN.md -- Frontend: RTK Query mutations, RoleActions, GrantRoleDialog, RevokeRoleDialog, user detail integration
 **UI hint**: yes
 
 ### Phase 56: Impersonation Backend & Audit
@@ -299,6 +302,6 @@ Plans:
 | 52. Permission Guard & Migration | v1.9 | 0/2 | Not started | - |
 | 53. Support Access & Routing | v1.9 | 0/2 | Not started | - |
 | 54. User Management | v1.9 | 0/TBD | Not started | - |
-| 55. Role Administration | v1.9 | 0/TBD | Not started | - |
+| 55. Role Administration | v1.9 | 0/2 | Not started | - |
 | 56. Impersonation Backend & Audit | v1.9 | 0/2 | Not started | - |
 | 57. Impersonation Frontend | v1.9 | 0/TBD | Not started | - |
