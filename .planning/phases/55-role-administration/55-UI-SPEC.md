@@ -97,11 +97,11 @@ Inherited from Phase 54:
 | Grant confirmation title | "Grant Admin Role" |
 | Grant confirmation description | "Grant admin access to {name}? They will be able to access the support dashboard and manage users." |
 | Grant confirmation action | "Grant Role" |
-| Grant confirmation cancel | "Cancel" |
+| Grant confirmation cancel | "Keep Current Role" |
 | Revoke confirmation title | "Revoke Admin Role" |
 | Revoke confirmation description | "Remove admin access from {name}? They will lose access to support tools immediately." |
 | Revoke confirmation action | "Revoke Role" |
-| Revoke confirmation cancel | "Cancel" |
+| Revoke confirmation cancel | "Keep Admin Role" |
 | Grant success toast | "Admin role granted to {name}" |
 | Revoke success toast | "Admin role revoked from {name}" |
 | Error toast (generic) | "Unable to update role. Please try again." |
@@ -158,7 +158,7 @@ Inherited from Phase 54:
 4. **Dialog content**:
    - Title: "Grant Admin Role"
    - Description: "Grant admin access to {name}? They will be able to access the support dashboard and manage users."
-   - Cancel button: "Cancel" (`AlertDialogCancel`)
+   - Cancel button: "Keep Current Role" (`AlertDialogCancel`)
    - Action button: "Grant Role" (`AlertDialogAction`, default variant)
 5. **On confirm**: Calls `POST /v1/users/:id/support-role` via RTK Query mutation.
 6. **On success**: Dialog closes, toast: "Admin role granted to {name}". RTK Query cache tags `['User', 'UserList']` invalidated.
@@ -175,7 +175,7 @@ Inherited from Phase 54:
 6. **Dialog content**:
    - Title: "Revoke Admin Role"
    - Description: "Remove admin access from {name}? They will lose access to support tools immediately."
-   - Cancel button: "Cancel" (`AlertDialogCancel`)
+   - Cancel button: "Keep Admin Role" (`AlertDialogCancel`)
    - Action button: "Revoke Role" (`AlertDialogAction`, `variant="destructive"`)
 7. **On confirm**: Calls `DELETE /v1/users/:id/support-role` via RTK Query mutation.
 8. **On success**: Dialog closes, toast: "Admin role revoked from {name}". RTK Query cache tags `['User', 'UserList']` invalidated.
