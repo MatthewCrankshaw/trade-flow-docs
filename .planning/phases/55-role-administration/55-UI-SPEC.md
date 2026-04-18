@@ -1,7 +1,8 @@
 ---
 phase: 55
 slug: role-administration
-status: draft
+status: approved
+reviewed_at: 2026-04-18
 shadcn_initialized: true
 preset: new-york
 created: 2026-04-18
