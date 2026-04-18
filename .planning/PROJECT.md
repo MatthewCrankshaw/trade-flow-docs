@@ -106,23 +106,15 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 
 <!-- Current scope. Building toward these. -->
 
-## Current Milestone: v1.8 Estimates
+## Current Milestone: v1.9 Support & Admin Tools
 
-**Goal:** Ship estimates as a parallel document type with price ranges, soft customer response flow, automated follow-ups, and seamless conversion to quotes -- handling the pre-site-visit "rough cost" conversation that currently lives in WhatsApp and missed calls.
+**Goal:** Give the support team a dedicated experience — login without onboarding, user management dashboard with membership summaries, customer impersonation for debugging, and super-user role administration.
 
 **Target features:**
-- Document type toggle (Quote / Estimate) on the existing creation dialog; shared line-item data model
-- Base price + contingency slider (0-30% in 5% steps, default 10%) with range / "from £X" display modes
-- Optional uncertainty notes with quick-tap reasons (site inspection, pipework, materials, access)
-- Separate E-YYYY-NNN numbering via new `estimate_counters` collection
-- Versioned revisions (parent_estimate_id + revision_number) invisible to users; UI reads as "edit and resend"; collapsed History section for audit trail
-- Customer-facing estimate page via token-based public access (reuses v1.3 infra), with four response buttons: Book a site visit (pre-populated availability prompt, structured request type), Send me a quote, I have a question (inline reply), Not right now (structured decline reasons)
-- View tracking parity with quotes (firstViewedAt)
-- Status lifecycle: Draft -> Sent -> Viewed -> Responded -> (Site Visit Requested / Converted / Declined / Expired)
-- Tradesperson actions: Convert to Quote (pulls from latest revision, drops contingency, back-links), Revise Estimate (resets follow-up sequence), Mark as Lost (structured reason)
-- Automated follow-up sequence (3 / 10 / 21 days) via BullMQ delayed jobs on v1.4 worker infrastructure, defaults only, resets on revision
-- Configurable estimate email template in Business settings with Maizzle HTML rendering and appropriate non-binding legal language
-- Structured decline reasons persisted for future reporting milestone
+- Support user login that bypasses onboarding (no business association required)
+- User management dashboard showing all users (support + customer) with membership status summaries
+- Customer impersonation — support user can "login as" a customer to see exactly what they see
+- Super user role management — grant and revoke support roles on other users
 
 ### Out of Scope
 
@@ -247,18 +239,10 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 
 ## Current State
 
-**Shipped:** v1.7 Onboarding & Landing Page (2026-04-07)
-**Current milestone:** v1.8 Estimates (started 2026-04-10)
+**Shipped:** v1.8 Estimates (2026-04-18)
+**Current milestone:** v1.9 Support & Admin Tools (started 2026-04-18)
 
-Trade Flow is a monetized SaaS product with a complete user acquisition funnel: public landing page, mandatory onboarding wizard, no-card free trial, and hard paywall. The core product flow -- from customer management through job tracking, quoting, and payment -- is fully functional. New users discover the product at the root URL, sign up, set up their profile and business in a two-step wizard, and start a 30-day trial automatically. The getting-started checklist guides them to create their first job and send their first quote.
-
-Phase 42 complete — Estimate revision chain (parentEstimateId/rootEstimateId/revisionNumber/isCurrent) with EstimateReviser service, ConflictError for concurrent writes, and IEstimateFollowupCanceller DI hook for Phase 44.
-
-Phase 49 complete — revision-frontend-ui. Closed REV-02/REV-04 frontend gap: Estimate type extended with revision fields, `useReviseEstimateMutation` and `useGetEstimateRevisionsQuery` RTK Query endpoints added, "Edit and resend" button on `EstimateActionStrip` for Sent/Viewed/Responded statuses, collapsible `EstimateRevisionHistory` card on `EstimateDetailPage` for revised estimates.
-
-Phase 50 complete — response-display-convert-route-fix. Backend `EstimateRepository.toDto()` now derives `responseSummary` from the `responses[]` array; trader sees the customer's response type, message, decline reason, and timestamp on the estimate detail page (RESP-08). Added `/quotes/:quoteId/edit` route so the convert-to-quote flow lands on a working page for mandatory review (CONV-03).
-
-Phase 48 complete — di-token-fix-cleanup. Fixed critical DI token override (EstimateModule's local NoopEstimateFollowupCanceller no longer shadows the real BullMQ canceller in production), removed duplicate Noop registration and empty ConvertEstimateRequest class, eliminated dead `site_visit_requested` status across 6+ frontend files, and retyped three status tuples in `EstimateActionStrip.tsx` as `readonly EstimateStatus[]` to restore TypeScript union exhaustiveness — preventing the recurrence of the exact class of bug that slipped past Plan 48-02 review.
+Trade Flow is a monetized SaaS product with a complete user acquisition funnel: public landing page, mandatory onboarding wizard, no-card free trial, and hard paywall. The core product flow -- from customer management through job tracking, quoting, estimates, and payment -- is fully functional. Support role exists (v1.6) and bypasses subscription gating, but lacks dedicated tooling for user management, impersonation, and role administration.
 
 ## Evolution
 
@@ -278,4 +262,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-16 Phase 48 DI Token Fix & Cleanup complete*
+*Last updated: 2026-04-18 after milestone v1.9 started*

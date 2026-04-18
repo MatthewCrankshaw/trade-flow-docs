@@ -1,57 +1,41 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.8
-milestone_name: Estimates
-status: executing
-stopped_at: Phase 50 UI-SPEC approved
-last_updated: "2026-04-16T06:57:39.313Z"
-last_activity: 2026-04-16
+milestone: v1.9
+milestone_name: Support & Admin Tools
+status: defining-requirements
+stopped_at: null
+last_updated: "2026-04-18T00:00:00.000Z"
+last_activity: 2026-04-18
 progress:
-  total_phases: 12
-  completed_phases: 11
-  total_plans: 49
-  completed_plans: 48
-  percent: 98
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-07)
+See: .planning/PROJECT.md (updated 2026-04-18)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 48 — di-token-fix-cleanup
+**Current focus:** Defining requirements for v1.9 Support & Admin Tools
 
 ## Current Position
 
-Phase: 49
-Plan: Not started
-Status: Executing Phase 48
-Last activity: 2026-04-17 - Completed quick task 260417-bwd: Fix mobile modal scrolling and make modals fullscreen on mobile devices
-
-**Next step:** `/gsd-execute-phase 45` — land Phase 45 (Public Customer Page & Response Handling).
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-18 — Milestone v1.9 started
 
 ## Roadmap Summary
 
-**Milestone:** v1.8 Estimates
-**Phases:** 41-47 (7 phases, restructured 2026-04-11)
-**Requirements:** 58/58 mapped (100% coverage)
+**Milestone:** v1.9 Support & Admin Tools
+**Phases:** TBD (defining requirements)
+**Requirements:** TBD
 **Granularity:** fine
-**Full detail:** `.planning/milestones/v1.8-ROADMAP.md`
-
-| Phase | Goal | Requirements | Status |
-|-------|------|--------------|--------|
-| 41. Estimate Module CRUD (Backend) | Trader can CRUD estimates with E-YYYY-NNN numbering and validated lifecycle; document-token unified; estimate_line_items module created | EST-01..09, CONT-01/02/05, RESP-08 | Complete |
-| 42. Revisions | Invisible versioned revisions with partial unique index and history | REV-01..05 | Complete |
-| 43. Estimate Frontend CRUD | Visual create/edit/list/detail with contingency slider and range display | CONT-03/04 | Complete |
-| 44. Email & Send Flow | Send estimate with mandatory non-binding legal copy and audit HTML; new estimate-settings module | SND-01..07 | Not started |
-| 45. Public Customer Page & Response Handling | Latest-revision resolution, 4-button response flow, structured decline | CUST-01..07, RESP-01..07 | Not started |
-| 46. Follow-up Queue & Automation | BullMQ delayed 3/10/21d follow-ups with cancel-on-exit and AOF infra gate | FUP-01..08 | Not started |
-| 47. Convert to Quote & Mark as Lost | Idempotent convert with mandatory review, back-link, markLost | CONV-01..06, LOST-01/02 | Not started |
-
-**Critical path (estimates work end to end):** 41 -> 44 -> 45 -> 46 -> 47
-**Parallel:** Phase 42 (revisions) and Phase 43 (frontend CRUD) can run in parallel after Phase 41 lands.
 
 ## Performance Metrics
 
@@ -159,6 +143,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-15T19:57:48.959Z
-Stopped at: Phase 50 UI-SPEC approved
-Resume file: .planning/phases/50-response-display-convert-route-fix/50-UI-SPEC.md
+Last session: 2026-04-18
+Stopped at: Milestone v1.9 started — defining requirements
+Resume file: .planning/REQUIREMENTS.md
