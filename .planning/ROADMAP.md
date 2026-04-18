@@ -201,7 +201,13 @@ Plans:
   2. Support user can click into a user detail page showing the user's profile information, business association, current subscription status with dates, and role assignments.
   3. The `/support` dashboard shows membership summary cards: total users, active trials, active subscriptions, expired subscriptions, and canceled subscriptions -- computed from real data.
   4. The user list loads within a reasonable time and paginates correctly for the expected user base size.
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 54-01-PLAN.md -- Core query infrastructure (filter parser, sort parser, aggregate method, base DTO extension)
+- [ ] 54-02-PLAN.md -- Support user list API (module, repository aggregation, retriever service, controller)
+- [ ] 54-03-PLAN.md -- User detail and dashboard metrics API (Firebase admin, detail endpoint, metrics endpoint)
+- [ ] 54-04-PLAN.md -- Frontend user list (RTK Query, hooks, filters, table, pagination, page rewrite)
+- [ ] 54-05-PLAN.md -- Frontend user detail page, dashboard metrics cards, route registration
 **UI hint**: yes
 
 ### Phase 55: Role Administration
@@ -305,7 +311,7 @@ Plans:
 | 51. RBAC Data Model & Seed | v1.9 | 0/2 | Not started | - |
 | 52. Permission Guard & Migration | v1.9 | 0/2 | Not started | - |
 | 53. Support Access & Routing | v1.9 | 0/2 | Not started | - |
-| 54. User Management | v1.9 | 0/TBD | Not started | - |
+| 54. User Management | v1.9 | 0/5 | Not started | - |
 | 55. Role Administration | v1.9 | 0/2 | Not started | - |
 | 56. Impersonation Backend & Audit | v1.9 | 0/2 | Not started | - |
 | 57. Impersonation Frontend | v1.9 | 0/3 | Not started | - |
