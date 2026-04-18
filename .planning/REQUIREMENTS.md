@@ -1,212 +1,141 @@
 # Requirements: Trade Flow
 
-**Defined:** 2026-04-11
-**Milestone:** v1.8 Estimates
+**Defined:** 2026-04-18
+**Milestone:** v1.9 Support & Admin Tools
 **Core Value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment in one simple, structured system.
 
-## v1.8 Requirements
+## v1.9 Requirements
 
-Requirements for Estimates milestone. Each maps to roadmap phases.
+Requirements for Support & Admin Tools milestone. Each maps to roadmap phases.
 
-### Estimate Core
+### Roles & Permissions Infrastructure
 
-- [ ] **EST-01**: User can create an estimate via a document-type toggle (Quote / Estimate) on the shared create dialog
-- [ ] **EST-02**: Estimates are numbered E-YYYY-NNN via a new atomic `estimate_counters` collection (mirror of v1.2 `quote_counters` pattern)
-- [ ] **EST-03**: Estimate creation uses its own dedicated `estimate_line_items` collection and module (mirroring the quote line-item stack), with separate repository, services, bundle factories, and tax-rate integration -- `quote_line_items` is not touched or widened
-- [ ] **EST-04**: User can edit an estimate in Draft status (scope, line items, contingency, notes, customer, job)
-- [ ] **EST-05**: User can soft-delete an estimate from Draft status (DELETED enum; preserves line item history)
-- [ ] **EST-06**: User can view a list of all estimates with tab filtering by status
-- [ ] **EST-07**: User can view estimate detail with line items, contingency range, totals, status, customer info, and response summary
-- [ ] **EST-08**: Estimate has status lifecycle: Draft -> Sent -> Viewed -> Responded -> (SiteVisitRequested / Converted / Declined / Expired / Lost) with valid transitions enforced by API
-- [ ] **EST-09**: `quote-token` module is renamed to `document-token` with `documentType: "quote" | "estimate"` discriminator and `documentId` field, collection renamed from `quote_tokens` to `document_tokens` via one-shot migration, and existing quote tokens continue to validate against the public quote page unchanged
+- [ ] **RBAC-01**: System defines workflow-based permissions (e.g., `send_quote`, `manage_schedules`, `view_financials`, `manage_users`, `impersonate_user`) rather than CRUD-based permissions
+- [ ] **RBAC-02**: Permissions are stored as a defined set in a `permissions` collection with name, description, and category
+- [ ] **RBAC-03**: Roles are stored in a `roles` collection with name, description, type (support or customer), and an array of associated permission IDs
+- [ ] **RBAC-04**: Super User support role is seeded with all permissions and cannot be restricted
+- [ ] **RBAC-05**: Admin support role is seeded with a default set of permissions and is configurable (permissions can be added or removed)
+- [ ] **RBAC-06**: Business Administrator customer role is seeded with full business-scoped permissions (default for solo operators)
+- [ ] **RBAC-07**: User-role assignments are stored per user, scoped to either support (global) or business (business-specific)
+- [ ] **RBAC-08**: A permission-checking guard/decorator infrastructure validates user permissions on API endpoints (e.g., `@RequiresPermission('manage_users')`)
+- [ ] **RBAC-09**: Existing hardcoded role checks (SubscriptionGuard support bypass, PaywallGuard support bypass) are migrated to use the new permission system
+- [ ] **RBAC-10**: Solo business users never see role management UI; the data model supports future team roles without exposing complexity prematurely
 
-### Contingency & Display
+### Support Access
 
-- [ ] **CONT-01**: User can set contingency percentage via a slider in the estimate form (0-30% in 5% increments, default 10%)
-- [ ] **CONT-02**: Estimate displays price as a range (£X-£Y) by default, computed from base total + contingency percentage
-- [ ] **CONT-03**: User can toggle estimate price display to "From £X" mode for diagnostic/repair work where the upper bound is genuinely unknown
-- [ ] **CONT-04**: User can add optional uncertainty reasons via five quick-tap preset chips — Site inspection needed (`site_inspection`), Hidden conditions (`hidden_conditions`), Materials & supply (`materials_supply`), Access & working space (`access_working_space`), Scope unclear until investigation (`scope_unclear`) — plus a freeform notes textarea. The five chip values are trade-agnostic and cover all ten `BusinessTrade` values without requiring per-trade dispatch.
-- [ ] **CONT-05**: Contingency range math is computed API-side only; UI displays API-returned low/high values without client-side multiplication
+- [ ] **SACC-01**: Support user can log in and bypass onboarding entirely (no business association required)
+- [ ] **SACC-02**: Support user is redirected to `/support` dashboard after login instead of the main app dashboard
+- [ ] **SACC-03**: Support routes (`/support/*`) are protected and only accessible to users with a support role
+- [ ] **SACC-04**: Support user bypasses subscription gating (existing behaviour, preserved through RBAC migration)
 
-### Revisions
+### User Management
 
-- [ ] **REV-01**: Estimate entity stores `parentEstimateId`, `revisionNumber`, and `isCurrent` to support versioned revisions
-- [ ] **REV-02**: User can revise a Sent estimate via an "Edit and resend" action which creates a new revision under the same E-YYYY-NNN number and marks the previous revision as non-current
-- [x] **REV-03**: Only one revision per estimate chain can have `isCurrent: true`, enforced by a partial unique index on `(parentEstimateId, isCurrent: true)`
-- [ ] **REV-04**: Estimate detail shows a collapsed History section listing previous revisions with send/view timestamps (trader-only, not on customer page)
-- [x] **REV-05**: Revising an estimate cancels pending follow-ups and schedules a fresh 3/10/21-day sequence for the new revision
+- [ ] **UMGT-01**: Support user can view a paginated list of all users (support and customer) with search by name or email
+- [ ] **UMGT-02**: User list displays each user's role (support badge), subscription status (trialing, active, past_due, canceled, expired), and associated business name
+- [ ] **UMGT-03**: Support user can view a user detail page showing profile, business association, subscription status, and role assignments
+- [ ] **UMGT-04**: Support dashboard shows membership summary cards (total users, active trials, active subscriptions, expired, canceled)
 
-### Send & Email
+### Role Administration
 
-- [ ] **SND-01**: User can send an estimate to a customer via email with a secure public link generated by `document-token`
-- [ ] **SND-02**: A new `estimate-settings` module exposes `estimateEmailTemplate` via its own API; the Business > Documents tab in trade-flow-ui fetches and saves estimate and quote templates via their two independent APIs (`quote-settings` is untouched)
-- [ ] **SND-03**: Send dialog allows the user to review and edit the pre-filled subject and rich-text body before sending
-- [ ] **SND-04**: Rendered email HTML is persisted on the estimate at send time for dispute audit trail
-- [ ] **SND-05**: Default estimate email template includes mandatory non-binding legal language ("This is an estimate, not a fixed price commitment. A firm quote will be provided after a site visit.") that cannot be removed by the user
-- [ ] **SND-06**: User can re-send an estimate already in Sent or revised status without creating a new revision
-- [ ] **SND-07**: Estimate email subject line includes "Estimate" (not "Quote") to avoid customer confusion and reduce legal ambiguity
+- [ ] **RADM-01**: Super user can grant the support admin role to any customer user
+- [ ] **RADM-02**: Super user can revoke the support admin role from any support user
+- [ ] **RADM-03**: Super user cannot revoke their own super user role (last-admin protection)
+- [ ] **RADM-04**: Role changes take effect immediately without requiring the target user to re-login
+- [ ] **RADM-05**: Role grant/revoke actions require a confirmation dialog in the UI
 
-### Customer-Facing Public Page
+### Customer Impersonation
 
-- [ ] **CUST-01**: Customer can view the full estimate via a secure token link at `/estimate/:token` without logging in
-- [ ] **CUST-02**: Customer page shows estimate details: scope, price range (or "from £X"), contingency explanation, validity, uncertainty notes, trader business info
-- [ ] **CUST-03**: Customer page displays non-binding legal language prominently at the top of the document
-- [ ] **CUST-04**: Customer page has NO "Accept" button, NO digital signature mechanism, and NO single fixed total
-- [ ] **CUST-05**: Customer page records `firstViewedAt` on the token and triggers status transition to Viewed
-- [ ] **CUST-06**: Customer page always resolves to the latest revision in the estimate chain, even if an older revision was emailed (the token references the parent/root, not a specific revision)
-- [ ] **CUST-07**: Customer page sets zero non-essential cookies (PECR compliance)
+- [ ] **IMP-01**: Support user with impersonation permission can initiate a "login as" session for any customer user
+- [ ] **IMP-02**: Support user cannot impersonate other support users (prevents lateral privilege movement)
+- [ ] **IMP-03**: During impersonation, the app renders exactly what the customer sees (same data, same subscription state, same permissions)
+- [ ] **IMP-04**: A fixed impersonation banner is visible at all times during an impersonation session showing the impersonated user's name and a "Return to Support" button
+- [ ] **IMP-05**: Support user can terminate the impersonation session and return to their support dashboard cleanly
+- [ ] **IMP-06**: Impersonation sessions are time-limited (maximum duration enforced)
 
-### Customer Response Handling
+### Impersonation Audit
 
-- [ ] **RESP-01**: Customer can tap "Happy to Proceed" to signal intent to proceed with the work; status transitions to RESPONDED and trader is notified
-- [ ] **RESP-02**: Customer can tap "Message [Tradesperson First Name]" to send a freeform message (max 2000 characters) inline; status transitions to RESPONDED and trader is notified with the message
-- [ ] **RESP-03**: Customer can tap "Not right for me" to decline with a structured reason (Too expensive / Going with someone else / Decided not to do the work / Just getting an idea of costs / Timing isn't right) plus optional freeform text (max 500 characters); status transitions to DECLINED and trader is notified with reason and message
-- [ ] **RESP-04**: After any response submission, the action area is replaced with an inline success confirmation ("Thanks! [Name] has been notified and will be in touch.") and future visits show a read-only terminal view
-- [ ] **RESP-05**: Trader receives an email notification on any customer response with the response type and message preserved for targeted follow-up
-- [ ] **RESP-06**: Estimate status automatically transitions on customer response (Responded / SiteVisitRequested / Declined)
-- [ ] **RESP-07**: Terminal-state estimates (Converted / Declined / Expired / Lost) show a friendly read-only message on the customer page with no active response buttons
-- [ ] **RESP-08**: Customer response data (type, reason, message, timestamp) is persisted on the estimate for the trader's detail view
+- [ ] **IAUD-01**: Every impersonation session is logged with: who (support user), whom (target user), when (start/end timestamps), and reason (required text field)
+- [ ] **IAUD-02**: Impersonation audit log is stored in a dedicated `impersonation_audit` collection
+- [ ] **IAUD-03**: Impersonation audit entries are append-only (cannot be modified or deleted)
 
-### Follow-up Automation
-
-- [ ] **FUP-01**: Sending an estimate automatically schedules 3-day, 10-day, and 21-day follow-up emails via BullMQ delayed jobs on the new `ESTIMATE_FOLLOWUPS` queue
-- [ ] **FUP-02**: Follow-up delays are relative in UTC (72h, 240h, 504h from send time) for DST safety
-- [ ] **FUP-03**: Follow-up jobs use deterministic `jobId` pattern `estimate-followup:{estimateId}:{revisionNumber}:{step}` for idempotent add and O(1) cancellation
-- [ ] **FUP-04**: Each follow-up email includes the estimate summary and the same four response buttons as the initial send
-- [ ] **FUP-05**: Any exit transition (customer response, revision, conversion, deletion, mark as lost) cancels all pending follow-ups for that estimate chain
-- [ ] **FUP-06**: Worker processor performs a defence-in-depth state check before sending and silently no-ops if the estimate is no longer in a follow-up-worthy status
-- [ ] **FUP-07**: Estimates auto-transition to Expired exactly 30 days after Sent timestamp
-- [ ] **FUP-08**: Production Redis has `appendonly yes` / `appendfsync everysec` persistence enabled so scheduled follow-ups survive restarts
-
-### Convert to Quote
-
-- [ ] **CONV-01**: User can convert a Sent or Responded estimate to a new quote from the estimate detail page
-- [ ] **CONV-02**: Convert pulls from the latest revision, copies line items with literal tax rate percentages (snapshot), and drops contingency entirely
-- [ ] **CONV-03**: Convert opens the new quote in edit mode for trader review before saving (mandatory review step, not one-tap)
-- [ ] **CONV-04**: Convert endpoint accepts an `Idempotency-Key` header and returns the same quote on double-submit within 24h
-- [ ] **CONV-05**: Converted estimate transitions to Converted status with `convertedToQuoteId` back-link, and the source estimate is locked from further revisions
-- [ ] **CONV-06**: Converted quote displays a "Converted from E-YYYY-NNN" back-link on its detail page linking to the source estimate
-
-### Mark as Lost
-
-- [ ] **LOST-01**: User can manually mark an estimate as Lost with a structured reason (same taxonomy as customer decline) or freeform text
-- [ ] **LOST-02**: Marking an estimate as Lost cancels all pending follow-ups
-
-## Future Requirements
+## v2 Requirements
 
 Deferred to future release. Tracked but not in current roadmap.
 
-### Smart Contingency Defaults (v1.9+)
+### Team Management
 
-- **SMART-01**: App suggests contingency percentage based on job type (boiler swap 5-10%, Victorian bathroom 15-20%, insurance repair 20-25%)
-- **SMART-02**: App learns contingency accuracy from user's own estimate-vs-actual history over time
-- **SMART-03**: User sees "your estimates typically come in X% under actual cost" feedback on estimate creation
-- **SMART-04**: Trade-specific uncertainty chip presets per `BusinessTrade`. Plumber surfaces pipework-specific chips, electrician surfaces wiring/consumer-unit chips, carpenter surfaces timber-rot chips, builder surfaces structural/foundations chips, etc. Phase 43 ships five trade-agnostic chips as the v1.8 baseline; SMART-04 introduces trade-aware dispatch once content design bandwidth is available.
+- **TEAM-01**: Business administrator can invite users to join their business as team members
+- **TEAM-02**: Business administrator can assign team roles with different permission sets
+- **TEAM-03**: Team members can access the business scoped to their assigned role permissions
+- **TEAM-04**: Business administrator can remove team members from their business
 
-### Follow-up Customization (v1.9+)
+### Advanced Support
 
-- **FUPC-01**: User can toggle automated follow-ups on/off per estimate
-- **FUPC-02**: User can customise timing (e.g., 5/14/28 days) per estimate
-- **FUPC-03**: User can edit each follow-up message per estimate
-
-### Site Visit Integration (v1.9+)
-
-- **SITE-01**: Customer can select from trader's available time slots directly on the estimate page
-- **SITE-02**: Booking a site visit creates a schedule entry on the job via the v1.0 schedule module
-- **SITE-03**: Trader can publish availability windows that customers see on estimate pages
-
-### Estimate Reporting (future)
-
-- **RPT-01**: Trader sees dashboard of declined-estimate reasons (pricing signal vs trust signal vs timing)
-- **RPT-02**: Trader sees estimate-to-quote conversion rate over time
-- **RPT-03**: Trader sees average response time and engagement metrics
+- **ASUP-01**: Support user can view a business detail page (customers, jobs, quotes) without impersonating
+- **ASUP-02**: Support user can view user activity timeline (recent actions, login history)
+- **ASUP-03**: Support users can add internal notes on user accounts
 
 ## Out of Scope
 
-Explicitly excluded from v1.8. Documented to prevent scope creep.
+Explicitly excluded. Documented to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| Estimate PDF generation | Deferred with quote PDF; will solve once for both document types |
-| Smart contingency defaults by job type | Over-scope for MVP; ship with 10% default and revisit with usage data |
-| Per-estimate follow-up customization | Defaults-only is simpler and covers the 80% case |
-| Site visit calendar slot picker | Full calendar integration is an entire product; message-based is sufficient for v1.8 |
-| Push notifications to trader | Email-only is sufficient; push adds mobile/web-push infrastructure |
-| Digital signature on estimates | Contradicts non-binding semantics; would create legal exposure |
-| Customer counter-offer mechanism | Adds negotiation UX complexity; "I have a question" covers the use case |
-| Deposit collection on estimate acceptance | Legally incoherent on non-binding document; quotes/invoices handle deposits |
-| AI-generated contingency suggestions | Premature; no training data yet |
-| Email tracking pixel | PECR/GDPR risk; link-click tracking via token is sufficient and legally cleaner |
-| Customer login for estimate responses | Token-based access is frictionless and proven in v1.3 |
-| Visible v2/v3 version suffixes in UI | Versioning is load-bearing but invisible to users; UI reads as "edit and resend" |
-| Estimate templates/presets | Wait for usage data before building a template library |
-| Quote -> Estimate downgrade | No real-world use case; downgrading binding to non-binding is unusual |
-| Automatic contingency learning from history | Requires completed-job cost data; premature without feedback loop |
+| Full audit logging system | Entire milestone unto itself; requires event sourcing infrastructure |
+| Direct database editing via admin panel | Security risk; bypasses business logic and validation |
+| Multi-tier support roles (L1/L2/L3) | Over-engineering for a small team; two support roles (super_user + admin) are sufficient |
+| Customer-facing "contact support" feature | Different domain (ticketing/helpdesk); scope creep |
+| Real-time user session monitoring | Complex WebSocket infrastructure; surveillance concerns |
+| Automated account actions (suspend, delete, force-reset) | Dangerous without comprehensive audit logging |
+| Support user editing subscriptions directly | Bypasses Stripe as source of truth; use Stripe Dashboard |
+| Bulk role management | Premature optimisation for a small support team |
+| Customer-facing role assignment UI | Deferred to team management milestone |
+| Permission management UI for admin role | Super users configure admin permissions via seed data for now; UI deferred |
 
 ## Traceability
 
-Requirements -> phases mapping (filled by roadmap 2026-04-10).
+Which phases cover which requirements. Updated during roadmap creation.
 
-| REQ-ID | Phase | Status |
-|--------|-------|--------|
-| EST-01 | Phase 41 | Pending |
-| EST-02 | Phase 41 | Pending |
-| EST-03 | Phase 41 | Pending |
-| EST-04 | Phase 41 | Pending |
-| EST-05 | Phase 41 | Pending |
-| EST-06 | Phase 41 | Pending |
-| EST-07 | Phase 41 | Pending |
-| EST-08 | Phase 41 | Pending |
-| EST-09 | Phase 41 | Pending |
-| CONT-01 | Phase 41 | Pending |
-| CONT-02 | Phase 41 | Pending |
-| CONT-03 | Phase 43 | Pending |
-| CONT-04 | Phase 43 | Pending |
-| CONT-05 | Phase 41 | Pending |
-| REV-01 | Phase 42 | Pending |
-| REV-02 | Phase 49 | Pending |
-| REV-03 | Phase 42 | Complete |
-| REV-04 | Phase 49 | Pending |
-| REV-05 | Phase 42 | Complete |
-| SND-01 | Phase 44 | Pending |
-| SND-02 | Phase 44 | Pending |
-| SND-03 | Phase 44 | Pending |
-| SND-04 | Phase 44 | Pending |
-| SND-05 | Phase 44 | Pending |
-| SND-06 | Phase 44 | Pending |
-| SND-07 | Phase 44 | Pending |
-| CUST-01 | Phase 45 | Pending |
-| CUST-02 | Phase 45 | Pending |
-| CUST-03 | Phase 45 | Pending |
-| CUST-04 | Phase 45 | Pending |
-| CUST-05 | Phase 45 | Pending |
-| CUST-06 | Phase 45 | Pending |
-| CUST-07 | Phase 45 | Pending |
-| RESP-01 | Phase 45 | Pending |
-| RESP-02 | Phase 45 | Pending |
-| RESP-03 | Phase 45 | Pending |
-| RESP-04 | Phase 45 | Pending |
-| RESP-05 | Phase 45 | Pending |
-| RESP-06 | Phase 45 | Pending |
-| RESP-07 | Phase 45 | Pending |
-| RESP-08 | Phase 50 | Pending |
-| FUP-01 | Phase 46 | Pending |
-| FUP-02 | Phase 46 | Pending |
-| FUP-03 | Phase 46 | Pending |
-| FUP-04 | Phase 46 | Pending |
-| FUP-05 | Phase 46 | Pending |
-| FUP-06 | Phase 46 | Pending |
-| FUP-07 | Phase 46 | Pending |
-| FUP-08 | Phase 46 | Pending |
-| CONV-01 | Phase 47 | Pending |
-| CONV-02 | Phase 47 | Pending |
-| CONV-03 | Phase 50 | Pending |
-| CONV-04 | Phase 47 | Pending |
-| CONV-05 | Phase 47 | Pending |
-| CONV-06 | Phase 47 | Pending |
-| LOST-01 | Phase 47 | Pending |
-| LOST-02 | Phase 47 | Pending |
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| RBAC-01 | TBD | Pending |
+| RBAC-02 | TBD | Pending |
+| RBAC-03 | TBD | Pending |
+| RBAC-04 | TBD | Pending |
+| RBAC-05 | TBD | Pending |
+| RBAC-06 | TBD | Pending |
+| RBAC-07 | TBD | Pending |
+| RBAC-08 | TBD | Pending |
+| RBAC-09 | TBD | Pending |
+| RBAC-10 | TBD | Pending |
+| SACC-01 | TBD | Pending |
+| SACC-02 | TBD | Pending |
+| SACC-03 | TBD | Pending |
+| SACC-04 | TBD | Pending |
+| UMGT-01 | TBD | Pending |
+| UMGT-02 | TBD | Pending |
+| UMGT-03 | TBD | Pending |
+| UMGT-04 | TBD | Pending |
+| RADM-01 | TBD | Pending |
+| RADM-02 | TBD | Pending |
+| RADM-03 | TBD | Pending |
+| RADM-04 | TBD | Pending |
+| RADM-05 | TBD | Pending |
+| IMP-01 | TBD | Pending |
+| IMP-02 | TBD | Pending |
+| IMP-03 | TBD | Pending |
+| IMP-04 | TBD | Pending |
+| IMP-05 | TBD | Pending |
+| IMP-06 | TBD | Pending |
+| IAUD-01 | TBD | Pending |
+| IAUD-02 | TBD | Pending |
+| IAUD-03 | TBD | Pending |
+
+**Coverage:**
+- v1.9 requirements: 32 total
+- Mapped to phases: 0
+- Unmapped: 32
 
 ---
-
-*Last updated: 2026-04-11 — v1.8 Estimates milestone restructured: Phase 41 dissolved, renumbered to 7 phases (41-47). See `.planning/notes/2026-04-11-v1.8-restructure-decisions.md` for rationale.*
+*Requirements defined: 2026-04-18*
+*Last updated: 2026-04-18 after initial definition*
