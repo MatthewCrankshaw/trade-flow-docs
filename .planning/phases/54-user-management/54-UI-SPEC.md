@@ -27,16 +27,13 @@ created: 2026-04-18
 
 ## Spacing Scale
 
-Inherited from project design system (no changes from Phase 53 contract).
+All values are multiples of 4.
 
 | Token | Value | Tailwind | Usage |
 |-------|-------|----------|-------|
-| 3xs | 2px | `0.5` | Micro alignment nudges |
-| 2xs | 4px | `1` | Tight inline gaps |
-| xs | 6px | `1.5` | Icon-text pairing inside buttons/badges |
-| sm | 8px | `2` | Field-level spacing |
-| md | 12px | `3` | Dense list/card stacking |
-| base | 16px | `4` | Component-level rhythm |
+| 2xs | 4px | `1` | Tight inline gaps, micro alignment |
+| sm | 8px | `2` | Icon-text pairing inside buttons/badges, field-level spacing |
+| base | 16px | `4` | Component-level rhythm, dense list/card stacking |
 | lg | 24px | `6` | Page-level / section-level rhythm |
 | xl | 48px | `12` | Empty state vertical padding |
 
@@ -46,20 +43,20 @@ Exceptions: none
 
 ## Typography
 
-Inherited from project design system (no changes from Phase 53 contract).
+Four sizes, two weights.
 
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
-| Body | 14px (`text-sm`) | 500 (`font-medium`) | default (`leading-normal`) |
 | Label | 12px (`text-xs`) | 500 (`font-medium`) | default |
-| Heading | 30px (`text-3xl`) | 700 (`font-bold`) | tight (`tracking-tight`) |
+| Body | 14px (`text-sm`) | 500 (`font-medium`) | default (`leading-normal`) |
 | Section | 18px (`text-lg`) | 500 (`font-medium`) | none (`leading-none`) |
+| Heading | 30px (`text-3xl`) | 700 (`font-bold`) | tight (`tracking-tight`) |
 
 Phase-specific usage:
 - **Users page h1**: `text-3xl font-bold tracking-tight` -- "All Users"
 - **Page description**: `text-muted-foreground` (inherits `text-sm`) -- "View and manage all users in the system"
 - **Detail page section headings**: `text-lg font-medium` -- "Profile", "Business", "Subscription", "Roles"
-- **Metric card value**: `text-2xl font-bold` -- numeric count
+- **Metric card value**: `text-3xl font-bold` -- numeric count (same size as headings, distinguished by context)
 - **Metric card label**: `text-sm font-medium` -- metric name (e.g., "Total Users")
 - **Metric card sublabel**: `text-xs text-muted-foreground` -- contextual hint (e.g., "platform users")
 - **Table cells**: `text-sm` -- default table body text
@@ -118,8 +115,10 @@ These follow the existing `SubscriptionStatusCard` pattern in `src/features/subs
 | Dashboard description | "Administrative tools and system management" (unchanged) |
 | Empty state heading | "No users found" |
 | Empty state body | "No users match your current search or filters. Try adjusting your search term or clearing filters." |
-| Error state | "Unable to load users. Please try again." with a "Retry" button. |
-| Detail page back link | "Back to Users" (with ArrowLeft icon) |
+| Error state (users) | "Unable to load users. Please try again." with a "Try Again" button. |
+| Error state (metrics) | "Unable to load metrics. Please try again." with a "Try Again" button. |
+| Error state (detail) | "Unable to load user details. Please try again." with a "Try Again" button. |
+| Detail page back link | "Back to Users" (with ArrowLeft icon, `aria-label="Back to Users"`) |
 | Search placeholder | "Search by name or email..." |
 | Filter tabs | "All", "Support", "Customer" |
 | Subscription filter labels | "All statuses", "Trialing", "Active", "Past Due", "Canceled", "Expired" |
@@ -182,12 +181,12 @@ These follow the existing `SubscriptionStatusCard` pattern in `src/features/subs
 ### Dashboard Metric Cards
 
 1. Five cards render in a responsive grid: `grid gap-4 md:grid-cols-5` (stacks to single column on mobile)
-2. Each card shows: icon (top-right, `h-4 w-4 text-muted-foreground`), label (`text-sm font-medium`), count (`text-2xl font-bold`), sublabel (`text-xs text-muted-foreground`)
+2. Each card shows: icon (top-right, `h-4 w-4 text-muted-foreground`), label (`text-sm font-medium`), count (`text-3xl font-bold`), sublabel (`text-xs text-muted-foreground`)
 3. Cards are clickable -- entire card is a `Link` to `/support/users` with the appropriate filter query param
 4. Hover state: card border transitions to `border-primary` with `transition-colors`
 5. Card icons: Total Users = `Users`, Active Trials = `Clock`, Active Subscriptions = `CreditCard`, Expired = `XCircle`, Canceled = `Ban`
 6. **Loading state**: 5 `Skeleton` cards matching card dimensions
-7. **Error state**: `Alert` with "Unable to load metrics. Please try again." and Retry button
+7. **Error state**: `Alert` with "Unable to load metrics. Please try again." and "Try Again" button
 
 ### User List Page
 
@@ -231,7 +230,7 @@ These follow the existing `SubscriptionStatusCard` pattern in `src/features/subs
 
 #### Layout
 
-1. Back button: `Button variant="ghost" size="icon"` with `ArrowLeft` icon, links to `/support/users`
+1. Back button: `Button variant="ghost" size="icon"` with `ArrowLeft` icon and `aria-label="Back to Users"`, links to `/support/users`
 2. Header: User name as `text-3xl font-bold tracking-tight`, email below as `text-muted-foreground`
 3. Role badges rendered inline next to user name (if support user)
 4. Four section cards in a 2-column grid on desktop (`grid gap-6 md:grid-cols-2`), single column on mobile
@@ -271,7 +270,7 @@ These follow the existing `SubscriptionStatusCard` pattern in `src/features/subs
 #### Error State
 
 1. If user not found (404): Navigate to `/support/users` with toast "User not found"
-2. If network error: `Alert` with "Unable to load user details. Please try again." and Retry button
+2. If network error: `Alert` with "Unable to load user details. Please try again." and "Try Again" button
 
 ### Filter-to-URL Synchronization
 
