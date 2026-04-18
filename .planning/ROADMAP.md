@@ -187,8 +187,10 @@ Plans:
   2. Routes under `/support/*` are protected by a frontend route guard that checks for a support role; non-support users attempting to access `/support` are redirected away.
   3. Support users bypass subscription gating (existing v1.6 behaviour preserved through the RBAC migration in Phase 52, not a separate hardcoded check).
   4. The `/support` dashboard renders as a shell page ready for user management content in Phase 54.
-**Plans**: TBD
-**UI hint**: yes
+**Plans**: 2 plans
+Plans:
+- [ ] 53-01-PLAN.md -- SupportGuard component, navigation config split, barrel export
+- [ ] 53-02-PLAN.md -- App.tsx route restructure, LoginPage redirect, DashboardLayout nav, support page cleanup
 
 ### Phase 54: User Management
 **Goal**: Support users can browse all platform users, search by name or email, view user details with subscription and role information, and see membership summary metrics on their dashboard
@@ -292,7 +294,7 @@ Plans:
 | 50. Response Display & Convert Route Fix | v1.8 | 2/2 | Complete | 2026-04-16 |
 | 51. RBAC Data Model & Seed | v1.9 | 0/2 | Not started | - |
 | 52. Permission Guard & Migration | v1.9 | 0/2 | Not started | - |
-| 53. Support Access & Routing | v1.9 | 0/TBD | Not started | - |
+| 53. Support Access & Routing | v1.9 | 0/2 | Not started | - |
 | 54. User Management | v1.9 | 0/TBD | Not started | - |
 | 55. Role Administration | v1.9 | 0/TBD | Not started | - |
 | 56. Impersonation Backend & Audit | v1.9 | 0/TBD | Not started | - |
