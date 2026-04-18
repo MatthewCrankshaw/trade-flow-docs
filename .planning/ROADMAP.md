@@ -225,7 +225,10 @@ Plans:
   2. Attempting to impersonate another support user returns 403 Forbidden -- the API prevents lateral privilege movement.
   3. Impersonation sessions have a maximum duration (enforced server-side); expired sessions are rejected with a clear error directing the support user to start a new session.
   4. Every impersonation session is logged in a dedicated `impersonation_audit` collection with: support user ID, target user ID, start timestamp, end timestamp, and reason (required text field at session start). Audit entries are append-only -- no update or delete operations exist on the collection.
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 56-01-PLAN.md -- Module foundation: data models, append-only audit repository, module registration, repository tests
+- [ ] 56-02-PLAN.md -- Services (creator/terminator), JwtAuthGuard dual-token extension, controller, service and controller tests
 
 ### Phase 57: Impersonation Frontend
 **Goal**: A support user can impersonate a customer and see exactly what that customer sees, with a persistent banner and a clean exit back to the support dashboard
@@ -297,5 +300,5 @@ Plans:
 | 53. Support Access & Routing | v1.9 | 0/2 | Not started | - |
 | 54. User Management | v1.9 | 0/TBD | Not started | - |
 | 55. Role Administration | v1.9 | 0/TBD | Not started | - |
-| 56. Impersonation Backend & Audit | v1.9 | 0/TBD | Not started | - |
+| 56. Impersonation Backend & Audit | v1.9 | 0/2 | Not started | - |
 | 57. Impersonation Frontend | v1.9 | 0/TBD | Not started | - |
