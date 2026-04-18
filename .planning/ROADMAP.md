@@ -173,7 +173,10 @@ Plans:
   1. A `@RequiresPermission('manage_users')` decorator and corresponding guard validate that the authenticated user has the specified permission before the endpoint handler executes, returning 403 Forbidden with a clear error code if the permission is missing.
   2. Existing hardcoded role checks in SubscriptionGuard (support bypass) and PaywallGuard (support bypass) are migrated to use the new permission system -- the observable behavior is identical but enforcement flows through the RBAC infrastructure.
   3. Solo business users never see role management UI; the permission infrastructure is entirely backend-enforced with no customer-facing complexity exposed.
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 52-01-PLAN.md -- Permission guard/decorator infrastructure, hasPermission utilities, tests
+- [ ] 52-02-PLAN.md -- Migrate all hardcoded role checks, delete old utilities, update tests
 
 ### Phase 53: Support Access & Routing
 **Goal**: Support users can log in and reach a dedicated /support dashboard without going through onboarding or needing a business association
@@ -288,7 +291,7 @@ Plans:
 | 49. Revision Frontend UI | v1.8 | 1/1 | Complete | 2026-04-16 |
 | 50. Response Display & Convert Route Fix | v1.8 | 2/2 | Complete | 2026-04-16 |
 | 51. RBAC Data Model & Seed | v1.9 | 0/2 | Not started | - |
-| 52. Permission Guard & Migration | v1.9 | 0/TBD | Not started | - |
+| 52. Permission Guard & Migration | v1.9 | 0/2 | Not started | - |
 | 53. Support Access & Routing | v1.9 | 0/TBD | Not started | - |
 | 54. User Management | v1.9 | 0/TBD | Not started | - |
 | 55. Role Administration | v1.9 | 0/TBD | Not started | - |
