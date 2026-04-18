@@ -160,7 +160,10 @@ Full details: `.planning/milestones/v1.9-ROADMAP.md`
   2. A `roles` collection stores roles with name, description, type (`support` or `customer`), and an array of permission IDs; Super User and Admin support roles and Business Administrator customer role are seeded on application startup.
   3. Super User role has all permissions and is marked as unrestrictable; Admin support role has a configurable default permission set; Business Administrator customer role has full business-scoped permissions.
   4. User-role assignments are stored per user with scope (support = global, customer = business-specific), and the data model supports future team roles without building team features yet.
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 51-01-PLAN.md -- Permission data model (enums, entity, DTO, repository, extend role entities/DTOs)
+- [ ] 51-02-PLAN.md -- RBAC seeder, permission hydration, tests, module registration
 
 ### Phase 52: Permission Guard & Migration
 **Goal**: API endpoints can be protected by permission-based decorators, and existing hardcoded support role checks are migrated to the new permission system
@@ -284,7 +287,7 @@ Full details: `.planning/milestones/v1.9-ROADMAP.md`
 | 48. DI Token Fix & Cleanup | v1.8 | 3/3 | Complete | 2026-04-16 |
 | 49. Revision Frontend UI | v1.8 | 1/1 | Complete | 2026-04-16 |
 | 50. Response Display & Convert Route Fix | v1.8 | 2/2 | Complete | 2026-04-16 |
-| 51. RBAC Data Model & Seed | v1.9 | 0/TBD | Not started | - |
+| 51. RBAC Data Model & Seed | v1.9 | 0/2 | Not started | - |
 | 52. Permission Guard & Migration | v1.9 | 0/TBD | Not started | - |
 | 53. Support Access & Routing | v1.9 | 0/TBD | Not started | - |
 | 54. User Management | v1.9 | 0/TBD | Not started | - |
