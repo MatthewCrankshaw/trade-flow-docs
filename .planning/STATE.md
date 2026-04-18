@@ -100,6 +100,40 @@ None.
 | 260411-a41 | Review recent commits against new comments code standard and refactor | 2026-04-11 | fa07323 (api), aa44616 (ui) | [260411-a41-review-recent-commits-against-new-commen](./quick/260411-a41-review-recent-commits-against-new-commen/) |
 | 260417-bwd | Fix mobile modal scrolling and make modals fullscreen on mobile devices | 2026-04-17 | c467987, e299d6e, 9de5a4e | [260417-bwd-fix-mobile-modal-scrolling-and-make-moda](./quick/260417-bwd-fix-mobile-modal-scrolling-and-make-moda/) |
 
+## Deferred Items
+
+Items acknowledged and deferred at v1.8 milestone close on 2026-04-18:
+
+| Category | Item | Status |
+|----------|------|--------|
+| debug | billing-invalid-datetime-and-portal-redirect | awaiting_human_verify |
+| debug | bundle-component-alignment-v2 | diagnosed |
+| debug | bundle-component-alignment | diagnosed |
+| debug | bundle-pricing-mode-toggle | diagnosed |
+| debug | bundle-tax-not-calculated | diagnosed |
+| debug | checkout-duplicate-subscription-key | awaiting_human_verify |
+| debug | get-quote-500-error | diagnosed |
+| debug | knowledge-base | unknown |
+| debug | line-item-hard-delete | diagnosed |
+| debug | line-total-missing-tax | diagnosed |
+| debug | migration-fails-duplicate-users | awaiting_human_verify |
+| debug | picker-width-too-small | diagnosed |
+| debug | playwright-auth-setup-failures | fixing |
+| debug | pricing-strategy-wrong-location | diagnosed |
+| debug | subscription-module-missing-user-retriever | awaiting_human_verify |
+| debug | ui-shows-active-instead-of-trial | awaiting_human_verify |
+| debug | user-duplicate-creation-race-condition | awaiting_human_verify |
+| debug | worker-mongodb-econnrefused | investigating |
+| uat_gap | Phase 42 (1 pending scenario) | partial |
+| uat_gap | Phase 49 (3 pending scenarios) | partial |
+| verification | Phase 42 | human_needed |
+| verification | Phase 43 | human_needed |
+| verification | Phase 44 | human_needed |
+| verification | Phase 46 | human_needed |
+| verification | Phase 47 | human_needed |
+| verification | Phase 49 | human_needed |
+| quick_task | 20 tasks with missing status files | missing |
+
 ## Session Continuity
 
 Last session: 2026-04-18T12:04:53.106Z

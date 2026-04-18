@@ -332,6 +332,58 @@
 
 ---
 
+## Milestone: v1.8 -- Estimates
+
+**Shipped:** 2026-04-18
+**Phases:** 10 (41-50) | **Plans:** 45 | **Timeline:** 7 days (2026-04-11 -> 2026-04-18)
+
+### What Was Built
+- Full estimate backend module with E-YYYY-NNN numbering, dedicated estimate_line_items collection, contingency range math, and document-token unification
+- Revision system with parentEstimateId chain, partial unique index, EstimateReviser, and frontend "Edit and resend" button with History card
+- Estimate frontend CRUD with document-type toggle, ContingencySlider, uncertainty chips, range/"from" price display
+- Email sending via standalone estimate-settings module with mandatory non-binding legal copy, Maizzle template, SendEstimateDialog
+- Public customer page with 3-action conversational response model, latest-revision resolution, view tracking, structured decline reasons
+- BullMQ follow-up automation: 3/10/21-day delayed jobs, deterministic jobIds, defence-in-depth processor, 30-day auto-expiry, Redis AOF gate
+- Convert-to-quote with idempotent endpoint, literal tax-rate snapshots, mandatory review, back-links, and mark-as-lost with structured reasons
+- Three gap closure phases (48-50) fixing DI token override, adding revision frontend UI, fixing responseSummary and convert route
+
+### What Worked
+- Milestone audit (run at Phase 47 completion) identified 4 critical requirement gaps and a DI token integration risk -- all addressed by gap closure phases 48-50 before shipping
+- Separation-over-DRY architecture decision (separate estimate_line_items, separate estimate-settings) prevented cross-contamination with quote system and made independent evolution possible
+- document-token unification (shared infrastructure, different documents) was the right compromise -- one guard, one session/rate-limit code path, zero duplication of security logic
+- 3-action conversational response model (replacing original 4-button model) better matched the non-binding nature of estimates vs quotes
+- Copy-adapt pattern from quote module to estimate module continued to accelerate delivery -- Phase 41 (8 plans) established the full backend in 1 day
+- Follow-up queue design with deterministic jobIds enabled both idempotent scheduling and O(1) cancellation -- no orphaned jobs possible
+
+### What Was Inefficient
+- 3 gap closure phases (48-50) out of 10 total (30% gap closure rate) -- DI token override, missing revision UI, and responseSummary null were all detectable during initial phase planning
+- Phase 45-05 (E2E verification checkpoint) was planned but never executed -- skipping integration verification created the conditions for the gaps found in the audit
+- v1.8-ROADMAP.md archive was created before gap closure phases were added, requiring manual update at milestone close
+- Milestone close happened after v1.9 requirements were already written and STATE.md moved forward -- the formal close was deferred, creating cleanup overhead
+
+### Patterns Established
+- Separation-over-DRY at entity boundaries: distinct modules/collections for estimate vs quote line items and settings
+- document-token with documentType discriminator: shared token infrastructure serving multiple document types
+- Conversational response model: 3-action CTA pattern (proceed/message/decline) for non-binding documents
+- Deterministic BullMQ jobId pattern: `{queue}:{entityId}:{version}:{step}` for idempotent scheduling and cancellation
+- IEstimateFollowupCanceller interface: DI token allowing noop in non-queue contexts and real canceller in queue module
+- Gap closure phases as post-audit remediation: phases 48-50 pattern for addressing audit findings before milestone close
+- Mandatory non-binding legal copy in email templates: non-removable disclaimer pattern for compliance
+
+### Key Lessons
+1. Run milestone audit at ~75% and ALSO execute the planned E2E verification checkpoint -- skipping 45-05 directly caused 3 of the 4 requirement gaps
+2. DI token resolution in NestJS: local providers override imported module exports -- always verify cross-module DI bindings with an integration test
+3. Milestone close should happen before starting the next milestone's requirements -- deferring creates cleanup debt
+4. Gap closure phases work well as post-audit remediation but are a symptom of insufficient integration testing during execution
+5. Conversational CTA models need the response data pipeline (persistence -> derivation -> display) planned end-to-end, not per-phase -- responseSummary null was a cross-phase gap
+
+### Cost Observations
+- Model mix: opus for planning, execution, and audit
+- Timeline: 7 days for 45 plans across 10 phases
+- Notable: gap closure rate (30%) higher than v1.7 (17%) but lower than v1.3 (40%) -- complex feature milestones still generate more gaps than infrastructure milestones
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -345,6 +397,7 @@
 | v1.4 | ~15 min | 4 | Infrastructure-only milestone, dual entry-point pattern, zero gap closure, lowest plan count per outcome |
 | v1.6 | ~55 min | 6 | Full SaaS billing, webhook processing via BullMQ, soft paywall, Luxon standardization, zero gap closure |
 | v1.7 | ~7 days | 6 | User acquisition funnel, hard paywall replacing soft, milestone audit caught critical integration gap |
+| v1.8 | ~7 days | 10 | Full estimate lifecycle (58 reqs), milestone audit + 3 gap closure phases, separation-over-DRY pattern |
 
 ### Top Lessons (Verified Across Milestones)
 
@@ -360,3 +413,7 @@
 10. Infrastructure milestones (v1.4) unlock future product milestones -- tight scope + no gap closure = fastest shipping rate yet
 11. Run milestone audit at ~75% completion, not after final phase -- catches integration gaps while there's still time to fix cheaply (confirmed: v1.7 INT-01)
 12. Hard paywall is simpler than soft paywall for subscription enforcement -- one blocking route vs per-page gating in every feature (confirmed: v1.7 deleted 7 files + cleaned 10 pages)
+13. Separation over DRY at entity boundaries prevents cross-contamination -- separate collections/modules for estimate vs quote line items and settings enables independent evolution (confirmed: v1.8 estimate-settings, estimate_line_items)
+14. Execute planned E2E verification checkpoints -- skipping them directly causes requirement gaps that require gap closure phases (confirmed: v1.8 skipped 45-05, caused 3 gaps)
+15. NestJS local providers override imported module exports -- always verify cross-module DI bindings with integration tests (confirmed: v1.8 NoopEstimateFollowupCanceller override)
+16. Plan response data pipelines (persistence -> derivation -> display) end-to-end across phases, not per-phase (confirmed: v1.8 responseSummary null was a cross-phase gap)

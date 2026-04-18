@@ -101,6 +101,16 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - ✓ Onboarding wizard resumes at correct step on refresh/return -- v1.7
 - ✓ Existing users with profile + business + subscription bypass onboarding -- v1.7
 - ✓ @SkipSubscriptionCheck on onboarding endpoints (user patch, business create) -- v1.7
+- ✓ User can create estimates with E-YYYY-NNN numbering, contingency slider, and price range display -- v1.8
+- ✓ Estimates use dedicated estimate_line_items collection independent from quotes -- v1.8
+- ✓ document-token module unifies quote and estimate token infrastructure with documentType discriminator -- v1.8
+- ✓ User can revise sent estimates ("Edit and resend") with revision chain and partial unique index enforcement -- v1.8
+- ✓ User can send estimates via email with mandatory non-binding legal language -- v1.8
+- ✓ Customer can view estimate via secure token link and respond with 3-action model (proceed/message/decline) -- v1.8
+- ✓ Automated follow-up emails (3/10/21 day) via BullMQ with deterministic jobIds and cancellation on exit transitions -- v1.8
+- ✓ User can convert estimate to quote with mandatory review and idempotent endpoint -- v1.8
+- ✓ User can mark estimate as lost with structured reason; cancels pending follow-ups -- v1.8
+- ✓ Estimates auto-expire 30 days after send; Redis AOF persistence for follow-up durability -- v1.8
 
 ### Active
 
@@ -168,7 +178,8 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - **Stripe billing shipped (v1.6):** Full SaaS billing — Stripe API-based trial (no card required), webhook processing via BullMQ (5 event types), subscription management API (GET/DELETE/portal), hard paywall for invalid subscriptions, trial badge, Settings > Billing tab
 - **Onboarding & landing page shipped (v1.7):** Public marketing page at root URL, mandatory two-step onboarding wizard, no-card 30-day trial, hard paywall (replaced soft modal), welcome dashboard with getting-started checklist, old onboarding system removed
 - **Luxon standardized (v1.6):** All DTOs use Luxon DateTime (no native Date), shared toDateTime utility, date-helpers module in UI
-- **Codebase size:** ~22k LOC API (TypeScript) + ~24k LOC UI (TypeScript/TSX)
+- **Estimates shipped (v1.8):** Full estimate lifecycle -- create/edit/delete, contingency ranges, revisions, email sending with legal copy, public customer response page, BullMQ follow-up automation, convert-to-quote, mark-as-lost. Separate estimate_line_items and estimate-settings modules. document-token unification for shared public access infrastructure.
+- **Codebase size:** ~25k LOC API (TypeScript) + ~27k LOC UI (TypeScript/TSX)
 
 ## Constraints
 
@@ -236,6 +247,16 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 | @SkipSubscriptionCheck decorator for onboarding | Method-level bypass avoids weakening global guard; explicit and auditable | ✓ Good -- surgical |
 | Landing page bundle-isolated from app | Lazy-loaded route doesn't import Redux/auth/features; fast public page load | ✓ Good -- performance |
 | DefaultQuoteSettingsCreatorService with forwardRef | Circular dependency between business and quote-settings modules resolved cleanly | ✓ Good -- pragmatic |
+| Separate estimate_line_items collection | Separation over DRY at entity boundaries; estimates and quotes evolve independently | ✓ Good -- clean separation |
+| Standalone estimate-settings module | Independent from quote-settings; same pattern, no shared code | ✓ Good -- no cross-contamination |
+| document-token unification (shared module) | Single guard/session/rate-limit code path for both document types via documentType discriminator | ✓ Good -- DRY for security infrastructure |
+| 3-action conversational response model | proceed/message/decline better matches non-binding estimate semantics than accept/reject | ✓ Good -- appropriate UX |
+| Non-binding legal copy mandatory and non-removable | UK consumer law compliance for estimate emails; cannot be deleted by user | ✓ Good -- legally sound |
+| Contingency range math API-side only | UI renders API-returned low/high values; no client-side multiplication | ✓ Good -- single source of truth |
+| Deterministic BullMQ jobIds for follow-ups | Pattern `estimate-followup:{id}:{rev}:{step}` enables idempotent scheduling and O(1) cancellation | ✓ Good -- reliable |
+| Redis AOF as hard infra gate | appendonly yes / appendfsync everysec required before follow-up queue ships | ✓ Good -- prevents silent data loss |
+| IEstimateFollowupCanceller DI token | Allows NoopCanceller in non-queue contexts; real BullMQ canceller injected via module exports | ✓ Good -- but required Phase 48 fix for provider precedence |
+| Idempotency-Key for convert-to-quote | 24h deduplication window prevents double-submit creating duplicate quotes | ✓ Good -- defensive |
 
 ## Current State
 
@@ -262,4 +283,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-18 after milestone v1.9 started*
+*Last updated: 2026-04-18 after v1.8 milestone close*
