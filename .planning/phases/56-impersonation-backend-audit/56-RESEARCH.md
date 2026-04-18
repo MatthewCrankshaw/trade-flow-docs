@@ -46,7 +46,7 @@ None -- discussion stayed within phase scope.
 
 | ID | Description | Research Support |
 |----|-------------|------------------|
-| IMP-01 | Support user with impersonation permission can initiate a "login as" session for any customer user | ImpersonationCreator service + `@RequiresPermission('impersonate_user')` on POST /v1/impersonation/start |
+| IMP-01 | Support user with impersonation permission can initiate a "login as" session for any customer user | ImpersonationCreator service + support-role check on POST /v1/impersonation/start |
 | IMP-02 | Support user cannot impersonate other support users (prevents lateral privilege movement) | Service-level check: verify target user has no support roles; throw ForbiddenError if they do |
 | IMP-06 | Impersonation sessions are time-limited (maximum duration enforced) | JWT `expiresIn: '30m'` enforced server-side; expired tokens rejected with 401 + descriptive message |
 | IAUD-01 | Every impersonation session is logged with who, whom, when, and reason | ImpersonationAuditRepository.create() called at session start; endedAt updated at session end |
@@ -139,8 +139,8 @@ Support User Request (Bearer: impersonation-jwt)
         v
   +-------------------------+
   | ImpersonationController |
-  | @RequiresPermission     |
-  | ('impersonate_user')    |
+  | supportRoles.length     |
+  | check (interim D-10)    |
   +-------------------------+
         |
         v
@@ -232,9 +232,9 @@ if (decoded?.payload?.type === "impersonation") {
     issuer: "trade-flow-impersonation",
   });
 
-  // Hydrate target user
-  const targetUser = await this.userRetriever.getByIdOrFail(payload.targetUserId);
-  const supportUser = await this.userRetriever.getByIdOrFail(payload.supportUserId);
+  // Hydrate target user (CONFIRMED: getById exists)
+  const targetUser = await this.userRetriever.getById(payload.targetUserId);
+  const supportUser = await this.userRetriever.getById(payload.supportUserId);
 
   request.user = targetUser;
   request.impersonator = supportUser;
@@ -245,6 +245,7 @@ if (decoded?.payload?.type === "impersonation") {
 ```
 
 [VERIFIED: jsonwebtoken `decode()` and `verify()` API from Context7 /auth0/node-jsonwebtoken]
+[VERIFIED: `UserRetriever.getById(userId: string): Promise<IUserDto | null>` exists at src/user/services/user-retriever.service.ts:17]
 
 ### Pattern 2: Append-Only Repository
 
@@ -337,9 +338,9 @@ const token = jwt.sign(
 | JWT signing/verification | Custom token format or encryption | `jsonwebtoken` (installed) | Battle-tested, handles expiry, algorithms, claims validation |
 | Request validation | Manual field checking | `class-validator` decorators on request DTOs | Project standard; integrates with NestJS ValidationPipe |
 | Timestamp generation | `new Date().toISOString()` | `DateTime.utc().toISO()` from Luxon | Project standard for consistent date handling |
-| Permission checking | Manual role array inspection | `@RequiresPermission('impersonate_user')` from Phase 52 | Already built; uses PermissionGuard + Reflector pattern |
+| Permission checking | Manual role array inspection | `@RequiresPermission('impersonate_user')` from Phase 52 | Not yet built; interim hardcoded supportRoles check in controller delivers D-10 |
 
-**Key insight:** This phase composes existing infrastructure (guards, permission decorators, repository patterns, error classes) rather than inventing new patterns. The only novel element is the dual-token detection in JwtAuthGuard.
+**Key insight:** This phase composes existing infrastructure (guards, repository patterns, error classes) rather than inventing new patterns. The only novel element is the dual-token detection in JwtAuthGuard.
 
 ## Common Pitfalls
 
@@ -445,11 +446,14 @@ export class ImpersonationCreator {
   ) {}
 
   async create(authUser: IUserDto, request: StartImpersonationRequest): Promise<IImpersonationResponse> {
-    const targetUser = await this.userRetriever.getByIdOrFail(request.targetUserId);
+    const targetUser = await this.userRetriever.getById(request.targetUserId);
+    if (!targetUser) {
+      throw new ResourceNotFoundError(ErrorCodes.RESOURCE_NOT_FOUND, "Target user not found");
+    }
 
     // IMP-02: Prevent lateral impersonation
     if (targetUser.supportRoles && targetUser.supportRoles.length > 0) {
-      throw new ForbiddenError("Cannot impersonate support users");
+      throw new ForbiddenError(ErrorCodes.ACTION_NOT_ALLOWED, "Cannot impersonate support users");
     }
 
     // IAUD-01: Create audit entry AFTER validation passes
@@ -484,7 +488,7 @@ export class ImpersonationCreator {
 }
 ```
 
-[ASSUMED: UserRetriever has a `getByIdOrFail()` method -- needs verification against actual codebase. The context references `getByExternalAuthUserId()` which may be the only retrieval method; an internal ID lookup may need to be added or may already exist.]
+[VERIFIED: `UserRetriever.getById(userId: string): Promise<IUserDto | null>` confirmed at src/user/services/user-retriever.service.ts:17. Returns fully hydrated IUserDto with supportRoles.]
 
 ### Express Request Type Extension
 
@@ -516,26 +520,20 @@ declare global {
 | # | Claim | Section | Risk if Wrong |
 |---|-------|---------|---------------|
 | A1 | MongoDbWriter/MongoDbFetcher method signatures match the patterns shown in code examples | Architecture Patterns, Code Examples | LOW -- patterns derived from CONVENTIONS.md and STRUCTURE.md; actual signatures may differ slightly in parameter order or generics |
-| A2 | UserRetriever has a `getByIdOrFail()` method for internal MongoDB ID lookup (not just `getByExternalAuthUserId()`) | Code Examples | MEDIUM -- if only external auth ID lookup exists, a new method may need to be added or the impersonation flow needs to resolve external ID differently |
+| A2 | ~~UserRetriever has a `getByIdOrFail()` method for internal MongoDB ID lookup~~ **RESOLVED:** `UserRetriever.getById(userId: string): Promise<IUserDto | null>` confirmed at `src/user/services/user-retriever.service.ts:17`. Returns fully hydrated IUserDto with supportRoles. | Code Examples | RESOLVED -- no risk |
 | A3 | Express Request type augmentation is the project's pattern for adding custom properties to request | Code Examples | LOW -- standard Express pattern; project may use a different approach |
 | A4 | The lateral impersonation check uses `supportRoles.length > 0` on the hydrated IUserDto | Code Examples | LOW -- Phase 52 may change how support role detection works (migrating to permissions); check with Phase 52 implementation |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **UserRetriever internal ID lookup**
-   - What we know: `UserRetriever.getByExternalAuthUserId()` exists for Firebase UID lookup during auth
-   - What's unclear: Whether a `getByIdOrFail(internalId)` method exists for MongoDB ObjectId lookup
-   - Recommendation: The implementer should check the UserRetriever service and add an internal ID retrieval method if missing. This is needed for both hydrating the target user (from `targetUserId` in the request) and hydrating users from the JWT payload during guard verification.
+1. **UserRetriever internal ID lookup** -- RESOLVED
+   - **Answer:** `UserRetriever.getById(userId: string): Promise<IUserDto | null>` exists at `src/user/services/user-retriever.service.ts:17`. It returns a fully hydrated `IUserDto` including `supportRoles`. Use `getById()` (not `getByIdOrFail()`) and handle the null return with a ResourceNotFoundError.
 
-2. **Support user detection after Phase 52 migration**
-   - What we know: Phase 52 deletes `isSupportUser()` utility and migrates to permission-based checks
-   - What's unclear: How to check "is this user a support user" for lateral impersonation prevention after Phase 52
-   - Recommendation: Check for presence of any support role (hydrated `supportRoles` on IUserDto) or check for a specific support-tier permission. The simplest approach: `targetUser.supportRoles.length > 0` (roles still exist, only the utility functions are deleted).
+2. **Support user detection after Phase 52 migration** -- RESOLVED
+   - **Answer:** Check `targetUser.supportRoles.length > 0` on the hydrated IUserDto. Roles still exist on the DTO even after Phase 52 deletes the `isSupportUser()` utility. The controller also uses `request.user.supportRoles.length === 0` as an interim permission guard (D-10) until Phase 52's `@RequiresPermission` decorator is available.
 
-3. **Whether to add GET /v1/impersonation/active endpoint**
-   - What we know: Phase 57 (frontend) will need to know if the current session is an impersonation session
-   - What's unclear: Whether the frontend detects this from the token payload or needs a server endpoint
-   - Recommendation: Skip this endpoint. The frontend can detect impersonation from the JWT payload (decode without verification on client side to check `type: "impersonation"`). An endpoint adds unnecessary round-trips.
+3. **Whether to add GET /v1/impersonation/active endpoint** -- RESOLVED
+   - **Answer:** Skip this endpoint. The frontend can detect impersonation from the JWT payload (decode without verification on client side to check `type: "impersonation"`). An endpoint adds unnecessary round-trips.
 
 ## Validation Architecture
 
@@ -566,7 +564,7 @@ declare global {
 - [ ] `src/impersonation/test/services/impersonation-creator.service.spec.ts` -- covers IMP-01, IMP-02, IAUD-01
 - [ ] `src/impersonation/test/services/impersonation-terminator.service.spec.ts` -- covers D-11 end session
 - [ ] `src/impersonation/test/repositories/impersonation-audit.repository.spec.ts` -- covers IAUD-02, IAUD-03
-- [ ] `src/impersonation/test/controllers/impersonation.controller.spec.ts` -- covers routing + validation
+- [ ] `src/impersonation/test/controllers/impersonation.controller.spec.ts` -- covers routing + validation + D-10 permission guard
 - [ ] `src/impersonation/test/mocks/impersonation-mock-generator.ts` -- shared mocks
 - [ ] `src/auth/test/auth.guard.spec.ts` -- extended to cover impersonation token detection (IMP-06)
 
@@ -578,7 +576,7 @@ declare global {
 |---------------|---------|-----------------|
 | V2 Authentication | yes | Impersonation JWT signed with HS256 + dedicated secret; verified server-side on every request |
 | V3 Session Management | yes | 30-minute hard expiry via JWT `exp` claim; no refresh mechanism (intentional) |
-| V4 Access Control | yes | `@RequiresPermission('impersonate_user')` guard; lateral impersonation prevention (support->support blocked) |
+| V4 Access Control | yes | Controller-level supportRoles check (interim D-10 enforcement); lateral impersonation prevention (support->support blocked) |
 | V5 Input Validation | yes | class-validator on StartImpersonationRequest (targetUserId, reason @MinLength(10)) |
 | V6 Cryptography | no | HS256 symmetric signing with shared secret -- standard, not custom crypto |
 
@@ -591,7 +589,8 @@ declare global {
 | Audit log tampering | Tampering | Repository enforces append-only (no update/delete); controlled markEnded() only |
 | Missing audit trail | Repudiation | Audit entry created BEFORE token is returned; reason is mandatory |
 | Weak impersonation secret | Information Disclosure | IMPERSONATION_JWT_SECRET from environment; must be strong random value |
-| Impersonation of non-existent user | Spoofing | UserRetriever.getByIdOrFail() throws 404 if target doesn't exist |
+| Impersonation by non-support user | Elevation of Privilege | Controller checks `request.user.supportRoles.length === 0` and throws ForbiddenError (D-10) |
+| Impersonation of non-existent user | Spoofing | UserRetriever.getById() returns null; service throws ResourceNotFoundError (404) |
 
 ## Sources
 
@@ -602,6 +601,7 @@ declare global {
 - .planning/codebase/CONVENTIONS.md -- File naming, class naming, module structure
 - .planning/codebase/STRUCTURE.md -- Directory structure, module organization
 - .planning/codebase/INTEGRATIONS.md -- MongoDB connection pattern, auth flow
+- trade-flow-api/src/user/services/user-retriever.service.ts -- CONFIRMED: getById(userId: string): Promise<IUserDto | null> at line 17
 
 ### Secondary (MEDIUM confidence)
 - .planning/phases/51-rbac-data-model-seed/51-CONTEXT.md -- Permission model, role hydration on IUserDto
