@@ -24,7 +24,6 @@ dependency_graph:
 tech_stack:
   added: []
   patterns:
-    - Firebase RFC 2822 date parsing via Luxon DateTime.fromRFC2822
     - Clickable metric cards as Link components with filter query params
     - 4-card grid layout with md:grid-cols-2 for user detail sections
     - 5-card grid layout with md:grid-cols-5 for dashboard metrics
@@ -44,8 +43,10 @@ key_files:
     - trade-flow-ui/src/features/support/api/index.ts
 
 decisions:
-  - "Firebase auth dates parsed with DateTime.fromRFC2822 since Firebase returns RFC 2822 format; subscription dates parsed with DateTime.fromISO"
   - "MembershipMetrics filter links use the established query convention (filter:subscription.status:eq=value) for URL param state continuity with the user list page"
+  - "Removed Firebase Admin SDK metadata (creationTime/lastSignInTime) during verification — credentials not configured and not needed"
+  - "Expired metric counts incomplete subscriptions only (not incomplete_expired which is not a valid SubscriptionStatus)"
+  - "Trade field converted from MongoDB object {primaryTrade, customTradeName} to display string in repository mapBusiness"
   - "Route path uses :id parameter to match NestJS controller @Param('id') convention"
 
 metrics:
@@ -76,7 +77,7 @@ metrics:
 - `SupportUserDetail` already existed from Plan 54-04
 
 **RTK Query Endpoints** (`src/features/support/api/supportApi.ts`):
-- `getSupportUserDetail` -- fetches single user with Firebase metadata, transforms StandardResponse
+- `getSupportUserDetail` -- fetches single user detail, transforms StandardResponse
 - `getDashboardMetrics` -- fetches membership counts, transforms StandardResponse
 
 **RoleBadge** (`src/features/support/components/RoleBadge.tsx`):
@@ -94,7 +95,7 @@ metrics:
 **SupportUserDetailPage** (`src/pages/support/SupportUserDetailPage.tsx`):
 - Back button with ArrowLeft icon linking to `/support/users`
 - Header with user name, email, and inline RoleBadge components
-- Profile card: Display Name, Email, Account Created (fromRFC2822), Last Sign-In (fromRFC2822)
+- Profile card: Display Name, Email
 - Business card: Business Name, Trade Type, or "No business associated"
 - Subscription card: SubscriptionBadge, Status, Trial Start, Trial End, Current Period End, Canceled At (conditional)
 - Roles card: RoleBadge list or "No support roles assigned"
@@ -111,7 +112,10 @@ metrics:
 
 ## Deviations from Plan
 
-None -- plan executed exactly as written. All code already existed from prior execution.
+- Removed Firebase Admin SDK metadata (creationTime/lastSignInTime) from user detail -- credentials not configured and feature deemed unnecessary
+- Fixed trade field rendering: MongoDB stores trade as object {primaryTrade, customTradeName}, repository now converts to display string
+- Fixed expired metric: uses `incomplete` status (valid enum value) instead of nonexistent `expired` status
+- Added `in` operator support to subscription status filter in repository
 
 ## Known Stubs
 
