@@ -1,9 +1,9 @@
 ---
-status: complete
+status: diagnosed
 phase: 54-user-management
 source: [54-01-SUMMARY.md, 54-02-SUMMARY.md, 54-03-SUMMARY.md, 54-04-SUMMARY.md]
 started: 2026-04-19T08:00:00Z
-updated: 2026-04-19T08:30:00Z
+updated: 2026-04-19T09:00:00Z
 ---
 
 ## Current Test
@@ -86,57 +86,87 @@ blocked: 1
   reason: "User reported: When I login as a support user it takes me to the /onboarding page instead of taking me directly to the support page."
   severity: major
   test: 1
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "OnboardingGuard lacks support user bypass — checks hasDisplayName && hasBusiness only. Support users with no business always fail and redirect to /onboarding. Secondary: LoginPage savedLocation check runs before support role check, overriding role-based redirect."
+  artifacts:
+    - path: "trade-flow-ui/src/features/auth/components/OnboardingGuard.tsx"
+      issue: "Missing support user bypass (PaywallGuard has one but OnboardingGuard does not)"
+    - path: "trade-flow-ui/src/pages/LoginPage.tsx"
+      issue: "savedLocation takes precedence over role-based redirect for support users"
+  missing:
+    - "Add support role bypass to OnboardingGuard matching PaywallGuard pattern"
+    - "In LoginPage, ignore savedLocation when user has support roles"
+  debug_session: ".planning/debug/support-login-redirect.md"
 
 - truth: "Support nav menu should highlight only the active item"
   status: failed
   reason: "User reported: When I go to select the users navigation in the side menu, the dashboard remains selected and the users selection also becomes selected."
   severity: cosmetic
   test: 2b
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "NavLink uses default prefix matching. Dashboard href '/support' is a prefix of '/support/users', so both match. NavLink missing 'end' prop for exact matching."
+  artifacts:
+    - path: "trade-flow-ui/src/components/layouts/DashboardLayout.tsx"
+      issue: "NavLink missing 'end' prop for exact-match routes"
+    - path: "trade-flow-ui/src/config/navigation.ts"
+      issue: "Dashboard href '/support' is prefix of all support sub-routes"
+  missing:
+    - "Add 'end' prop to NavLink for the Dashboard item (or all nav items)"
+  debug_session: ".planning/debug/nav-menu-highlight.md"
 
 - truth: "Subscription status filter should show users with matching subscription status (trialing, canceled, etc.)"
   status: failed
   reason: "User reported: Trialing customers are not showing under the trialing section, canceled doesn't show under the canceled section. They all show as 'no subscription'."
   severity: major
   test: 4
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "$lookup joins user._id (ObjectId converted to string via $toString) with subscription.userId, but subscription.userId stores the Firebase externalAuthUserId, not the MongoDB ObjectId string. Join never matches."
+  artifacts:
+    - path: "trade-flow-api/src/support/repositories/support-user.repository.ts"
+      issue: "$lookup let uses { $toString: '$_id' } instead of '$externalAuthUserId' — lines 72-75"
+  missing:
+    - "Change $lookup let variable from { odUserId: { $toString: '$_id' } } to { odUserId: '$externalAuthUserId' }"
+  debug_session: ".planning/debug/subscription-status-broken.md"
 
 - truth: "User detail page should display business and subscription data for users who have them"
   status: failed
   reason: "User reported: Detail page shows 'No business associated' and 'No subscription' for all users even if they do have a business or subscription."
   severity: major
   test: 7
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Two $lookup failures: (1) Subscription $lookup uses wrong identifier — $toString of _id instead of $externalAuthUserId. (2) Business $lookup references non-existent $businessIds field on user document — businessIds is a derived value populated by UserRetriever service, not stored in MongoDB. Needs to go through businessusers join collection."
+  artifacts:
+    - path: "trade-flow-api/src/support/repositories/support-user.repository.ts"
+      issue: "findByIdWithDetails: subscription $lookup uses wrong join key; business $lookup references non-existent $businessIds field"
+  missing:
+    - "Fix subscription $lookup to use $externalAuthUserId"
+    - "Replace business $lookup with two-step: first $lookup businessusers, then $lookup businesses"
+  debug_session: ".planning/debug/detail-page-missing-data.md"
 
 - truth: "Dashboard metrics should return accurate subscription counts (activeTrials, activeSubscriptions, etc.)"
   status: failed
   reason: "User reported: The counts are all 0 except for the total users."
   severity: major
   test: 9
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Same $lookup join mismatch as Tests 4 and 7 — $toString of user._id vs subscription.userId (Firebase UID). totalUsers works because it counts user docs via $sum:1 after $unwind with preserveNullAndEmptyArrays, not dependent on subscription join."
+  artifacts:
+    - path: "trade-flow-api/src/support/services/support-dashboard-metrics.service.ts"
+      issue: "$lookup let uses { $toString: '$_id' } instead of '$externalAuthUserId' — line 36"
+  missing:
+    - "Change $lookup let variable to use $externalAuthUserId"
+  debug_session: ".planning/debug/dashboard-metrics-zeros.md"
 
 - truth: "User detail page should render without errors, including for support users; firebaseMetadata should return real creationTime and lastSignInTime"
   status: failed
   reason: "User reported: TypeError in RoleBadge.tsx:5:32 — Cannot read properties of null (reading 'replace'). firebaseMetadata always null."
   severity: blocker
   test: 10
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "RoleBadge crash: $lookup projects { name: 1 } but SupportRoleEntity field is 'roleName'. MongoDB returns docs with only _id, mapping produces [undefined], RoleBadge calls undefined.replace() and crashes. Firebase null: FirebaseAuthMetadataService swallows all errors silently — likely missing/invalid FIREBASE_CLIENT_EMAIL and FIREBASE_PRIVATE_KEY env vars."
+  artifacts:
+    - path: "trade-flow-api/src/support/repositories/support-user.repository.ts"
+      issue: "$lookup projection uses 'name' instead of 'roleName' (line 159); mapping uses r.name instead of r.roleName (line 214)"
+    - path: "trade-flow-ui/src/features/support/components/RoleBadge.tsx"
+      issue: "No null guard on roleName.replace() call"
+    - path: "trade-flow-api/src/support/services/firebase-auth-metadata.service.ts"
+      issue: "Catches all errors silently, returns nulls — Firebase Admin SDK may not be initialized correctly"
+  missing:
+    - "Fix $lookup projection to use 'roleName' and update mapping"
+    - "Add null guard in RoleBadge as defense-in-depth"
+    - "Verify Firebase Admin SDK env vars are configured; consider surfacing init errors"
+  debug_session: ".planning/debug/rolebadge-crash-firebase-null.md"
