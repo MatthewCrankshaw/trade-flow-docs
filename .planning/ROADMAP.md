@@ -140,7 +140,7 @@ Full details: `.planning/milestones/v1.8-ROADMAP.md`
 **Milestone Goal:** Give the support team a dedicated experience -- login without onboarding, user management dashboard with membership summaries, customer impersonation for debugging, and super-user role administration. Built on a proper RBAC foundation that supports future team roles without exposing complexity to solo operators.
 
 - [ ] **Phase 51: RBAC Data Model & Seed** - Permissions, roles, and user-role assignment collections with seeded support and customer roles
-- [ ] **Phase 52: Permission Guard & Migration** - Permission-checking guard/decorator infrastructure and migration of existing hardcoded role checks
+- [x] **Phase 52: Permission Guard & Migration** - Permission-checking guard/decorator infrastructure and migration of existing hardcoded role checks -- completed 2026-04-19
 - [ ] **Phase 53: Support Access & Routing** - Support user login bypass, /support redirect, and route protection
 - [ ] **Phase 54: User Management** - Paginated user list, user detail, and membership summary dashboard for support users
 - [ ] **Phase 55: Role Administration** - Super user can grant/revoke support admin role with confirmation and immediate effect
@@ -175,8 +175,8 @@ Plans:
   3. Solo business users never see role management UI; the permission infrastructure is entirely backend-enforced with no customer-facing complexity exposed.
 **Plans**: 2 plans
 Plans:
-- [ ] 52-01-PLAN.md -- Permission guard/decorator infrastructure, hasPermission utilities, tests
-- [ ] 52-02-PLAN.md -- Migrate all hardcoded role checks, delete old utilities, update tests
+- [x] 52-01-PLAN.md -- Permission guard/decorator infrastructure, hasPermission utilities, tests
+- [x] 52-02-PLAN.md -- Migrate all hardcoded role checks, delete old utilities, update tests
 
 ### Phase 53: Support Access & Routing
 **Goal**: Support users can log in and reach a dedicated /support dashboard without going through onboarding or needing a business association
