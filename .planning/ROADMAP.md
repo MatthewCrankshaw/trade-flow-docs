@@ -316,6 +316,6 @@ Plans:
 | 52. Permission Guard & Migration | v1.9 | 0/2 | Not started | - |
 | 53. Support Access & Routing | v1.9 | 2/2 | Complete | 2026-04-19 |
 | 54. User Management | v1.9 | 4/8 | In Progress | - |
-| 55. Role Administration | v1.9 | 3/3 | Complete | - |
+| 55. Role Administration | v1.9 | 3/3 | Complete | 2026-04-19 |
 | 56. Impersonation Backend & Audit | v1.9 | 0/2 | Not started | - |
 | 57. Impersonation Frontend | v1.9 | 0/3 | Not started | - |
