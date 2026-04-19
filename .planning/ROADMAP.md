@@ -189,7 +189,7 @@ Plans:
   4. The `/support` dashboard renders as a shell page ready for user management content in Phase 54.
 **Plans**: 2 plans
 Plans:
-- [ ] 53-01-PLAN.md -- SupportGuard component, navigation config split, barrel export
+- [x] 53-01-PLAN.md -- SupportGuard component, navigation config split, barrel export
 - [ ] 53-02-PLAN.md -- App.tsx route restructure, LoginPage redirect, DashboardLayout nav, support page cleanup
 
 ### Phase 54: User Management
@@ -310,7 +310,7 @@ Plans:
 | 50. Response Display & Convert Route Fix | v1.8 | 2/2 | Complete | 2026-04-16 |
 | 51. RBAC Data Model & Seed | v1.9 | 0/2 | Not started | - |
 | 52. Permission Guard & Migration | v1.9 | 0/2 | Not started | - |
-| 53. Support Access & Routing | v1.9 | 0/2 | Not started | - |
+| 53. Support Access & Routing | v1.9 | 1/2 | In Progress | - |
 | 54. User Management | v1.9 | 0/5 | Not started | - |
 | 55. Role Administration | v1.9 | 0/2 | Not started | - |
 | 56. Impersonation Backend & Audit | v1.9 | 0/2 | Not started | - |
