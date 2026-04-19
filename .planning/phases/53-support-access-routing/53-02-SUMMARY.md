@@ -27,7 +27,7 @@ decisions:
 metrics:
   duration: 658s
   completed: 2026-04-19T07:06:33Z
-  tasks_completed: 2
+  tasks_completed: 3
   tasks_total: 3
   files_created: 0
   files_modified: 7
@@ -43,7 +43,7 @@ App.tsx route tree restructured with SupportGuard branch outside OnboardingGuard
 |------|------|--------|-------|
 | 1 | Restructure App.tsx route tree and update LoginPage redirect | 77b63f1 (trade-flow-ui) | App.tsx, LoginPage.tsx |
 | 2 | Update DashboardLayout nav and clean up support pages | 77f1ec0 (trade-flow-ui) | DashboardLayout.tsx, navigation.ts, SupportDashboardPage.tsx, SupportBusinessesPage.tsx, SupportUsersPage.tsx, LoginPage.tsx |
-| 3 | Verify support access and routing end-to-end | CHECKPOINT | Awaiting human verification |
+| 3 | Verify support access and routing end-to-end | APPROVED | Human verified all flows in browser + CI passes |
 
 ## What Was Built
 
@@ -108,8 +108,19 @@ App.tsx route tree restructured with SupportGuard branch outside OnboardingGuard
 - DashboardLayout uses role-conditional navigation functions
 - No hasSupportRole checks remain in support pages
 
-## Checkpoint: Human Verification Pending
+## Checkpoint: Human Verification APPROVED
 
-Task 3 requires manual verification of the complete support access and routing system. See checkpoint details in executor output.
+Task 3 human verification completed successfully. The user tested all support routing flows in the browser and confirmed:
+- Support user login redirects to /support (not /dashboard or /onboarding)
+- Non-support user cannot access /support (redirected to /dashboard)
+- Support sidebar shows only Dashboard, Users, Businesses
+- Business user sidebar shows Main + Business sections (no support items)
+- Logo link is role-aware
+
+Two additional API fixes were made outside this plan scope during verification:
+- SupportModule now imports UserModule (fixes JwtAuthGuard DI error)
+- MigrationPolicy now allows any support user to read (fixes 403 on /v1/migrations/status)
+
+CI verification (`npm run ci`) passes: 99 tests, 0 lint errors, formatting clean, typecheck clean.
 
 ## Self-Check: PASSED
