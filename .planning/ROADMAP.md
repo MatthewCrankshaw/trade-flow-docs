@@ -207,7 +207,7 @@ Plans:
 - [x] 54-02-PLAN.md -- Support user list API (module, repository aggregation, retriever service, controller)
 - [x] 54-03-PLAN.md -- User detail and dashboard metrics API (Firebase admin, detail endpoint, metrics endpoint)
 - [x] 54-04-PLAN.md -- Frontend user list (RTK Query, hooks, filters, table, pagination, page rewrite)
-- [ ] 54-05-PLAN.md -- Frontend user detail page, dashboard metrics cards, route registration
+- [x] 54-05-PLAN.md -- Frontend user detail page, dashboard metrics cards, route registration
 - [x] 54-06-PLAN.md -- [GAP CLOSURE] Fix $lookup join keys in repository and metrics service
 - [ ] 54-07-PLAN.md -- [GAP CLOSURE] Fix support login redirect, nav highlight, RoleBadge null guard
 **UI hint**: yes

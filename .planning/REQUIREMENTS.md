@@ -32,8 +32,8 @@ Requirements for Support & Admin Tools milestone. Each maps to roadmap phases.
 
 - [ ] **UMGT-01**: Support user can view a paginated list of all users (support and customer) with search by name or email
 - [ ] **UMGT-02**: User list displays each user's role (support badge), subscription status (trialing, active, past_due, canceled, expired), and associated business name
-- [ ] **UMGT-03**: Support user can view a user detail page showing profile, business association, subscription status, and role assignments
-- [ ] **UMGT-04**: Support dashboard shows membership summary cards (total users, active trials, active subscriptions, expired, canceled)
+- [x] **UMGT-03**: Support user can view a user detail page showing profile, business association, subscription status, and role assignments
+- [x] **UMGT-04**: Support dashboard shows membership summary cards (total users, active trials, active subscriptions, expired, canceled)
 
 ### Role Administration
 
@@ -114,8 +114,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SACC-04 | Phase 53 | Pending |
 | UMGT-01 | Phase 54 | Pending |
 | UMGT-02 | Phase 54 | Pending |
-| UMGT-03 | Phase 54 | Pending |
-| UMGT-04 | Phase 54 | Pending |
+| UMGT-03 | Phase 54 | Complete |
+| UMGT-04 | Phase 54 | Complete |
 | RADM-01 | Phase 55 | Pending |
 | RADM-02 | Phase 55 | Pending |
 | RADM-03 | Phase 55 | Pending |
