@@ -143,7 +143,7 @@ Full details: `.planning/milestones/v1.8-ROADMAP.md`
 - [x] **Phase 52: Permission Guard & Migration** - Permission-checking guard/decorator infrastructure and migration of existing hardcoded role checks -- completed 2026-04-19
 - [ ] **Phase 53: Support Access & Routing** - Support user login bypass, /support redirect, and route protection
 - [ ] **Phase 54: User Management** - Paginated user list, user detail, and membership summary dashboard for support users
-- [x] **Phase 55: Role Administration** - Super user can grant/revoke support admin role with confirmation and immediate effect
+- [x] **Phase 55: Role Administration** - Super user can grant/revoke support admin role with confirmation and immediate effect -- completed 2026-04-19
 - [ ] **Phase 56: Impersonation Backend & Audit** - "Login as" session creation, time limits, audit logging in dedicated append-only collection
 - [ ] **Phase 57: Impersonation Frontend** - Impersonation banner, customer-identical rendering, and clean session termination
 
