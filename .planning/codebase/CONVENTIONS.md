@@ -221,6 +221,54 @@ public setContext(context: string): void {
 
 ---
 
+## Query Filtering & Sorting Convention
+
+Established in Phase 54 (v1.9). Applies to all future list endpoints.
+
+### URL Parameter Format
+
+| Concern | Format | Example |
+|---------|--------|---------|
+| Filter | `?filter:<field>:<operator>=<value>` | `?filter:subscription.status:eq=active` |
+| Sort ascending | `?sort=<field>` | `?sort=email` |
+| Sort descending | `?sort=-<field>` | `?sort=-createdAt` |
+| Search | `?search=<term>` | `?search=john` |
+| Pagination | `?page=<n>&limit=<n>` | `?page=1&limit=20` |
+
+### Filter Operators
+
+| Operator | Meaning | Multi-value? |
+|----------|---------|-------------|
+| `eq` | equals | No |
+| `nq` | not equals | No |
+| `lt` | less than | No |
+| `gt` | greater than | No |
+| `le` | less or equal | No |
+| `ge` | greater or equal | No |
+| `in` | in list | Yes (comma-separated) |
+| `bt` | between | Yes (comma-separated, exactly 2 values) |
+
+### Implementation Files
+
+- `@core/interfaces/query-filter.interface` — `IQueryFilter` interface and `FilterOperator` type
+- `@core/utilities/query-filter-parser.utility` — `parseQueryFilters()` and `escapeRegex()`
+- `@core/utilities/query-sort-parser.utility` — `parseQuerySort()`
+- `@core/data-transfer-objects/base-query-options.dto` — `IBaseQueryOptionsDto` with `filters`, `sort`, `search`, `pagination`
+
+### Usage Pattern
+
+Controllers parse URL params and build the options DTO:
+
+```typescript
+const filters = parseQueryFilters(query as Record<string, string>);
+const sort = parseQuerySort(query.sort as string | undefined);
+const options: IBaseQueryOptionsDto = { filters, sort, search: query.search, pagination: { page, limit } };
+```
+
+Each endpoint validates allowed filter field names against its own allowlist — the generic parser accepts any field name.
+
+---
+
 ## Frontend (UI) Conventions
 
 ### File Naming Patterns
