@@ -190,7 +190,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 53-01-PLAN.md -- SupportGuard component, navigation config split, barrel export
-- [ ] 53-02-PLAN.md -- App.tsx route restructure, LoginPage redirect, DashboardLayout nav, support page cleanup
+- [x] 53-02-PLAN.md -- App.tsx route restructure, LoginPage redirect, DashboardLayout nav, support page cleanup
 
 ### Phase 54: User Management
 **Goal**: Support users can browse all platform users, search by name or email, view user details with subscription and role information, and see membership summary metrics on their dashboard
@@ -310,7 +310,7 @@ Plans:
 | 50. Response Display & Convert Route Fix | v1.8 | 2/2 | Complete | 2026-04-16 |
 | 51. RBAC Data Model & Seed | v1.9 | 2/2 | Complete | 2026-04-19 |
 | 52. Permission Guard & Migration | v1.9 | 0/2 | Not started | - |
-| 53. Support Access & Routing | v1.9 | 1/2 | In Progress | - |
+| 53. Support Access & Routing | v1.9 | 2/2 | Complete | 2026-04-19 |
 | 54. User Management | v1.9 | 0/5 | Not started | - |
 | 55. Role Administration | v1.9 | 0/2 | Not started | - |
 | 56. Impersonation Backend & Audit | v1.9 | 0/2 | Not started | - |
