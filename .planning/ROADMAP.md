@@ -210,7 +210,7 @@ Plans:
 - [x] 54-05-PLAN.md -- Frontend user detail page, dashboard metrics cards, route registration
 - [x] 54-06-PLAN.md -- [GAP CLOSURE] Fix $lookup join keys in repository and metrics service
 - [x] 54-07-PLAN.md -- [GAP CLOSURE] Fix support login redirect, nav highlight, RoleBadge null guard
-- [ ] 54-08-PLAN.md -- [GAP CLOSURE] Add Role and Business columns to UserListTable
+- [x] 54-08-PLAN.md -- [GAP CLOSURE] Add Role and Business columns to UserListTable
 **UI hint**: yes
 
 ### Phase 55: Role Administration
