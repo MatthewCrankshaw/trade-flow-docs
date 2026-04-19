@@ -45,12 +45,12 @@ Requirements for Support & Admin Tools milestone. Each maps to roadmap phases.
 
 ### Customer Impersonation
 
-- [ ] **IMP-01**: Support user with impersonation permission can initiate a "login as" session for any customer user
+- [x] **IMP-01**: Support user with impersonation permission can initiate a "login as" session for any customer user
 - [ ] **IMP-02**: Support user cannot impersonate other support users (prevents lateral privilege movement)
 - [ ] **IMP-03**: During impersonation, the app renders exactly what the customer sees (same data, same subscription state, same permissions)
 - [ ] **IMP-04**: A fixed impersonation banner is visible at all times during an impersonation session showing the impersonated user's name and a "Return to Support" button
 - [ ] **IMP-05**: Support user can terminate the impersonation session and return to their support dashboard cleanly
-- [ ] **IMP-06**: Impersonation sessions are time-limited (maximum duration enforced)
+- [x] **IMP-06**: Impersonation sessions are time-limited (maximum duration enforced)
 
 ### Impersonation Audit
 
@@ -121,12 +121,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RADM-03 | Phase 55 | Pending |
 | RADM-04 | Phase 55 | Pending |
 | RADM-05 | Phase 55 | Complete |
-| IMP-01 | Phase 56 | Pending |
+| IMP-01 | Phase 56 | Complete |
 | IMP-02 | Phase 56 | Pending |
 | IMP-03 | Phase 57 | Pending |
 | IMP-04 | Phase 57 | Pending |
 | IMP-05 | Phase 57 | Pending |
-| IMP-06 | Phase 56 | Pending |
+| IMP-06 | Phase 56 | Complete |
 | IAUD-01 | Phase 56 | Pending |
 | IAUD-02 | Phase 56 | Pending |
 | IAUD-03 | Phase 56 | Pending |

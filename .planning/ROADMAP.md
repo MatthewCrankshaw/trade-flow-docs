@@ -243,7 +243,7 @@ Plans:
 Plans:
 - [x] 56-01-PLAN.md -- Module foundation: data models, append-only audit repository, module registration, repository tests
 - [x] 56-02-PLAN.md -- Services (creator/terminator), JwtAuthGuard dual-token extension, controller, service and controller tests
-- [ ] 56-03-PLAN.md -- [GAP CLOSURE] Fix SupportModule missing ImpersonationModule import, worker express.d.ts type augmentation
+- [x] 56-03-PLAN.md -- [GAP CLOSURE] Fix SupportModule missing ImpersonationModule import, worker express.d.ts type augmentation
 
 ### Phase 57: Impersonation Frontend
 **Goal**: A support user can impersonate a customer and see exactly what that customer sees, with a persistent banner and a clean exit back to the support dashboard
@@ -319,5 +319,5 @@ Plans:
 | 53. Support Access & Routing | v1.9 | 2/2 | Complete | 2026-04-19 |
 | 54. User Management | v1.9 | 4/9 | In Progress | - |
 | 55. Role Administration | v1.9 | 3/3 | Complete | 2026-04-19 |
-| 56. Impersonation Backend & Audit | v1.9 | 2/3 | In Progress | - |
+| 56. Impersonation Backend & Audit | v1.9 | 3/3 | Complete   | 2026-04-19 |
 | 57. Impersonation Frontend | v1.9 | 0/3 | Not started | - |
