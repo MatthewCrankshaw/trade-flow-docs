@@ -221,7 +221,7 @@ Plans:
   4. Both grant and revoke actions require a confirmation dialog in the UI before executing.
 **Plans**: 2 plans
 Plans:
-- [ ] 55-01-PLAN.md -- Backend: repository methods, SupportRoleAssigner service, SupportRoleAdminController, unit tests
+- [x] 55-01-PLAN.md -- Backend: repository methods, SupportRoleAssigner service, SupportRoleAdminController, unit tests
 - [ ] 55-02-PLAN.md -- Frontend: RTK Query mutations, RoleActions, GrantRoleDialog, RevokeRoleDialog, user detail integration
 **UI hint**: yes
 
