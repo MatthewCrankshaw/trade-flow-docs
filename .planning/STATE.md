@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.9
 milestone_name: Support & Admin Tools
 status: executing
-stopped_at: Completed 54-08-PLAN.md
-last_updated: "2026-04-19T13:39:41Z"
-last_activity: 2026-04-19 -- Phase 54 plan 08 completed
+stopped_at: Completed 55-03-PLAN.md
+last_updated: "2026-04-19T13:44:00Z"
+last_activity: 2026-04-19 -- Phase 55 plan 03 completed (gap closure)
 progress:
   total_phases: 7
   completed_phases: 3
   total_plans: 22
-  completed_plans: 16
-  percent: 73
+  completed_plans: 17
+  percent: 77
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-18)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 54 — user-management
+**Current focus:** Phase 55 — role-administration
 
 ## Current Position
 
-Phase: 54 (user-management) — EXECUTING
-Plan: 8 of 8
-Status: Phase 54 complete (all 8 plans done)
-Last activity: 2026-04-19 -- Phase 54 plan 08 completed
+Phase: 55 (role-administration) — EXECUTING
+Plan: 3 of 3 (gap closure plans)
+Status: Phase 55 gap closure complete (plan 03 done)
+Last activity: 2026-04-19 -- Phase 55 plan 03 completed (gap closure)
 
 ## Roadmap Summary
 
@@ -68,6 +68,7 @@ Key decisions archived in PROJECT.md Key Decisions table.
 - Data model must support future team roles without building team features or exposing role UI to solo operators
 - Impersonation audit ships WITH impersonation, not separately (Phase 56)
 - Separation over DRY at entity boundaries (project convention) -- permissions, roles, user-role assignments are separate collections
+- Guards must throw NestJS HttpException subclasses (not domain errors) -- domain errors only work in controller catch blocks via createHttpError()
 
 ### Pending Todos
 
@@ -136,6 +137,6 @@ Items acknowledged and deferred at v1.8 milestone close on 2026-04-18:
 
 ## Session Continuity
 
-Last session: 2026-04-19T13:39:41Z
-Stopped at: Completed 54-08-PLAN.md
+Last session: 2026-04-19T13:44:00Z
+Stopped at: Completed 55-03-PLAN.md
 Resume file: None

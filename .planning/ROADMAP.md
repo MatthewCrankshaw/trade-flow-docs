@@ -143,7 +143,7 @@ Full details: `.planning/milestones/v1.8-ROADMAP.md`
 - [x] **Phase 52: Permission Guard & Migration** - Permission-checking guard/decorator infrastructure and migration of existing hardcoded role checks -- completed 2026-04-19
 - [ ] **Phase 53: Support Access & Routing** - Support user login bypass, /support redirect, and route protection
 - [ ] **Phase 54: User Management** - Paginated user list, user detail, and membership summary dashboard for support users
-- [ ] **Phase 55: Role Administration** - Super user can grant/revoke support admin role with confirmation and immediate effect
+- [x] **Phase 55: Role Administration** - Super user can grant/revoke support admin role with confirmation and immediate effect
 - [ ] **Phase 56: Impersonation Backend & Audit** - "Login as" session creation, time limits, audit logging in dedicated append-only collection
 - [ ] **Phase 57: Impersonation Frontend** - Impersonation banner, customer-identical rendering, and clean session termination
 
@@ -226,7 +226,7 @@ Plans:
 Plans:
 - [x] 55-01-PLAN.md -- Backend: repository methods, SupportRoleAssigner service, SupportRoleAdminController, unit tests
 - [x] 55-02-PLAN.md -- Frontend: RTK Query mutations, RoleActions, GrantRoleDialog, RevokeRoleDialog, user detail integration
-- [ ] 55-03-PLAN.md -- [GAP CLOSURE] Fix SubscriptionGuard blocking role endpoints, PermissionGuard returning 500 instead of 403
+- [x] 55-03-PLAN.md -- [GAP CLOSURE] Fix SubscriptionGuard blocking role endpoints, PermissionGuard returning 500 instead of 403
 **UI hint**: yes
 
 ### Phase 56: Impersonation Backend & Audit
@@ -316,6 +316,6 @@ Plans:
 | 52. Permission Guard & Migration | v1.9 | 0/2 | Not started | - |
 | 53. Support Access & Routing | v1.9 | 2/2 | Complete | 2026-04-19 |
 | 54. User Management | v1.9 | 4/8 | In Progress | - |
-| 55. Role Administration | v1.9 | 2/3 | In Progress | - |
+| 55. Role Administration | v1.9 | 3/3 | Complete | - |
 | 56. Impersonation Backend & Audit | v1.9 | 0/2 | Not started | - |
 | 57. Impersonation Frontend | v1.9 | 0/3 | Not started | - |

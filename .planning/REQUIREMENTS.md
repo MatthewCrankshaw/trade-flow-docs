@@ -37,11 +37,11 @@ Requirements for Support & Admin Tools milestone. Each maps to roadmap phases.
 
 ### Role Administration
 
-- [ ] **RADM-01**: Super user can grant the support admin role to any customer user
-- [ ] **RADM-02**: Super user can revoke the support admin role from any support user
+- [x] **RADM-01**: Super user can grant the support admin role to any customer user
+- [x] **RADM-02**: Super user can revoke the support admin role from any support user
 - [ ] **RADM-03**: Super user cannot revoke their own super user role (last-admin protection)
 - [ ] **RADM-04**: Role changes take effect immediately without requiring the target user to re-login
-- [ ] **RADM-05**: Role grant/revoke actions require a confirmation dialog in the UI
+- [x] **RADM-05**: Role grant/revoke actions require a confirmation dialog in the UI
 
 ### Customer Impersonation
 
@@ -116,11 +116,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UMGT-02 | Phase 54 | Complete |
 | UMGT-03 | Phase 54 | Complete |
 | UMGT-04 | Phase 54 | Complete |
-| RADM-01 | Phase 55 | Pending |
-| RADM-02 | Phase 55 | Pending |
+| RADM-01 | Phase 55 | Complete |
+| RADM-02 | Phase 55 | Complete |
 | RADM-03 | Phase 55 | Pending |
 | RADM-04 | Phase 55 | Pending |
-| RADM-05 | Phase 55 | Pending |
+| RADM-05 | Phase 55 | Complete |
 | IMP-01 | Phase 56 | Pending |
 | IMP-02 | Phase 56 | Pending |
 | IMP-03 | Phase 57 | Pending |
