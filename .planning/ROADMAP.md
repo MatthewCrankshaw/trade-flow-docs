@@ -139,7 +139,7 @@ Full details: `.planning/milestones/v1.8-ROADMAP.md`
 
 **Milestone Goal:** Give the support team a dedicated experience -- login without onboarding, user management dashboard with membership summaries, customer impersonation for debugging, and super-user role administration. Built on a proper RBAC foundation that supports future team roles without exposing complexity to solo operators.
 
-- [ ] **Phase 51: RBAC Data Model & Seed** - Permissions, roles, and user-role assignment collections with seeded support and customer roles
+- [x] **Phase 51: RBAC Data Model & Seed** - Permissions, roles, and user-role assignment collections with seeded support and customer roles -- completed 2026-04-19
 - [x] **Phase 52: Permission Guard & Migration** - Permission-checking guard/decorator infrastructure and migration of existing hardcoded role checks -- completed 2026-04-19
 - [ ] **Phase 53: Support Access & Routing** - Support user login bypass, /support redirect, and route protection
 - [ ] **Phase 54: User Management** - Paginated user list, user detail, and membership summary dashboard for support users
@@ -162,8 +162,8 @@ Full details: `.planning/milestones/v1.9-ROADMAP.md`
   4. User-role assignments are stored per user with scope (support = global, customer = business-specific), and the data model supports future team roles without building team features yet.
 **Plans**: 2 plans
 Plans:
-- [ ] 51-01-PLAN.md -- Permission data model (enums, entity, DTO, repository, extend role entities/DTOs)
-- [ ] 51-02-PLAN.md -- RBAC seeder, permission hydration, tests, module registration
+- [x] 51-01-PLAN.md -- Permission data model (enums, entity, DTO, repository, extend role entities/DTOs)
+- [x] 51-02-PLAN.md -- RBAC seeder, permission hydration, tests, module registration
 
 ### Phase 52: Permission Guard & Migration
 **Goal**: API endpoints can be protected by permission-based decorators, and existing hardcoded support role checks are migrated to the new permission system
@@ -308,7 +308,7 @@ Plans:
 | 48. DI Token Fix & Cleanup | v1.8 | 3/3 | Complete | 2026-04-16 |
 | 49. Revision Frontend UI | v1.8 | 1/1 | Complete | 2026-04-16 |
 | 50. Response Display & Convert Route Fix | v1.8 | 2/2 | Complete | 2026-04-16 |
-| 51. RBAC Data Model & Seed | v1.9 | 0/2 | Not started | - |
+| 51. RBAC Data Model & Seed | v1.9 | 2/2 | Complete | 2026-04-19 |
 | 52. Permission Guard & Migration | v1.9 | 0/2 | Not started | - |
 | 53. Support Access & Routing | v1.9 | 1/2 | In Progress | - |
 | 54. User Management | v1.9 | 0/5 | Not started | - |
