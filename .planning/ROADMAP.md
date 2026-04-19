@@ -201,7 +201,7 @@ Plans:
   2. Support user can click into a user detail page showing the user's profile information, business association, current subscription status with dates, and role assignments.
   3. The `/support` dashboard shows membership summary cards: total users, active trials, active subscriptions, expired subscriptions, and canceled subscriptions -- computed from real data.
   4. The user list loads within a reasonable time and paginates correctly for the expected user base size.
-**Plans**: 8 plans
+**Plans**: 9 plans
 Plans:
 - [x] 54-01-PLAN.md -- Core query infrastructure (filter parser, sort parser, aggregate method, base DTO extension)
 - [x] 54-02-PLAN.md -- Support user list API (module, repository aggregation, retriever service, controller)
@@ -211,6 +211,7 @@ Plans:
 - [x] 54-06-PLAN.md -- [GAP CLOSURE] Fix $lookup join keys in repository and metrics service
 - [x] 54-07-PLAN.md -- [GAP CLOSURE] Fix support login redirect, nav highlight, RoleBadge null guard
 - [x] 54-08-PLAN.md -- [GAP CLOSURE] Add Role and Business columns to UserListTable
+- [ ] 54-09-PLAN.md -- [GAP CLOSURE] Thread user createdAt through aggregation pipeline, DTO, and controller response
 **UI hint**: yes
 
 ### Phase 55: Role Administration
@@ -315,7 +316,7 @@ Plans:
 | 51. RBAC Data Model & Seed | v1.9 | 2/2 | Complete | 2026-04-19 |
 | 52. Permission Guard & Migration | v1.9 | 0/2 | Not started | - |
 | 53. Support Access & Routing | v1.9 | 2/2 | Complete | 2026-04-19 |
-| 54. User Management | v1.9 | 4/8 | In Progress | - |
+| 54. User Management | v1.9 | 4/9 | In Progress | - |
 | 55. Role Administration | v1.9 | 3/3 | Complete | 2026-04-19 |
 | 56. Impersonation Backend & Audit | v1.9 | 0/2 | Not started | - |
 | 57. Impersonation Frontend | v1.9 | 0/3 | Not started | - |
