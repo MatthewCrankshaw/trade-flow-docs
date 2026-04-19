@@ -140,3 +140,4 @@ Last session: 2026-04-18T21:05:00.000Z
 Stopped at: Phase 57 UI-SPEC approved
 Resume file: .planning/phases/57-impersonation-frontend/57-UI-SPEC.md
 
+
