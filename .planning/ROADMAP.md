@@ -201,7 +201,7 @@ Plans:
   2. Support user can click into a user detail page showing the user's profile information, business association, current subscription status with dates, and role assignments.
   3. The `/support` dashboard shows membership summary cards: total users, active trials, active subscriptions, expired subscriptions, and canceled subscriptions -- computed from real data.
   4. The user list loads within a reasonable time and paginates correctly for the expected user base size.
-**Plans**: 7 plans
+**Plans**: 8 plans
 Plans:
 - [x] 54-01-PLAN.md -- Core query infrastructure (filter parser, sort parser, aggregate method, base DTO extension)
 - [x] 54-02-PLAN.md -- Support user list API (module, repository aggregation, retriever service, controller)
@@ -209,7 +209,8 @@ Plans:
 - [x] 54-04-PLAN.md -- Frontend user list (RTK Query, hooks, filters, table, pagination, page rewrite)
 - [x] 54-05-PLAN.md -- Frontend user detail page, dashboard metrics cards, route registration
 - [x] 54-06-PLAN.md -- [GAP CLOSURE] Fix $lookup join keys in repository and metrics service
-- [ ] 54-07-PLAN.md -- [GAP CLOSURE] Fix support login redirect, nav highlight, RoleBadge null guard
+- [x] 54-07-PLAN.md -- [GAP CLOSURE] Fix support login redirect, nav highlight, RoleBadge null guard
+- [ ] 54-08-PLAN.md -- [GAP CLOSURE] Add Role and Business columns to UserListTable
 **UI hint**: yes
 
 ### Phase 55: Role Administration
