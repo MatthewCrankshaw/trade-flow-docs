@@ -244,7 +244,7 @@ Plans:
 - [x] 56-01-PLAN.md -- Module foundation: data models, append-only audit repository, module registration, repository tests
 - [x] 56-02-PLAN.md -- Services (creator/terminator), JwtAuthGuard dual-token extension, controller, service and controller tests
 - [x] 56-03-PLAN.md -- [GAP CLOSURE] Fix SupportModule missing ImpersonationModule import, worker express.d.ts type augmentation
-- [ ] 56-04-PLAN.md -- [GAP CLOSURE] Fix SubscriptionGuard blocking impersonated requests, fix stale session preventing new session start
+- [x] 56-04-PLAN.md -- [GAP CLOSURE] Fix SubscriptionGuard blocking impersonated requests, fix stale session preventing new session start
 
 ### Phase 57: Impersonation Frontend
 **Goal**: A support user can impersonate a customer and see exactly what that customer sees, with a persistent banner and a clean exit back to the support dashboard

@@ -4,8 +4,8 @@ milestone: v1.9
 milestone_name: Support & Admin Tools
 status: executing
 stopped_at: Completed 55-03-PLAN.md
-last_updated: "2026-04-20T07:07:38.776Z"
-last_activity: 2026-04-20 -- Phase 56 execution started
+last_updated: "2026-04-20T07:11:04.947Z"
+last_activity: 2026-04-20 -- Phase 57 execution started
 progress:
   total_phases: 7
   completed_phases: 5
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-18)
 
 **Core value:** A job is the centre of the business -- Trade Flow helps tradespeople run their entire business from first call to final payment
-**Current focus:** Phase 56 — impersonation-backend-audit
+**Current focus:** Phase 57 — impersonation-frontend
 
 ## Current Position
 
-Phase: 56 (impersonation-backend-audit) — EXECUTING
+Phase: 57 (impersonation-frontend) — EXECUTING
 Plan: 1 of 4
-Status: Executing Phase 56
-Last activity: 2026-04-20 -- Phase 56 execution started
+Status: Executing Phase 57
+Last activity: 2026-04-20 -- Phase 57 execution started
 
 ## Roadmap Summary
 
@@ -69,6 +69,8 @@ Key decisions archived in PROJECT.md Key Decisions table.
 - Impersonation audit ships WITH impersonation, not separately (Phase 56)
 - Separation over DRY at entity boundaries (project convention) -- permissions, roles, user-role assignments are separate collections
 - Guards must throw NestJS HttpException subclasses (not domain errors) -- domain errors only work in controller catch blocks via createHttpError()
+- Bypass subscription via request.impersonator presence -- impersonator field only set after cryptographic JWT verification (Phase 56-04)
+- Auto-terminate stale impersonation sessions instead of rejecting -- preserves audit trail while allowing browser-refresh recovery (Phase 56-04)
 
 ### Pending Todos
 
@@ -137,6 +139,6 @@ Items acknowledged and deferred at v1.8 milestone close on 2026-04-18:
 
 ## Session Continuity
 
-Last session: 2026-04-19T19:13:19.079Z
-Stopped at: Completed 55-03-PLAN.md
+Last session: 2026-04-20T07:13:29Z
+Stopped at: Completed 56-04-PLAN.md
 Resume file: None
