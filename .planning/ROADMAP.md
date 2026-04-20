@@ -254,11 +254,12 @@ Plans:
   1. During impersonation, the app renders exactly what the customer sees -- same data, same subscription state, same permissions -- as if the support user were logged in as that customer.
   2. A fixed impersonation banner is visible at all times during an impersonation session, showing the impersonated user's name and a "Return to Support" button that cannot be scrolled away or dismissed.
   3. Clicking "Return to Support" terminates the impersonation session (recording the end timestamp in the audit log) and cleanly navigates back to the support dashboard with the support user's own identity restored.
-**Plans**: 3 plans
+**Plans**: 4 plans
 Plans:
-- [ ] 57-01-PLAN.md -- Impersonation infrastructure: Redux slice, store registration, RTK Query API endpoints, token switching in prepareHeaders, baseQuery expired-token wrapper
-- [ ] 57-02-PLAN.md -- Impersonation UX: useImpersonation hook, ImpersonationBanner, DashboardLayout integration, guard bypasses, navigation switching
-- [ ] 57-03-PLAN.md -- Impersonation entry point: ImpersonateUserDialog with required reason field, Impersonate User button on SupportUserDetailPage
+- [x] 57-01-PLAN.md -- Impersonation infrastructure: Redux slice, store registration, RTK Query API endpoints, token switching in prepareHeaders, baseQuery expired-token wrapper
+- [x] 57-02-PLAN.md -- Impersonation UX: useImpersonation hook, ImpersonationBanner, DashboardLayout integration, guard bypasses, navigation switching
+- [x] 57-03-PLAN.md -- Impersonation entry point: ImpersonateUserDialog with required reason field, Impersonate User button on SupportUserDetailPage
+- [ ] 57-04-PLAN.md -- [GAP CLOSURE] Add targetUser to impersonation start response
 **UI hint**: yes
 
 ## Progress
