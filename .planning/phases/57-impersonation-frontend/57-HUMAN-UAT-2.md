@@ -1,31 +1,31 @@
 ---
-status: diagnosed
+status: passed
 phase: 57-impersonation-frontend
 source: [57-VERIFICATION.md]
 started: 2026-04-20T08:20:00Z
-updated: 2026-04-20T20:40:00Z
+updated: 2026-04-20T21:00:00Z
 ---
 
 ## Current Test
 
-[awaiting re-test after fixes]
+[complete]
 
 ## Tests
 
 ### 1. Full impersonation flow (re-test after Plan 04 fix)
 expected: Amber banner shows "Impersonating: {user name}" instead of white space. Sidebar switches to customer navigation. Banner stays fixed while scrolling and above modals.
-result: issue — banner renders but POST/PATCH requests during impersonation fail with 500 (SubscriptionGuard rejects before JwtAuthGuard runs). Fixed: SubscriptionGuard now defers when no user present.
+result: pass — banner renders correctly, POST/PATCH requests work after SubscriptionGuard fix.
 
 ### 2. Return to Support button flow (re-test)
 expected: Click "Return to Support" during active impersonation. Navigates to /support, banner disappears, toast shows "Impersonation session ended".
-result: issue — toast shows "Session end request failed" because prepareHeaders attaches impersonation token (HS256) but endpoint requires Firebase token (RS256). Fixed: dispatch endImpersonation() before API call so prepareHeaders uses Firebase token.
+result: pass — toast shows success message, navigation works correctly after token fix.
 
 ## Summary
 
 total: 2
-passed: 0
-issues: 2
-pending: 2
+passed: 2
+issues: 0
+pending: 0
 skipped: 0
 blocked: 0
 
