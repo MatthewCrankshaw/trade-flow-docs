@@ -1,9 +1,9 @@
 ---
-status: complete
+status: diagnosed
 phase: 56-impersonation-backend-audit
 source: [56-VERIFICATION.md]
 started: 2026-04-19T20:30:00Z
-updated: 2026-04-20T06:45:00Z
+updated: 2026-04-20T06:50:00Z
 ---
 
 ## Current Test
@@ -46,11 +46,16 @@ blocked: 0
   reason: "User reported: (1) Cannot start/resume session after browser refresh during impersonation. (2) SubscriptionGuard rejects impersonated requests with 500 — guard does not recognize impersonation auth context. (3) Impersonation banner is white/invisible."
   severity: blocker
   test: 4
-  root_cause: ""
+  root_cause: "Three distinct issues: (A) SubscriptionGuard checks user subscription but impersonated target user (customer) has no subscription — guard throws ForbiddenError. The guard needs to recognize impersonation context and use the support user's subscription or bypass for impersonated requests. (B) Concurrent session prevention in impersonation-creator.service.ts blocks new session start when previous session is still ACTIVE after browser refresh cleared frontend state. Backend session remains ACTIVE but frontend lost the token. (C) ImpersonationBanner uses bg-amber-500 but CSS may not be loading — likely Tailwind build or z-index issue (phase 57)."
   artifacts:
     - path: "src/subscription/guards/subscription.guard.ts"
-      issue: "SubscriptionGuard.canActivate does not handle impersonation context — throws ForbiddenError at line 46"
+      issue: "SubscriptionGuard.canActivate does not handle impersonation context — throws ForbiddenError at line 46 when target user has no subscription"
+    - path: "src/impersonation/services/impersonation-creator.service.ts"
+      issue: "Concurrent session prevention blocks new session when previous ACTIVE session exists after browser refresh"
+    - path: "src/auth/auth.guard.ts"
+      issue: "Impersonation tokens can authenticate management endpoints — needs explicit path-based rejection"
   missing:
-    - "SubscriptionGuard needs to recognize impersonated users and pass through subscription checks using the target user's subscription"
-    - "Session recovery after browser refresh needs investigation — may be frontend auth state issue"
+    - "SubscriptionGuard must detect request.impersonator and bypass subscription check for impersonated requests"
+    - "Impersonation start should auto-expire or allow overriding stale ACTIVE sessions from same support user"
+    - "Verify ImpersonationBanner CSS loading (phase 57 concern)"
   debug_session: ""
