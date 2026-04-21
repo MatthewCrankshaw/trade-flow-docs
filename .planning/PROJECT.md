@@ -111,20 +111,26 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - ✓ User can convert estimate to quote with mandatory review and idempotent endpoint -- v1.8
 - ✓ User can mark estimate as lost with structured reason; cancels pending follow-ups -- v1.8
 - ✓ Estimates auto-expire 30 days after send; Redis AOF persistence for follow-up durability -- v1.8
+- ✓ Workflow-based RBAC with permissions, roles, and user-role assignments seeded on startup -- v1.9
+- ✓ Permission-checking guard/decorator infrastructure replacing all hardcoded role checks -- v1.9
+- ✓ Support user login bypasses onboarding and redirects to dedicated /support dashboard -- v1.9
+- ✓ Support routes protected by frontend route guard checking for support role -- v1.9
+- ✓ Paginated user list with search, subscription status, role badges, and business association -- v1.9
+- ✓ User detail page with profile, subscription, and role information -- v1.9
+- ✓ Membership summary dashboard cards (total users, active trials, active/expired/canceled subscriptions) -- v1.9
+- ✓ Super user can grant/revoke support admin role with confirmation dialog and immediate effect -- v1.9
+- ✓ Last-admin protection prevents super user from revoking their own role -- v1.9
+- ✓ Time-limited impersonation sessions with HS256 JWT and 30-minute expiry -- v1.9
+- ✓ Impersonation audit logging in dedicated append-only collection with reason field -- v1.9
+- ✓ Impersonation banner with "Return to Support" button visible at all times during session -- v1.9
+- ✓ Clean impersonation session termination with audit trail and identity restoration -- v1.9
+- ✓ Support user cannot impersonate other support users (lateral privilege prevention) -- v1.9
 
 ### Active
 
 <!-- Current scope. Building toward these. -->
 
-## Current Milestone: v1.9 Support & Admin Tools
-
-**Goal:** Give the support team a dedicated experience — login without onboarding, user management dashboard with membership summaries, customer impersonation for debugging, and super-user role administration.
-
-**Target features:**
-- Support user login that bypasses onboarding (no business association required)
-- User management dashboard showing all users (support + customer) with membership status summaries
-- Customer impersonation — support user can "login as" a customer to see exactly what they see
-- Super user role management — grant and revoke support roles on other users
+(No active milestone -- planning next milestone)
 
 ### Out of Scope
 
@@ -144,7 +150,7 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - File/photo uploads on jobs -- separate feature
 - Job notes (non-schedule) -- separate feature
 - Data export/backup -- future
-- Audit logging -- future
+- Audit logging (beyond impersonation) -- future (impersonation audit shipped in v1.9)
 - Drag-and-drop calendar -- over-engineering for current use case
 - Route optimization -- solo operator with local work
 - Automated scheduling / AI -- tradespeople want control
@@ -179,7 +185,8 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 - **Onboarding & landing page shipped (v1.7):** Public marketing page at root URL, mandatory two-step onboarding wizard, no-card 30-day trial, hard paywall (replaced soft modal), welcome dashboard with getting-started checklist, old onboarding system removed
 - **Luxon standardized (v1.6):** All DTOs use Luxon DateTime (no native Date), shared toDateTime utility, date-helpers module in UI
 - **Estimates shipped (v1.8):** Full estimate lifecycle -- create/edit/delete, contingency ranges, revisions, email sending with legal copy, public customer response page, BullMQ follow-up automation, convert-to-quote, mark-as-lost. Separate estimate_line_items and estimate-settings modules. document-token unification for shared public access infrastructure.
-- **Codebase size:** ~25k LOC API (TypeScript) + ~27k LOC UI (TypeScript/TSX)
+- **Support & admin tools shipped (v1.9):** RBAC foundation (permissions/roles/user-role assignments), permission guard infrastructure replacing hardcoded checks, support user dashboard with user management and membership metrics, role administration (grant/revoke support admin), customer impersonation with time-limited sessions, audit logging, and persistent banner UX
+- **Codebase size:** ~28k LOC API (TypeScript) + ~30k LOC UI (TypeScript/TSX)
 
 ## Constraints
 
@@ -257,13 +264,20 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 | Redis AOF as hard infra gate | appendonly yes / appendfsync everysec required before follow-up queue ships | ✓ Good -- prevents silent data loss |
 | IEstimateFollowupCanceller DI token | Allows NoopCanceller in non-queue contexts; real BullMQ canceller injected via module exports | ✓ Good -- but required Phase 48 fix for provider precedence |
 | Idempotency-Key for convert-to-quote | 24h deduplication window prevents double-submit creating duplicate quotes | ✓ Good -- defensive |
+| Workflow-based permissions (not CRUD-based) | Permissions like `send_quote`, `manage_users` map to business actions, not database operations | ✓ Good -- meaningful to support team |
+| Separate collections for permissions, roles, user-role assignments | Separation over DRY at entity boundaries; each evolves independently | ✓ Good -- clean separation |
+| HS256 impersonation JWT with dedicated secret | Separate from Firebase RS256 tokens; JwtAuthGuard detects token type via decode peek | ✓ Good -- no Firebase dependency for impersonation |
+| Append-only impersonation audit collection | No update/delete operations; immutable audit trail for compliance | ✓ Good -- trustworthy audit |
+| Auto-terminate stale impersonation sessions | Browser refresh recovery instead of blocking new sessions; preserves audit trail | ✓ Good -- better UX than hard rejection |
+| SubscriptionGuard bypass via request.impersonator | Impersonator field only set after cryptographic JWT verification; clean bypass | ✓ Good -- secure |
+| Guards throw NestJS HttpException (not domain errors) | Domain errors only work in controller catch blocks via createHttpError(); guards need direct HTTP exceptions | ✓ Good -- fixed 500→403 bug |
 
 ## Current State
 
-**Shipped:** v1.8 Estimates (2026-04-18)
-**Current milestone:** v1.9 Support & Admin Tools (started 2026-04-18)
+**Shipped:** v1.9 Support & Admin Tools (2026-04-21)
+**Current milestone:** Planning next milestone
 
-Trade Flow is a monetized SaaS product with a complete user acquisition funnel: public landing page, mandatory onboarding wizard, no-card free trial, and hard paywall. The core product flow -- from customer management through job tracking, quoting, estimates, and payment -- is fully functional. Support role exists (v1.6) and bypasses subscription gating, but lacks dedicated tooling for user management, impersonation, and role administration.
+Trade Flow is a monetized SaaS product with a complete user acquisition funnel: public landing page, mandatory onboarding wizard, no-card free trial, and hard paywall. The core product flow -- from customer management through job tracking, quoting, estimates, and payment -- is fully functional. The platform now has a proper RBAC foundation with workflow-based permissions, a dedicated support dashboard with user management and membership metrics, role administration (grant/revoke support admin), and customer impersonation with time-limited sessions and full audit logging.
 
 ## Evolution
 
@@ -283,4 +297,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-18 after v1.8 milestone close*
+*Last updated: 2026-04-21 after v1.9 milestone close*

@@ -1,5 +1,5 @@
 ---
-status: diagnosed
+status: complete
 phase: 55-role-administration
 source: [55-01-SUMMARY.md, 55-02-SUMMARY.md]
 started: 2026-04-19T09:00:00Z

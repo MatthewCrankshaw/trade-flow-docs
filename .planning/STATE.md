@@ -4,8 +4,8 @@ milestone: v1.9
 milestone_name: Support & Admin Tools
 status: executing
 stopped_at: Completed 56-04-PLAN.md
-last_updated: "2026-04-20T07:17:16.517Z"
-last_activity: 2026-04-20
+last_updated: "2026-04-21T19:22:30.297Z"
+last_activity: 2026-04-21
 progress:
   total_phases: 7
   completed_phases: 7
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-18)
 Phase: 57 (impersonation-frontend) — EXECUTING
 Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-04-20
+Last activity: 2026-04-21
 
 ## Roadmap Summary
 
@@ -105,10 +105,11 @@ None.
 
 ## Deferred Items
 
-Items acknowledged and deferred at v1.8 milestone close on 2026-04-18:
+Items acknowledged and deferred at v1.9 milestone close on 2026-04-21:
 
 | Category | Item | Status |
 |----------|------|--------|
+| debug | api-ci-warnings-to-errors | investigating |
 | debug | billing-invalid-datetime-and-portal-redirect | awaiting_human_verify |
 | debug | bundle-component-alignment-v2 | diagnosed |
 | debug | bundle-component-alignment | diagnosed |
@@ -127,15 +128,6 @@ Items acknowledged and deferred at v1.8 milestone close on 2026-04-18:
 | debug | ui-shows-active-instead-of-trial | awaiting_human_verify |
 | debug | user-duplicate-creation-race-condition | awaiting_human_verify |
 | debug | worker-mongodb-econnrefused | investigating |
-| uat_gap | Phase 42 (1 pending scenario) | partial |
-| uat_gap | Phase 49 (3 pending scenarios) | partial |
-| verification | Phase 42 | human_needed |
-| verification | Phase 43 | human_needed |
-| verification | Phase 44 | human_needed |
-| verification | Phase 46 | human_needed |
-| verification | Phase 47 | human_needed |
-| verification | Phase 49 | human_needed |
-| quick_task | 20 tasks with missing status files | missing |
 
 ## Session Continuity
 

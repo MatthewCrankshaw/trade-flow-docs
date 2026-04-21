@@ -1,4 +1,5 @@
 ---
+status: complete
 phase: quick
 plan: 260321-tua
 subsystem: ui
@@ -32,6 +33,7 @@ requirements-completed: [auto-select-new-job]
 duration: 1min
 completed: 2026-03-21
 ---
+status: complete
 
 # Quick Task 260321-tua: Auto-Select Newly Created Job in Quote Dialog Summary
 

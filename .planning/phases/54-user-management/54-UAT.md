@@ -1,5 +1,5 @@
 ---
-status: diagnosed
+status: complete
 phase: 54-user-management
 source: [54-01-SUMMARY.md, 54-02-SUMMARY.md, 54-03-SUMMARY.md, 54-04-SUMMARY.md]
 started: 2026-04-19T08:00:00Z

@@ -1,5 +1,39 @@
 # Milestones
 
+## v1.9 Support & Admin Tools (Shipped: 2026-04-21)
+
+**Phases completed:** 7 phases, 26 plans, 37 tasks
+
+**Key accomplishments:**
+
+- Enums:
+- RbacSeeder seeds 18 permissions and support roles on every boot via OnModuleInit; role repositories now hydrate permissions onto DTOs via PermissionRepository injection; UserRepository gains setSupportRoleIds.
+- `src/auth/utilities/has-permission.utility.ts`
+- `src/subscription/guards/subscription.guard.ts`
+- 1. [Rule 3 - Blocking] Kept getNavigationItems as backward-compatible alias
+- 1. [Rule 1 - Bug] Fixed setState-in-effect lint violation in LoginPage
+- One-liner:
+- GET /v1/support/users endpoint with MongoDB $lookup aggregation pipeline joining users, subscriptions, and businesses, protected by manage_users permission guard.
+- Firebase Admin SDK integration for auth metadata plus GET /v1/support/users/:id and GET /v1/support/dashboard/metrics endpoints backed by MongoDB aggregation pipelines.
+- One-liner:
+- RTK Query endpoints for user detail and dashboard metrics, MembershipMetrics and RoleBadge components, SupportUserDetailPage with 4-card layout, and route registration at /support/users/:id.
+- Fixed all broken MongoDB $lookup join keys in the support module using externalAuthUserId for subscriptions, two-step businessusers join for business data, and roleName for role projection
+- Fix support user login redirect, nav highlight prefix matching, and RoleBadge null crash
+- Added Role and Business columns to UserListTable for complete user information display in support dashboard
+- Gap closed:
+- One-liner:
+- One-liner:
+- Fixed SubscriptionGuard blocking grant/revoke endpoints via @SkipSubscriptionCheck() and PermissionGuard returning 500 via ForbiddenException replacement
+- Data Models:
+- ImpersonationCreator (IMP-01, IAUD-01):
+- Task 1 — SupportModule dependency fix:
+- Redux impersonation slice with token-switching prepareHeaders and expired-session baseQuery wrapper — complete data layer for impersonation
+- Fixed amber banner, useImpersonation hook, guard bypasses, and nav switching — complete impersonation UX layer
+- Confirmation dialog with required reason field and conditional Impersonate User button on the support user detail page — complete impersonation entry point
+- Backend impersonation start endpoint now returns targetUser {id, name, email} alongside token and sessionId, enabling the frontend ImpersonationBanner to display the impersonated user's identity
+
+---
+
 ## v1.8 Estimates (Shipped: 2026-04-18)
 
 **Phases completed:** 10 phases (41-50), 45 plans

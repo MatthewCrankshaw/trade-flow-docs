@@ -1,4 +1,5 @@
 ---
+status: complete
 phase: quick-2
 plan: 01
 subsystem: api
@@ -52,6 +53,7 @@ requirements-completed: [QUICK-2]
 duration: 5min
 completed: 2026-03-01
 ---
+status: complete
 
 # Quick Task 2: Merge date+startTime into startDateTime Summary
 

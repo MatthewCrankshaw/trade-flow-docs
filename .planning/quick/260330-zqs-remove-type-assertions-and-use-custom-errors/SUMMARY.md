@@ -1,3 +1,6 @@
+---
+status: complete
+---
 # Quick Task: Remove Type Assertions and Use Custom Errors in Stripe Webhook Processor
 
 **Commit:** `e399c93` in trade-flow-api

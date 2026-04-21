@@ -1,4 +1,5 @@
 ---
+status: complete
 phase: quick
 plan: 260321-thu
 subsystem: api, ui
@@ -42,6 +43,7 @@ requirements-completed: []
 duration: 4min
 completed: 2026-03-21
 ---
+status: complete
 
 # Quick Task 260321-thu: Simplify Quote Creation Summary
 

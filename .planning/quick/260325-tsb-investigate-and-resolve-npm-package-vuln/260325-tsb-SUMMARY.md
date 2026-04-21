@@ -1,4 +1,5 @@
 ---
+status: complete
 phase: quick
 plan: 260325-tsb
 subsystem: security
@@ -31,6 +32,7 @@ requirements-completed: []
 duration: 2min
 completed: 2026-03-25
 ---
+status: complete
 
 # Quick Task 260325-tsb: Investigate and Resolve npm Package Vulnerabilities
 

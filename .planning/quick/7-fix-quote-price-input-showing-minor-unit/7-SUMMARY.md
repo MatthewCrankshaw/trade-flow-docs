@@ -1,4 +1,5 @@
 ---
+status: complete
 phase: quick-7
 plan: 1
 subsystem: ui
@@ -32,6 +33,7 @@ requirements-completed: [QUICK-7]
 duration: 1min
 completed: 2026-03-15
 ---
+status: complete
 
 # Quick Task 7: Fix Quote Price Input Showing Minor Units Summary
 

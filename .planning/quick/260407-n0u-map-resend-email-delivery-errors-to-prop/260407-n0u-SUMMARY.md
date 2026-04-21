@@ -1,4 +1,5 @@
 ---
+status: complete
 type: quick
 quick_id: 260407-n0u
 description: Map Resend email delivery errors to proper HTTP response codes
@@ -6,6 +7,7 @@ metrics:
   duration: 3min
   completed: 2026-04-07T15:40:00Z
 ---
+status: complete
 
 # Quick Task 260407-n0u: Map Resend Email Delivery Errors Summary
 

@@ -1,10 +1,12 @@
 ---
+status: complete
 id: 260410-tkt
 name: Review onboarding defect fixes and refactor for better holistic solution
 mode: quick
 created: 2026-04-10
 completed: 2026-04-10
 ---
+status: complete
 
 # Summary: Onboarding defect-fix review and holistic refactor
 

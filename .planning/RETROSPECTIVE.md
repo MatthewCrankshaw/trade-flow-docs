@@ -384,6 +384,57 @@
 
 ---
 
+## Milestone: v1.9 -- Support & Admin Tools
+
+**Shipped:** 2026-04-21
+**Phases:** 7 (51-57) | **Plans:** 26 | **Timeline:** 3 days (2026-04-18 -> 2026-04-21)
+
+### What Was Built
+- RBAC foundation: permissions collection (18 workflow-based permissions), roles collection (Super User, Admin, Business Administrator), user-role assignments with support/business scoping
+- Permission guard infrastructure: @RequiresPermission decorator, PermissionGuard, hasPermission utility, migration of all hardcoded role checks from SubscriptionGuard/PaywallGuard
+- Support user experience: dedicated /support dashboard, login redirect bypassing onboarding, SupportGuard route protection, split navigation config
+- User management: paginated user list with MongoDB $lookup aggregation, user detail page, membership metrics dashboard, Firebase Admin SDK for auth metadata
+- Role administration: grant/revoke support admin role, confirmation dialogs, last-admin protection, @SkipSubscriptionCheck on role endpoints
+- Impersonation backend: time-limited HS256 JWT sessions (30min), dual-token JwtAuthGuard detection, append-only audit collection, auto-terminate stale sessions
+- Impersonation frontend: Redux slice with token switching, ImpersonationBanner, guard bypasses, ImpersonateUserDialog with required reason field
+- 7 gap closure plans (54-06 through 54-09, 55-03, 56-03, 56-04, 57-04) addressing MongoDB join keys, guard exceptions, DI wiring, and response data
+
+### What Worked
+- Gap closure plans were targeted and surgical -- each addressed a specific verified issue (wrong $lookup join key, guard throwing wrong exception type, missing module import)
+- Dual-token JWT approach (HS256 for impersonation, RS256 for Firebase) cleanly separated auth concerns without modifying Firebase config
+- Append-only audit collection design prevents any tampering with impersonation records
+- Auto-terminate stale sessions (instead of blocking new session creation) provided better UX for browser-refresh recovery while preserving audit trail
+- SubscriptionGuard bypass via request.impersonator field was clean -- field only exists after cryptographic JWT verification
+- Separation pattern continued: permissions, roles, user-role assignments as separate collections
+
+### What Was Inefficient
+- 7 gap closure plans out of 26 total (27% gap closure rate) -- MongoDB $lookup join issues (54-06, 54-07) should have been caught during initial development with integration tests
+- ROADMAP.md plan checkboxes and progress table fell significantly out of sync during execution -- some phases showed 0/2 plans complete despite having summaries for all plans
+- Requirements traceability table in REQUIREMENTS.md was not maintained during execution -- 24/32 requirements still showed "Pending" at milestone close despite all phases being complete
+- Guards throwing NestJS HttpException vs domain errors confusion (55-03) is a recurring pattern that should be documented as a project convention
+
+### Patterns Established
+- Workflow-based permissions (send_quote, manage_users) over CRUD-based permissions (create_job, read_customer) -- maps to business actions
+- HS256 impersonation JWT with JwtAuthGuard decode-peek for token type detection
+- Append-only audit collection pattern: insert-only repository with no update/delete methods
+- MongoDB $lookup aggregation with two-step join pattern (via intermediate collection) for indirect relationships
+- @SkipSubscriptionCheck on admin endpoints: subscription guard bypass for internal tooling routes
+- Auto-terminate stale sessions pattern: recover from interrupted sessions instead of hard-blocking
+
+### Key Lessons
+1. MongoDB $lookup join keys must be validated with integration tests -- string/ObjectId mismatches and wrong field names cause silent empty results, not errors
+2. Guards in NestJS must throw HttpException subclasses (ForbiddenException, UnauthorizedException), not domain errors -- domain errors only work in controller catch blocks via createHttpError()
+3. Requirements traceability needs automation or enforcement during plan completion -- manual tracking drifts within days
+4. Auto-termination of stale state (impersonation sessions) is better UX than hard rejection for browser-refresh scenarios
+5. Dual-token authentication (different signing algorithms for different token types) is a clean pattern for adding new auth mechanisms alongside existing ones
+
+### Cost Observations
+- Model mix: opus for planning and execution
+- Timeline: 3 days for 26 plans across 7 phases
+- Notable: gap closure rate (27%) consistent with complex feature milestones -- infrastructure-adjacent phases (51-52) had 0 gap closure; UI-heavy phases (54, 57) had most
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -398,6 +449,7 @@
 | v1.6 | ~55 min | 6 | Full SaaS billing, webhook processing via BullMQ, soft paywall, Luxon standardization, zero gap closure |
 | v1.7 | ~7 days | 6 | User acquisition funnel, hard paywall replacing soft, milestone audit caught critical integration gap |
 | v1.8 | ~7 days | 10 | Full estimate lifecycle (58 reqs), milestone audit + 3 gap closure phases, separation-over-DRY pattern |
+| v1.9 | ~3 days | 7 | RBAC + support tooling + impersonation, dual-token auth, 27% gap closure rate, append-only audit |
 
 ### Top Lessons (Verified Across Milestones)
 
@@ -417,3 +469,5 @@
 14. Execute planned E2E verification checkpoints -- skipping them directly causes requirement gaps that require gap closure phases (confirmed: v1.8 skipped 45-05, caused 3 gaps)
 15. NestJS local providers override imported module exports -- always verify cross-module DI bindings with integration tests (confirmed: v1.8 NoopEstimateFollowupCanceller override)
 16. Plan response data pipelines (persistence -> derivation -> display) end-to-end across phases, not per-phase (confirmed: v1.8 responseSummary null was a cross-phase gap)
+17. Guards must throw NestJS HttpException subclasses, not domain errors -- domain errors only work in controller catch blocks (confirmed: v1.9 PermissionGuard 500→403 fix)
+18. MongoDB $lookup join keys need integration tests -- string/ObjectId mismatches cause silent empty results (confirmed: v1.9 externalAuthUserId join fixes)

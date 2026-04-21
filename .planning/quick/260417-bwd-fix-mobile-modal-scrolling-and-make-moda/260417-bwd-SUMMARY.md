@@ -1,4 +1,5 @@
 ---
+status: complete
 phase: quick
 plan: 260417-bwd
 subsystem: ui-components
@@ -27,6 +28,7 @@ metrics:
   tasks: 2/2 auto tasks completed (1 checkpoint pending)
   files: 4
 ---
+status: complete
 
 # Quick Task 260417-bwd: Fix Mobile Modal Scrolling and Make Dialogs Fullscreen Summary
 

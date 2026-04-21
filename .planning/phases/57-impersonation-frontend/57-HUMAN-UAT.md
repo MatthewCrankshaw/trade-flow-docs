@@ -1,5 +1,5 @@
 ---
-status: diagnosed
+status: complete
 phase: 57-impersonation-frontend
 source: [57-VERIFICATION.md]
 started: 2026-04-19T18:30:00Z

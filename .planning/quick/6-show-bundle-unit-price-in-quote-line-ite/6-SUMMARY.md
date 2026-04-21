@@ -1,4 +1,5 @@
 ---
+status: complete
 phase: quick
 plan: 6
 subsystem: ui
@@ -21,6 +22,7 @@ requirements-completed: [QUICK-6]
 duration: 5min
 completed: 2026-03-15
 ---
+status: complete
 
 # Quick Task 6: Show Bundle Unit Price in Quote Line Items Summary
 

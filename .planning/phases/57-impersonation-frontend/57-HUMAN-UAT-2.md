@@ -1,5 +1,5 @@
 ---
-status: passed
+status: complete
 phase: 57-impersonation-frontend
 source: [57-VERIFICATION.md]
 started: 2026-04-20T08:20:00Z

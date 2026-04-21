@@ -1,3 +1,6 @@
+---
+status: complete
+---
 # Quick Task 260407-s9g: Summary
 
 ## Task

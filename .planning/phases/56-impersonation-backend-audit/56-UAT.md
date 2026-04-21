@@ -1,5 +1,5 @@
 ---
-status: diagnosed
+status: complete
 phase: 56-impersonation-backend-audit
 source:
   - 56-01-SUMMARY.md
