@@ -170,12 +170,13 @@ Full details: `.planning/milestones/v1.9-ROADMAP.md`
 **Goal:** Remove all hardcoded/mocked data from the job detail page, wire real API-sourced data, build a job events system for the timeline, and clean up UI sections that reference unbuilt features
 **Requirements**: TBD
 **Depends on:** Phase 0
-**Plans:** 3 plans
+**Plans:** 4 plans
 
 Plans:
 - [ ] 01-01-PLAN.md — Job event backend module (entity, services, controller, tests)
 - [ ] 01-02-PLAN.md — Frontend mock removal and real data wiring
-- [ ] 01-03-PLAN.md — Inline event writes and timeline UI integration
+- [ ] 01-03-PLAN.md — Inline event writes in existing backend services
+- [ ] 01-04-PLAN.md — Frontend timeline UI and cache invalidation
 
 ### Phase 2: Inline customer and job creation during quote/estimate creation
 

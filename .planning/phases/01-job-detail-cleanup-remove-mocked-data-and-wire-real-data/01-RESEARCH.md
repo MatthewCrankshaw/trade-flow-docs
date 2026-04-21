@@ -104,12 +104,14 @@ This phase uses only existing project dependencies. No new packages need to be i
 --- Event Writing (Backend, inline in services) ---
 
 [quote-creator.service] --writes--> job_events { type: "quote_created", jobId, ... }
-[quote-updater.service] --writes--> job_events { type: "quote_sent/accepted/rejected", ... }
+[quote-transition.service] --writes--> job_events { type: "quote_sent/accepted/rejected", ... }
 [schedule-creator.service] --writes--> job_events { type: "schedule_created", ... }
 [schedule-updater.service] --writes--> job_events { type: "schedule_status_changed", ... }
 [job-updater.service] --writes--> job_events { type: "job_status_changed", ... }
 [estimate-creator.service] --writes--> job_events { type: "estimate_created", ... }
-[estimate-updater.service] --writes--> job_events { type: "estimate_sent/responded/converted/lost", ... }
+[estimate-transition.service] --writes--> job_events { type: "estimate_sent/responded", ... }
+[estimate-to-quote-converter.service] --writes--> job_events { type: "estimate_converted", ... }
+[estimate-lost-marker.service] --writes--> job_events { type: "estimate_lost", ... }
 ```
 
 ### Recommended Project Structure -- Backend (new files)
@@ -395,22 +397,22 @@ const { data: customer } = useGetCustomerQuery(job?.customerId, { skip: !job?.cu
 | A4 | Schedule module exists with `useGetSchedulesByJobQuery` hook | Code Context | CONTEXT.md references it as "Already used on job detail page" -- but codebase docs are from Feb |
 | A5 | Estimate module exists with full CRUD from v1.8 | Pitfall 6 | If module structure differs from expected, event-writing injection points may differ |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Estimate module's exact service file names**
-   - What we know: Estimate module was built in v1.8 (Phases 41-50), shipped April 2026
-   - What's unclear: Exact service class names (EstimateCreator? EstimateUpdater?) and whether there is an estimate-sender service
-   - Recommendation: The executing agent should inspect `src/estimate/services/` in trade-flow-api at implementation time. Follow whatever naming exists.
+1. **Estimate module's exact service file names** (RESOLVED 2026-04-21)
+   - **Answer:** Confirmed from v1.8 milestone artifacts (Phases 41-50). The estimate module has these services:
+     - `estimate-creator.service.ts` (class: `EstimateCreator`) -- creates estimates
+     - `estimate-transition.service.ts` (class: `EstimateTransitionService`) -- handles status transitions (SENT, RESPONDED via ALLOWED_TRANSITIONS map)
+     - `estimate-to-quote-converter.service.ts` (class: `EstimateToQuoteConverter`) -- converts estimate to quote (transitions to Converted)
+     - `estimate-lost-marker.service.ts` (class: `EstimateLostMarker`) -- marks estimate as lost (transitions to Lost)
+   - No separate "estimate-sender" service; the email-sending service (`estimate-email-sender`) calls `EstimateTransitionService` for the SENT transition.
+   - Module file: `estimate.module.ts` (class: `EstimateModule`)
 
-2. **Quote filtering by jobId**
-   - What we know: `useGetQuotesQuery` exists, and CONTEXT.md says quotes need to be fetched for a job
-   - What's unclear: Whether the existing quote API endpoint supports `?jobId=` filtering or only `?businessId=`
-   - Recommendation: Check `quoteApi.ts` and `quote.controller.ts` at implementation time. If jobId filtering does not exist, add it as part of this phase.
+2. **Quote filtering by jobId** (RESOLVED via PATTERNS.md)
+   - **Answer:** The existing `useGetQuotesQuery` fetches by `businessId`, then filtering by jobId is done client-side. PATTERNS.md confirms this pattern at `JobDetailPage.tsx` line 93-103 where `allQuotes` is fetched by businessId and filtered in the component.
 
-3. **RTK Query tag types registration**
-   - What we know: New `"JobEvent"` tag type needs to be added to the base API slice
-   - What's unclear: Where tag types are registered -- likely in `src/services/api.ts`
-   - Recommendation: Add `"JobEvent"` to the `tagTypes` array in the base `createApi` call.
+3. **RTK Query tag types registration** (RESOLVED via PATTERNS.md)
+   - **Answer:** Tag types are registered in `trade-flow-ui/src/services/api.ts` in the `createApi` call's `tagTypes` array. PATTERNS.md confirms the exact location at lines 46-62 of that file.
 
 ## Validation Architecture
 
@@ -476,6 +478,7 @@ const { data: customer } = useGetCustomerQuery(job?.customerId, { skip: !job?.cu
 ### Secondary (MEDIUM confidence)
 - `.planning/ROADMAP.md` -- Confirmed estimate module exists (v1.8 shipped)
 - `.planning/STATE.md` -- Project history and current position
+- v1.8 milestone artifacts -- Confirmed estimate service file names (Phases 41-50)
 
 ### Tertiary (LOW confidence)
 - None -- all claims derived from project documentation
@@ -487,6 +490,7 @@ const { data: customer } = useGetCustomerQuery(job?.customerId, { skip: !job?.cu
 - Architecture: HIGH -- follows exact same module pattern used 15+ times in codebase
 - Pitfalls: HIGH -- based on known RTK Query patterns and NestJS DI behavior
 - Event system design: MEDIUM -- entity design is discretionary, but follows established patterns
+- Estimate service names: HIGH -- confirmed from v1.8 milestone artifacts
 
 **Research date:** 2026-04-21
 **Valid until:** 2026-05-21 (stable -- no external dependency changes)
