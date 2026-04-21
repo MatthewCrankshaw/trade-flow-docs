@@ -164,3 +164,25 @@ Full details: `.planning/milestones/v1.9-ROADMAP.md`
 | 35-40 | v1.7 | 13/13 | Complete | 2026-04-07 |
 | 41-50 | v1.8 | 46/46 | Complete | 2026-04-18 |
 | 51-57 | v1.9 | 26/26 | Complete | 2026-04-21 |
+
+### Phase 1: Job Detail Cleanup — Remove mocked data and wire real data
+
+**Goal:** Remove all hardcoded/mocked data from the job detail page, wire real API-sourced data, build a job events system for the timeline, and clean up UI sections that reference unbuilt features
+**Requirements**: TBD
+**Depends on:** Phase 0
+**Plans:** 3 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Job event backend module (entity, services, controller, tests)
+- [ ] 01-02-PLAN.md — Frontend mock removal and real data wiring
+- [ ] 01-03-PLAN.md — Inline event writes and timeline UI integration
+
+### Phase 2: Inline customer and job creation during quote/estimate creation
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 1
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 2 to break down)
