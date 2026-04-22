@@ -180,10 +180,12 @@ Plans:
 
 ### Phase 2: Inline customer and job creation during quote/estimate creation
 
-**Goal:** [To be planned]
-**Requirements**: TBD
+**Goal:** Enable inline entity creation so a tradesperson can go from zero (no customer, no job) to a complete quote or estimate in a single stacked-dialog flow, with auto-generated job titles and auto-selection of newly created entities
+**Requirements**: D-01, D-02, D-03, D-04, D-05, D-06, D-07, D-08, D-09, D-10, D-11, D-12
 **Depends on:** Phase 1
-**Plans:** 0 plans
+**Plans:** 3 plans
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 2 to break down)
+- [ ] 02-01-PLAN.md — Backend job title auto-generation (countByCustomerId + title pattern)
+- [ ] 02-02-PLAN.md — InlineCustomerForm component and CreateJobDialog stacked dialog integration
+- [ ] 02-03-PLAN.md — Estimate dialog parity verification and full creation chain visual checkpoint
