@@ -48,11 +48,11 @@ Exceptions: Stacked dialog backdrop offset -- each stacked dialog shifts 0px (ov
 | Role | Size | Weight | Line Height |
 |------|------|--------|-------------|
 | Body | 14px | 400 (regular) | 1.5 |
-| Label | 14px | 500 (medium) | 1.4 |
+| Label | 14px | 600 (semibold) | 1.4 |
 | Heading | 18px | 600 (semibold) | 1.2 |
 | Helper | 12px | 400 (regular) | 1.5 |
 
-Source: Existing trade-flow-ui conventions. 3 distinct sizes (12, 14, 18), 2 primary weights (400, 600) with 500 for labels only.
+Source: Existing trade-flow-ui conventions. 3 distinct sizes (12, 14, 18), 2 weights (400 regular, 600 semibold). Labels use 14px/600 to distinguish from 14px/400 body text via weight contrast.
 
 ---
 
@@ -66,6 +66,12 @@ Source: Existing trade-flow-ui conventions. 3 distinct sizes (12, 14, 18), 2 pri
 | Destructive | `bg-destructive` / `text-destructive` (semantic token) | Form validation error text, error border on invalid fields |
 
 Accent reserved for: Primary CTA buttons in each dialog (Create Quote, Create Estimate, Create Job, Create Customer), "+ New" action items in selectors, active/focused form field borders.
+
+---
+
+## Focal Point
+
+Primary visual anchor: the "Create Quote" / "Create Estimate" CTA button at the dialog footer. This is the highest-contrast element on screen (accent background, semibold text) and the terminal action the user works toward through the entire dialog chain.
 
 ---
 
@@ -169,7 +175,7 @@ The "+ New job" and "+ New customer" actions appear as the last item in their re
 | Position | Bottom of dropdown list, separated by a visual divider (`Separator`) |
 | Icon | `Plus` from lucide-react (16px), positioned before text |
 | Text color | `text-primary` (accent) |
-| Text weight | 500 (medium) |
+| Text weight | 600 (semibold) |
 | Hover | `bg-muted` background |
 | Cursor | `pointer` |
 | Behavior | Opens the corresponding inline creation dialog |
