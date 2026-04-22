@@ -612,6 +612,75 @@ Every deployment must pass these checks in order:
 - **Quick tasks:** Must not leave any repo with failing CI checks
 - **No suppression:** Do not use `eslint-disable`, `@ts-ignore`, `@ts-expect-error`, or `@ts-nocheck` to bypass checks -- fix the root cause
 
+## NestJS Module Discipline (trade-flow-api)
+
+Most `Nest can't resolve dependencies of the X (?)` bootstrap crashes come from four mistakes in module metadata. Whenever you add a provider, add a controller, or create a new `*.module.ts`, walk through every rule below before finishing. Reference: https://docs.nestjs.com/modules.
+
+### 1. A provider must be reachable in the module where it is injected
+
+A class `Foo` is reachable inside module `A` only if:
+- it appears in `A`'s own `providers`, **or**
+- it appears in the `exports` of a module listed in `A`'s `imports`, **or**
+- it appears in the `exports` of `@core/core.module.ts` (CoreModule is `@Global()`, so its exports are app-wide).
+
+Listing `Foo` in `providers` does not make it visible to other modules -- other modules also need it in `exports`.
+
+### 2. Cross-module injection = both `exports` AND `imports` must be set
+
+Example: `QuoteModule` injects `BusinessRetriever`. Required edits:
+- `business.module.ts` lists `BusinessRetriever` in `providers` AND `exports`.
+- `quote.module.ts` lists `BusinessModule` in `imports`.
+
+Miss either side and the app crashes on boot with `Nest can't resolve dependencies of the QuoteRetriever (?). Please make sure that the argument BusinessRetriever at index [N] is available in the QuoteModule context.` The error message always names the consuming class, the missing dependency, and the module it was looked up in -- read it carefully; it tells you exactly which edge of the graph is broken.
+
+### 3. Circular module imports require `forwardRef` on BOTH sides
+
+If `BusinessModule` imports `UserModule` and `UserModule` also imports `BusinessModule`, both modules must wrap the import:
+
+```ts
+// business.module.ts
+imports: [CoreModule, forwardRef(() => UserModule), ...]
+// user.module.ts
+imports: [CoreModule, forwardRef(() => BusinessModule), ...]
+```
+
+And the constructor that injects across the cycle must use `@Inject(forwardRef(() => OtherService))`. Before reaching for `forwardRef`, ask: "Can the shared piece be extracted into its own module?" -- a dedicated module is almost always cleaner than a cycle. The existing `forwardRef` usages in `business.module.ts` (`UserModule`, `QuoteSettingsModule`, `EstimateSettingsModule`) are load-bearing; do not remove them without first breaking the cycle.
+
+### 4. Every new module must be registered in `app.module.ts`
+
+A new `[feature].module.ts` file does nothing until it is added to the `imports` array of `src/app.module.ts`. Routes, providers, and module lifecycle hooks are all inert until it is registered there.
+
+### Standard feature-module shape
+
+Mirror the minimal example in `src/job-event/job-event.module.ts`:
+
+```ts
+@Module({
+  imports: [CoreModule /* plus any feature module whose exports you inject */],
+  controllers: [FeatureController],
+  providers: [
+    FeatureCreator,
+    FeatureRetriever,
+    FeatureUpdater,
+    FeatureRepository,
+    FeaturePolicy,
+  ],
+  exports: [/* only what other modules inject -- often a Retriever or Creator. May be empty. */],
+})
+export class FeatureModule {}
+```
+
+Additional rules:
+- Always import `CoreModule` explicitly even though it is `@Global()` -- keeps dependencies visible at a glance.
+- Never list the same provider class in two different modules' `providers`. Register it once in its owning module, `exports` it, and `imports` the owning module elsewhere. Double-registration silently creates two instances with separate state.
+- `exports` is a minimal public surface. Export only what is actually consumed externally; do not reflexively export every provider.
+- Do not add `@Global()` to a feature module. `CoreModule` is the only global module in this codebase.
+- Keep `providers`, `controllers`, `imports`, and `exports` arrays in the order shown above -- matches the existing convention across the repo.
+
+### Verification step before calling a module change "done"
+
+`npm run ci` runs tests + lint + format + typecheck but does NOT necessarily exercise the full DI container, so it can pass while the app is broken. After any change to a `*.module.ts`, a constructor signature, or a provider's `@Injectable()` decorator, start the API with `npm run start:dev` in `trade-flow-api` and confirm it reaches `Nest application successfully started`. If it logs `Nest can't resolve dependencies…`, the error names the exact class and the missing argument -- fix that edge before moving on.
+
 <!-- GSD:profile-start -->
 ## Developer Profile
 
