@@ -275,7 +275,7 @@ A job is the centre of the business -- Trade Flow helps tradespeople run their e
 ## Current State
 
 **Shipped:** v1.9 Support & Admin Tools (2026-04-21)
-**Current milestone:** Planning next milestone
+**Current milestone:** Post-v1.9 improvements — Phase 1 complete (Job Detail Cleanup)
 
 Trade Flow is a monetized SaaS product with a complete user acquisition funnel: public landing page, mandatory onboarding wizard, no-card free trial, and hard paywall. The core product flow -- from customer management through job tracking, quoting, estimates, and payment -- is fully functional. The platform now has a proper RBAC foundation with workflow-based permissions, a dedicated support dashboard with user management and membership metrics, role administration (grant/revoke support admin), and customer impersonation with time-limited sessions and full audit logging.
 
@@ -297,4 +297,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-21 after v1.9 milestone close*
+*Last updated: 2026-04-22 after Phase 1 (Job Detail Cleanup) completion*
