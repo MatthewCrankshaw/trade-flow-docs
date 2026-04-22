@@ -173,10 +173,10 @@ Full details: `.planning/milestones/v1.9-ROADMAP.md`
 **Plans:** 4 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Job event backend module (entity, services, controller, tests)
-- [ ] 01-02-PLAN.md — Frontend mock removal and real data wiring
-- [ ] 01-03-PLAN.md — Inline event writes in existing backend services
-- [ ] 01-04-PLAN.md — Frontend timeline UI and cache invalidation
+- [x] 01-01-PLAN.md — Job event backend module (entity, services, controller, tests)
+- [x] 01-02-PLAN.md — Frontend mock removal and real data wiring
+- [x] 01-03-PLAN.md — Inline event writes in existing backend services
+- [x] 01-04-PLAN.md — Frontend timeline UI and cache invalidation
 
 ### Phase 2: Inline customer and job creation during quote/estimate creation
 
