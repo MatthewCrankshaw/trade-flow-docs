@@ -360,22 +360,25 @@ interface InlineCustomerFormProps {
 | A4 | The inline customer creation only needs name (no other required fields on the API) | Code Examples | If API requires more fields, InlineCustomerForm needs more inputs |
 | A5 | Existing CreateJobDialog uses a Command/Combobox pattern for customer selection (not a plain Select) | Architecture Patterns | The "+ New customer" action integration differs for Select vs Command |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Does the customer create API accept name-only?**
    - What we know: D-02 says name only. The `create-customer.request.ts` exists but the actual required fields are not visible (no repo access).
    - What's unclear: Whether email/phone are required by the API validation decorators.
    - Recommendation: Check `create-customer.request.ts` at execution time. If other fields are required, either make them optional on the API or pass empty strings. The context decision says name-only.
+   - RESOLVED: 02-PATTERNS.md confirmed API requires `name` (string, 1-64 chars) and `customerType` (enum). Phone, email, billingAddress are all optional. InlineCustomerForm defaults customerType to "individual". Handled in Plan 02 Task 1.
 
 2. **Exact selector component type in CreateJobDialog**
    - What we know: Quick task #8 used Command/Combobox pattern in CreateQuoteDialog for job selection.
    - What's unclear: Whether CreateJobDialog uses the same Command pattern or a plain Select for customer selection.
    - Recommendation: Check at execution time. The "+ New" action works with both patterns (CommandItem vs SelectItem with a separator).
+   - RESOLVED: 02-PATTERNS.md confirmed CreateJobDialog uses Command/Combobox pattern for customer selection with CommandItem elements. Plan 02 Task 2 adds a CommandItem for "+ New customer".
 
 3. **Does CreateEstimateDialog exist yet or is it a new component?**
    - What we know: The CONTEXT.md references it as a canonical file. The estimates feature directory exists in STRUCTURE.md.
    - What's unclear: The exact current implementation (it may be a stub or fully implemented with a different pattern).
    - Recommendation: Executor must read the file and adapt accordingly.
+   - RESOLVED: 02-PATTERNS.md confirmed CreateEstimateForm already has the job-first pattern with inline job creation (CreateJobDialog integration). Plan 03 Task 1 verifies parity rather than building from scratch.
 
 ## Environment Availability
 
