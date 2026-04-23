@@ -1,5 +1,23 @@
 # Milestones
 
+## v1.10 Job Detail & Inline Creation (Shipped: 2026-04-22)
+
+**Phases completed:** 2 phases, 7 plans
+**Timeline:** 1 day (2026-04-22)
+
+**Key accomplishments:**
+
+- Job event backend module with full CRUD, timeline event types, and inline writes from quote/estimate/schedule services
+- Job detail page wired to real API data with all mock constants, unbuilt tabs, and stub UI removed
+- Job title auto-generation (`{JobType} - {CustomerName} #{N}`) for inline creation without explicit title
+- InlineCustomerForm component with name-only field and stacked dialog integration in CreateJobDialog
+- Full 3-level inline creation chain: quote/estimate -> new job -> new customer -> all auto-select back
+- Quote and estimate dialog parity verified with "+ New job" actions and customer auto-resolution
+
+Known deferred items at close: 21 (see STATE.md Deferred Items)
+
+---
+
 ## v1.9 Support & Admin Tools (Shipped: 2026-04-21)
 
 **Phases completed:** 7 phases, 26 plans, 37 tasks

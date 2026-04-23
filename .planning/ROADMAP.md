@@ -12,6 +12,7 @@
 - ✅ **v1.7 Onboarding & Landing Page** -- Phases 35-40 (shipped 2026-04-07)
 - ✅ **v1.8 Estimates** -- Phases 41-50 (shipped 2026-04-18)
 - ✅ **v1.9 Support & Admin Tools** -- Phases 51-57 (shipped 2026-04-21)
+- ✅ **v1.10 Job Detail & Inline Creation** -- Phases 1-2 (shipped 2026-04-22)
 
 ## Phases
 
@@ -150,6 +151,16 @@ Full details: `.planning/milestones/v1.9-ROADMAP.md`
 
 </details>
 
+<details>
+<summary>✅ v1.10 Job Detail & Inline Creation (Phases 1-2) -- SHIPPED 2026-04-22</summary>
+
+- [x] Phase 1: Job Detail Cleanup (4/4 plans) -- completed 2026-04-22
+- [x] Phase 2: Inline Customer and Job Creation (3/3 plans) -- completed 2026-04-22
+
+Full details: `.planning/milestones/v1.10-ROADMAP.md`
+
+</details>
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -164,28 +175,4 @@ Full details: `.planning/milestones/v1.9-ROADMAP.md`
 | 35-40 | v1.7 | 13/13 | Complete | 2026-04-07 |
 | 41-50 | v1.8 | 46/46 | Complete | 2026-04-18 |
 | 51-57 | v1.9 | 26/26 | Complete | 2026-04-21 |
-
-### Phase 1: Job Detail Cleanup — Remove mocked data and wire real data
-
-**Goal:** Remove all hardcoded/mocked data from the job detail page, wire real API-sourced data, build a job events system for the timeline, and clean up UI sections that reference unbuilt features
-**Requirements**: TBD
-**Depends on:** Phase 0
-**Plans:** 4 plans
-
-Plans:
-- [x] 01-01-PLAN.md — Job event backend module (entity, services, controller, tests)
-- [x] 01-02-PLAN.md — Frontend mock removal and real data wiring
-- [x] 01-03-PLAN.md — Inline event writes in existing backend services
-- [x] 01-04-PLAN.md — Frontend timeline UI and cache invalidation
-
-### Phase 2: Inline customer and job creation during quote/estimate creation
-
-**Goal:** Enable inline entity creation so a tradesperson can go from zero (no customer, no job) to a complete quote or estimate in a single stacked-dialog flow, with auto-generated job titles and auto-selection of newly created entities
-**Requirements**: D-01, D-02, D-03, D-04, D-05, D-06, D-07, D-08, D-09, D-10, D-11, D-12
-**Depends on:** Phase 1
-**Plans:** 3 plans
-
-Plans:
-- [x] 02-01-PLAN.md — Backend job title auto-generation (countByCustomerId + title pattern)
-- [x] 02-02-PLAN.md — InlineCustomerForm component and CreateJobDialog stacked dialog integration
-- [x] 02-03-PLAN.md — Estimate dialog parity verification and full creation chain visual checkpoint
+| 1-2 | v1.10 | 7/7 | Complete | 2026-04-22 |
