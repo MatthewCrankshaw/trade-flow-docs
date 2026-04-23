@@ -186,6 +186,6 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Backend job title auto-generation (countByCustomerId + title pattern)
-- [ ] 02-02-PLAN.md — InlineCustomerForm component and CreateJobDialog stacked dialog integration
-- [ ] 02-03-PLAN.md — Estimate dialog parity verification and full creation chain visual checkpoint
+- [x] 02-01-PLAN.md — Backend job title auto-generation (countByCustomerId + title pattern)
+- [x] 02-02-PLAN.md — InlineCustomerForm component and CreateJobDialog stacked dialog integration
+- [x] 02-03-PLAN.md — Estimate dialog parity verification and full creation chain visual checkpoint
